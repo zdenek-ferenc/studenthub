@@ -28,3 +28,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.input {
+  @apply w-full text-center border border-gray-300 rounded-2xl px-6 py-3 font-semibold text-black;
+  @apply focus:outline-none focus:ring-2 focus:ring-[var(--barva-primarni)] focus:border-transparent;
+  @apply transition-all;
+}
+
+/* Speciální styl pro input s datem, když NENÍ vyplněný, aby text vypadal jako placeholder */
+.input[type="date"]:invalid {
+  @apply text-gray-400;
+}
+
+/* Styl pro klasický placeholder u textových inputů */
+.input::placeholder {
+  @apply text-gray-400 font-semibold;
+}
