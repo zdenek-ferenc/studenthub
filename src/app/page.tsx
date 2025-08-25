@@ -36,7 +36,13 @@ export default function HomePage() {
     </div>
       </section>
       <StatsSection />
-
+      <Image
+        src="/sponzori.png"
+        alt="Partnerské startupy."
+        width={1900}
+        height={343}
+        className="w-1/2 mx-auto py-12 h-8xl rounded-lg"
+      />
     </div>
   );
 }
