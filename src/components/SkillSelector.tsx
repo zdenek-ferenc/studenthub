@@ -1,8 +1,6 @@
-// src/components/SkillSelector.tsx
-
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 type Skill = {
@@ -15,14 +13,21 @@ type SkillSelectorProps = {
   initialSelectedIds?: string[];
 };
 
+// Seznam nejdůležitějších dovedností, které se zobrazí na začátku
+const popularSkills = [
+  'Marketing', 'Copywriting', 'SEO', 'Sociální sítě', 'React', 
+  'Python', 'UI Design', 'UX Design', 'Figma', 'Canva', 
+  'Adobe Photoshop', 'Frontend', 'Backend', 'Analýza dat'
+];
+
 export default function SkillSelector({ onSelectionChange, initialSelectedIds = [] }: SkillSelectorProps) {
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // --- Stav pro vyhledávací text ---
   const [searchTerm, setSearchTerm] = useState('');
+  // Nový stav pro zobrazení všech dovedností
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const fetchSkills = async () => {
@@ -36,7 +41,7 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
         console.error("Chyba při načítání dovedností:", error);
         setError("Nepodařilo se načíst dovednosti.");
       } else {
-        setAllSkills(data);
+        setAllSkills(data || []);
       }
       setLoading(false);
     };
@@ -44,29 +49,41 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
     fetchSkills();
   }, []);
 
-const handleToggleSkill = (skillId: string) => {
-  const newSelectedIds = new Set(selectedIds);
-  if (newSelectedIds.has(skillId)) {
-    newSelectedIds.delete(skillId);
-  } else {
-    newSelectedIds.add(skillId);
-  }
-  
-  const updatedIds = Array.from(newSelectedIds);
-  setSelectedIds(updatedIds);
-  onSelectionChange(updatedIds);
-  setSearchTerm('');
-};
+  const handleToggleSkill = (skillId: string) => {
+    const newSelectedIds = new Set(selectedIds);
+    if (newSelectedIds.has(skillId)) {
+      newSelectedIds.delete(skillId);
+    } else {
+      newSelectedIds.add(skillId);
+    }
+    
+    const updatedIds = Array.from(newSelectedIds);
+    setSelectedIds(updatedIds);
+    onSelectionChange(updatedIds);
+    setSearchTerm('');
+  };
 
-const filteredSkills = allSkills.filter(skill => {
-  // Převedeme hledaný výraz na malá písmena jen jednou
-  const lowerCaseSearchTerm = searchTerm.toLowerCase();
-  
-  // Rozdělíme název dovednosti na jednotlivá slova a zkontrolujeme každé z nich
-  return skill.name.toLowerCase().split(' ').some(word => 
-    word.startsWith(lowerCaseSearchTerm)
-  );
-});
+  // Logika pro zobrazení dovedností
+  const displayedSkills = useMemo(() => {
+    if (searchTerm) {
+      return allSkills.filter(skill => 
+        skill.name.toLowerCase().split(' ').some(word => 
+          word.startsWith(searchTerm.toLowerCase())
+        )
+      );
+    }
+    if (showAll) {
+      return allSkills;
+    }
+    return allSkills.filter(skill => popularSkills.includes(skill.name));
+  }, [searchTerm, allSkills, showAll]);
+
+  // Dynamický nadpis
+  const getSkillsTitle = () => {
+    if (searchTerm) return "Výsledky vyhledávání";
+    if (showAll) return "Všechny dovednosti";
+    return "Populární dovednosti";
+  };
 
   if (loading) {
     return <p className='text-[var(--barva-primarni)] text-4xl font-bold'>Načítám dovednosti...</p>;
@@ -78,7 +95,6 @@ const filteredSkills = allSkills.filter(skill => {
 
   return (
     <div className='flex flex-col items-center'>
-      {/*Vyhledávací políčko*/}
       <input
         type="text"
         value={searchTerm}
@@ -87,20 +103,34 @@ const filteredSkills = allSkills.filter(skill => {
         className="flex min-w-[24rem] content-start m-auto mb-12 px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]"
       />
 
-      {/* Zde se zobrazují skill bubliny" */}
+      {/* Nadpis a tlačítko pro zobrazení všech */}
+      <div className="w-full flex justify-between items-center px-32 mb-8">
+            <h4 className="text-lg font-semibold opacity-70 text-[var(--barva-primarni)]">{getSkillsTitle()}</h4>
+            {!searchTerm && (
+                <button type="button" onClick={() => setShowAll(!showAll)} className="text-md font-semibold text-[var(--barva-primarni)] flex items-center gap-1">
+                    {showAll ? 'Skrýt' : 'Zobrazit vše'}
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${showAll ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            )}
+        </div>
+
+      {/* Zde se zobrazují skill bubliny */}
       <div className="flex flex-wrap justify-center gap-8 px-32">
-        {filteredSkills.map(skill => (
+        {displayedSkills.map(skill => (
           <button
-          key={skill.id}
-          onClick={() => handleToggleSkill(skill.id)}
-          className={`px-6 py-2 text-[var(--barva-primarni)] rounded-full font-light text-3xl outline-2 transition-colors duration-200 cursor-pointer
-            ${selectedIds.includes(skill.id)
-              ? 'bg-[var(--barva-primarni2)]' // Styl pro vybranou bublinu
-              : 'bg-white' // Styl pro nevybranou
-            }`}
-        >
-          {skill.name}
-        </button>
+            key={skill.id}
+            type="button"
+            onClick={() => handleToggleSkill(skill.id)}
+            className={`px-6 py-2 text-[var(--barva-primarni)] rounded-full font-light text-3xl outline-2 transition-colors duration-200 cursor-pointer
+              ${selectedIds.includes(skill.id)
+                ? 'bg-[var(--barva-primarni2)]' // Styl pro vybranou bublinu
+                : 'bg-white' // Styl pro nevybranou
+              }`}
+          >
+            {skill.name}
+          </button>
         ))}
       </div>
     </div>

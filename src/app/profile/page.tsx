@@ -1,21 +1,34 @@
 "use client";
 
 import { useAuth } from '../../contexts/AuthContext';
-import withAuth from '../../components/withAuth'; // Importujeme našeho strážce
+import withAuth from '../../components/withAuth';
+
+// Zatím si jen představujeme, že tyto komponenty existují.
+// V dalším kroku je vytvoříme.
+import StudentProfileView from './student-profile/StudentProfileView';
+import StartupProfileView from './startup-profile/StartupProfileView';
 
 function ProfilePage() {
-  // Díky strážci 'withAuth' máme 100% jistotu, že 'user' a 'profile' zde nebudou null.
-  const { user, profile } = useAuth();
+  // Vezmeme si data z našeho funkčního AuthContextu
+  const { profile, loading } = useAuth();
 
-  return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-4">Můj profil</h1>
-      <p>Vítej, <span className="font-semibold">{profile?.email}</span>!</p>
-      <p>Tvoje role je: <span className="font-semibold">{profile?.role}</span></p>
-      <p className="text-sm text-gray-500 mt-2">ID: {user?.id}</p>
-    </div>
-  );
+  // Během načítání zobrazíme jednoduchou zprávu
+  if (loading) {
+    return <p className="text-center py-20">Načítám...</p>;
+  }
+
+  // --- Tady je ta "výhybka" ---
+  // Podle role zobrazíme správnou komponentu
+  if (profile?.role === 'student') {
+    return <StudentProfileView />;
+  }
+
+  if (profile?.role === 'startup') {
+    return <StartupProfileView />;
+  }
+
+  // Záložní stav, pokud by se něco pokazilo
+  return <p className="text-center py-20">Profil se nepodařilo načíst nebo nemá platnou roli.</p>;
 }
 
-// Tady je ta magie: Exportujeme naši stránku "obalenou" do našeho strážce.
 export default withAuth(ProfilePage);

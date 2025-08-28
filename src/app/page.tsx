@@ -4,8 +4,8 @@ import StatsSection from '../components/StatsSection';
 
 export default function HomePage() {
   return (
-    <div className="mx-auto px-4 bg-[var(--barva-svetle-pozadi)] w-f">
-      <section className="py-24 sm:py-32 px-32 flex">
+    <div className="bg-[var(--barva-svetle-pozadi)] w-f">
+      <section className="py-24 sm:py-32 px-32 flex justify-center">
         <div className='text-left w-1/2'>
         <h1 className="text-4xl sm:text-7xl font-semibold text-[var(--barva-primarni)] leading-tight">
           Rozvíjej své dovednosti <br></br> na reálných výzvách.

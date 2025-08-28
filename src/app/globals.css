@@ -7,6 +7,7 @@
   --barva-primarni2: #CEE8FF;
   --barva-tmava: #003566;
   --barva-svetle-pozadi: #EFF8FF;
+  --barva-podtext: #00356675;
 }
 
 @theme inline {
@@ -23,6 +24,13 @@
   }
 }
 
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #006ACC #f0f0f0;
+}
+
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -30,10 +38,18 @@ body {
 }
 
 .input {
-  @apply w-full text-center border border-gray-300 rounded-2xl px-6 py-3 font-semibold text-black;
+  @apply w-full text-left border border-gray-300 rounded-2xl px-4 py-3 font-semibold text-black;
   @apply focus:outline-none focus:ring-2 focus:ring-[var(--barva-primarni)] focus:border-transparent;
   @apply transition-all;
 }
+
+.input2 {
+  @apply w-full text-left border border-gray-300 rounded-2xl px-12 py-3 font-semibold text-black;
+  @apply focus:outline-none focus:ring-2 focus:ring-[var(--barva-primarni)] focus:border-transparent;
+  @apply transition-all;
+}
+
+
 
 /* Speciální styl pro input s datem, když NENÍ vyplněný, aby text vypadal jako placeholder */
 .input[type="date"]:invalid {
@@ -42,5 +58,5 @@ body {
 
 /* Styl pro klasický placeholder u textových inputů */
 .input::placeholder {
-  @apply text-gray-400 font-semibold;
+  @apply text-gray-400 font-normal;
 }

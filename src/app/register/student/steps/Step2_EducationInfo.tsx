@@ -17,7 +17,7 @@ export default function Step2_EducationInfo({ onNext }: StepProps) {
 
   return (
     // Používáme stejný hlavní kontejner pro konzistentní vzhled
-    <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
+    <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xs bg-white'>
       <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-8">Vzdělání</h2>
       
       <form onSubmit={handleSubmit(onNext)} className="space-y-4">

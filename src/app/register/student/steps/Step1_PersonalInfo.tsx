@@ -1,5 +1,6 @@
 "use client";
 import { useForm } from 'react-hook-form';
+import { supabase } from '../../../../lib/supabaseClient'; // Uprav cestu
 
 type FormData = {
   first_name: string;
@@ -17,11 +18,9 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
   return (
-    // Tento hlavní kontejner nyní řídí šířku, centrování a vzhled.
     <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
       <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-8">Vytvoř si profil</h2>
       
-      {/* Formulář se už stará jen o rozestupy mezi prvky. */}
       <form onSubmit={handleSubmit(onNext)} className="space-y-4">
         
         <div>
@@ -29,7 +28,6 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
             id="first_name" 
             placeholder="Jméno"
             {...register('first_name', { required: 'Jméno je povinné' })} 
-            // Používáme jen jednu, čistou třídu definovanou v globals.css
             className="input" 
           />
           {errors.first_name && <p className="error text-center">{errors.first_name.message}</p>}
@@ -49,7 +47,21 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
           <input 
             id="username" 
             placeholder="Uživatelské jméno"
-            {...register('username', { required: 'Uživatelské jméno je povinné' })} 
+            {...register('username', { 
+                required: 'Uživatelské jméno je povinné',
+                minLength: { value: 3, message: 'Jméno musí mít alespoň 3 znaky.' },
+                // OPRAVA: Přidali jsme validaci unikátnosti
+                validate: async (value) => {
+                    const { data } = await supabase
+                        .from('StudentProfile')
+                        .select('username')
+                        .eq('username', value)
+                        .single();
+                    
+                    // Pokud data existují, jméno je zabrané
+                    return !data || 'Uživatelské jméno je již zabrané.';
+                }
+            })} 
             className="input" 
           />
           {errors.username && <p className="error text-center">{errors.username.message}</p>}
@@ -70,8 +82,6 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
             id="date_of_birth" 
             type="date"
             {...register('date_of_birth')} 
-            // Třída .input se postará o stejnou šířku.
-            // Přidáváme jen třídu pro barvu textu, když není vybráno datum.
             className="input" 
           />
         </div>
