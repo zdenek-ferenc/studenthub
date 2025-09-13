@@ -1,92 +1,120 @@
 "use client";
 
-import Link from 'next/link';
 import Image from 'next/image';
-import { useMemo } from 'react'; // Přidali jsme import pro useMemo
+import Link from 'next/link';
+import { CheckCircle } from 'lucide-react'; // Import ikony
 
-// Definujeme si typy pro data, která bude karta zobrazovat
+// Upravíme typy
 type Skill = { id: string; name: string; };
 type StartupProfile = { company_name: string; logo_url: string | null; };
 type Challenge = {
-id: string;
-title: string;
-short_description: string | null;
-budget_in_cents: number | null;
-deadline: string | null;
-created_at: string;
-max_applicants: number | null;
-ChallengeSkill: { Skill: Skill }[];
-Submission: { id: string }[];
-StartupProfile: StartupProfile | null;
+  id: string;
+  title: string;
+  short_description: string;
+  reward_first_place: number | null;
+  reward_second_place: number | null;
+  reward_third_place: number | null;
+  max_applicants: number | null;
+  deadline: string;
+  Submission: { student_id: string }[];
+  ChallengeSkill: { Skill: Skill }[];
+  StartupProfile: StartupProfile | null;
 };
 
-// Komponenta teď přijímá i pole IDček dovedností přihlášeného studenta
-export default function StudentChallengeCard({ challenge, studentSkillIds }: { challenge: Challenge, studentSkillIds: string[] }) {
-const applicantCount = challenge.Submission.length;
+// Komponenta pro zobrazení odměny
+const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
+    const rewards = [
+      challenge.reward_first_place,
+      challenge.reward_second_place,
+      challenge.reward_third_place,
+    ].filter((r): r is number => r !== null && r > 0);
+  
+    if (rewards.length === 0) {
+      return <span className="font-semibold">Nefinanční</span>;
+    }
+  
+    const topReward = Math.max(...rewards);
+    return <span className="font-bold text-lg">{topReward} Kč</span>
+};
 
-  // --- ZMĚNA ZDE: Seřadíme dovednosti před jejich zobrazením ---
-const sortedSkills = useMemo(() => {
-    return [...challenge.ChallengeSkill].sort((a, b) => {
+// Hlavní komponenta karty
+export default function StudentChallengeCard({ challenge, studentSkillIds = [], isApplied }: { challenge: Challenge, studentSkillIds?: string[], isApplied: boolean }) {
+  const applicantCount = challenge.Submission.length;
+
+  const sortedSkills = [...challenge.ChallengeSkill].sort((a, b) => {
     const aIsMatch = studentSkillIds.includes(a.Skill.id);
     const bIsMatch = studentSkillIds.includes(b.Skill.id);
-      // Jednoduchá logika: shodující se dovednosti mají vyšší prioritu
-    return (bIsMatch ? 1 : 0) - (aIsMatch ? 1 : 0);
-    });
-}, [challenge.ChallengeSkill, studentSkillIds]);
+    if (aIsMatch && !bIsMatch) return -1;
+    if (!aIsMatch && bIsMatch) return 1;
+    return 0;
+  });
 
-return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col h-full hover:shadow-xl transition-shadow duration-300">
-      {/* Horní část s logem a názvem */}
-    <div className="flex items-center gap-4 mb-4">
-        {challenge.StartupProfile?.logo_url ? (
-        <Image src={challenge.StartupProfile.logo_url} alt={`${challenge.StartupProfile.company_name} logo`} width={48} height={48} className="rounded-lg object-cover" />
-        ) : (
-        <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center font-bold text-gray-500">
-            {challenge.StartupProfile?.company_name?.substring(0, 2)}
-        </div>
-        )}
-        <div className='flex flex-col gap-1'>
-        <p className="font-medium text-lg text-gray-800">{challenge.StartupProfile?.company_name}</p>
-        <h3 className="font-bold text-xl text-[var(--barva-tmava)] -mt-1">{challenge.title}</h3>
-        </div>
-    </div>
-      {/* Střední část */}
-    <div className="flex-grow">
-        <div className='min-h-12 flex items-center'>
-            <p className="text-gray-600 text-md">{challenge.short_description}</p>
-        </div>
-        <div className="flex flex-wrap gap-2 mt-4 border-t-2 pt-6">
-          {/* Používáme nově seřazené pole 'sortedSkills' */}
-        {sortedSkills.map(({ Skill }) => {
-            const isMatch = studentSkillIds.includes(Skill.id);
-            return (
-            <span 
-                key={Skill.id} 
-                className={`px-4 py-1 text-sm rounded-full border-2 font-medium
-                ${isMatch 
-                    ? 'bg-[var(--barva-primarni2)] border-[var(--barva-primarni)] text-[var(--barva-primarni)]' // Zvýrazněný styl
-                    : 'border-[var(--barva-primarni)] text-[var(--barva-primarni)]' 
-                }`}
-            >
-                {Skill.name}
-            </span>
-            );
-        })}
-        </div>
-    </div>
-
-      {/* Spodní část */}
-    <div className="mt-6 border-t border-gray-100 pt-4">
-        <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4 text-sm text-gray-600 font-medium">
-                <span>👤 {applicantCount}/{challenge.max_applicants || '∞'}</span>
-                <span>🏆 {challenge.budget_in_cents ? `${challenge.budget_in_cents} Kč` : 'Nefinanční'}</span>
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-xs hover:shadow-none transition-all duration-300 ease-in-out border border-gray-100 flex flex-col h-full">
+      <div className="flex-grow">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {challenge.StartupProfile?.logo_url ? (
+              <Image src={challenge.StartupProfile.logo_url} alt="logo firmy" width={56} height={56} className="rounded-lg" />
+            ) : (
+              <div className="w-14 h-14 rounded-lg bg-gray-200 flex-shrink-0"></div>
+            )}
+            <div className='flex flex-col gap-1'>
+              <p className="font-semibold text-gray-700">{challenge.StartupProfile?.company_name}</p>
+              <h3 className="text-xl font-bold text-[var(--barva-tmava)] -mt-1">{challenge.title}</h3>
             </div>
-            <Link href={`/challenges/${challenge.id}`} className="px-5 py-2 text-sm rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
-                Přihlásit se
-            </Link>
+          </div>
+          {/* ZDE JE NOVÝ ŠTÍTEK */}
+          {isApplied && (
+            <div className="flex-shrink-0 flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full">
+              <CheckCircle size={14} />
+              <span>Přihlášeno</span>
+            </div>
+          )}
         </div>
+
+        <p className="text-gray-600 my-5 line-clamp-2 flex-grow">{challenge.short_description}</p>
+        
+        <div className="flex flex-wrap gap-2">
+          {sortedSkills.slice(0, 4).map(({ Skill }) => {
+              const isMatch = studentSkillIds.includes(Skill.id);
+              return (
+                  <span key={Skill.id} className={`flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-sm font-semibold transition-colors ${
+                      isMatch 
+                      ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border-[var(--barva-primarni)] font-semibold' 
+                      : 'bg-white text-gray-600 border-gray-300'
+                  }`}>
+                      {Skill.name}
+                  </span>
+              )
+          })}
+          {sortedSkills.length > 4 && (
+              <span className="text-sm text-gray-500 font-medium self-center">
+                  +{sortedSkills.length - 4}
+              </span>
+          )}
+        </div>
+      </div>
+
+      <div className="border-t border-gray-100 mt-4 pt-4 flex items-end justify-between">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-800 font-medium">
+            <div className="flex items-center gap-2">
+                <Image src="/icons/users.svg" alt="" width={16} height={16} />
+                <span>{applicantCount} / {challenge.max_applicants || '∞'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+                <Image src="/icons/award.svg" alt="" width={16} height={16} />
+                <RewardsDisplay challenge={challenge} />
+            </div>
+            <div className="col-span-2 flex items-center gap-2">
+                <Image src="/icons/calendar.svg" alt="" width={16} height={16} />
+                <span>{challenge.deadline ? new Date(challenge.deadline).toLocaleDateString('cs-CZ') : 'N/A'}</span>
+            </div>
+        </div>
+        <Link href={`/challenges/${challenge.id}`} className="px-4 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
+          Detail výzvy
+        </Link>
+      </div>
     </div>
-    </div>
-);
+  );
 }

@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
+"use client";
+
+import { AuthProvider } from '../contexts/AuthContext';
+import { ChallengesProvider } from '../contexts/ChallengesContext';
+import { DataProvider } from '../contexts/DataContext';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import MainContent from '../components/MainContent';
+import './globals.css';
 import { Sora } from "next/font/google";
-import "./globals.css";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { AuthProvider } from "../contexts/AuthContext";
+import ToastContainer from '../components/ToastContainer'; // <-- 1. IMPORTUJ TOAST
 
 const sora = Sora({
   subsets: ["latin"],
-  variable: '--font-sora', // Toto je stále klíčové
+  variable: '--font-sora',
 });
-
-export const metadata: Metadata = {
-  title: "StudentHub",
-  description: "Platforma pro studenty a startupy",
-};
 
 export default function RootLayout({
   children,
@@ -22,14 +22,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="cs">
-      <body className={sora.className}>
+      <body className={sora.variable}>
         <AuthProvider>
-          <Header />
-          <main className="main-content">
-            {children}
-          </main>
-          <Footer />
-        </AuthProvider>        
+          <ChallengesProvider>
+            <DataProvider>
+              <Header />
+              <MainContent>
+                {children}
+              </MainContent>
+              <Footer />
+              <ToastContainer />
+            </DataProvider>
+          </ChallengesProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '../../../lib/supabaseClient';
 import Link from 'next/link';
 
 import StartupInfoCard from './StartupInfoCard';
 import StartupCategoriesCard from './StartupCategoriesCard';
-import StartupChallengeCard from './StartupChallengesCard'; 
+import StartupChallengeCard from './StartupChallengesCard';
 
-// OPRAVA: Definujeme si přesné typy pro data
 type StartupProfileData = {
   company_name: string;
   website: string;
@@ -24,14 +23,13 @@ type StartupProfileData = {
   contact_position?: string;
 };
 
-type CategoryData = { 
-  Category: { 
-    id: string; 
-    name: string; 
-  } | null 
+type CategoryData = {
+  Category: {
+    id: string;
+    name: string;
+  } | null
 };
 
-// Vytvoříme si nový typ pro validní kategorie, který budeme předávat dál
 export type ValidCategoryData = {
     Category: {
         id: string;
@@ -44,6 +42,7 @@ type ChallengeData = {
   title: string;
   deadline: string | null;
   status: 'draft' | 'open' | 'closed' | 'archived';
+  Submission: { status: string }[];
   StartupProfile: {
     company_name: string;
     logo_url: string | null;
@@ -64,7 +63,7 @@ export default function StartupProfileView() {
       const [profileRes, categoriesRes, challengesRes] = await Promise.all([
         supabase.from('StartupProfile').select('*').eq('user_id', user.id).single(),
         supabase.from('StartupCategory').select('Category(*)').eq('startup_id', user.id),
-        supabase.from('Challenge').select('*, StartupProfile(*)').eq('startup_id', user.id)
+        supabase.from('Challenge').select('*, StartupProfile(*), Submission(status)').eq('startup_id', user.id)
       ]);
 
       if (profileRes.data) setProfileData(profileRes.data);
@@ -77,32 +76,54 @@ export default function StartupProfileView() {
     fetchProfileData();
   }, [user]);
 
+  // --- VŠECHNY HOOKY A DEKLARACE PŘESUNUTY NA ZAČÁTEK ---
+  const activeChallenges = useMemo(() => challenges.filter(c => c.status === 'open' || c.status === 'draft'), [challenges]);
+  const completedChallenges = useMemo(() => challenges.filter(c => c.status === 'closed' || c.status === 'archived'), [challenges]);
+
+  const sortedActiveChallenges = useMemo(() => {
+      const getNeedsAttention = (challenge: ChallengeData) => {
+          const isPastDeadline = challenge.deadline ? new Date() > new Date(challenge.deadline) : false;
+          const hasUnreviewedSubmissions = challenge.Submission?.some(
+              s => s.status === 'applied' || s.status === 'submitted'
+          );
+          return isPastDeadline && hasUnreviewedSubmissions;
+      };
+      
+      return [...activeChallenges].sort((a, b) => {
+          const aNeedsAttention = getNeedsAttention(a);
+          const bNeedsAttention = getNeedsAttention(b);
+
+          if (aNeedsAttention && !bNeedsAttention) return -1;
+          if (!bNeedsAttention && aNeedsAttention) return 1;
+
+          const dateA = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+          const dateB = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+          
+          return dateA - dateB;
+      });
+  }, [activeChallenges]);
+
+  const validCategories: ValidCategoryData[] = useMemo(() => categories.filter(
+    (c): c is ValidCategoryData => c.Category !== null
+  ), [categories]);
+
+  // Až teď, když jsou všechny hooky zavolané, můžeme mít podmíněný return
   if (loading) {
     return <p className="text-center py-20">Načítám profil startupu...</p>;
   }
-
-  const activeChallenges = challenges.filter(c => c.status === 'open' || c.status === 'draft');
-  const completedChallenges = challenges.filter(c => c.status === 'closed' || c.status === 'archived');
-  
-  // OPRAVA: Filtrujeme kategorie a zároveň je přetypujeme na bezpečný typ
-  const validCategories: ValidCategoryData[] = categories.filter(
-    (c): c is ValidCategoryData => c.Category !== null
-  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-2/3 mx-auto mt-12 mb-24">
       <div className="lg:col-span-2 space-y-8">
         <StartupInfoCard profile={profileData} />
-        {/* Předáváme jen validní kategorie */}
         <StartupCategoriesCard categories={validCategories} />
       </div>
       <div className="space-y-8">
-        {/* Sekce pro aktivní výzvy */}
         <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
             <h3 className="text-xl text-center text-[var(--barva-tmava)] font-bold mb-4">Aktivní výzvy</h3>
-            {activeChallenges.length > 0 ? (
+            {sortedActiveChallenges.length > 0 ? (
                 <div className="space-y-3">
-                    {activeChallenges.map(challenge => 
+                    {sortedActiveChallenges.map(challenge => 
                         <StartupChallengeCard key={challenge.id} challenge={challenge} />
                     )}
                 </div>
@@ -111,14 +132,13 @@ export default function StartupProfileView() {
                     <p>Žádné aktivní výzvy.</p>
                 </div>
             )}
-            <div className='pt-6 text-center'>
-                <Link href="/challenges/create" className="px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold text-sm">
+            <div className='pt-7 text-center'>
+                <Link href="/challenges/create" className="px-4 py-3 leading-none rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-md cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out">
                     Vytvořit novou výzvu
                 </Link>
             </div>
         </div>
         
-        {/* Sekce pro ukončené výzvy */}
         <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
             <h3 className="text-xl text-center text-[var(--barva-tmava)] font-bold mb-4">Ukončené výzvy</h3>
             {completedChallenges.length > 0 ? (

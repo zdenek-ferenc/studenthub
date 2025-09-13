@@ -7,11 +7,11 @@ import Image from 'next/image';
 import { supabase } from '../../../lib/supabaseClient';
 import { Session, User, Provider } from '@supabase/supabase-js';
 
-// OPRAVA 1: Opraveny cesty k importům
 import Step1_PersonalInfo from './steps/Step1_PersonalInfo';
 import Step2_EducationInfo from './steps/Step2_EducationInfo';
 import Step3_Skills from './steps/Step3_Skills';
 import Step4_Languages from './steps/Step4_Languages';
+import ConfirmationModal from '../../../components/ConfirmationModal'; // Import modálního okna
 
 // --- VÝVOJÁŘSKÝ PŘEPÍNAČ ---
 const IS_DEVELOPMENT_MODE = false; 
@@ -59,11 +59,11 @@ export default function StudentRegistrationPage() {
   const [loading, setLoading] = useState(!IS_DEVELOPMENT_MODE);
   const router = useRouter();
 
-  // Stavy pro vlastní registrační formulář
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [showEmailRegister, setShowEmailRegister] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Nový stav pro modální okno
 
   useEffect(() => {
     if (IS_DEVELOPMENT_MODE) {
@@ -94,29 +94,24 @@ export default function StudentRegistrationPage() {
     setError(null);
     setLoading(true);
 
-    // Krok 1: Zkontrolujeme, jestli uživatel s tímto e-mailem už existuje v naší tabulce 'User'
     const { data: existingUser, error: checkError } = await supabase
       .from('User')
       .select('email')
       .eq('email', email)
       .single();
 
-    // 'PGRST116' je kód pro "řádek nebyl nalezen", což je v tomto případě správně.
-    // Pokud nastane jakákoliv jiná chyba, zobrazíme ji.
     if (checkError && checkError.code !== 'PGRST116') {
         setError("Došlo k chybě při ověřování e-mailu.");
         setLoading(false);
         return;
     }
       
-    // Pokud data existují, znamená to, že e-mail je zabraný.
     if (existingUser) {
       setError("Uživatel s tímto e-mailem již existuje.");
       setLoading(false);
       return;
     }
 
-    // Krok 2: Pokud e-mail neexistuje, pokračujeme v registraci
     const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -128,8 +123,7 @@ export default function StudentRegistrationPage() {
     if (signUpError) {
         setError("Registrace se nezdařila. Zkuste to prosím znovu.");
     } else {
-        alert("Potvrzovací e-mail byl odeslán. Zkontrolujte si prosím schránku.");
-        setShowEmailRegister(false); // Vrátíme se na výběr
+        setIsModalOpen(true); // Otevře modální okno namísto alertu
     }
     setLoading(false);
   };
@@ -261,6 +255,18 @@ export default function StudentRegistrationPage() {
           </div>
         </div>
       )}
+      
+      {/* Nové modální okno pro potvrzení e-mailu */}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={() => {
+            setIsModalOpen(false);
+            setShowEmailRegister(false);
+        }}
+        title="E-mail odeslán"
+        message="Potvrzovací e-mail byl odeslán na vaši adresu. Zkontrolujte si prosím schránku a dokončete registraci."
+      />
     </div>
   );
 }

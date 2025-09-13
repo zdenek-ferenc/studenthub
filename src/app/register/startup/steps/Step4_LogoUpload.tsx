@@ -1,19 +1,19 @@
 "use client";
 import { useState } from 'react';
-import { supabase } from '../../../../lib/supabaseClient'; // Uprav cestu, pokud je potřeba
+import { supabase } from '../../../../lib/supabaseClient';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 type StepProps = {
-  onNext: (data: { logo_url: string }) => void;
-  userId: string; // Potřebujeme ID uživatele pro unikátní cestu k souboru
+  onNext: (data: { logo_url: string | null }) => void;
+  userId: string;
 };
 
 export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useAuth();
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      setError(null);
       const file = event.target.files?.[0];
       if (!file) {
         return;
@@ -21,11 +21,9 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
 
       setUploading(true);
 
-      // Vytvoříme unikátní název souboru, aby se nepřepsala loga jiných firem
       const fileExt = file.name.split('.').pop();
       const filePath = `${userId}-${Date.now()}.${fileExt}`;
 
-      // Nahrajeme soubor do Supabase Storage do "bucketu" s názvem 'logos'
       const { data, error: uploadError } = await supabase.storage
         .from('logos')
         .upload(filePath, file);
@@ -34,16 +32,19 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
         throw uploadError;
       }
 
-      // Získáme veřejnou URL nahraného souboru
       const { data: { publicUrl } } = supabase.storage
         .from('logos')
         .getPublicUrl(data.path);
       
-      // Předáme URL rodičovské komponentě a ta dokončí registraci
       onNext({ logo_url: publicUrl });
+      showToast("Logo bylo úspěšně nahráno!", 'success');
 
-    } catch (error) { // OPRAVA: Odstranili jsme ': any' pro lepší typovou bezpečnost
-      setError('Nahrávání selhalo. Zkuste to prosím znovu.');
+    } catch (error: unknown) { // <-- ZMĚNA ZDE
+      let errorMessage = 'Nahrávání selhalo. Zkuste to prosím znovu.';
+      if (error instanceof Error) {
+        errorMessage = `Nahrávání selhalo: ${error.message}`;
+      }
+      showToast(errorMessage, 'error');
       console.error('Chyba při nahrávání loga:', error);
     } finally {
       setUploading(false);
@@ -57,16 +58,14 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
         <p className="text-gray-600 mb-6">Nahrajte své logo. Tento krok můžete přeskočit.</p>
         
         <div className='my-12'>
-          {/* Skrytý input pro výběr souboru */}
           <input 
             type="file" 
             id="logoUpload" 
-            accept="image/*" // Povolíme jen obrázky
+            accept="image/*"
             onChange={handleUpload} 
             disabled={uploading} 
             className="hidden" 
           />
-          {/* Tlačítko, které vizuálně nahrazuje input */}
           <label 
             htmlFor="logoUpload" 
             className={`cursor-pointer px-12 py-4 rounded-3xl text-xl font-semibold transition-all duration-300 ease-in-out
@@ -78,12 +77,10 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
             {uploading ? 'Nahrávám...' : 'Vybrat soubor z počítače'}
           </label>
         </div>
-
-        {error && <p className="error text-center">{error}</p>}
         
         <div className="pt-6 flex justify-center">
           <button 
-            onClick={() => onNext({ logo_url: '' })} // Pošleme prázdný string, pokud uživatel přeskočí
+            onClick={() => onNext({ logo_url: null })}
             className="text-gray-500 hover:text-gray-800 hover:underline"
           >
             Přeskočit a dokončit registraci

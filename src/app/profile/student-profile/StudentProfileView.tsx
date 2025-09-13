@@ -1,18 +1,16 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../../contexts/AuthContext'; // Uprav cestu
-import { supabase } from '../../../lib/supabaseClient'; // Uprav cestu
+import { useAuth } from '../../../contexts/AuthContext';
+import { supabase } from '../../../lib/supabaseClient';
 import Link from 'next/link';
-import Image from 'next/image';
 
-// Přejmenovali jsme komponenty pro lepší přehlednost
 import StudentInfoCard from './StudentInfoCard';
 import StudentSkillsCard from './StudentSkillsCard';
-// Importujeme naši novou kartu pro zobrazení výzvy
-import ProfileChallengeCard from './StudentChallengesCard';
+// Použijeme jen jednu, jednoduchou kartu pro odkaz
+import ProfileChallengeCard from './StudentChallengesCard'; 
 
-// Definujeme si typy pro data
+// Typy můžeme zjednodušit, nepotřebujeme už tolik detailů přímo na profilu
 type StudentProfileData = {
   first_name: string;
   last_name: string;
@@ -21,10 +19,11 @@ type StudentProfileData = {
   field_of_study: string;
   bio: string | null;
 };
-type SkillData = { Skill: { id: string; name: string; } };
+type SkillData = { Skill: { id: string; name:string; } };
 type LanguageData = { Language: { id: string; name: string; } };
-// Nový typ pro data o přihlášené výzvě
-type AppliedChallenge = {
+
+type SubmissionWithChallenge = {
+  status: string | null;
   Challenge: {
     id: string;
     title: string;
@@ -40,27 +39,28 @@ export default function StudentProfileView() {
   const [profileData, setProfileData] = useState<StudentProfileData | null>(null);
   const [skills, setSkills] = useState<SkillData[]>([]);
   const [languages, setLanguages] = useState<LanguageData[]>([]);
-  // Nový stav pro uložení výzev, do kterých se student přihlásil
-  const [appliedChallenges, setAppliedChallenges] = useState<AppliedChallenge[]>([]);
+  const [submissions, setSubmissions] = useState<SubmissionWithChallenge[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchProfileData = async () => {
-      // Načteme všechna data najednou, včetně přihlášených výzev
-      const [profileRes, skillsRes, languagesRes, challengesRes] = await Promise.all([
+      const [profileRes, skillsRes, languagesRes, submissionsRes] = await Promise.all([
         supabase.from('StudentProfile').select('*').eq('user_id', user.id).single(),
         supabase.from('StudentSkill').select('Skill(*)').eq('student_id', user.id),
         supabase.from('StudentLanguage').select('Language(*)').eq('student_id', user.id),
-        // Tento dotaz získá všechny výzvy, do kterých se student přihlásil
-        supabase.from('Submission').select('Challenge(*, StartupProfile(company_name, logo_url))').eq('student_id', user.id)
+        // Stále načítáme všechna řešení s detaily o výzvě
+        supabase
+            .from('Submission')
+            .select('status, Challenge(*, StartupProfile(company_name, logo_url))')
+            .eq('student_id', user.id)
       ]);
 
       if (profileRes.data) setProfileData(profileRes.data);
       if (skillsRes.data) setSkills(skillsRes.data as unknown as SkillData[]);
       if (languagesRes.data) setLanguages(languagesRes.data as unknown as LanguageData[]);
-      if (challengesRes.data) setAppliedChallenges(challengesRes.data as unknown as AppliedChallenge[]);
+      if (submissionsRes.data) setSubmissions(submissionsRes.data as unknown as SubmissionWithChallenge[]);
       
       setLoading(false);
     };
@@ -68,66 +68,58 @@ export default function StudentProfileView() {
     fetchProfileData();
   }, [user]);
 
+  const activeChallenges = submissions.filter(s => s.status === 'applied' || s.status === 'submitted');
+  const completedChallenges = submissions.filter(s => s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected');
+
   if (loading) {
     return <p className="text-center py-20">Načítám profil studenta...</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-2/3 mx-auto mt-12 mb-24">
+    <div className='w-2/3 mx-auto pt-12'>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mx-auto">
       <div className="lg:col-span-2 space-y-8">
         <StudentInfoCard profile={profileData} />
         <StudentSkillsCard skills={skills} languages={languages} />
       </div>
       <div className="space-y-8">
-        {/* Sekce pro aktuální výzvy */}
-        <div className="bg-white p-8 py-4 rounded-2xl shadow-xs">
-            <h3 className="text-xl text-center text-[var(--barva-tmava)] font-bold mb-4">Aktuální výzvy</h3>
-            {appliedChallenges.length > 0 ? (
-              <div className='flex flex-col justify-center'>
+        
+        <div className="bg-white p-6 rounded-2xl shadow-xs">
+            <h3 className="text-xl text-center text-[var(--barva-tmava)] font-bold mb-4">Aktivní výzvy</h3>
+            {activeChallenges.length > 0 ? (
                 <div className="space-y-4">
-                    {appliedChallenges.map(item => 
+                    {activeChallenges.map(item => 
                         item.Challenge ? <ProfileChallengeCard key={item.Challenge.id} challenge={item.Challenge} /> : null
                     )}
                 </div>
-                <button className="mt-6 w-1/2 mx-auto px-3 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">Najít výzvu</button>
-              </div>
-                
-                
             ) : (
-                <div className="text-center">
-                    <Image
-                        src="/frown.svg"
-                        alt="Smutný smajlík"
-                        width={50}
-                        height={50}
-                        className="w-12 mx-auto my-4"
-                    />
-                    <p className="text-gray-500">Nic tady není</p>
-                    <Link href="/challenges" className="inline-block mt-6 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
-                        Najít výzvu
+                <div className="text-center py-4">
+                    <p className="text-gray-500">Momentálně nepracuješ na žádné výzvě.</p>
+                    <Link href="/challenges" className="inline-block mt-4 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer text-sm">
+                        Najít novou výzvu
                     </Link>
                 </div>
             )}
         </div>
         
-        {/* Sekce pro hotové výzvy (zatím prázdný stav) */}
-        <div className="bg-white p-8 py-4 rounded-2xl shadow-xs">
+        <div className="bg-white p-6 rounded-2xl shadow-xs">
             <h3 className="text-xl text-center text-[var(--barva-tmava)] font-bold mb-4">Hotové výzvy</h3>
-            <div className="text-center">
-                <Image
-                    src="/frown.svg"
-                    alt="Smutný smajlík"
-                    width={50}
-                    height={50}
-                    className="w-12 mx-auto my-4"
-                />
-                <p className="text-gray-500">Nic tady není</p>
-                <Link href="/challenges" className="inline-block mt-6 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
-                        Najít výzvu
-                    </Link>
-            </div>
+            {completedChallenges.length > 0 ? (
+                <div className="space-y-4">
+                    {/* Zde je ta změna - i pro hotové výzvy použijeme stejnou odkazovací kartu */}
+                    {completedChallenges.map(item => 
+                        item.Challenge ? <ProfileChallengeCard key={item.Challenge.id} challenge={item.Challenge} /> : null
+                    )}
+                </div>
+            ) : (
+                 <div className="text-center py-4">
+                    <p className="text-gray-500">Zatím jsi nedokončil žádnou výzvu.</p>
+                </div>
+            )}
         </div>
       </div>
     </div>
+    </div>
+    
   );
 }

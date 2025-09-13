@@ -12,6 +12,7 @@ import Step1_CompanyInfo from './steps/Step1_CompanyInfo';
 import Step2_ContactPerson from './steps/Step2_ContactPerson';
 import Step3_Categories from './steps/Step3_Categories';
 import Step4_LogoUpload from './steps/Step4_LogoUpload';
+import ConfirmationModal from '../../../components/ConfirmationModal'; // Import modálního okna
 
 // --- VÝVOJÁŘSKÝ PŘEPÍNAČ ---
 const IS_DEVELOPMENT_MODE = false; 
@@ -58,11 +59,11 @@ export default function StartupRegistrationPage() {
   const [loading, setLoading] = useState(!IS_DEVELOPMENT_MODE);
   const router = useRouter();
 
-  // Stavy pro vlastní registrační formulář
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [showEmailRegister, setShowEmailRegister] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Nový stav pro modální okno
 
   useEffect(() => {
     if (IS_DEVELOPMENT_MODE) {
@@ -88,20 +89,18 @@ export default function StartupRegistrationPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // --- PŘIDANÁ LOGIKA PRO VALIDACI E-MAILU ---
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    // Krok 1: Zkontrolujeme, jestli uživatel s tímto e-mailem už existuje v naší tabulce 'User'
     const { data: existingUser, error: checkError } = await supabase
       .from('User')
       .select('email')
       .eq('email', email)
       .single();
 
-    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = řádek nebyl nalezen, což je v pořádku
+    if (checkError && checkError.code !== 'PGRST116') {
         setError("Došlo k chybě při ověřování e-mailu.");
         setLoading(false);
         return;
@@ -113,7 +112,6 @@ export default function StartupRegistrationPage() {
       return;
     }
 
-    // Krok 2: Pokud e-mail neexistuje, pokračujeme v registraci
     const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -125,8 +123,7 @@ export default function StartupRegistrationPage() {
     if (signUpError) {
         setError("Registrace se nezdařila. Zkuste to prosím znovu.");
     } else {
-        alert("Potvrzovací e-mail byl odeslán. Zkontrolujte si prosím schránku.");
-        setShowEmailRegister(false);
+        setIsModalOpen(true); // Otevře modální okno namísto alertu
     }
     setLoading(false);
   };
@@ -243,7 +240,7 @@ export default function StartupRegistrationPage() {
               <p className="text-center text-sm text-gray-600 mt-8">
                 Už máte účet?{' '}
                 <Link href="/login" className="font-semibold text-[var(--barva-primarni)] hover:underline">
-                  Přihlaste se
+                  Přihlašte se
                 </Link>
               </p>
             </div>
@@ -260,6 +257,19 @@ export default function StartupRegistrationPage() {
           </div>
         </div>
       )}
+      
+      {/* Nové modální okno pro potvrzení e-mailu */}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={() => {
+            setIsModalOpen(false);
+            setShowEmailRegister(false);
+        }}
+        title="E-mail odeslán"
+        message="Potvrzovací e-mail byl odeslán na vaši adresu. Zkontrolujte si prosím schránku a dokončete registraci."
+      />
+
     </div>
   );
 }

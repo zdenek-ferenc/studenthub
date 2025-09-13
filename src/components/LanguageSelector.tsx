@@ -80,7 +80,7 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
         className="flex min-w-[24rem] content-start m-auto mb-12 px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]" // Používáme stejnou třídu jako u ostatních inputů
       />
 
-      <div className="flex flex-wrap gap-3 min-h-[12rem] content-start">
+      <div className="flex flex-wrap justify-center gap-3 min-h-[12rem] content-start">
         {filteredLanguages.map(lang => (
           <button
             key={lang.id}

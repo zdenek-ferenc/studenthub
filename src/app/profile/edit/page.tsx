@@ -1,0 +1,38 @@
+"use client";
+
+import { useAuth } from '../../../contexts/AuthContext';
+import withAuth from '../../../components/withAuth';
+import StudentEditForm from './StudentEditForm'; // Tuto komponentu vytvoříme
+import StartupEditForm from './StartupEditForm';   // Tuto komponentu vytvoříme
+import Link from 'next/link';
+
+function EditProfilePage() {
+  const { profile, loading } = useAuth();
+
+  if (loading) {
+    return <p className="text-center py-20">Načítání profilu...</p>;
+  }
+
+  // "Výhybka" - podle role zobrazíme správný formulář
+  const renderForm = () => {
+    if (profile?.role === 'student') {
+      return <StudentEditForm />;
+    }
+    if (profile?.role === 'startup') {
+      return <StartupEditForm />;
+    }
+    return <p>Váš profil nemá platnou roli pro úpravy.</p>;
+  };
+
+  return (
+    <div className="container mx-auto py-12 px-4">
+        <div className="mb-8">
+            <Link href="/profile" className="text-gray-500 hover:text-[var(--barva-primarni)] transition-colors">Zpět na profil</Link>
+            <h1 className="text-4xl font-bold text-[var(--barva-tmava)] mt-2">Upravit profil</h1>
+        </div>
+        {renderForm()}
+    </div>
+  );
+}
+
+export default withAuth(EditProfilePage);

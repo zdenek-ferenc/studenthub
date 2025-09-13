@@ -1,8 +1,8 @@
 "use client";
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../../contexts/AuthContext'; // Uprav cestu, pokud je potřeba
-import { supabase } from '../../../lib/supabaseClient'; // Uprav cestu, pokud je potřeba
+import { useAuth } from '../../../contexts/AuthContext';
+import { supabase } from '../../../lib/supabaseClient';
 
 type StartupProfileData = {
   company_name: string;
@@ -12,12 +12,11 @@ type StartupProfileData = {
 };
 
 export default function StartupInfoCard({ profile }: { profile: StartupProfileData | null }) {
-  const { user } = useAuth();
+  const { user, showToast } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [descriptionText, setDescriptionText] = useState(profile?.description || '');
   const [saving, setSaving] = useState(false);
 
-  // Efekt pro aktualizaci textu, pokud se změní profil
   useEffect(() => {
     setDescriptionText(profile?.description || '');
   }, [profile]);
@@ -28,18 +27,14 @@ export default function StartupInfoCard({ profile }: { profile: StartupProfileDa
     setSaving(true);
     const { error } = await supabase
       .from('StartupProfile')
-      .update({ description: descriptionText }) // Ukládáme do sloupce 'description'
+      .update({ description: descriptionText })
       .eq('user_id', user.id);
 
     if (error) {
-      alert('Chyba při ukládání popisu.');
-      console.error(error);
+      showToast(`Chyba při ukládání: ${error.message}`, 'error');
     } else {
-      // Po úspěšném uložení vypneme editační mód
-      // Zde by bylo ideální znovu načíst data profilu, aby se změna projevila,
-      // ale pro jednoduchost zatím jen vypneme editaci.
       setIsEditing(false);
-      // Můžeme také optimisticky aktualizovat lokální stav, ale to vynecháme.
+      showToast('Popis byl úspěšně uložen!', 'success');
     }
     setSaving(false);
   };
@@ -60,18 +55,15 @@ export default function StartupInfoCard({ profile }: { profile: StartupProfileDa
         </div>
       </div>
       
-      {/* Sekce pro popis s logikou pro editaci */}
       <div className="mt-6">
-        {descriptionText && !isEditing && (
+        {descriptionText && !isEditing ? (
           <div>
             <p className="text-gray-700 whitespace-pre-wrap">{descriptionText}</p>
             <button onClick={() => setIsEditing(true)} className="cursor-pointer mt-6 text-md rounded-full text-[var(--barva-primarni)] font-semibold hover:text-[#014688] transition-all duration-300">
               Upravit popis
             </button>
           </div>
-        )}
-
-        {(!descriptionText || isEditing) && (
+        ) : (
           <div className="space-y-3">
             <textarea
               value={descriptionText}
@@ -79,16 +71,16 @@ export default function StartupInfoCard({ profile }: { profile: StartupProfileDa
               placeholder="Řekněte nám něco o vaší firmě, vizi a co hledáte..."
               className="w-full min-h-[120px] rounded-lg border border-gray-200 bg-gray-50 p-3 text-base text-[var(--barva-tmava)] placeholder-gray-400 transition-colors focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
             />
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <button 
                 onClick={handleSaveDescription} 
                 disabled={saving} 
-                className="text-sm rounded-2xl text-[var(--barva-primarni)] font-semibold cursor-pointer hover:text-[#295f91] transition-all duration-300 ease-in-out"
+                className="cursor-pointer text-md rounded-full text-[var(--barva-primarni)] font-semibold hover:text-[#014688] transition-all duration-300 disabled:text-gray-400"
               >
                 {saving ? 'Ukládám...' : 'Uložit popis'}
               </button>
               {isEditing && (
-                <button onClick={() => setIsEditing(false)} className="px-6 text-sm font-semibold text-gray-600 hover:bg-gray-100">
+                <button onClick={() => setIsEditing(false)} className="cursor-pointer text-md rounded-full text-gray-500 hover:text-gray-800 transition-all duration-300">
                     Zrušit
                 </button>
               )}
