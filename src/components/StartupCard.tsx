@@ -71,7 +71,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
         </p>
 
         {/* --- ZMĚNA ZDE: POUŽITÍ NOVÉ FUNKCE --- */}
-        <div className="flex items-center gap-6 mb-5 text-sm font-medium text-gray-500">
+        <div className="flex items-center gap-4 mb-5 text-sm font-medium text-gray-500">
           <div className="flex items-center gap-1.5">
             <Briefcase className="text-blue-500" size={18} />
             <span>{formatChallengeText(activeChallenges, 'active')}</span>

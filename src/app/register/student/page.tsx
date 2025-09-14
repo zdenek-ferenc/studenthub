@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,9 +11,8 @@ import Step1_PersonalInfo from './steps/Step1_PersonalInfo';
 import Step2_EducationInfo from './steps/Step2_EducationInfo';
 import Step3_Skills from './steps/Step3_Skills';
 import Step4_Languages from './steps/Step4_Languages';
-import ConfirmationModal from '../../../components/ConfirmationModal'; // Import modálního okna
+import ConfirmationModal from '../../../components/ConfirmationModal';
 
-// --- VÝVOJÁŘSKÝ PŘEPÍNAČ ---
 const IS_DEVELOPMENT_MODE = false; 
 const DEV_START_STEP = 2; 
 
@@ -31,8 +30,6 @@ type FormData = {
   languages?: string[];
 };
 
-
-// Komponenta pro tlačítko se sociální sítí, stejná jako na login stránce
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
   const handleLogin = async () => {
     await supabase.auth.signInWithOAuth({
@@ -63,7 +60,70 @@ export default function StudentRegistrationPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [showEmailRegister, setShowEmailRegister] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Nový stav pro modální okno
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // --- NOVÁ, ROBUSTNÍ LOGIKA PRO ZPRACOVÁNÍ PŘIHLÁŠENÍ A REGISTRACE ---
+  const handleUserSignedIn = useCallback(async (session: Session) => {
+    const userId = session.user.id;
+    const userEmail = session.user.email;
+
+    // 1. Zkontrolujeme, jestli uživatel s tímto ID už existuje v naší tabulce 'User'
+    const { data: existingUser } = await supabase
+      .from('User')
+      .select('id, role')
+      .eq('id', userId)
+      .single();
+
+    if (existingUser) {
+        // Uživatel existuje, zkontrolujeme jeho roli
+        if (existingUser.role !== 'student') {
+            // Chyba: Účet existuje, ale není to student (např. je to startup)
+            setError(`Účet s e-mailem ${userEmail} je již registrován s jinou rolí.`);
+            await supabase.auth.signOut(); // Okamžitě ho odhlásíme
+            return;
+        }
+
+        // Uživatel je student, zjistíme, kde v registraci skončil
+        const { data: profile } = await supabase
+            .from('StudentProfile')
+            .select('registration_step')
+            .eq('user_id', userId)
+            .single();
+        
+        const currentStep = profile?.registration_step || 1;
+        // Pokud je registrace dokončená, přesměrujeme ho pryč
+        if(currentStep > 5) {
+            router.push('/');
+        } else {
+            setStep(currentStep);
+        }
+
+    } else {
+        // Uživatel neexistuje, vytvoříme nové záznamy
+        const { error: userError } = await supabase.from('User').insert({
+            id: userId,
+            email: userEmail,
+            role: 'student'
+        });
+        if (userError) {
+            console.error("Chyba při vytváření záznamu v tabulce User:", userError);
+            setError("Nepodařilo se vytvořit uživatelský účet.");
+            return;
+        }
+        
+        const { error: profileError } = await supabase.from('StudentProfile').insert({
+            user_id: userId,
+            registration_step: 2 // Začíná na kroku 2 (osobní údaje)
+        });
+        if (profileError) {
+            console.error("Chyba při vytváření studentského profilu:", profileError);
+            setError("Nepodařilo se vytvořit profil.");
+            return;
+        }
+        setStep(2); // Posuneme ho na první krok formuláře
+    }
+  }, [router]);
+
 
   useEffect(() => {
     if (IS_DEVELOPMENT_MODE) {
@@ -76,18 +136,13 @@ export default function StudentRegistrationPage() {
       setUser(session?.user ?? null);
       
       if (_event === 'SIGNED_IN' && session) {
-        const { error } = await supabase.rpc('create_user_and_student_profile');
-        if (error) {
-            console.error("Chyba při volání RPC funkce pro studenta:", error);
-        } else {
-            setStep(2);
-        }
+        await handleUserSignedIn(session);
       }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [handleUserSignedIn]);
 
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,27 +178,18 @@ export default function StudentRegistrationPage() {
     if (signUpError) {
         setError("Registrace se nezdařila. Zkuste to prosím znovu.");
     } else {
-        setIsModalOpen(true); // Otevře modální okno namísto alertu
+        setIsModalOpen(true);
     }
     setLoading(false);
   };
 
   const handleNextStep = async (formData: FormData) => {
-    if (IS_DEVELOPMENT_MODE) {
-      console.log("DEV_MODE: Data z kroku:", formData);
-      if (step === 5) {
-        alert("DEV_MODE: Registrace dokončena!");
-        setStep(DEV_START_STEP);
-      } else {
-        setStep(prev => prev + 1);
-      }
-      return;
-    }
-
     if (!user) return;
     setLoading(true);
     let error;
+    const nextStep = step + 1;
 
+    // Aktualizace profilu podle aktuálního kroku
     if (step === 2) { ({ error } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id)); }
     if (step === 3) { ({ error } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id)); }
     if (step === 4) {
@@ -159,15 +205,25 @@ export default function StudentRegistrationPage() {
         const languagesToInsert = formData.languages.map((langId: string) => ({ student_id: user.id, language_id: langId }));
         if (languagesToInsert.length > 0) ({ error } = await supabase.from('StudentLanguage').insert(languagesToInsert));
       }
-      router.push('/dashboard/student');
-      return;
     }
 
     if (error) {
       alert('Něco se pokazilo: ' + error.message);
-    } else {
-      setStep(prev => prev + 1);
+      setLoading(false);
+      return;
     }
+
+    // Uložíme postup do databáze
+    const { error: stepError } = await supabase.from('StudentProfile').update({ registration_step: nextStep }).eq('user_id', user.id);
+
+    if (stepError) {
+        alert('Chyba při ukládání postupu: ' + stepError.message);
+    } else if (nextStep > 5) {
+        router.push('/'); // Po dokončení přesměrujeme na hlavní stránku
+    } else {
+        setStep(nextStep);
+    }
+
     setLoading(false);
   };
 
@@ -184,7 +240,7 @@ export default function StudentRegistrationPage() {
   const handleDevPrev = () => setStep(prev => Math.max(2, prev - 1));
   const handleDevNext = () => setStep(prev => Math.min(5, prev + 1));
 
-  if (loading && !IS_DEVELOPMENT_MODE) return <p>Načítání...</p>;
+  if (loading && !IS_DEVELOPMENT_MODE) return <p className="text-center py-20">Načítání...</p>;
 
   return (
     <div className="w-full min-h-screen my-8 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
@@ -212,6 +268,7 @@ export default function StudentRegistrationPage() {
               </div>
 
               <div className="mt-8 space-y-4">
+                {error && <p className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg">{error}</p>}
                 {!showEmailRegister ? (
                     <>
                         <SocialButton provider="google" label="Pokračovat s Googlem" icon={<svg className="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C41.38,36.151,44,30.63,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>} />
@@ -232,7 +289,7 @@ export default function StudentRegistrationPage() {
                         <button type="button" onClick={() => setShowEmailRegister(false)} className="w-full text-sm text-gray-500 hover:underline">Zpět na ostatní možnosti</button>
                     </form>
                 )}
-                {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                
               </div>
 
               <p className="text-center text-sm text-gray-600 mt-8">
@@ -256,7 +313,6 @@ export default function StudentRegistrationPage() {
         </div>
       )}
       
-      {/* Nové modální okno pro potvrzení e-mailu */}
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -270,3 +326,4 @@ export default function StudentRegistrationPage() {
     </div>
   );
 }
+

@@ -67,7 +67,7 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
         <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setIsOpen(!isOpen)}
-              className={`w-12 h-12 rounded-full bg-[#86C5FF] text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer text-lg hover:shadow-md hover:scale-105 transition-all ease-in duration-100
+              className={`w-12 h-12 rounded-full bg-[#86C5FF] text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer text-lg hover:shadow-md transition-all ease-in duration-300
               ${isActive ? 'ring-2 ring-[var(--barva-primarni)] leading-none' : ''}
             `}>
                 {initials}
