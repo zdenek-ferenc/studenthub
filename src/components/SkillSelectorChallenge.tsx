@@ -86,13 +86,13 @@ export default function SkillSelectorChallenge({ onSelectionChange, initialSelec
   }
 
   return (
-    <div className="w-full bg-white rounded-lg p-3 mt-3">
+    <div className="w-full bg-white rounded-lg mt-3">
       <input
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Hledej dovednost (např. React)"
-        className="w-full text-[var(--barva-primarni)] border-0 focus:outline-none p-2"
+        className="w-full text-[var(--barva-primarni)] border-2 border-[var(--barva-primarni2)] rounded-2xl focus:outline-none p-3"
       />
       
       <div className="min-h-[6rem]">

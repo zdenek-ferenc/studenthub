@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '../../../lib/supabaseClient';
@@ -8,7 +8,6 @@ import Image from 'next/image';
 import ChallengeCard from './components/ChallengeCard';
 import CommandCenter, { CommandCenterStats, RecentSubmission } from './components/CommandCenter';
 
-// Typ, který používáme, nyní obsahuje i `submitted_at` pro správné řazení
 export type Challenge = {
     id: string;
     title: string;
@@ -21,60 +20,65 @@ export type Challenge = {
     Submission: { id: string, status: string, submitted_at: string }[];
 };
 
+type FilterType = 'active' | 'drafts' | 'completed';
+
 export default function StartupChallengesView() {
     const { user } = useAuth();
     const [allChallenges, setAllChallenges] = useState<Challenge[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeFilter, setActiveFilter] = useState<'active' | 'completed'>('active');
+    const [activeFilter, setActiveFilter] = useState<FilterType>('active');
 
-    useEffect(() => {
+    const [underlineStyle, setUnderlineStyle] = useState({});
+    const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
+
+
+    const fetchChallenges = useCallback(async () => {
         if (!user) {
             setLoading(false);
             return;
-        };
-
-        const fetchChallenges = async () => {
-        setLoading(true);
-        // Požadujeme `submitted_at` pro správné řazení v dropdownu
-        const { data, error } = await supabase
-            .from('Challenge')
-            .select(`
-            id, title, status, short_description, deadline, created_at, max_applicants,
-            ChallengeSkill ( Skill ( id, name ) ),
-            Submission ( id, status, submitted_at )
-            `)
-            .eq('startup_id', user.id);
-
-        if (error) {
-            console.error("Chyba při načítání výzev:", error);
-            setAllChallenges([]);
-        } else {
-            setAllChallenges(data as unknown as Challenge[] || []);
         }
-        setLoading(false);
-        };
+        if (allChallenges.length === 0) {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('Challenge')
+                .select(`
+                    id, title, status, short_description, deadline, created_at, max_applicants,
+                    ChallengeSkill ( Skill ( id, name ) ),
+                    Submission ( id, status, submitted_at )
+                `)
+                .eq('startup_id', user.id);
 
+            if (error) {
+                console.error("Chyba při načítání výzev:", error);
+                setAllChallenges([]);
+            } else {
+                setAllChallenges(data as unknown as Challenge[] || []);
+            }
+            setLoading(false);
+        }
+    }, [user, allChallenges.length]);
+
+    useEffect(() => {
         fetchChallenges();
-    }, [user]);
+    }, [fetchChallenges]);
 
-    const { sortedActiveChallenges, completedChallenges, dashboardStats } = useMemo(() => {
-        const active = allChallenges.filter(c => c.status === 'open' || c.status === 'draft');
+    const { sortedActiveChallenges, completedChallenges, draftChallenges, dashboardStats } = useMemo(() => {
+        const active = allChallenges.filter(c => c.status === 'open');
         const completed = allChallenges.filter(c => c.status === 'closed' || c.status === 'archived');
+        const drafts = allChallenges.filter(c => c.status === 'draft');
 
         const unreviewedSubmissions: RecentSubmission[] = [];
         
-        // --- KLÍČOVÁ ZMĚNA ZDE: Nová, srozumitelnější logika pro anonymní ID ---
         const submissionCounts: { [key: string]: number } = {};
         active.forEach((challenge) => {
             if(Array.isArray(challenge.Submission)) {
                 challenge.Submission.forEach((sub) => {
                     if (sub.status === 'applied' || sub.status === 'submitted') {
-                        // Pro každou výzvu počítáme řešení zvlášť
                         const count = (submissionCounts[challenge.id] || 0) + 1;
                         submissionCounts[challenge.id] = count;
 
                         unreviewedSubmissions.push({
-                            anonymousId: `Řešení #${count}`, // Výsledek: "Řešení #1", "Řešení #2", atd.
+                            anonymousId: `Řešení #${count}`,
                             challengeTitle: challenge.title,
                             challengeId: challenge.id,
                             submittedAt: sub.submitted_at
@@ -88,11 +92,11 @@ export default function StartupChallengesView() {
             activeChallengesCount: active.length,
             unreviewedSubmissionsCount: unreviewedSubmissions.length,
             totalApplicantsCount: active.reduce((acc, c) => acc + (c.Submission?.length || 0), 0),
-            // Seřadíme je podle data odevzdání a vezmeme prvních 5 pro zobrazení
             recentSubmissions: unreviewedSubmissions.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()).slice(0, 5)
         };
         
         const getNeedsAttention = (challenge: Challenge) => {
+            if (challenge.status === 'draft') return true;
             const isPastDeadline = challenge.deadline ? new Date() > new Date(challenge.deadline) : false;
             const hasUnreviewedSubmissions = challenge.Submission.some((s: {status: string}) => s.status === 'applied' || s.status === 'submitted');
             return isPastDeadline && hasUnreviewedSubmissions;
@@ -103,7 +107,7 @@ export default function StartupChallengesView() {
             const bNeedsAttention = getNeedsAttention(b);
 
             if (aNeedsAttention && !bNeedsAttention) return -1;
-            if (!bNeedsAttention && aNeedsAttention) return 1;
+            if (!aNeedsAttention && bNeedsAttention) return 1;
 
             const dateA = a.deadline ? new Date(a.deadline).getTime() : Infinity;
             const dateB = b.deadline ? new Date(b.deadline).getTime() : Infinity;
@@ -111,10 +115,41 @@ export default function StartupChallengesView() {
             return dateA - dateB;
         });
         
-        return { sortedActiveChallenges: sorted, completedChallenges: completed, dashboardStats: stats };
+        const sortedDrafts = [...drafts].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+        return { sortedActiveChallenges: sorted, completedChallenges: completed, draftChallenges: sortedDrafts, dashboardStats: stats };
     }, [allChallenges]);
     
-    const displayedChallenges = activeFilter === 'active' ? sortedActiveChallenges : completedChallenges;
+    const displayedChallenges = useMemo(() => {
+        switch (activeFilter) {
+            case 'active':
+                return sortedActiveChallenges;
+            case 'completed':
+                return completedChallenges;
+            case 'drafts':
+                return draftChallenges;
+            default:
+                return [];
+        }
+    }, [activeFilter, sortedActiveChallenges, completedChallenges, draftChallenges]);
+    
+    const filters: { id: FilterType; label: string; count: number }[] = useMemo(() => [
+        { id: 'active', label: 'Aktivní', count: sortedActiveChallenges.length },
+        { id: 'drafts', label: 'Koncepty', count: draftChallenges.length },
+        { id: 'completed', label: 'Dokončené', count: completedChallenges.length },
+    ], [sortedActiveChallenges, draftChallenges, completedChallenges]);
+
+    useEffect(() => {
+        const activeIndex = filters.findIndex(f => f.id === activeFilter);
+        const activeButton = buttonsRef.current[activeIndex];
+
+        if (activeButton) {
+            setUnderlineStyle({
+                width: `${activeButton.offsetWidth}px`,
+                transform: `translateX(${activeButton.offsetLeft}px)`,
+            });
+        }
+    }, [activeFilter, filters, allChallenges]);
 
     if (loading) {
         return <p className="text-center py-20">Načítám vaše výzvy...</p>;
@@ -124,7 +159,7 @@ export default function StartupChallengesView() {
         <div className="container mx-auto py-12">
         {!loading && allChallenges.length === 0 ? (
             <div className="text-center max-w-lg mx-auto">
-                <Image
+                 <Image
                     src="/frownbig.svg"
                     alt="Smutný smajlík"
                     width={50}
@@ -142,18 +177,35 @@ export default function StartupChallengesView() {
         ) : (
             <div>
                 <CommandCenter stats={dashboardStats} />
-                <div className="bg-white p-2 rounded-full flex gap-3 items-center max-w-min mb-8">
-                    <button 
-                        onClick={() => setActiveFilter('active')}
-                        className={`cursor-pointer px-5 py-2 rounded-full text-sm font-semibold transition-colors ${activeFilter === 'active' ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] shadow-sm' : 'hover:bg-gray-100 text-gray-700'}`}>
-                        Aktivní ({sortedActiveChallenges.length})
-                    </button>
-                    <button 
-                        onClick={() => setActiveFilter('completed')}
-                        className={`cursor-pointer px-5 py-2 rounded-full text-sm font-semibold transition-colors ${activeFilter === 'completed' ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] shadow-sm' : 'hover:bg-gray-100 text-gray-700'}`}
-                    >
-                        Dokončené ({completedChallenges.length})
-                    </button>
+                
+                {/* --- ZMĚNA ZDE: Nový filtr s podtrhávací animací --- */}
+                <div className="relative flex items-center border-b border-gray-200 w-fit mb-8">
+                    {filters.map((filter, index) => (
+                        <button
+                            key={filter.id}
+                            ref={(el) => {
+                            buttonsRef.current[index] = el;
+                            }}
+                            onClick={() => setActiveFilter(filter.id)}
+                            className="flex items-center justify-center gap-2 px-5 py-3 text-md font-semibold z-10 transition-colors duration-200"
+                        >
+                            <span className={activeFilter === filter.id ? 'text-[var(--barva-primarni)]' : 'text-gray-500 cursor-pointer hover:text-gray-800'}>
+                                {filter.label}
+                            </span>
+                            <span
+                                className={`flex-shrink-0 flex items-center justify-center text-xs font-bold rounded-full w-6 h-6 transition-colors duration-200 ${
+                                    activeFilter === filter.id ? 'bg-[var(--barva-primarni2)] text-[var(--barva-primarni)]' : 'bg-white text-gray-500'
+                                }`}
+                            >
+                                {filter.count}
+                            </span>
+                        </button>
+                    ))}
+                    {/* Podtržítko */}
+                    <div
+                        className="absolute bottom-0 h-1 bg-[var(--barva-primarni)] rounded-full transition-all duration-300 ease-in-out"
+                        style={underlineStyle}
+                    />
                 </div>
 
                 {displayedChallenges.length > 0 ? (
@@ -164,8 +216,8 @@ export default function StartupChallengesView() {
                     </div>
                 ) : (
                     <div className="text-center bg-white p-12 rounded-2xl shadow-md">
-                        <h2 className="text-xl font-bold text-[var(--barva-tmava)]">Žádné {activeFilter === 'active' ? 'aktivní' : 'dokončené'} výzvy</h2>
-                        <p className="text-gray-500 mt-2">V této kategorii se nenachází žádná výzva.</p>
+                        <h2 className="text-xl font-bold text-[var(--barva-tmava)]">Žádné výzvy v této kategorii</h2>
+                        <p className="text-gray-500 mt-2">Zkuste se podívat do jiné sekce.</p>
                     </div>
                 )}
                 </div>
@@ -173,4 +225,3 @@ export default function StartupChallengesView() {
         </div>
     );
 }
-
