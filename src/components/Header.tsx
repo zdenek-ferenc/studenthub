@@ -261,8 +261,8 @@ export default function Header() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link href="/login" className="px-5 py-2.5 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Přihlásit se</Link>
-                <Link href="/register/student" className="px-5 py-2.5 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700">Registrovat</Link>
+                <Link href="/login" className="px-5 py-2.5 rounded-md text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all ease-in-out duration-200">Přihlásit se</Link>
+                <Link href="/register/student" className="px-5 py-2.5 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-500 transition-all ease-in-out duration-200">Registrovat</Link>
               </div>
             )
           )}

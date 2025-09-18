@@ -50,7 +50,7 @@ export default function CommandCenter({ stats }: { stats: CommandCenterStats }) 
         {/* Mřížka s widgety */}
         <div className="flex flex-wrap gap-6">
             {/* --- INTERAKTIVNÍ WIDGET PRO NOVÁ ŘEŠENÍ --- */}
-            <Popover className="relative flex-1 min-w-[240px]">
+            <Popover className="relative flex-1 min-w-[240px] z-99">
               {({ open }) => (
                 <>
                   <Popover.Button 

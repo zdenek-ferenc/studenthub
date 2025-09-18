@@ -7,13 +7,15 @@ import { Listbox, Transition } from '@headlessui/react';
 import { User } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 
-// Typy zůstávají stejné, jen se už nepoužívá is_favorite
 type StudentProfile = {
     first_name: string; last_name: string; username: string; bio: string | null; university: string | null; field_of_study: string | null;
 };
+
+// --- ZMĚNA ZDE: Přidána vlastnost completed_outputs ---
 export type Submission = {
   id: string; student_id: string; status: string; link: string | null; file_url: string | null;
   rating: number | null; position: number | null; feedback_comment: string | null; is_favorite: boolean;
+  completed_outputs: string[]; // Přidáno pro ukládání stavu checklistu
   StudentProfile: StudentProfile | null;
 };
 
@@ -64,7 +66,6 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
                     <p className="text-sm text-gray-500">Anonymní student</p>
                 </div>
             </div>
-            {/* Hvězdička pro favority je pryč */}
       </div>      
       {submission.link && (
         <div className="text-sm">

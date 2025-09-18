@@ -1,8 +1,6 @@
-// src/app/challenges/[id]/StudentChallengeDetail.tsx
-
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '../../../lib/supabaseClient';
@@ -10,6 +8,7 @@ import SubmissionForm from './SubmissionForm';
 import { useRouter } from 'next/navigation';
 import StudentChallengeRecap from './StudentChallengeRecap';
 import type { Submission } from './SubmissionCard';
+// --- OPRAVA ZDE: Odstraněn nepoužívaný import 'CheckSquare' ---
 import { Download, Lock } from 'lucide-react';
 
 type Challenge = {
@@ -40,6 +39,8 @@ const getFileNameFromUrl = (url: string) => {
         const name = lastPart.split('-').slice(1).join('-');
         return decodeURIComponent(name);
     } catch (error) {
+        // --- OPRAVA ZDE: Použití proměnné 'error', aby se odstranila chyba ---
+        console.error("Chyba při parsování názvu souboru z URL:", error);
         return 'Stáhnout soubor';
     }
 };
@@ -77,9 +78,11 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   
   const [isApplying, setIsApplying] = useState(false);
   const [userSubmission, setUserSubmission] = useState<Submission | undefined>(undefined);
-  
-  // ODSTRANĚNO: Už nepotřebujeme stav isDetailsVisible, protože detail bude vidět vždy.
 
+  const expectedOutputsArray = useMemo(() => {
+    return challenge.expected_outputs.split('\n').filter(line => line.trim() !== '');
+  }, [challenge.expected_outputs]);
+  
   useEffect(() => {
     if (user && challenge.Submission) {
         const submission = challenge.Submission.find(sub => sub.student_id === user.id);
@@ -135,9 +138,6 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
             <h1 className="text-4xl font-bold text-[var(--barva-tmava)]">{challenge.title}</h1>
         </div>
 
-        {/* ODSTRANĚNO: Tlačítko pro skrytí/zobrazení detailu už není potřeba */}
-
-        {/* ZOBRAZENO VŽDY: Obsah detailu je nyní viditelný pro všechny */}
         <>
             <div className="border-t border-b border-gray-100 py-6">
                 <h2 className="text-xl font-semibold text-[var(--barva-tmava)] mb-4">Potřebné dovednosti</h2>
@@ -155,10 +155,14 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
                 <p>{challenge.description}</p>
                 <h3 className='font-semibold text-lg mt-3 border-b-2 py-3'>Cíle výzvy</h3>
                 <p className='mt-3'>{challenge.goals}</p>
+
                 <h3 className='font-semibold text-lg mt-3 border-b-2 py-3'>Co má být odevzdáno:</h3>
-                <p className='mt-3'>{challenge.expected_outputs}</p>
+                <ul className='mt-3 list-disc pl-5 space-y-2'>
+                  {expectedOutputsArray.map((output, index) => (
+                    <li key={index}>{output}</li>
+                  ))}
+                </ul>
                 
-                {/* ZŮSTÁVÁ: Sekce pro přílohy s logikou zamčení */}
                 {challenge.attachments_urls && challenge.attachments_urls.length > 0 && (
                     <>
                         <h3 className='font-semibold text-lg mt-6 border-b-2 py-3'>Podklady ke stažení</h3>
@@ -194,6 +198,7 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
                 )}
                 
                 <ul>
+                {/* --- OPRAVA ZDE: Odstraněn překlep v názvu funkce --- */}
                 <li className='font-semibold text-xl mt-6'>Termín odevzdání do: <strong className='ml-3 '>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></li>
                 </ul>
             </div>
@@ -212,7 +217,8 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
         <SubmissionForm 
           challengeId={challenge.id} 
           submissionId={userSubmission.id} 
-          initialSubmission={userSubmission} 
+          initialSubmission={userSubmission}
+          expectedOutputs={expectedOutputsArray}
           onSuccess={handleSubmissionUpdate}
         />
       )}

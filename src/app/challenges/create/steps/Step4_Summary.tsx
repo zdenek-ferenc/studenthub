@@ -107,7 +107,7 @@ export default function Step4_Summary({ setStep }: { setStep: (step: number) => 
                                 <h4 className="font-bold text-gray-600 flex items-center gap-2 not-prose">
                                     <FileText size={16} /> Podrobný popis
                                 </h4>
-                                <p className="text-sm line-clamp-3 mt-1">{data.description}</p>
+                                <p className="text-sm max-w-xl mt-1">{data.description}</p>
                             </div>
                              <div>
                                 <h4 className="font-bold text-gray-600 flex items-center gap-2 not-prose">
