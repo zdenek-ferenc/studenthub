@@ -1,5 +1,3 @@
-// src/components/CategorySelector.tsx
-
 "use client";
 
 import { useState, useEffect } from 'react';

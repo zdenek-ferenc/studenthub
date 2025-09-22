@@ -9,9 +9,10 @@ import { useRouter } from 'next/navigation';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import ChallengeRecapView from './ChallengeRecapView';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AlertCircle, CheckCircle, Lock } from 'lucide-react';
+import { AlertCircle, CheckCircle, Lock, Clock, Users,} from 'lucide-react';
+import { differenceInDays, format } from 'date-fns'; // Pro práci s datem
 
-
+// Typy zůstávají stejné
 type Challenge = {
   id: string; status: 'draft' | 'open' | 'closed' | 'archived'; title: string;
   description: string; goals: string; expected_outputs: string;
@@ -22,20 +23,82 @@ type Challenge = {
   StartupProfile: { company_name: string, logo_url: string | null } | null;
 };
 
-// Nová komponenta pro stavový panel
-const EvaluationStatusPanel = ({ canFinalize, ratedCount, totalCount, onProceed }: { canFinalize: boolean, ratedCount: number, totalCount: number, onProceed: () => void }) => {
+const EvaluationStatusPanel = ({
+    canFinalize,
+    ratedCount,
+    totalCount,
+    onProceed,
+    deadline,
+    applicants,
+    maxApplicants
+}: {
+    canFinalize: boolean,
+    ratedCount: number,
+    totalCount: number,
+    onProceed: () => void,
+    deadline: string,
+    applicants: number,
+    maxApplicants: number | null
+}) => {
     const allRated = ratedCount === totalCount && totalCount > 0;
+    const deadlineDate = new Date(deadline);
+    const daysRemaining = differenceInDays(deadlineDate, new Date());
+    const timeProgress = Math.max(0, 100 - (daysRemaining / 30) * 100); // Předpokládáme max 30 dní
+    const capacityProgress = maxApplicants ? (applicants / maxApplicants) * 100 : 0;
 
+    // Pokud ještě nelze finalizovat, zobrazíme nový, detailní panel
     if (!canFinalize) {
         return (
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-                <Lock className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                <h3 className="text-xl font-bold text-[var(--barva-tmava)]">Výběr vítězů bude dostupný po uzávěrce</h3>
-                <p className="text-gray-500 mt-2">Jakmile uplyne termín odevzdání nebo se naplní kapacita, budete moci vybrat vítěze.</p>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
+                <div className="max-w-3xl mx-auto">
+                    <h3 className="text-2xl font-bold text-center text-[var(--barva-tmava)] mb-2">
+                        {daysRemaining < 0 ? "Výzva je po termínu, čeká se na odevzdání" : "Výzva je v plném proudu"}
+                    </h3>
+                    <p className="text-center text-gray-500 mb-8">Zde je přehled aktuálního stavu a dalších kroků.</p>
+
+                    {/* Progress bary */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <div className="flex justify-between items-center mb-1 font-semibold text-sm">
+                                <span className="text-gray-600 flex items-center gap-2"><Clock size={14}/> Čas do konce</span>
+                                <span className="text-[var(--barva-tmava)]">{daysRemaining > 0 ? `${daysRemaining} dní` : 'Po termínu'}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${timeProgress}%` }}></div></div>
+                        </div>
+                        <div>
+                            <div className="flex justify-between items-center mb-1 font-semibold text-sm">
+                                <span className="text-gray-600 flex items-center gap-2"><Users size={14}/> Naplněnost</span>
+                                <span className="text-[var(--barva-tmava)]">{applicants} / {maxApplicants || '∞'}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{ width: `${capacityProgress}%` }}></div></div>
+                        </div>
+                    </div>
+
+                    {/* Akce */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-gray-50 p-4 rounded-xl">
+                            <h4 className="font-bold text-lg text-gray-800">Co teď?</h4>
+                            <p className="text-sm text-gray-600 mt-1">Průběžně hodnoťte odevzdaná řešení. Studentům to pomůže a vám to ušetří práci na konci.</p>
+                            <div className="mt-3 text-sm font-semibold text-[var(--barva-primarni)]">
+                                Ohodnoceno: {ratedCount} z {totalCount}
+                            </div>
+                        </div>
+                        <div className="bg-gray-50 p-4 rounded-xl">
+                            <h4 className="font-bold text-lg text-gray-800">Co dál?</h4>
+                            <p className="text-sm text-gray-600 mt-1">
+                                Finální výběr vítězů se odemkne po termínu ({format(deadlineDate, 'd. M. yyyy')}) nebo po naplnění kapacity a odevzdání všech řešení.
+                            </p>
+                            <button disabled className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gray-200 text-gray-500 cursor-not-allowed">
+                                <Lock size={14}/> Vybrat vítěze (zamčeno)
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
     
+    // Pokud už lze finalizovat, zobrazíme původní, upravený panel
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
             <div className="max-w-2xl mx-auto">
@@ -103,13 +166,22 @@ export default function StartupChallengeDetail({ challenge }: { challenge: Chall
     setSubmissions(current => current.map(s => s.id === updatedSubmission.id ? updatedSubmission : s));
   };
   
-  // OPRAVA: Všechny hooky jsou nyní před jakýmkoliv podmíněným returnem
   const { canFinalize, ratedCount } = useMemo(() => {
     const isAfterDeadline = new Date() > new Date(challenge.deadline);
-    const isFull = challenge.Submission.length >= (challenge.max_applicants || Infinity);
+    
+    const maxApplicants = challenge.max_applicants || 0;
+    const appliedCount = challenge.Submission.length;
+    const submittedCount = submissions.filter(s => s.status === 'submitted' || s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected').length;
+    
+    const isFullAndAllHaveSubmitted = 
+      maxApplicants > 0 &&
+      appliedCount === maxApplicants &&
+      submittedCount === appliedCount;
+
     const rated = submissions.filter(s => s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected');
+    
     return {
-        canFinalize: isAfterDeadline || isFull,
+        canFinalize: isAfterDeadline || isFullAndAllHaveSubmitted,
         ratedCount: rated.length,
     };
   }, [challenge, submissions]);
@@ -150,7 +222,15 @@ export default function StartupChallengeDetail({ challenge }: { challenge: Chall
         <>
             {view === 'evaluating' && (
                 <>
-                    <EvaluationStatusPanel canFinalize={canFinalize} ratedCount={ratedCount} totalCount={submissions.length} onProceed={() => setView('selecting_winners')} />
+                    <EvaluationStatusPanel
+                        canFinalize={canFinalize}
+                        ratedCount={ratedCount}
+                        totalCount={submissions.length}
+                        onProceed={() => setView('selecting_winners')}
+                        deadline={challenge.deadline}
+                        applicants={challenge.Submission.length}
+                        maxApplicants={challenge.max_applicants}
+                    />
                     
                     {submissions.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -188,4 +268,3 @@ export default function StartupChallengeDetail({ challenge }: { challenge: Chall
     </div>
   );
 }
-
