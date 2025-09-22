@@ -5,15 +5,15 @@ import StartupFilterSidebar from '../../components/StartupFilterSidebar';
 import { useAuth } from '../../contexts/AuthContext';
 import withAuth from '../../components/withAuth';
 import { useData } from '../../contexts/DataContext';
-// Vytvoř si skeleton komponentu analogicky k ostatním
-// import StartupCardSkeleton from '../../components/skeletons/StartupCardSkeleton';
+import LoadingSpinner from '../../components/LoadingSpinner'
+
 
 function StartupCatalogPage() {
     const { profile, loading: authLoading } = useAuth();
     const { startups, allCategories, startupFilters, loadingStartups, loadMoreStartups, hasMoreStartups } = useData();
 
     if (authLoading) {
-        return <p className="text-center py-20">Načítání...</p>;
+        return <LoadingSpinner />;
     }
 
     if (profile?.role !== 'student') {

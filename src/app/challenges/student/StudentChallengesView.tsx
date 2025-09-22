@@ -5,7 +5,7 @@ import { useChallenges } from '../../../contexts/ChallengesContext';
 import { useAuth } from '../../../contexts/AuthContext'; // Potřebujeme usera pro porovnání
 import StudentChallengeCard from './components/StudentChallengeCard';
 import ChallengeFilterSidebar from './components/ChallengeFilterSidebar';
-import ChallengeCardSkeleton from '../../../components/skeletons/ChallengeCardSkeleton';
+import LoadingSpinner from '../../../components/LoadingSpinner'
 
 export default function StudentChallengesView() {
   const { user } = useAuth(); // Získáme aktuálně přihlášeného uživatele
@@ -54,12 +54,7 @@ export default function StudentChallengesView() {
       />
       <main className="flex-1 w-full">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
-            <ChallengeCardSkeleton />
-            <ChallengeCardSkeleton />
-            <ChallengeCardSkeleton />
-            <ChallengeCardSkeleton />
-          </div>
+          <LoadingSpinner />
         ) : (
           <>
             <div className="mb-6">

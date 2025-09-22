@@ -10,6 +10,7 @@ import StudentChallengeRecap from './StudentChallengeRecap';
 import type { Submission } from './SubmissionCard';
 // --- OPRAVA ZDE: Odstraněn nepoužívaný import 'CheckSquare' ---
 import { Download, Lock } from 'lucide-react';
+import LoadingSpinner from '../../../components/LoadingSpinner'
 
 type Challenge = {
   id: string;
@@ -118,7 +119,7 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   };
 
   if (authLoading) {
-    return <p className="text-center py-20">Načítání...</p>;
+    return <LoadingSpinner />;
   }
 
   const isChallengeFull = challenge.Submission.length >= challenge.max_applicants;

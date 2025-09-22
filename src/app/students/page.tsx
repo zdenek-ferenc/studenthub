@@ -6,13 +6,14 @@ import { useAuth } from '../../contexts/AuthContext';
 import withAuth from '../../components/withAuth';
 import { useData } from '../../contexts/DataContext';
 import StudentCardSkeleton from '../../components/skeletons/StudentCardSkeleton';
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 function StudentCatalogPage() {
     const { profile, loading: authLoading } = useAuth();
     const { students, allSkills, studentFilters, loadingStudents, loadMoreStudents, hasMoreStudents } = useData();
 
     if (authLoading) {
-        return <p className="text-center py-20">Načítání...</p>;
+        return <LoadingSpinner />;
     }
 
     if (profile?.role !== 'startup') {

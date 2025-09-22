@@ -5,12 +5,13 @@ import withAuth from '../../../components/withAuth';
 import StudentEditForm from './StudentEditForm'; // Tuto komponentu vytvoříme
 import StartupEditForm from './StartupEditForm';   // Tuto komponentu vytvoříme
 import Link from 'next/link';
+import LoadingSpinner from '../../../components/LoadingSpinner'
 
 function EditProfilePage() {
   const { profile, loading } = useAuth();
 
   if (loading) {
-    return <p className="text-center py-20">Načítání profilu...</p>;
+    return <LoadingSpinner />;
   }
 
   // "Výhybka" - podle role zobrazíme správný formulář

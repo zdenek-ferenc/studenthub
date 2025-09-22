@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '../../../lib/supabaseClient';
 import withAuth from '../../../components/withAuth';
+import LoadingSpinner from '../../../components/LoadingSpinner'
 
 import StudentChallengeDetail from './StudentChallengeDetail';
 import StartupChallengeDetail from './StartupChallengeDetail';
@@ -88,7 +89,7 @@ function ChallengeDetailPage() {
   }, [challengeId]);
 
   if (authLoading || loading) {
-    return <p className="text-center py-20">Načítám detail výzvy...</p>;
+    return <LoadingSpinner />
   }
 
   if (!challenge) {

@@ -7,6 +7,7 @@ import { supabase } from '../../../lib/supabaseClient';
 import Image from 'next/image';
 import ChallengeCard from './components/ChallengeCard';
 import CommandCenter, { CommandCenterStats, RecentSubmission } from './components/CommandCenter';
+import LoadingSpinner from '../../../components/LoadingSpinner'
 
 export type Challenge = {
     id: string;
@@ -152,7 +153,7 @@ export default function StartupChallengesView() {
     }, [activeFilter, filters, allChallenges]);
 
     if (loading) {
-        return <p className="text-center py-20">Načítám vaše výzvy...</p>;
+        return <LoadingSpinner />;
     }
 
     return (

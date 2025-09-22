@@ -11,6 +11,7 @@ import ChallengeRecapView from './ChallengeRecapView';
 import { useAuth } from '../../../contexts/AuthContext';
 import { AlertCircle, CheckCircle, Lock } from 'lucide-react';
 
+
 type Challenge = {
   id: string; status: 'draft' | 'open' | 'closed' | 'archived'; title: string;
   description: string; goals: string; expected_outputs: string;

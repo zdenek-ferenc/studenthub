@@ -8,6 +8,8 @@ import Link from 'next/link';
 import StartupInfoCard from './StartupInfoCard';
 import StartupCategoriesCard from './StartupCategoriesCard';
 import StartupChallengeCard from './StartupChallengesCard';
+import LoadingSpinner from '../../../components/LoadingSpinner'
+
 
 type StartupProfileData = {
   company_name: string;
@@ -109,7 +111,7 @@ export default function StartupProfileView() {
 
   // Až teď, když jsou všechny hooky zavolané, můžeme mít podmíněný return
   if (loading) {
-    return <p className="text-center py-20">Načítám profil startupu...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

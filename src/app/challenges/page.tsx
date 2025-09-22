@@ -6,12 +6,13 @@ import withAuth from '../../components/withAuth'; // Uprav cestu
 // Importujeme nové komponenty pro jednotlivé pohledy
 import StartupChallengesView from './startup/StartupChallengesView';
 import StudentChallengesView from './student/StudentChallengesView';
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 function ChallengesPage() {
   const { profile, loading } = useAuth();
 
   if (loading) {
-    return <p className="text-center py-20">Načítání...</p>;
+    return <LoadingSpinner />;
   }
 
   // --- Tady je ta "výhybka" ---

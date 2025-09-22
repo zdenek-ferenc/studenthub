@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useState, useEffect, ReactNode } from 'react';
 import { Provider } from '@supabase/supabase-js';
 
+
 // Komponenta pro tlačítko se sociální sítí, upravený design
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
   const handleLogin = async () => {

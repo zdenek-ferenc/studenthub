@@ -9,6 +9,7 @@ import StudentInfoCard from './StudentInfoCard';
 import StudentSkillsCard from './StudentSkillsCard';
 // Použijeme jen jednu, jednoduchou kartu pro odkaz
 import ProfileChallengeCard from './StudentChallengesCard'; 
+import LoadingSpinner from '../../../components/LoadingSpinner'
 
 // Typy můžeme zjednodušit, nepotřebujeme už tolik detailů přímo na profilu
 type StudentProfileData = {
@@ -27,6 +28,7 @@ type SubmissionWithChallenge = {
   Challenge: {
     id: string;
     title: string;
+    deadline: string | null; 
     StartupProfile: {
       company_name: string;
       logo_url: string | null;
@@ -72,7 +74,7 @@ export default function StudentProfileView() {
   const completedChallenges = submissions.filter(s => s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected');
 
   if (loading) {
-    return <p className="text-center py-20">Načítám profil studenta...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

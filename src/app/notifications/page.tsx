@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Bell, CheckCheck, MessageSquareText, Trophy, Zap } from 'lucide-react';
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import { cs } from 'date-fns/locale';
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 // Typ pro jednu notifikaci
 type Notification = {
@@ -99,7 +100,7 @@ function NotificationsPage() {
     }, {} as Record<string, Notification[]>);
 
     if (loading) {
-        return <p className="text-center py-20">Načítám notifikace...</p>;
+        return <LoadingSpinner />;
     }
 
     return (

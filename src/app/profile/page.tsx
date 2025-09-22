@@ -7,6 +7,7 @@ import withAuth from '../../components/withAuth';
 // V dalším kroku je vytvoříme.
 import StudentProfileView from './student-profile/StudentProfileView';
 import StartupProfileView from './startup-profile/StartupProfileView';
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 function ProfilePage() {
   // Vezmeme si data z našeho funkčního AuthContextu
@@ -14,7 +15,7 @@ function ProfilePage() {
 
   // Během načítání zobrazíme jednoduchou zprávu
   if (loading) {
-    return <p className="text-center py-20">Načítám...</p>;
+    return <LoadingSpinner />;
   }
 
   // --- Tady je ta "výhybka" ---
