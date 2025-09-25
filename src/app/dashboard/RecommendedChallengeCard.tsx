@@ -1,0 +1,106 @@
+"use client";
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { Sparkles, ChevronRight, Users, Clock, AlertTriangle } from 'lucide-react';
+import { differenceInCalendarDays } from 'date-fns';
+
+/**
+ * Typ pro data, která karta potřebuje.
+ */
+export type RecommendedChallenge = {
+    id: string;
+    title: string;
+    deadline: string | null;
+    applicantCount: number;
+    max_applicants: number | null;
+    StartupProfile: {
+        company_name: string;
+        logo_url: string | null;
+    } | null;
+    matchingSkills: number;
+    requiredSkills: number;
+};
+
+// Pomocná komponenta pro zobrazení jednoho "tagu" s informací
+const InfoTag = ({ icon: Icon, text, colorClass, className }: { icon: React.ElementType, text: string | React.ReactNode, colorClass?: string, className?: string }) => (
+    <div className={`flex items-center gap-1.5 text-xs md:text-sm font-semibold ${colorClass || 'text-gray-600'} ${className}`}>
+        <Icon size={14} className="flex-shrink-0" />
+        <span>{text}</span>
+    </div>
+);
+
+
+/**
+ * Finální, plně responzivní a funkční karta pro doporučenou výzvu.
+ */
+export default function RecommendedChallengeCard({ challenge }: { challenge: RecommendedChallenge }) {
+    const daysRemaining = challenge.deadline ? differenceInCalendarDays(new Date(challenge.deadline), new Date()) : null;
+    let deadlineText: string | null = null;
+    let deadlineColor = 'text-gray-600';
+
+    if (daysRemaining !== null) {
+        if (daysRemaining < 0) {
+            deadlineText = 'Ukončeno';
+            deadlineColor = 'text-red-500';
+        } else if (daysRemaining === 0) {
+            deadlineText = 'Dnes končí!';
+            deadlineColor = 'text-orange-500';
+        } else if (daysRemaining === 1) {
+            deadlineText = 'Zbývá 1 den';
+            deadlineColor = 'text-orange-500';
+        } else if (daysRemaining <= 4) {
+            deadlineText = `Zbývají ${daysRemaining} dny`;
+            deadlineColor = 'text-orange-500';
+        } else if (daysRemaining <= 7) {
+            deadlineText = `Zbývá ${daysRemaining} dní`;
+            deadlineColor = 'text-orange-500';
+        } else {
+            deadlineText = `Zbývá ${daysRemaining} dní`;
+        }
+    }
+
+    return (
+        <Link href={`/challenges/${challenge.id}`} className="group block bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:bg-blue-50 transition-all duration-300 h-full">
+            {/* --- ZMĚNA ZDE: Nová struktura pro perfektní responzivitu --- */}
+            <div className="flex flex-col justify-between h-full">
+                {/* Horní část s logem a názvem (vždy vedle sebe) */}
+                <div className="flex items-start gap-4">
+                    <Image 
+                        src={challenge.StartupProfile?.logo_url || '/logo.svg'} 
+                        alt="logo" 
+                        width={48} 
+                        height={48} 
+                        className="rounded-lg w-12 h-12 object-cover flex-shrink-0" 
+                    />
+                    
+                    {/* Kontejner pro text, který se správně zalamuje */}
+                    <div className="flex-grow min-w-0">
+                        <p className="text-sm font-semibold text-gray-500 truncate">{challenge.StartupProfile?.company_name}</p>
+                        <h5 className="text-sm md:text-lg font-bold text-gray-800 break-words">{challenge.title}</h5>
+                    </div>
+
+                    {/* Šipka se zobrazí jen na větších obrazovkách */}
+                    <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-300 self-center">
+                        <ChevronRight size={24} strokeWidth={2.5} className="text-blue-500" />
+                    </div>
+                </div>
+
+                {/* Spodní část se statistikami (odsazená a zalamuje se) */}
+                <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-6 gap-y-2 leading-none">
+                    <InfoTag 
+                        icon={Sparkles} 
+                        text={<>Shoda dovedností: <strong>{challenge.matchingSkills}/{challenge.requiredSkills}</strong></>}
+                        colorClass="text-blue-500"
+                    />
+                     <InfoTag 
+                        icon={Users} 
+                        text={<>{challenge.applicantCount} / {challenge.max_applicants || '∞'}</>}
+                        className="hidden sm:flex"
+                    />
+                    {deadlineText && <InfoTag icon={daysRemaining !== null && daysRemaining < 0 ? AlertTriangle : Clock} text={deadlineText} colorClass={deadlineColor} />}
+                </div>
+            </div>
+        </Link>
+    );
+}

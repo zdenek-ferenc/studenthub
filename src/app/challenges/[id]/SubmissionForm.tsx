@@ -290,7 +290,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
                     {({ }) => (
                       <>
                         <Popover.Button className="focus:outline-none">
-                           <Info className="w-4 h-4 text-gray-400 hover:text-blue-500 cursor-pointer" />
+                          <Info className="w-4 h-4 text-gray-400 hover:text-blue-500 cursor-pointer" />
                         </Popover.Button>
                         <Transition
                           as={Fragment}

@@ -74,7 +74,8 @@ export default function StartupChallengesView() {
         active.forEach((challenge) => {
             if(Array.isArray(challenge.Submission)) {
                 challenge.Submission.forEach((sub) => {
-                    if (sub.status === 'applied' || sub.status === 'submitted') {
+                    // --- ZMĚNA ZDE: Odstraněn status 'applied' ---
+                    if (sub.status === 'submitted') {
                         const count = (submissionCounts[challenge.id] || 0) + 1;
                         submissionCounts[challenge.id] = count;
 
@@ -99,7 +100,8 @@ export default function StartupChallengesView() {
         const getNeedsAttention = (challenge: Challenge) => {
             if (challenge.status === 'draft') return true;
             const isPastDeadline = challenge.deadline ? new Date() > new Date(challenge.deadline) : false;
-            const hasUnreviewedSubmissions = challenge.Submission.some((s: {status: string}) => s.status === 'applied' || s.status === 'submitted');
+            // --- ZMĚNA ZDE: Odstraněn status 'applied' ---
+            const hasUnreviewedSubmissions = challenge.Submission.some((s: {status: string}) => s.status === 'submitted');
             return isPastDeadline && hasUnreviewedSubmissions;
         };
         

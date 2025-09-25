@@ -16,12 +16,12 @@ const StatItem = ({ icon: Icon, text, colorClass }: { icon: React.ElementType, t
 
 export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
     const applicantCount = challenge.Submission?.length || 0;
-    const unreviewedCount = challenge.Submission?.filter((s: { status: string }) => s.status === 'applied' || s.status === 'submitted').length || 0;
+    // --- ZMĚNA ZDE: Odstraněn status 'applied' ---
+    const unreviewedCount = challenge.Submission?.filter((s: { status: string }) => s.status === 'submitted').length || 0;
     const progress = challenge.max_applicants ? (applicantCount / challenge.max_applicants) * 100 : 0;
     
     const isPastDeadline = challenge.deadline ? new Date() > new Date(challenge.deadline) : false;
     const needsAttention = isPastDeadline && unreviewedCount > 0;
-    // --- NOVÁ LOGIKA: Rozpoznání konceptu ---
     const isDraft = challenge.status === 'draft';
 
     const getAction = () => {
@@ -36,7 +36,7 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
     return (
         // --- NOVÁ LOGIKA: Podmíněný styl pro koncept a pro upozornění ---
         <div className={`bg-white p-6 rounded-2xl flex flex-col h-full hover:shadow-md transition-all duration-300
-            ${isDraft ? 'border-2 border-yellow-200' : (needsAttention ? 'border-2 border-red-500' : 'border shadow-sm border-gray-100')}`}>
+            ${isDraft ? 'border-2 border-yellow-200' : (needsAttention ? 'border-2 border-red-500' : 'border shadow-sm')}`}>
             
             <div className="flex justify-between items-start mb-2">
                 <h3 className="font-bold text-xl text-[var(--barva-tmava)] pr-2 line-clamp-2">{challenge.title}</h3>

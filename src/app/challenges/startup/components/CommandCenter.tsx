@@ -38,7 +38,7 @@ export default function CommandCenter({ stats }: { stats: CommandCenterStats }) 
     <div className="mb-8">
         {/* Sekce s nadpisem a hlavními tlačítky */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <h1 className="text-4xl font-bold text-[var(--barva-tmava)]">Váš přehled</h1>
+            <h1 className="text-4xl font-bold text-[var(--barva-primarni)]">Přehled výzev</h1>
             <div className="flex items-center gap-3">
                 <Link href="/challenges/create" className="px-5 py-2.5 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:opacity-90 transition-all duration-200 flex items-center gap-1 text-sm">
                     <Plus size={18} />

@@ -12,6 +12,7 @@ import { Bell } from 'lucide-react'; // Přidán import pro ikonu zvonečku
 // Komponenta PillSwitch zůstává 1:1, nedotčeno
 function PillSwitch({ role, pathname }: { role: 'student' | 'startup', pathname: string }) {
   const studentLinks = [
+    { id: 'prehled', label: 'Přehled', href: '/dashboard' },
     { id: 'vyzvy', label: 'Výzvy', href: '/challenges' },
     { id: 'startupy', label: 'Startupy', href: '/startups' },
   ];
