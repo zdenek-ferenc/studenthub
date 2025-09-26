@@ -7,12 +7,44 @@ import ActiveChallengeCard, { type ActiveChallengeData } from './ActiveChallenge
 import CompletedChallengeCard, { type CompletedChallengeData } from './CompletedChallengeCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import LoadingSpinner from '../../components/LoadingSpinner'
-
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 type View = 'active' | 'completed';
 
-// Definice typů pro čištění dat
+// --- TYPY PRO DATA (FINÁLNÍ OPRAVA) ---
+
+// Typ pro Skill, jak ho vrací Supabase (pole v poli)
+type RawSkill = { name: string };
+type RawChallengeSkill = { Skill: RawSkill | RawSkill[] | null };
+
+// Typ pro StartupProfile, jak ho vrací Supabase (pole)
+type RawStartupProfile = {
+    company_name: string;
+    logo_url: string | null;
+};
+
+// Typ pro Challenge, jak ho vrací Supabase (pole)
+type RawChallenge = {
+    id: string;
+    title: string;
+    status: 'open' | 'closed' | 'archived';
+    expected_outputs: string;
+    deadline: string | null;
+    StartupProfile: RawStartupProfile | RawStartupProfile[] | null;
+    ChallengeSkill: RawChallengeSkill[];
+};
+
+// Typ pro "surová" data, jak přijdou ze Supabase, bez 'any'
+type RawSubmissionFromDB = {
+    id: string;
+    completed_outputs: string[];
+    status: string;
+    rating: number | null;
+    position: number | null;
+    Challenge: RawChallenge | RawChallenge[] | null;
+};
+
+// Typ pro naše "čistá" data, se kterými chceme pracovat
 type CleanSubmission = {
     id: string;
     completed_outputs: string[];
@@ -22,7 +54,7 @@ type CleanSubmission = {
     Challenge: {
         id: string;
         title: string;
-        status: 'open' | 'closed' | 'archived'; // <-- PŘIDÁNO
+        status: 'open' | 'closed' | 'archived';
         expected_outputs: string;
         deadline: string | null;
         StartupProfile: {
@@ -36,8 +68,6 @@ type CleanSubmission = {
         }[];
     } | null;
 };
-
-// ... (Funkce parseSubmissions a Raw typy zůstávají stejné, ale musí reflektovat nový 'status' v Challenge)
 
 export default function StudentChallengesWidget() {
     const { user } = useAuth();
@@ -53,21 +83,45 @@ export default function StudentChallengesWidget() {
             const { data, error } = await supabase
                 .from('Submission')
                 .select(`
-    id, completed_outputs, status, rating, position,
-    Challenge:Challenge!Submission_challenge_id_fkey (
-        id, title, status, expected_outputs, deadline,
-        StartupProfile (company_name, logo_url),
-        ChallengeSkill (Skill (name))
-    )
-`)
+                    id, completed_outputs, status, rating, position,
+                    Challenge:Challenge!Submission_challenge_id_fkey (
+                        id, title, status, expected_outputs, deadline,
+                        StartupProfile (company_name, logo_url),
+                        ChallengeSkill (Skill (name))
+                    )
+                `)
                 .eq('student_id', user.id);
 
             if (error) {
                 console.error("Chyba při načítání všech výzev:", error);
                 setAllSubmissions([]);
             } else if (data) {
-                // Funkce parseSubmissions by měla být zde pro čištění dat, pokud je potřeba
-                setAllSubmissions(data as CleanSubmission[]);
+                // Tady je ta magie: převedeme zkurvená data na čistá
+                const cleanedData = (data as RawSubmissionFromDB[]).map((sub): CleanSubmission => {
+                    const challengeRaw = Array.isArray(sub.Challenge) ? sub.Challenge[0] : sub.Challenge;
+                    
+                    let cleanChallenge: CleanSubmission['Challenge'] = null;
+
+                    if (challengeRaw) {
+                        const startupProfileRaw = Array.isArray(challengeRaw.StartupProfile) ? challengeRaw.StartupProfile[0] : challengeRaw.StartupProfile;
+                        
+                        // "Rozbalíme" i zanořené Skilly
+                        const cleanChallengeSkills = challengeRaw.ChallengeSkill.map(cs => {
+                            const skillRaw = Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill;
+                            return { Skill: skillRaw };
+                        });
+
+                        cleanChallenge = {
+                            ...challengeRaw,
+                            StartupProfile: startupProfileRaw || null,
+                            ChallengeSkill: cleanChallengeSkills,
+                        };
+                    }
+                    
+                    return { ...sub, Challenge: cleanChallenge };
+                });
+                
+                setAllSubmissions(cleanedData);
             }
             setLoading(false);
             setHasFetched(true);
@@ -77,9 +131,7 @@ export default function StudentChallengesWidget() {
         }
     }, [user, hasFetched]);
 
-    // --- ZDE JE KLÍČOVÁ ZMĚNA LOGIKY ---
     const { activeChallenges, completedChallenges } = useMemo(() => {
-        // Aktivní je vše, co je 'applied', 'submitted', NEBO 'reviewed' ale výzva je stále 'open'.
         const active = allSubmissions
             .filter(s => 
                 s.status === 'applied' || 
@@ -88,7 +140,6 @@ export default function StudentChallengesWidget() {
             )
             .sort((a) => (a.status === 'applied' ? -1 : 1));
 
-        // Dokončené je vše, co je 'winner', 'rejected', NEBO 'reviewed' a výzva je už 'closed'.
         const completed = allSubmissions
             .filter(s => 
                 s.status === 'winner' || 
@@ -134,7 +185,7 @@ export default function StudentChallengesWidget() {
                             activeChallenges.length > 0 ? (
                                 <div className="space-y-4">
                                     {activeChallenges.map(sub => (
-                                        <ActiveChallengeCard key={sub.id} submission={sub as ActiveChallengeData} />
+                                        <ActiveChallengeCard key={sub.id} submission={sub as unknown as ActiveChallengeData} />
                                     ))}
                                 </div>
                             ) : (
@@ -149,7 +200,7 @@ export default function StudentChallengesWidget() {
                             completedChallenges.length > 0 ? (
                                 <div className="space-y-4">
                                     {completedChallenges.map(sub => (
-                                        <CompletedChallengeCard key={sub.id} submission={sub as CompletedChallengeData} />
+                                        <CompletedChallengeCard key={sub.id} submission={sub as unknown as CompletedChallengeData} />
                                     ))}
                                 </div>
                             ) : (
