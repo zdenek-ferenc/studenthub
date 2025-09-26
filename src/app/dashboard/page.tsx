@@ -18,7 +18,7 @@ function DashboardPage() {
   if (profile?.role !== 'student') return <p className="text-center py-20">Tato stránka je určena pouze pro studenty.</p>;
 
   return (
-    <div className="container mx-auto py-8 px-4 md:py-12 md:px-6">
+    <div className="container mx-auto px-4 md:py-2 md:px-6">
       <h1 className="text-3xl md:text-4xl font-bold text-[var(--barva-tmava)] mb-6 md:mb-8">
         Vítej {displayName}!
       </h1>

@@ -8,9 +8,8 @@ import SubmissionForm from './SubmissionForm';
 import { useRouter } from 'next/navigation';
 import StudentChallengeRecap from './StudentChallengeRecap';
 import type { Submission } from './SubmissionCard';
-// --- OPRAVA ZDE: Odstraněn nepoužívaný import 'CheckSquare' ---
 import { Download, Lock } from 'lucide-react';
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 type Challenge = {
   id: string;
@@ -40,7 +39,6 @@ const getFileNameFromUrl = (url: string) => {
         const name = lastPart.split('-').slice(1).join('-');
         return decodeURIComponent(name);
     } catch (error) {
-        // --- OPRAVA ZDE: Použití proměnné 'error', aby se odstranila chyba ---
         console.error("Chyba při parsování názvu souboru z URL:", error);
         return 'Stáhnout soubor';
     }
@@ -91,9 +89,6 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
     }
   }, [challenge.Submission, user]);
 
-  const isApplied = !!userSubmission;
-  const isChallengeClosed = challenge.status === 'closed';
-
   const handleApply = async () => {
     if (isApplying || !user) return;
     setIsApplying(true);
@@ -121,9 +116,11 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   if (authLoading) {
     return <LoadingSpinner />;
   }
-
+  
+  const isApplied = !!userSubmission;
   const isChallengeFull = challenge.Submission.length >= challenge.max_applicants;
-
+  const isGraded = userSubmission && ['reviewed', 'winner', 'rejected'].includes(userSubmission.status);
+  
   return (
     <div className="max-w-4xl mx-auto my-12">
       <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-xs">
@@ -199,13 +196,12 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
                 )}
                 
                 <ul>
-                {/* --- OPRAVA ZDE: Odstraněn překlep v názvu funkce --- */}
                 <li className='font-semibold text-xl mt-6'>Termín odevzdání do: <strong className='ml-3 '>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></li>
                 </ul>
             </div>
         </>
         
-        {!isChallengeClosed && !isApplied && (
+        {!isApplied && (
             <div className="mt-10 text-center">
                 <button onClick={handleApply} disabled={isApplying || isChallengeFull} className="px-7 py-3 text-white bg-[var(--barva-primarni)] rounded-full font-normal text-2xl outline-2 transition-colors duration-200 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed">
                     {isApplying ? 'Přihlašuji...' : (isChallengeFull ? 'Kapacita naplněna' : 'Přihlásit se k výzvě')}
@@ -214,7 +210,7 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
         )}
       </div>
 
-      {!isChallengeClosed && isApplied && userSubmission && (
+      {isApplied && !isGraded && userSubmission && (
         <SubmissionForm 
           challengeId={challenge.id} 
           submissionId={userSubmission.id} 
@@ -224,8 +220,11 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
         />
       )}
 
-      {isChallengeClosed && isApplied && userSubmission && (
-        <StudentChallengeRecap submission={userSubmission} />
+      {isGraded && userSubmission && (
+        <StudentChallengeRecap 
+            submission={userSubmission} 
+            challengeStatus={challenge.status} 
+        />
       )}
     </div>
   );

@@ -16,6 +16,7 @@ export type Submission = {
   id: string; student_id: string; status: string; link: string | null; file_url: string | null;
   rating: number | null; position: number | null; feedback_comment: string | null; is_favorite: boolean;
   completed_outputs: string[]; // Přidáno pro ukládání stavu checklistu
+  is_public_on_profile: boolean;
   StudentProfile: StudentProfile | null;
 };
 

@@ -1,35 +1,22 @@
 "use client";
 
+import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import withAuth from '../../components/withAuth';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
-// Zatím si jen představujeme, že tyto komponenty existují.
-// V dalším kroku je vytvoříme.
-import StudentProfileView from './student-profile/StudentProfileView';
-import StartupProfileView from './startup-profile/StartupProfileView';
-import LoadingSpinner from '../../components/LoadingSpinner'
+function ProfileRedirectPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
-function ProfilePage() {
-  // Vezmeme si data z našeho funkčního AuthContextu
-  const { profile, loading } = useAuth();
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace(`/profile/${user.id}`);
+    }
+  }, [user, loading, router]);
 
-  // Během načítání zobrazíme jednoduchou zprávu
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  // --- Tady je ta "výhybka" ---
-  // Podle role zobrazíme správnou komponentu
-  if (profile?.role === 'student') {
-    return <StudentProfileView />;
-  }
-
-  if (profile?.role === 'startup') {
-    return <StartupProfileView />;
-  }
-
-  // Záložní stav, pokud by se něco pokazilo
-  return <p className="text-center py-20">Profil se nepodařilo načíst nebo nemá platnou roli.</p>;
+  return <LoadingSpinner />;
 }
 
-export default withAuth(ProfilePage);
+export default withAuth(ProfileRedirectPage);

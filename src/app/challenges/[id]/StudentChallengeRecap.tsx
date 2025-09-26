@@ -3,9 +3,60 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import type { Submission } from './SubmissionCard';
-import { Star, Trophy, MessageSquareText, Download, Award, Sparkles } from 'lucide-react';
+import { Star, Trophy, MessageSquareText, Download, Award, Sparkles, Eye, EyeOff, Info } from 'lucide-react';
+import { useAuth } from '../../../contexts/AuthContext';
 
-// --- Komponenta XpGainedSummary ---
+// --- Komponenta pro přepínání viditelnosti v portfoliu ---
+const PortfolioToggle = ({ submission, onToggle }: { submission: Submission, onToggle: (isPublic: boolean) => void }) => {
+    const [isPublic, setIsPublic] = useState(submission.is_public_on_profile);
+    const [isLoading, setIsLoading] = useState(false);
+    const { showToast } = useAuth();
+
+    const handleToggle = async () => {
+        setIsLoading(true);
+        const newStatus = !isPublic;
+        const { error } = await supabase
+            .from('Submission')
+            .update({ is_public_on_profile: newStatus })
+            .eq('id', submission.id);
+        
+        if (error) {
+            showToast('Změna viditelnosti se nezdařila.', 'error');
+        } else {
+            setIsPublic(newStatus);
+            onToggle(newStatus);
+            showToast(newStatus ? 'Výzva byla zveřejněna v portfoliu!' : 'Výzva byla skryta z portfolia.', 'success');
+        }
+        setIsLoading(false);
+    };
+
+    return (
+        <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+                {isPublic ? <Eye className="w-6 h-6 text-blue-500" /> : <EyeOff className="w-6 h-6 text-gray-500" />}
+                <div>
+                    <h4 className="font-bold text-gray-800">Viditelnost v portfoliu</h4>
+                    <p className="text-sm text-gray-600">
+                        {isPublic ? 'Tento úspěch je viditelný na tvém veřejném profilu.' : 'Tento úspěch je skrytý.'}
+                    </p>
+                </div>
+            </div>
+            <button
+                onClick={handleToggle}
+                disabled={isLoading}
+                className={`px-5 py-2 rounded-full font-semibold text-sm transition-colors w-full sm:w-auto ${
+                    isPublic 
+                        ? 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300' 
+                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+            >
+                {isLoading ? 'Měním...' : (isPublic ? 'Skrýt z profilu' : 'Zveřejnit na profilu')}
+            </button>
+        </div>
+    );
+};
+
+// --- Komponenta pro zobrazení získaných XP ---
 type XpEventWithSkill = {
   event_type: string;
   xp_gained: number;
@@ -79,12 +130,14 @@ function XpGainedSummary({ events }: { events: XpEventWithSkill[] }) {
 }
 
 // --- Hlavní komponenta StudentChallengeRecap ---
-export default function StudentChallengeRecap({ submission }: { submission: Submission }) {
+export default function StudentChallengeRecap({ submission, challengeStatus }: { submission: Submission, challengeStatus: 'open' | 'closed' | 'draft' | 'archived' }) {
     const [xpEvents, setXpEvents] = useState<XpEventWithSkill[]>([]);
+    const [currentSubmission, setCurrentSubmission] = useState(submission);
+
+    const isFinal = challengeStatus === 'closed' || challengeStatus === 'archived';
 
     useEffect(() => {
         if (!submission) return;
-
         const fetchXpEvents = async () => {
             const { data, error } = await supabase
                 .from('XpEvent')
@@ -98,19 +151,40 @@ export default function StudentChallengeRecap({ submission }: { submission: Subm
             }
         };
 
-        fetchXpEvents();
-    }, [submission]);
+        if (isFinal) {
+            fetchXpEvents();
+        }
+    }, [submission, isFinal]);
+
+    const handlePortfolioToggle = (isPublic: boolean) => {
+        setCurrentSubmission(prev => ({...prev, is_public_on_profile: isPublic}));
+    };
 
     return (
         <>
-            <div className="bg-white p-8 rounded-2xl shadow-xs mt-8">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs mt-8">
                 <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-[var(--barva-tmava)]">Výsledky tvého řešení</h2>
-                    <p className="text-lg text-gray-600 mt-2">Výzva je již uzavřena. Zde je zpětná vazba od startupu.</p>
+                    <h2 className="text-3xl font-bold text-[var(--barva-tmava)]">
+                        {isFinal ? "Výsledky tvého řešení" : "Tvoje řešení bylo ohodnoceno!"}
+                    </h2>
+                    <p className="text-lg text-gray-600 mt-2">
+                        {isFinal ? "Výzva je již uzavřena. Zde je finální zpětná vazba od startupu." : "Skvělá práce! Startup ti poslal zpětnou vazbu."}
+                    </p>
                 </div>
-                <div className="flex justify-around items-center p-4 max-w-lg mx-auto">
-                    {submission.position && [1, 2, 3].includes(submission.position) && (
-                        <div className="text-center px-4">
+
+                {!isFinal && (
+                    <div className="max-w-2xl mx-auto mb-8 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg flex items-start gap-3">
+                        <Info className="w-8 h-8 text-blue-500 flex-shrink-0" />
+                        <div>
+                            <h4 className="font-bold text-blue-800">Co se děje teď?</h4>
+                            <p className="text-sm text-blue-700">Tvoje řešení je ohodnocené, ale výzva stále běží pro ostatní. Na finální vyhlášení vítězů a případné umístění si ještě musíš počkat po termínu uzávěrky.</p>
+                        </div>
+                    </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row justify-around items-center p-4 max-w-lg mx-auto gap-6">
+                    {isFinal && submission.position && [1, 2, 3].includes(submission.position) && (
+                        <div className="text-center">
                             <p className="text-sm font-semibold text-gray-500">Tvoje umístění</p>
                             <div className="flex items-center gap-2 mt-1">
                                 <Trophy className="w-8 h-8 text-amber-500" />
@@ -119,8 +193,8 @@ export default function StudentChallengeRecap({ submission }: { submission: Subm
                         </div>
                     )}
                     {submission.rating && (
-                        <div className="text-center px-4">
-                            <p className="text-sm font-semibold text-gray-500">Finální hodnocení</p>
+                        <div className="text-center">
+                            <p className="text-sm font-semibold text-gray-500">Hodnocení</p>
                             <div className="flex items-center gap-2 mt-1">
                                 <Star className="w-8 h-8 text-blue-500" />
                                 <p className="text-2xl font-bold text-gray-800">{submission.rating} / 10</p>
@@ -157,9 +231,10 @@ export default function StudentChallengeRecap({ submission }: { submission: Subm
                         </div>
                     )}
                 </div>
+                {isFinal && <PortfolioToggle submission={currentSubmission} onToggle={handlePortfolioToggle} />}
             </div>
             
-            {xpEvents.length > 0 && <XpGainedSummary events={xpEvents} />}
+            {isFinal && xpEvents.length > 0 && <XpGainedSummary events={xpEvents} />}
         </>
     );
 }

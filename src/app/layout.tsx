@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import MainContent from '../components/MainContent';
 import './globals.css';
 import { Sora } from "next/font/google";
-import ToastContainer from '../components/ToastContainer'; // <-- 1. IMPORTUJ TOAST
+import ToastContainer from '../components/ToastContainer';
 
 const sora = Sora({
   subsets: ["latin"],

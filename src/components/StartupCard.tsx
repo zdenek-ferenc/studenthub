@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Briefcase, CheckCircle } from 'lucide-react';
 import { Startup } from '../contexts/DataContext';
+import Link from 'next/link';
 
 type StartupCardProps = {
   startup: Startup;
@@ -98,9 +99,12 @@ export default function StartupCard({ startup }: StartupCardProps) {
         </div>
         
         <div className="mt-auto pt-4 border-t border-gray-100 flex justify-center">
-          <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-2xl hover:opacity-90 transition-opacity">
-            Profil startupu
-          </div>
+          <Link href={`/profile/${startup.user_id}`}>
+            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-2xl hover:opacity-90 transition-opacity">
+              Profil startupu
+            </div>
+          </Link>
+          
         </div>
       </div>
   );

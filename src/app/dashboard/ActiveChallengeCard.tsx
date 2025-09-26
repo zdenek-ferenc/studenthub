@@ -1,11 +1,9 @@
-// Soubor: src/app/dashboard/ActiveChallengeCard.tsx
 "use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckSquare, Clock, Edit3, ChevronRight } from 'lucide-react';
+import { CheckSquare, Clock, Edit3, ChevronRight, Star } from 'lucide-react'; // <-- PŘIDÁNA IKONA Star
 
-// --- ZMĚNA ZDE: Odebrán `deadline` z typu ---
 export type ActiveChallengeData = {
   id: string;
   completed_outputs: string[];
@@ -35,7 +33,7 @@ const ProgressBar = ({ value, maxValue }: { value: number, maxValue: number }) =
   );
 };
 
-// --- FINÁLNÍ VERZE KOMPONENTY PRO STATUS (zjednodušená) ---
+// --- ZDE JE DRUHÁ KLÍČOVÁ ZMĚNA LOGIKY ---
 const StatusInfo = ({ status }: { status: string }) => {
     let text = '';
     let icon = null;
@@ -49,7 +47,12 @@ const StatusInfo = ({ status }: { status: string }) => {
         text = 'Čeká na vyhodnocení';
         icon = <Clock size={14} />;
         colorClass = 'text-amber-500';
-    } else {
+    } else if (status === 'reviewed') { // <-- NOVÝ STAV
+        text = 'Ohodnoceno';
+        icon = <Star size={14} />;
+        colorClass = 'text-green-500';
+    }
+    else {
         return null;
     }
 
@@ -113,7 +116,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 </div>
                 <ProgressBar value={completedCount} maxValue={totalOutputs} />
             </div>
-            <div className="w-full flex justify-end items-end mt-3 h-5">
+            <div className="w-full flex justify-end md:justify-start items-end mt-3 h-5">
                 <div className="group-hover:opacity-0 opacity-100 transition-opacity duration-200">
                     <StatusInfo status={submission.status} />
                 </div>
