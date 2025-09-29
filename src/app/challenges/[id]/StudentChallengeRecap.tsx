@@ -6,7 +6,6 @@ import type { Submission } from './SubmissionCard';
 import { Star, Trophy, MessageSquareText, Download, Award, Sparkles, Eye, EyeOff, Info } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 
-// --- Komponenta pro přepínání viditelnosti v portfoliu ---
 const PortfolioToggle = ({ submission, onToggle }: { submission: Submission, onToggle: (isPublic: boolean) => void }) => {
     const [isPublic, setIsPublic] = useState(submission.is_public_on_profile);
     const [isLoading, setIsLoading] = useState(false);
@@ -55,8 +54,6 @@ const PortfolioToggle = ({ submission, onToggle }: { submission: Submission, onT
         </div>
     );
 };
-
-// --- Komponenta pro zobrazení získaných XP ---
 type XpEventWithSkill = {
   event_type: string;
   xp_gained: number;
@@ -129,7 +126,6 @@ function XpGainedSummary({ events }: { events: XpEventWithSkill[] }) {
     );
 }
 
-// --- Hlavní komponenta StudentChallengeRecap ---
 export default function StudentChallengeRecap({ submission, challengeStatus }: { submission: Submission, challengeStatus: 'open' | 'closed' | 'draft' | 'archived' }) {
     const [xpEvents, setXpEvents] = useState<XpEventWithSkill[]>([]);
     const [currentSubmission, setCurrentSubmission] = useState(submission);
@@ -215,7 +211,7 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                         </div>
                     )}
                     {(submission.file_url || submission.link) && (
-                         <div>
+                        <div>
                             <h5 className="font-semibold text-gray-700 flex items-center gap-2 mb-2 text-lg">
                                 <Download className="w-6 h-6" />
                                 Tvoje odevzdané řešení

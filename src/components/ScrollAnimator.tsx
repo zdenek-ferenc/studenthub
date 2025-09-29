@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useRef, useEffect, useState } from 'react';
@@ -5,8 +6,8 @@ import { useRef, useEffect, useState } from 'react';
 type ScrollAnimatorProps = {
   children: React.ReactNode;
   className?: string;
-  delay?: number; // Zpoždění v ms
-  threshold?: number; // Jak moc musí být prvek vidět (0 až 1)
+  delay?: number; 
+  threshold?: number; 
 };
 
 export default function ScrollAnimator({ children, className, delay = 0, threshold = 0.1 }: ScrollAnimatorProps) {
@@ -18,7 +19,7 @@ export default function ScrollAnimator({ children, className, delay = 0, thresho
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.unobserve(entry.target); // Spustí se jen jednou
+          observer.unobserve(entry.target); 
         }
       },
       { threshold }

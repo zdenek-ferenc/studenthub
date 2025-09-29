@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import type { Submission } from './SubmissionCard';
 import { Download, MessageSquareText } from 'lucide-react';
 
-// --- SUB-KOMPONENTA: KARTA PRO JEDNOHO VÍTĚZE ---
 const SingleWinnerCard = ({ submission }: { submission: Submission }) => {
     const student = submission.StudentProfile;
     return (
@@ -41,7 +40,6 @@ const SingleWinnerCard = ({ submission }: { submission: Submission }) => {
     );
 };
 
-// --- SUB-KOMPONENTA: SEZNAM VÍTĚZŮ POD PÓDIEM ---
 const WinnerListItem = ({ submission }: { submission: Submission }) => {
     const student = submission.StudentProfile;
     const placeText: { [key: number]: string } = { 1: "1st", 2: "2nd", 3: "3rd" };
@@ -69,7 +67,6 @@ const WinnerListItem = ({ submission }: { submission: Submission }) => {
     );
 };
 
-// --- HLAVNÍ KOMPONENTA PRO REKAPITULACI ---
 export default function ChallengeRecapView({ submissions }: { submissions: Submission[] }) {
     
     const winners = useMemo(() => {
@@ -78,14 +75,12 @@ export default function ChallengeRecapView({ submissions }: { submissions: Submi
             .sort((a, b) => a.position! - b.position!);
     }, [submissions]);
 
-    // Pořadí pro vizuální zobrazení na pódiu (2, 1, 3)
     const podiumOrder = [
         winners.find(w => w.position === 2),
         winners.find(w => w.position === 1),
         winners.find(w => w.position === 3)
     ].filter(Boolean) as Submission[];
 
-    // Výšky sloupců pro pódium
     const barHeights: { [key: number]: string } = { 1: 'h-48', 2: 'h-40', 3: 'h-32' };
 
     const renderContent = () => {
@@ -96,23 +91,18 @@ export default function ChallengeRecapView({ submissions }: { submissions: Submi
         if (winners.length > 1) {
             return (
                 <>
-                    {/* VIZUÁLNÍ GRAF VÍTĚZŮ (PÓDIUM) */}
                     <div className="flex justify-center items-end gap-4 sm:gap-8 h-64 mb-12">
                         {podiumOrder.map(winner => (
                             <div key={winner.id} className="flex flex-col items-center relative w-1/3 max-w-[120px]">
-                                {/* Avatar */}
                                 <div className="absolute -top-6 w-16 h-16 rounded-full bg-gray-200 border-4 border-white flex items-center justify-center font-bold text-gray-500 text-xl shadow-md">
                                     {winner.StudentProfile?.first_name?.[0]}{winner.StudentProfile?.last_name?.[0]}
                                 </div>
-                                {/* Sloupec grafu */}
                                 <div className={`w-full rounded-t-lg bg-[var(--barva-primarni2)] flex flex-col justify-end items-center p-2 text-center ${barHeights[winner.position!]}`}>
                                     <p className="font-bold text-2xl text-[var(--barva-primarni)]">{winner.position}</p>
                                 </div>
                             </div>
                         ))}
                     </div>
-
-                    {/* SEZNAM VÍTĚZŮ */}
                     <div className="space-y-3 max-w-2xl mx-auto">
                         {winners.map(winner => (
                             <WinnerListItem key={winner.id} submission={winner} />

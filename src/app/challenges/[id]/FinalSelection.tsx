@@ -14,7 +14,7 @@ type ContainerId = 'shortlist' | 'place1' | 'place2' | 'place3';
 const FinalistItem = ({ submission, isOverlay = false }: { submission: AnonymousSubmission, isOverlay?: boolean }) => (
     <div className={`flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border ${isOverlay ? 'shadow-lg scale-105' : ''}`}>
         <div className="cursor-grab active:cursor-grabbing touch-none">
-             <GripVertical className="h-5 w-5 text-gray-400" />
+            <GripVertical className="h-5 w-5 text-gray-400" />
         </div>
         <div className="flex-grow">
             <p className="font-bold text-gray-800 text-sm">{submission.anonymousId}</p>
@@ -106,41 +106,27 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
             return;
         }
 
-        // --- KOMPLETNÍ REWORK LOGIKY PRO PŘESUN MEZI KONTEJNERY ---
         const containers: { [key in ContainerId]: AnonymousSubmission[] } = { shortlist, place1, place2, place3 };
         const setters: { [key in ContainerId]: Dispatch<SetStateAction<AnonymousSubmission[]>> } = { shortlist: setShortlist, place1: setPlace1, place2: setPlace2, place3: setPlace3 };
 
         const activeItem = submissions.find(s => s.id === activeIdStr);
         if (!activeItem) return;
-
-        // 1. Odeber item z původního kontejneru
         const newActiveItems = containers[activeContainer].filter(item => item.id !== activeIdStr);
-        
-        // 2. Připrav nový cílový kontejner
         const newOverItems = [...containers[overContainer]];
         let itemToSwap: AnonymousSubmission | undefined = undefined;
-
-        // Pokud je cílový kontejner vítězný slot a je obsazený, připrav prohození
         if (overContainer.startsWith('place') && newOverItems.length > 0) {
             itemToSwap = newOverItems.pop();
         }
-
-        // Vlož nový item do cílového kontejneru
         newOverItems.push(activeItem);
-
-        // 3. Aktualizuj stavy
         setters[activeContainer](newActiveItems);
         setters[overContainer](newOverItems);
-
-        // 4. Pokud se prohazovalo, vrať prohozený item zpět do shortlistu
         if (itemToSwap) {
             setShortlist(current => [...current, itemToSwap!].sort((a, b) => (b.rating || 0) - (a.rating || 0)));
         }
     };
     
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
-    const activeSubmission = activeId ? submissions.find(s => s.id === activeId) : null;
-    
+    const activeSubmission = activeId ? submissions.find(s => s.id === activeId) : null;    
     const handleFinalizeClick = () => {
         const winnerIds: { [key: number]: string } = {};
         if (place1[0]) winnerIds[1] = place1[0].id;
@@ -151,7 +137,6 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
 
     const allSlotsFilled = winnerSlots.every(place => (place === 1 ? place1 : place === 2 ? place2 : place3).length > 0);
     const displayedShortlist = showLowRated ? shortlist : shortlist.filter(s => (s.rating || 0) >= 5);
-
     return (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="text-center mb-8">
@@ -176,18 +161,16 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
                     </SortableContext>
                 </div>
                 <div className="lg:col-span-1 grid grid-cols-1 gap-4">
-                     {winnerSlots.includes(1) && <WinnerDropzone place={1} submission={place1[0] || null} reward={challenge.reward_first_place} />}
-                     {winnerSlots.includes(2) && <WinnerDropzone place={2} submission={place2[0] || null} reward={challenge.reward_second_place} />}
-                     {winnerSlots.includes(3) && <WinnerDropzone place={3} submission={place3[0] || null} reward={challenge.reward_third_place} />}
+                    {winnerSlots.includes(1) && <WinnerDropzone place={1} submission={place1[0] || null} reward={challenge.reward_first_place} />}
+                    {winnerSlots.includes(2) && <WinnerDropzone place={2} submission={place2[0] || null} reward={challenge.reward_second_place} />}
+                    {winnerSlots.includes(3) && <WinnerDropzone place={3} submission={place3[0] || null} reward={challenge.reward_third_place} />}
                 </div>
             </div>
-            
             <div className="text-center mt-10">
                 <button onClick={handleFinalizeClick} disabled={!allSlotsFilled} className="px-8 py-4 rounded-full bg-green-600 text-white font-bold text-lg shadow-lg hover:bg-green-700 transition-transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed">
                     {allSlotsFilled ? 'Vyhlásit výsledky a uzavřít výzvu' : `Obsaďte všechny pozice (${winnerSlots.length})`}
                 </button>
             </div>
-
             <DragOverlay>{activeSubmission && <FinalistItem submission={activeSubmission} isOverlay />}</DragOverlay>
         </DndContext>
     );

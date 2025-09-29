@@ -14,14 +14,14 @@ type TagStyle = {
   pulse?: boolean;
 };
 
-// Funkce pro výpočet zbývajícího času a určení stylu
+
 const getDeadlineInfo = (deadline: string | null): TagStyle | null => {
   if (!deadline) return null;
 
   const now = new Date();
   const deadlineDate = new Date(deadline);
 
-  // Nastavíme čas na začátek dne pro spravedlivé porovnání kalendářních dnů
+  
   now.setHours(0, 0, 0, 0);
   deadlineDate.setHours(0, 0, 0, 0);
 
@@ -29,7 +29,7 @@ const getDeadlineInfo = (deadline: string | null): TagStyle | null => {
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
-    return null; // Termín již vypršel
+    return null; 
   }
 
   if (diffDays === 0) {
@@ -65,7 +65,7 @@ const getDeadlineInfo = (deadline: string | null): TagStyle | null => {
     };
   }
 
-  return null; // Více než 7 dní do konce
+  return null; 
 };
 
 
@@ -73,7 +73,7 @@ export default function DeadlineTag({ deadline, className }: DeadlineTagProps) {
   const [tagStyle, setTagStyle] = useState<TagStyle | null>(null);
 
   useEffect(() => {
-    // Přidáme timeout, aby se předešlo hydratačním chybám v Next.js
+    
     const timer = setTimeout(() => {
       setTagStyle(getDeadlineInfo(deadline));
     }, 1);

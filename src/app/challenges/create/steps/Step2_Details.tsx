@@ -3,7 +3,6 @@ import { useFormContext, useFieldArray } from "react-hook-form";
 import { ChallengeFormData } from "../CreateChallengeWizard";
 import { PlusCircle, XCircle } from "lucide-react";
 
-// Pomocná komponenta pro strukturu pole formuláře
 const FormField = ({ label, description, children }: { label: string, description: string, children: React.ReactNode }) => (
     <div>
         <label className="block text-xl font-bold text-gray-800">{label}</label>
@@ -14,8 +13,6 @@ const FormField = ({ label, description, children }: { label: string, descriptio
 
 export default function Step2_Details() {
     const { register, control, formState: { errors } } = useFormContext<ChallengeFormData>();
-
-    // --- OPRAVA ZDE: Odstraněn 'as any' a správně se odkazuje na typ v ChallengeFormData ---
     const { fields, append, remove } = useFieldArray({
         control,
         name: "expected_outputs", 
@@ -62,7 +59,6 @@ export default function Step2_Details() {
                     {fields.map((field, index) => (
                         <div key={field.id} className="flex items-center gap-2">
                             <input
-                                // --- OPRAVA ZDE: Správná cesta k registraci pole objektů ---
                                 {...register(`expected_outputs.${index}.value` as const, { required: true })}
                                 className="input flex-grow"
                                 placeholder={`Např. PDF prezentace, odkaz na Figmu...`}
@@ -74,7 +70,6 @@ export default function Step2_Details() {
                     ))}
                     <button 
                         type="button" 
-                        // --- OPRAVA ZDE: Přidáváme objekt, ne jen string ---
                         onClick={() => append({ value: "" })}
                         className="flex items-center gap-2 text-sm font-semibold text-[var(--barva-primarni)] hover:text-blue-700 transition-colors"
                     >

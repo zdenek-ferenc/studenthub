@@ -2,7 +2,6 @@
 import { useFormContext } from "react-hook-form";
 import { ChallengeFormData } from "../CreateChallengeWizard";
 
-// Pomocná komponenta pro strukturu pole formuláře
 const FormField = ({ label, description, children }: { label: string, description: string, children: React.ReactNode }) => (
     <div>
         <label className="block text-xl font-bold text-gray-800">{label}</label>

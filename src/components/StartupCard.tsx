@@ -9,7 +9,6 @@ type StartupCardProps = {
   startup: Startup;
 };
 
-// --- NOVÁ POMOCNÁ FUNKCE PRO SKLOŇOVÁNÍ ---
 const formatChallengeText = (count: number, type: 'active' | 'completed') => {
   const activeNouns = {
     one: 'aktivní výzva',
@@ -31,7 +30,6 @@ const formatChallengeText = (count: number, type: 'active' | 'completed') => {
   if (count >= 2 && count <= 4) {
     return `${count} ${nouns.few}`;
   }
-  // Pro 0, 5 a více
   return `${count} ${nouns.other}`;
 };
 
@@ -45,8 +43,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
   const completedChallenges = startup.Challenge?.filter(c => c.status === 'closed').length ?? 0;
 
   return (
-      <div className="bg-white rounded-2xl shadow-xs p-6 border border-gray-100 hover:shadow-none transition-all duration-300 ease-in-out flex flex-col h-full cursor-pointer">
-        
+      <div className="bg-white rounded-2xl shadow-xs p-6 border border-gray-100 hover:shadow-none transition-all duration-300 ease-in-out flex flex-col h-full cursor-pointer">       
         <div className="flex items-center gap-4 mb-4">
           {startup.logo_url ? (
             <Image 
@@ -66,12 +63,9 @@ export default function StartupCard({ startup }: StartupCardProps) {
             {startup.website && <p className="text-sm text-blue-500 hover:underline">{startup.website}</p>}
           </div>
         </div>
-
         <p className="text-gray-600 text-sm mb-5 line-clamp-3 flex-grow">
           {startup.description || 'Tento startup zatím nepřidal žádný popis.'}
         </p>
-
-        {/* --- ZMĚNA ZDE: POUŽITÍ NOVÉ FUNKCE --- */}
         <div className="flex items-center gap-4 mb-5 text-sm font-medium text-gray-500">
           <div className="flex items-center gap-1.5">
             <Briefcase className="text-blue-500" size={18} />
@@ -82,7 +76,6 @@ export default function StartupCard({ startup }: StartupCardProps) {
             <span>{formatChallengeText(completedChallenges, 'completed')}</span>
           </div>
         </div>
-
         <div className="flex flex-wrap items-center gap-2 mb-6">
           {startup.StartupCategory?.slice(0, 3).map(({ Category }) => (
             Category && (
@@ -92,9 +85,9 @@ export default function StartupCard({ startup }: StartupCardProps) {
             )
           ))}
           {startup.StartupCategory?.length > 3 && (
-             <span className="text-[var(--barva-primarni)] text-sm">
-               +{startup.StartupCategory.length - 3} další
-             </span>
+            <span className="text-[var(--barva-primarni)] text-sm">
+              +{startup.StartupCategory.length - 3} další
+            </span>
           )}
         </div>
         
@@ -103,8 +96,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
             <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-2xl hover:opacity-90 transition-opacity">
               Profil startupu
             </div>
-          </Link>
-          
+          </Link>          
         </div>
       </div>
   );

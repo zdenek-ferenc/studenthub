@@ -3,20 +3,20 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
-// Přejmenovali jsme typ z Skill na Category
+
 type Category = {
   id: string;
   name: string;
 };
 
-// Přejmenovali jsme props
+
 type CategorySelectorProps = {
   onSelectionChange: (selectedIds: string[]) => void;
   initialSelectedIds?: string[];
 };
 
 export default function CategorySelector({ onSelectionChange, initialSelectedIds = [] }: CategorySelectorProps) {
-  // Přejmenovali jsme všechny stavy a funkce
+  
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
   const [loading, setLoading] = useState(true);
@@ -26,7 +26,7 @@ export default function CategorySelector({ onSelectionChange, initialSelectedIds
   useEffect(() => {
     const fetchCategories = async () => {
       setLoading(true);
-      // ZMĚNA: Dotazujeme se do tabulky "Category" místo "Skill"
+      
       const { data, error } = await supabase
         .from('Category')
         .select('*')
@@ -66,7 +66,7 @@ export default function CategorySelector({ onSelectionChange, initialSelectedIds
   });
 
   if (loading) {
-    // Změnili jsme text
+    
     return <p className='text-center text-[var(--barva-primarni)] text-4xl font-bold'>Načítám kategorie...</p>;
   }
 
@@ -80,21 +80,20 @@ export default function CategorySelector({ onSelectionChange, initialSelectedIds
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        // Změnili jsme placeholder
+        
         placeholder="Hledej kategorii"
         className="flex min-w-[24rem] content-start m-auto mb-12 px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]"
       />
 
       <div className="flex flex-wrap justify-center gap-8 px-32">
-        {/* Procházíme vyfiltrované kategorie */}
         {filteredCategories.map(category => (
           <button
             key={category.id}
             onClick={() => handleToggleCategory(category.id)}
             className={`px-6 py-2 text-[var(--barva-primarni)] rounded-full font-light text-3xl outline-2 transition-colors duration-200 cursor-pointer
               ${selectedIds.includes(category.id)
-                ? 'bg-[var(--barva-primarni2)]' // Styl pro vybranou bublinu
-                : 'bg-white' // Styl pro nevybranou
+                ? 'bg-[var(--barva-primarni2)]' 
+                : 'bg-white' 
               }`}
           >
             {category.name}

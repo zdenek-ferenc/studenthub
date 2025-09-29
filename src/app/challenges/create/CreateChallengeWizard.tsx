@@ -13,23 +13,23 @@ import Step4_Summary from './steps/Step4_Summary';
 import { CheckCircle, Check } from 'lucide-react';
 
 export type ChallengeFormData = {
-  id?: string;
-  title: string;
-  short_description: string;
-  description: string;
-  goals: string;
-  expected_outputs: { value: string }[];
-  has_financial_reward: boolean;
-  reward_first_place?: number;
-  reward_second_place?: number;
-  reward_third_place?: number;
-  reward_description?: string;
-  skills: string[];
-  attachments_urls: string[];
-  deadline: string;
-  max_applicants: number;
-  type: 'public' | 'anonymous';
-  status: 'draft' | 'open';
+id?: string;
+title: string;
+short_description: string;
+description: string;
+goals: string;
+expected_outputs: { value: string }[];
+has_financial_reward: boolean;
+reward_first_place?: number;
+reward_second_place?: number;
+reward_third_place?: number;
+reward_description?: string;
+skills: string[];
+attachments_urls: string[];
+deadline: string;
+max_applicants: number;
+type: 'public' | 'anonymous';
+status: 'draft' | 'open';
 };
 
 const STEPS = [
@@ -48,7 +48,6 @@ export default function CreateChallengeWizard() {
     const [challengeId, setChallengeId] = useState<string | null>(searchParams.get('draft_id'));
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
     const [isLoading, setIsLoading] = useState(true);
-    // --- NOVÁ LOGIKA: Stav pro sledování dokončených kroků ---
     const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
     const methods = useForm<ChallengeFormData>({
@@ -86,11 +85,10 @@ export default function CreateChallengeWizard() {
                     };
                     methods.reset(fetchedData);
                     
-                    // --- NOVÁ LOGIKA: Zjištění dokončených kroků z načtených dat ---
                     const newCompleted = new Set<number>();
                     if (data.title && data.short_description) newCompleted.add(1);
                     if (data.description && data.goals && data.expected_outputs) newCompleted.add(2);
-                    if (data.deadline) newCompleted.add(3); // Deadline je povinný v kroku 3
+                    if (data.deadline) newCompleted.add(3);
                     setCompletedSteps(newCompleted);
 
                 } else {
@@ -170,18 +168,14 @@ export default function CreateChallengeWizard() {
             if (formData.skills.length > 0) {
                 const skillsToInsert = formData.skills.map((skillId: string) => ({ challenge_id: currentChallengeId, skill_id: skillId }));
                 const { error: skillsError } = await supabase.from('ChallengeSkill').insert(skillsToInsert);
-                 if (skillsError) {
+                if (skillsError) {
                     console.error("Chyba při ukládání dovedností:", skillsError);
                 }
             }
         }
-        
-        // --- NOVÁ LOGIKA: Označíme aktuální krok jako dokončený ---
         setCompletedSteps(prev => new Set(prev).add(step));
-
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
-
         if (step < 4) {
             setStep(s => s + 1);
         }
@@ -221,9 +215,7 @@ export default function CreateChallengeWizard() {
                         {STEPS.map((s) => {
                             const isCompleted = completedSteps.has(s.id);
                             const isActive = step === s.id;
-                            // --- NOVÁ LOGIKA: Krok je klikatelný, pokud je dokončený, nebo je to první nehotový krok ---
                             const isClickable = isCompleted || completedSteps.has(s.id - 1) || s.id === 1;
-
                             return (
                                 <button
                                     key={s.id}
@@ -235,24 +227,21 @@ export default function CreateChallengeWizard() {
                                         ${isActive ? 'bg-[var(--barva-primarni)] text-white shadow-md' : 'text-[var(--barva-tmava)] hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'}`}
                                 >
                                     <span className={`flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${isActive || isCompleted ? 'bg-white text-[var(--barva-primarni)]' : 'bg-gray-200 text-gray-500'}`}>
-                                        {/* --- NOVÁ LOGIKA: Zobrazí fajfku jen pokud je krok dokončený a NENÍ aktivní --- */}
                                         {isCompleted && !isActive ? <Check size={18} /> : s.id}
                                     </span>
                                     {s.name}
                                 </button>
                             )
                         })}
-                         <div className="pt-4 text-center text-sm text-gray-500 h-6">
+                        <div className="pt-4 text-center text-sm text-gray-500 h-6">
                             {saveStatus === 'saving' && 'Ukládám...'}
                             {saveStatus === 'saved' && <span className="flex items-center justify-center gap-1 text-green-600"><CheckCircle size={16}/> Koncept uložen</span>}
                         </div>
                     </nav>
                 </aside>
-
                 <main className="md:col-span-3">
                     <form onSubmit={(e) => e.preventDefault()} className="bg-white p-8 rounded-2xl shadow-sm">
                         {renderStepContent()}
-
                         <div className="mt-8 pt-6 border-t flex justify-between items-center">
                             <button 
                                 type="button" 

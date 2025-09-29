@@ -1,12 +1,16 @@
 "use client";
 import { useState } from 'react';
-import SkillSelector from '../../../../components/SkillSelector'; // Uprav cestu, pokud je potřeba
+import SkillSelector from '../../../../components/SkillSelector';
+
+type Skill = { id: string; name: string; };
 
 type StepProps = {
   onNext: (data: { skills: string[] }) => void;
+  allSkills: Skill[];
+  isLoading: boolean;
 };
 
-export default function Step3_Skills({ onNext }: StepProps) {
+export default function Step3_Skills({ onNext, allSkills, isLoading }: StepProps) {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
   const handleContinue = () => {
@@ -14,16 +18,26 @@ export default function Step3_Skills({ onNext }: StepProps) {
   };
 
   return (
-    <div className="flex items-center flex-col py-24 w-2/3 mx-auto bg-white shadow-lg rounded-4xl">
-      <h2 className="text-5xl text-[var(--barva-tmava)] font-bold mb-2">Zvol si své dovednosti</h2>
-      <p className="text-gray-600 mb-6">Vyber vše, co umíš. Pomůže ti to najít relevantní výzvy.</p>
-      <SkillSelector onSelectionChange={setSelectedSkills} />
-      <button onClick={handleContinue} className="mt-8 px-14 py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] text-2xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out">Pokračovat</button>
-      {/* Tento blok je jen pro ukázku, abys viděl, že se stav mění */}
-      <div className="mt-8 p-4 bg-gray-100 rounded-md">
-        <h3 className="font-semibold text-black">testing: Aktuálně vybrané IDčka dovedností:</h3>
-        <p className="text-sm text-black">{selectedSkills.join(', ')}</p>
-      </div>
+    <div className="flex items-center flex-col p-4 sm:p-8 md:py-16 w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl">
+      <h2 className="text-[var(--barva-primarni)] text-4xl mb-2 text-center">Dovednosti</h2>
+      <p className="text-gray-600 mb-6 sm:mb-8 text-center px-4">Vyber vše, co umíš. Pomůže ti to najít relevantní výzvy.</p>
+      
+      {isLoading ? (
+        <p className='text-[var(--barva-primarni)] text-2xl sm:text-4xl font-bold'>Načítám dovednosti...</p>
+      ) : (
+        <SkillSelector 
+          onSelectionChange={setSelectedSkills} 
+          allSkills={allSkills} 
+        />
+      )}
+      
+      <button 
+        onClick={handleContinue} 
+        disabled={isLoading} 
+        className="mt-8 sm:mt-12 px-8 py-3 sm:px-14 sm:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] text-lg sm:text-2xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400"
+      >
+        Pokračovat
+      </button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '../lib/supabaseClient'; // Uprav cestu, pokud je potřeba
+import { supabase } from '../lib/supabaseClient';
 
 type Skill = {
   id: string;
@@ -13,7 +13,6 @@ type SkillSelectorProps = {
   initialSelectedIds?: string[];
 };
 
-// Seznam nejdůležitějších dovedností, které se zobrazí na začátku
 const popularSkills = [
   'Marketing', 'Copywriting', 'SEO', 'Sociální sítě', 'React', 
   'Python', 'UI Design', 'UX Design', 'Figma', 'Canva', 
@@ -25,7 +24,6 @@ export default function SkillSelectorChallenge({ onSelectionChange, initialSelec
   const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  // Nový stav pro zobrazení všech dovedností
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
@@ -53,33 +51,28 @@ export default function SkillSelectorChallenge({ onSelectionChange, initialSelec
     } else {
       newSelectedIds.add(skillId);
     }
-    
     const updatedIds = Array.from(newSelectedIds);
     setSelectedIds(updatedIds);
     onSelectionChange(updatedIds);
   };
 
   const displayedSkills = useMemo(() => {
-    // Pokud uživatel hledá, má to nejvyšší prioritu
     if (searchTerm) {
       return allSkills.filter(skill =>
         skill.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    // Pokud chce zobrazit všechny, zobrazíme všechny
     if (showAll) {
       return allSkills;
     }
-    // Jinak zobrazíme jen ty populární
     return allSkills.filter(skill => popularSkills.includes(skill.name));
   }, [searchTerm, allSkills, showAll]);
 
-  // Dynamický nadpis pro sekci s dovednostmi
-  const getSkillsTitle = () => {
-    if (searchTerm) return "Výsledky vyhledávání";
-    if (showAll) return "Všechny dovednosti";
-    return "Populární dovednosti";
-  };
+const getSkillsTitle = () => {
+  if (searchTerm) return "Výsledky vyhledávání";
+  if (showAll) return "Všechny dovednosti";
+  return "Populární dovednosti";
+};
 
   if (loading) {
     return <p className="text-gray-500">Načítám dovednosti...</p>;
@@ -96,7 +89,6 @@ export default function SkillSelectorChallenge({ onSelectionChange, initialSelec
       />
       
       <div className="min-h-[6rem]">
-        {/* Zobrazíme nejdříve vybrané dovednosti */}
         <div className="flex flex-wrap gap-3 mb-3 border-b-2 border-[var(--barva-svetle-pozadi)] py-6">
           {selectedIds.map(id => {
             const skill = allSkills.find(s => s.id === id);
@@ -114,8 +106,6 @@ export default function SkillSelectorChallenge({ onSelectionChange, initialSelec
             );
           })}
         </div>
-        
-        {/* Nadpis a tlačítko pro zobrazení všech */}
         <div className="flex justify-between items-center mb-4">
             <h4 className="text-sm font-semibold opacity-70 text-[var(--barva-primarni)]">{getSkillsTitle()}</h4>
             {!searchTerm && (
@@ -127,8 +117,6 @@ export default function SkillSelectorChallenge({ onSelectionChange, initialSelec
                 </button>
             )}
         </div>
-
-        {/* Poté zobrazíme zbytek (nevybrané) */}
         <div className="flex flex-wrap gap-3">
           {displayedSkills.filter(skill => !selectedIds.includes(skill.id)).map(skill => (
             <button

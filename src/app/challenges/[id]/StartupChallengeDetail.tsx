@@ -10,9 +10,8 @@ import ConfirmationModal from '../../../components/ConfirmationModal';
 import ChallengeRecapView from './ChallengeRecapView';
 import { useAuth } from '../../../contexts/AuthContext';
 import { AlertCircle, CheckCircle, Lock, Clock, Users,} from 'lucide-react';
-import { differenceInDays, format } from 'date-fns'; // Pro práci s datem
+import { differenceInDays, format } from 'date-fns';
 
-// Typy zůstávají stejné
 type Challenge = {
   id: string; status: 'draft' | 'open' | 'closed' | 'archived'; title: string;
   description: string; goals: string; expected_outputs: string;
@@ -43,10 +42,8 @@ const EvaluationStatusPanel = ({
     const allRated = ratedCount === totalCount && totalCount > 0;
     const deadlineDate = new Date(deadline);
     const daysRemaining = differenceInDays(deadlineDate, new Date());
-    const timeProgress = Math.max(0, 100 - (daysRemaining / 30) * 100); // Předpokládáme max 30 dní
+    const timeProgress = Math.max(0, 100 - (daysRemaining / 30) * 100);
     const capacityProgress = maxApplicants ? (applicants / maxApplicants) * 100 : 0;
-
-    // Pokud ještě nelze finalizovat, zobrazíme nový, detailní panel
     if (!canFinalize) {
         return (
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
@@ -55,8 +52,6 @@ const EvaluationStatusPanel = ({
                         {daysRemaining < 0 ? "Výzva je po termínu, čeká se na odevzdání" : "Výzva je v plném proudu"}
                     </h3>
                     <p className="text-center text-gray-500 mb-8">Zde je přehled aktuálního stavu a dalších kroků.</p>
-
-                    {/* Progress bary */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                         <div>
                             <div className="flex justify-between items-center mb-1 font-semibold text-sm">
@@ -73,8 +68,6 @@ const EvaluationStatusPanel = ({
                             <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{ width: `${capacityProgress}%` }}></div></div>
                         </div>
                     </div>
-
-                    {/* Akce */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-gray-50 p-4 rounded-xl">
                             <h4 className="font-bold text-lg text-gray-800">Co teď?</h4>
@@ -97,8 +90,6 @@ const EvaluationStatusPanel = ({
             </div>
         );
     }
-    
-    // Pokud už lze finalizovat, zobrazíme původní, upravený panel
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
             <div className="max-w-2xl mx-auto">
@@ -134,39 +125,39 @@ const EvaluationStatusPanel = ({
 
 
 export default function StartupChallengeDetail({ challenge }: { challenge: Challenge }) {
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<'evaluating' | 'selecting_winners'>('evaluating');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [winnersToConfirm, setWinnersToConfirm] = useState<{ [key: number]: string } | null>(null);
-  const router = useRouter();
-  const { showToast } = useAuth();
+const [submissions, setSubmissions] = useState<Submission[]>([]);
+const [loading, setLoading] = useState(true);
+const [view, setView] = useState<'evaluating' | 'selecting_winners'>('evaluating');
+const [isModalOpen, setIsModalOpen] = useState(false);
+const [winnersToConfirm, setWinnersToConfirm] = useState<{ [key: number]: string } | null>(null);
+const router = useRouter();
+const { showToast } = useAuth();
 
-  const fetchInitialSubmissions = useCallback(async () => {
+const fetchInitialSubmissions = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('Submission')
-      .select(`*, StudentProfile(*)`)
-      .eq('challenge_id', challenge.id)
-      .order('created_at', { ascending: true });
+    .from('Submission')
+    .select(`*, StudentProfile(*)`)
+    .eq('challenge_id', challenge.id)
+    .order('created_at', { ascending: true });
 
     if (error) {
-      console.error("Chyba při načítání přihlášek:", error);
+    console.error("Chyba při načítání přihlášek:", error);
     } else {
-      setSubmissions(data as Submission[]);
+    setSubmissions(data as Submission[]);
     }
     setLoading(false);
-  }, [challenge.id]);
+}, [challenge.id]);
 
-  useEffect(() => {
+useEffect(() => {
     fetchInitialSubmissions();
-  }, [fetchInitialSubmissions]);
+}, [fetchInitialSubmissions]);
 
-  const handleSubmissionUpdate = (updatedSubmission: Submission) => {
-    setSubmissions(current => current.map(s => s.id === updatedSubmission.id ? updatedSubmission : s));
-  };
-  
-  const { canFinalize, ratedCount } = useMemo(() => {
+const handleSubmissionUpdate = (updatedSubmission: Submission) => {
+setSubmissions(current => current.map(s => s.id === updatedSubmission.id ? updatedSubmission : s));
+};
+
+const { canFinalize, ratedCount } = useMemo(() => {
     const isAfterDeadline = new Date() > new Date(challenge.deadline);
     
     const maxApplicants = challenge.max_applicants || 0;
@@ -174,9 +165,9 @@ export default function StartupChallengeDetail({ challenge }: { challenge: Chall
     const submittedCount = submissions.filter(s => s.status === 'submitted' || s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected').length;
     
     const isFullAndAllHaveSubmitted = 
-      maxApplicants > 0 &&
-      appliedCount === maxApplicants &&
-      submittedCount === appliedCount;
+    maxApplicants > 0 &&
+    appliedCount === maxApplicants &&
+    submittedCount === appliedCount;
 
     const rated = submissions.filter(s => s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected');
     
@@ -184,18 +175,18 @@ export default function StartupChallengeDetail({ challenge }: { challenge: Chall
         canFinalize: isAfterDeadline || isFullAndAllHaveSubmitted,
         ratedCount: rated.length,
     };
-  }, [challenge, submissions]);
-  
-  const anonymousSubmissions = useMemo(() => 
+}, [challenge, submissions]);
+
+const anonymousSubmissions = useMemo(() => 
     submissions.map((sub, index) => ({...sub, anonymousId: `Řešení #${index + 1}`})
-  ), [submissions]);
+), [submissions]);
 
-  const prepareToFinalize = (winners: { [key: number]: string }) => {
-      setWinnersToConfirm(winners);
-      setIsModalOpen(true);
-  };
+const prepareToFinalize = (winners: { [key: number]: string }) => {
+    setWinnersToConfirm(winners);
+    setIsModalOpen(true);
+};
 
-  const handleFinalizeChallenge = async () => {
+const handleFinalizeChallenge = async () => {
     if (!winnersToConfirm) return;
     const updates = Object.entries(winnersToConfirm).map(([place, submissionId]) => 
         supabase.from('Submission').update({ position: parseInt(place), status: 'winner' }).eq('id', submissionId)
@@ -204,21 +195,21 @@ export default function StartupChallengeDetail({ challenge }: { challenge: Chall
     const { error } = await supabase.from('Challenge').update({ status: 'closed' }).eq('id', challenge.id);
     if (error) showToast(`Chyba: ${error.message}`, 'error');
     else {
-      showToast('Výsledky byly úspěšně vyhlášeny!', 'success');
-      router.push('/profile');
+    showToast('Výsledky byly úspěšně vyhlášeny!', 'success');
+    router.push('/profile');
     }
     setIsModalOpen(false);
-  };
+};
 
-  if (loading) return <p className="text-center py-20">Načítám přihlášky...</p>;
+if (loading) return <p className="text-center py-20">Načítám přihlášky...</p>;
 
-  return (
+return (
     <div className="container mx-auto py-12 space-y-8">
-      <ChallengeDetailBox challenge={challenge} />
+    <ChallengeDetailBox challenge={challenge} />
 
-      {challenge.status === 'closed' ? (
+    {challenge.status === 'closed' ? (
         <ChallengeRecapView submissions={submissions} />
-      ) : (
+    ) : (
         <>
             {view === 'evaluating' && (
                 <>
@@ -264,7 +255,7 @@ export default function StartupChallengeDetail({ challenge }: { challenge: Chall
                 message="Tato akce je nevratná. Vítězům bude přiřazeno pořadí, výzva se uzavře a identity studentů se odhalí."
             />
         </>
-      )}
+    )}
     </div>
-  );
+);
 }

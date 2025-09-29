@@ -1,17 +1,15 @@
 "use client";
-import { useEffect, useState, useMemo } from "react"; // OPRAVA: Přidán chybějící import 'useMemo'
+import { useEffect, useState, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { ChallengeFormData } from "../CreateChallengeWizard";
 import { supabase } from "../../../../lib/supabaseClient";
 import { Edit2, CheckCircle, Tag, Target, DollarSign, Settings, FileText, Info } from "lucide-react";
 
-// Typ pro načtené dovednosti z DB
 type Skill = {
     id: string;
     name: string;
 };
 
-// Vylepšená komponenta pro řádek souhrnu
 const SummaryRow = ({ 
     label, 
     value, 
@@ -109,7 +107,7 @@ export default function Step4_Summary({ setStep }: { setStep: (step: number) => 
                                 </h4>
                                 <p className="text-sm max-w-xl mt-1">{data.description}</p>
                             </div>
-                             <div>
+                            <div>
                                 <h4 className="font-bold text-gray-600 flex items-center gap-2 not-prose">
                                     <Target size={16} /> Cíle
                                 </h4>
@@ -131,7 +129,7 @@ export default function Step4_Summary({ setStep }: { setStep: (step: number) => 
                     setStep={setStep} 
                     icon={FileText}
                 />
-                 <SummaryRow 
+                <SummaryRow 
                     label="Nastavení" 
                     value={
                         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -143,7 +141,7 @@ export default function Step4_Summary({ setStep }: { setStep: (step: number) => 
                     setStep={setStep}
                     icon={Settings}
                 />
-                 <SummaryRow 
+                <SummaryRow 
                     label="Potřebné dovednosti" 
                     value={
                         <div className="flex flex-wrap gap-2">

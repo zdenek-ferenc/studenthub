@@ -31,18 +31,25 @@ export default function RecommendedChallengesWidget() {
             const { data: openChallengesData } = await supabase
                 .from('Challenge')
                 .select(`id, title, deadline, max_applicants, StartupProfile(company_name, logo_url), ChallengeSkill(Skill(id)), Submission(count)`)
-                .eq('status', 'open');
+                .eq('status', 'open'); // Načteme jen ty, co mají status 'open'
 
             if (!openChallengesData) { setLoading(false); return; }
 
             const scoredChallenges = openChallengesData
                 .map(challenge => {
+                    // --- ZDE JE KLÍČOVÁ OPRAVA ---
+                    // Přidali jsme kontrolu, zda je deadline v budoucnosti.
+                    // Pokud není, výzvu přeskočíme (return null).
+                    const isStillActive = challenge.deadline ? new Date(challenge.deadline) >= new Date() : false;
+                    if (!isStillActive) {
+                        return null;
+                    }
+                    
                     const submissionCount = challenge.Submission[0]?.count || 0;
                     if (appliedChallengeIds.includes(challenge.id) || (challenge.max_applicants && submissionCount >= challenge.max_applicants)) {
                         return null;
                     }
 
-                    // --- ZMĚNA ZDE: Správné zpracování vnořených dat ---
                     const requiredSkillIds = challenge.ChallengeSkill
                         .map(cs => {
                             const skill = Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill;
@@ -54,8 +61,7 @@ export default function RecommendedChallengesWidget() {
 
                     const matchingSkills = requiredSkillIds.filter(id => studentSkillIds.includes(id));
                     if (matchingSkills.length === 0) return null;
-
-                    // --- ZMĚNA ZDE: Správné zpracování vnořeného profilu ---
+                    
                     const startupProfile = Array.isArray(challenge.StartupProfile) ? challenge.StartupProfile[0] : challenge.StartupProfile;
 
                     return {
@@ -74,7 +80,6 @@ export default function RecommendedChallengesWidget() {
 
             scoredChallenges.sort((a, b) => b.score - a.score);
             
-            // --- ZMĚNA ZDE: Bezpečná konverze typu ---
             setRecommendations(scoredChallenges.slice(0, 3));
             setLoading(false);
         };

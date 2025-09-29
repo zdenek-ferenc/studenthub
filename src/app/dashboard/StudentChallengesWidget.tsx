@@ -154,7 +154,7 @@ export default function StudentChallengesWidget() {
     const SwitchButton = ({ buttonView, label, count }: { buttonView: View, label: string, count: number }) => (
         <button
             onClick={() => setView(buttonView)}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors relative ${view === buttonView ? 'text-[var(--barva-primarni)]' : 'cursor-pointer text-gray-500 hover:text-[var(--barva-tmava)]'}`}
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors relative ${view === buttonView ? 'text-[var(--barva-primarni)]' : 'cursor-pointer text-gray-500 hover:text-[var(--barva-tmava)]'}`}
         >
             {label} <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-gray-100">{count}</span>
             {view === buttonView && <motion.div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--barva-primarni)]" layoutId="underline" />}
@@ -164,7 +164,7 @@ export default function StudentChallengesWidget() {
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-[var(--barva-tmava)]">Moje výzvy</h3>
+            <h3 className="text-lg md:text-xl font-bold text-[var(--barva-tmava)]">Moje výzvy</h3>
             <div className="flex items-center rounded-lg p-1">
                 <SwitchButton buttonView="active" label="Aktivní" count={activeChallenges.length} />
                 <SwitchButton buttonView="completed" label="Hotové" count={completedChallenges.length} />

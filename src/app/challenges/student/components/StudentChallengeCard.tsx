@@ -111,7 +111,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
                 <span>{challenge.deadline ? new Date(challenge.deadline).toLocaleDateString('cs-CZ') : 'N/A'}</span>
             </div>
         </div>
-        <Link href={`/challenges/${challenge.id}`} className="px-4 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
+        <Link href={`/challenges/${challenge.id}`} className="px-2 py-2 md:px-4 md:py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
           Detail výzvy
         </Link>
       </div>

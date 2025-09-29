@@ -5,15 +5,13 @@ import CountUp from 'react-countup';
 export default function StatsSection() {
   return (
     <section className="flex flex-col sm:flex-row justify-center gap-x-16 sm:gap-x-24 text-center pt-24 text-white">
-      
-      {/* První statistika */}
       <div className='flex justify-center items-center gap-4'>
         <p className="text-4xl font-bold">
           <CountUp
             end={142}
             duration={2.5}
-            enableScrollSpy={true} // Spustí animaci, až když je vidět
-            scrollSpyOnce={true} // Spustí se jen jednou
+            enableScrollSpy={true} 
+            scrollSpyOnce={true}
             suffix="+"
           />
         </p>

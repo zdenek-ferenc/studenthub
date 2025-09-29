@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { LayoutDashboard, Briefcase, Rocket, UserCircle } from 'lucide-react';
 
-// Komponenta pro jednu položku v navigační liště
+
 const NavItem = ({ href, icon: Icon, label }: { href: string, icon: React.ElementType, label: string }) => {
     const pathname = usePathname();
     const isActive = pathname.startsWith(href);
@@ -24,10 +24,10 @@ export default function BottomNavBar() {
     const { profile, user } = useAuth();
 
     if (!profile || !user) {
-        return null; // Nezobrazuj, pokud není přihlášen
+        return null; 
     }
     
-    // Odkazy se mění podle role uživatele
+    
     const studentLinks = [
         { href: '/dashboard', icon: LayoutDashboard, label: 'Přehled' },
         { href: '/challenges', icon: Briefcase, label: 'Výzvy' },

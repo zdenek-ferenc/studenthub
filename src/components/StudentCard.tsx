@@ -90,9 +90,9 @@ export default function StudentCard({ student }: StudentCardProps) {
               )
             ))}
             {sortedSkills.length > 5 && (
-               <span className="text-[var(--barva-primarni)] text-sm self-center pt-2">
-                 +{sortedSkills.length - 5}
-               </span>
+              <span className="text-[var(--barva-primarni)] text-sm self-center pt-2">
+                +{sortedSkills.length - 5}
+              </span>
             )}
           </div>
           

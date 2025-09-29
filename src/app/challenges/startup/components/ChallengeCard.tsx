@@ -34,21 +34,19 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
     const action = getAction();
 
     return (
-        // --- NOVÁ LOGIKA: Podmíněný styl pro koncept a pro upozornění ---
         <div className={`bg-white p-6 rounded-2xl flex flex-col h-full hover:shadow-md transition-all duration-300
             ${isDraft ? 'border-2 border-yellow-200' : (needsAttention ? 'border-2 border-red-500' : 'border shadow-sm')}`}>
             
             <div className="flex justify-between items-start mb-2">
                 <h3 className="font-bold text-xl text-[var(--barva-tmava)] pr-2 line-clamp-2">{challenge.title}</h3>
                 <div className="flex-shrink-0">
-                    {/* --- NOVÁ LOGIKA: Zobrazení štítku pro koncept --- */}
                     {isDraft ? (
                         <div className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-yellow-100 text-yellow-700">
                             <Edit3 size={14} />
                             <span>Koncept</span>
                         </div>
                     ) : needsAttention ? (
-                         <div className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-red-100 text-red-700">
+                        <div className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-red-100 text-red-700">
                             <AlertTriangle size={14} />
                             <span>Vyžaduje akci</span>
                         </div>
@@ -59,7 +57,6 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
             </div>
 
             <p className="text-gray-500 text-base min-h-[40px] line-clamp-2 my-4 flex-grow">
-                {/* --- NOVÁ LOGIKA: Zástupný text pro prázdný popis u konceptu --- */}
                 {challenge.short_description || <span className="italic text-gray-400">Zatím bez popisu...</span>}
             </p>        
 
@@ -67,17 +64,14 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
                 <div className="flex justify-between items-center">
                     <StatItem icon={Users} text={`${applicantCount} / ${challenge.max_applicants || '∞'} přihlášeno`} />
                     {challenge.max_applicants && <span className="text-xs font-semibold text-gray-400">{Math.round(progress)}%</span>}
-                </div>
-                
+                </div>                
                 {unreviewedCount > 0 && <StatItem icon={CheckCircle} text={`${unreviewedCount} neohodnocených řešení`} colorClass="text-blue-600 font-bold" />}
-
                 {challenge.max_applicants && (
-                     <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
                         <div className="bg-[var(--barva-primarni)] h-1.5 rounded-full" style={{ width: `${progress}%` }}></div>
                     </div>
                 )}
             </div>
-
             <div className="mt-auto border-t-2 border-[var(--barva-svetle-pozadi)] pt-4 flex justify-between items-center">
                 <div className="text-xs text-gray-400 space-y-1">
                     <p>Vytvořeno: {new Date(challenge.created_at).toLocaleDateString('cs-CZ')}</p>
@@ -91,7 +85,6 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
                             : 'text-[var(--barva-primarni)]'
                         }`}
                 >
-                    {/* --- NOVÁ LOGIKA: Přidání ikony k tlačítku --- */}
                     {action.icon && <action.icon size={16} />}
                     {action.text}
                 </Link>

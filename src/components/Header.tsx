@@ -10,8 +10,6 @@ import Image from 'next/image';
 import { Bell } from 'lucide-react';
 import BottomNavBar from './BottomNavBar';
 
-// Zde jsou všechny sub-komponenty, které Header potřebuje
-// ... jejich kód zde není potřeba měnit ...
 function PillSwitch({ role, pathname }: { role: 'student' | 'startup', pathname: string }) {
   const studentLinks = [
     { id: 'prehled', label: 'Přehled', href: '/dashboard' },
@@ -51,7 +49,7 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
                 <div className="w-48 bg-white rounded-xl shadow-lg py-1 z-10">
                     <Link href={`/profile/${user?.id}`} className="block px-4 py-2 text-sm text-gray-700 rounded-xl hover:bg-gray-100" onClick={() => setIsOpen(false)}>Můj profil</Link>
                     <Link href="/profile/edit" className="block px-4 py-2 text-sm text-gray-700 rounded-xl hover:bg-gray-100" onClick={() => setIsOpen(false)}>Upravit profil</Link>
-                    <button onClick={handleLogout} className="w-full text-left block px-4 py-2 text-sm rounded-xl text-gray-700 hover:bg-gray-100">Odhlásit se</button>
+                    <button onClick={handleLogout} className="w-full cursor-pointer text-left block px-4 py-2 text-sm rounded-xl text-gray-700 hover:bg-gray-100">Odhlásit se</button>
                 </div>
             </div>
         </div>
@@ -77,21 +75,21 @@ function NotificationBell() {
     );
 }
 
-// --- HLAVNÍ KOMPONENTA HEADER (S FINÁLNÍ OPRAVOU) ---
+
 export default function Header() {
   const { user, profile, loading } = useAuth();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const isHomePage = pathname === '/';
 
-  useEffect(() => {
+useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  const showBackground = !isHomePage || scrolled;
+const showBackground = !isHomePage || scrolled;
 
   return (
     <>
@@ -110,7 +108,6 @@ export default function Header() {
               <PillSwitch role={profile.role} pathname={pathname} />
             )}
           </div>
-
           <div className="hidden md:flex flex-1 justify-end">
             {!loading && (
               user && profile ? (

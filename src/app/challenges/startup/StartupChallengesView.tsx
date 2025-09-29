@@ -74,11 +74,9 @@ export default function StartupChallengesView() {
         active.forEach((challenge) => {
             if(Array.isArray(challenge.Submission)) {
                 challenge.Submission.forEach((sub) => {
-                    // --- ZMĚNA ZDE: Odstraněn status 'applied' ---
                     if (sub.status === 'submitted') {
                         const count = (submissionCounts[challenge.id] || 0) + 1;
                         submissionCounts[challenge.id] = count;
-
                         unreviewedSubmissions.push({
                             anonymousId: `Řešení #${count}`,
                             challengeTitle: challenge.title,
@@ -162,7 +160,7 @@ export default function StartupChallengesView() {
         <div className="container mx-auto py-12">
         {!loading && allChallenges.length === 0 ? (
             <div className="text-center max-w-lg mx-auto">
-                 <Image
+                <Image
                     src="/frownbig.svg"
                     alt="Smutný smajlík"
                     width={50}
@@ -180,8 +178,6 @@ export default function StartupChallengesView() {
         ) : (
             <div>
                 <CommandCenter stats={dashboardStats} />
-                
-                {/* --- ZMĚNA ZDE: Nový filtr s podtrhávací animací --- */}
                 <div className="relative flex items-center border-b border-gray-200 w-fit mb-8">
                     {filters.map((filter, index) => (
                         <button
@@ -204,7 +200,6 @@ export default function StartupChallengesView() {
                             </span>
                         </button>
                     ))}
-                    {/* Podtržítko */}
                     <div
                         className="absolute bottom-0 h-1 bg-[var(--barva-primarni)] rounded-full transition-all duration-300 ease-in-out"
                         style={underlineStyle}

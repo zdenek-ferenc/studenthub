@@ -56,7 +56,7 @@ const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
     }
 
     if (rewards.length === 1 && rewards[0].amount) {
-        return <>{rewards[0].amount} Kč</>
+        return <>{rewards[0].amount.toLocaleString('cs-CZ')} Kč</>
     }
     
     return (
@@ -64,7 +64,7 @@ const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
         {rewards.map(({ place, amount }) => (
           <div key={place} className="text-center">
              <span className="text-sm font-semibold text-gray-400 block">{place}</span>
-             <span className="font-bold text-xl">{amount} Kč</span>
+             <span className="font-bold text-lg sm:text-xl">{amount?.toLocaleString('cs-CZ')} Kč</span>
           </div>
         ))}
       </div>
@@ -122,40 +122,39 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   const isGraded = userSubmission && ['reviewed', 'winner', 'rejected'].includes(userSubmission.status);
   
   return (
-    <div className="max-w-4xl mx-auto my-12">
-      <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-xs">
+    <div className="max-w-4xl mx-auto md:my-4 px-4">
+      <div className="bg-white p-6 sm:p-8 md:p-12 rounded-2xl shadow-xs">
         <div className="text-center mb-8">
             <Image 
                 src={challenge.StartupProfile?.logo_url || '/logo.svg'} 
                 alt="logo firmy" 
                 width={80} 
                 height={80} 
-                className="mx-auto rounded-lg mb-4"
+                className="mx-auto rounded-lg mb-4 w-16 h-16 sm:w-20 sm:h-20"
             />
             <p className="font-semibold text-gray-800">{challenge.StartupProfile?.company_name}</p>
-            <h1 className="text-4xl font-bold text-[var(--barva-tmava)]">{challenge.title}</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-[var(--barva-tmava)]">{challenge.title}</h1>
         </div>
 
         <>
             <div className="border-t border-b border-gray-100 py-6">
-                <h2 className="text-xl font-semibold text-[var(--barva-tmava)] mb-4">Potřebné dovednosti</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-[var(--barva-tmava)] mb-4">Potřebné dovednosti</h2>
                 <div className="flex flex-wrap gap-2">
                 {challenge.ChallengeSkill.map(({ Skill }) => (
-                    <span key={Skill.id} className="px-4 py-2 rounded-full bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-md text-[var(--barva-primarni)] font-semibold">{Skill.name}</span>
+                    <span key={Skill.id} className="px-2 py-1 sm:px-4 sm:py-2 rounded-full bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-sm sm:text-base text-[var(--barva-primarni)] md:font-semibold">{Skill.name}</span>
                 ))}
                 </div>
             </div>
-            <div className="flex justify-between items-center text-[var(--barva-tmava)] py-4 text-xl font-semibold">
+            <div className="flex flex-col sm:flex-row justify-between items-center text-[var(--barva-tmava)] py-4 text-base sm:text-lg font-semibold gap-4">
                 <span>Přihlášeno: <strong>{challenge.Submission.length} / {challenge.max_applicants}</strong></span>
-                <span className='flex flex-col items-center gap-2 justify-between'>Odměna: <strong><RewardsDisplay challenge={challenge} /></strong></span>
+                <span className='flex flex-col items-center gap-1 sm:gap-2 justify-between'>Odměna: <strong><RewardsDisplay challenge={challenge} /></strong></span>
             </div>
-            <div className="prose max-w-none mt-6 text-[var(--barva-tmava)]">
+            <div className="prose max-w-none text-[var(--barva-tmava)] prose-headings:font-semibold prose-h3:text-lg prose-h3:mt-3 prose-h3:border-b-2 prose-h3:pb-2">
                 <p>{challenge.description}</p>
-                <h3 className='font-semibold text-lg mt-3 border-b-2 py-3'>Cíle výzvy</h3>
-                <p className='mt-3'>{challenge.goals}</p>
-
-                <h3 className='font-semibold text-lg mt-3 border-b-2 py-3'>Co má být odevzdáno:</h3>
-                <ul className='mt-3 list-disc pl-5 space-y-2'>
+                <h3 className='text-xl md:text-2xl py-4 font-bold'>Cíle výzvy:</h3>
+                <p>{challenge.goals}</p>
+                <h3 className='text-xl md:text-2xl py-4 font-bold'>Co má být odevzdáno:</h3>
+                <ul className='mt-3 list-disc pl-8 space-y-2'>
                   {expectedOutputsArray.map((output, index) => (
                     <li key={index}>{output}</li>
                   ))}
@@ -163,7 +162,7 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
                 
                 {challenge.attachments_urls && challenge.attachments_urls.length > 0 && (
                     <>
-                        <h3 className='font-semibold text-lg mt-6 border-b-2 py-3'>Podklady ke stažení</h3>
+                        <h3>Podklady ke stažení</h3>
                         <div className="mt-4 space-y-3">
                             {challenge.attachments_urls.map((url, index) => (
                                 isApplied ? (
@@ -195,15 +194,13 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
                     </>
                 )}
                 
-                <ul>
-                <li className='font-semibold text-xl mt-6'>Termín odevzdání do: <strong className='ml-3 '>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></li>
-                </ul>
+                <p className='font-semibold text-lg sm:text-xl mt-6'>Termín odevzdání do: <strong className='ml-3'>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></p>
             </div>
         </>
         
         {!isApplied && (
             <div className="mt-10 text-center">
-                <button onClick={handleApply} disabled={isApplying || isChallengeFull} className="px-7 py-3 text-white bg-[var(--barva-primarni)] rounded-full font-normal text-2xl outline-2 transition-colors duration-200 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed">
+                <button onClick={handleApply} disabled={isApplying || isChallengeFull} className="px-6 py-3 sm:px-7 sm:py-3 text-white bg-[var(--barva-primarni)] rounded-full font-normal text-xl sm:text-2xl outline-2 transition-colors duration-200 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed">
                     {isApplying ? 'Přihlašuji...' : (isChallengeFull ? 'Kapacita naplněna' : 'Přihlásit se k výzvě')}
                 </button>
             </div>

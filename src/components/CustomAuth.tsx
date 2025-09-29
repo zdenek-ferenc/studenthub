@@ -1,17 +1,14 @@
 "use client";
 
-import { supabase } from '../lib/supabaseClient'; // Uprav cestu
+import { supabase } from '../lib/supabaseClient'; 
 import { Auth } from '@supabase/auth-ui-react';
-// Odstranili jsme problematický import 'Appearance'
 
-// Typ pro props zůstává stejný
 type CustomAuthProps = {
   view: 'sign_in' | 'sign_up';
 };
 
 export default function CustomAuth({ view }: CustomAuthProps) {
   
-  // 1. Překlad do češtiny zůstává stejný
   const localization = {
     variables: {
       sign_up: {
@@ -32,7 +29,7 @@ export default function CustomAuth({ view }: CustomAuthProps) {
     },
   };
 
-  // 2. OPRAVA: Vytvoříme si vlastní téma přesně podle dokumentace
+  
   const customTheme = {
     default: {
       colors: {
@@ -56,11 +53,11 @@ export default function CustomAuth({ view }: CustomAuthProps) {
   return (
     <Auth
       supabaseClient={supabase}
-      // 3. OPRAVA: Předáme vzhled přesně podle dokumentace
+      
       appearance={{
-        theme: customTheme, // Předáme náš objekt s tématem
+        theme: customTheme, 
         className: {
-          // A zde přepíšeme třídy
+          
           container: 'space-y-4',
           button: 'px-8 py-3 rounded-xl bg-[var(--barva-primarni)] text-2xl text-black font-semibold shadow-sm hover:opacity-90 transition-all duration-300 ease-in-out w-full',
           input: 'w-full bg-white rounded-lg p-3 my-2 text-base text-[var(--barva-tmava)] placeholder-gray-400 transition-colors focus:border-[var(--barva-primarni)] focus:ring-2 focus:ring-[var(--barva-primarni2)] focus:outline-none',
@@ -74,7 +71,7 @@ export default function CustomAuth({ view }: CustomAuthProps) {
       providers={['google', 'apple', 'facebook']}
       view={view}
       showLinks={false}
-      theme="default" // Říkáme, kterou variantu z našeho tématu má použít
+      theme="default" 
       redirectTo={typeof window !== 'undefined' ? window.location.href : ''}
     />
   );

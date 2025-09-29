@@ -11,11 +11,10 @@ type StudentProfile = {
     first_name: string; last_name: string; username: string; bio: string | null; university: string | null; field_of_study: string | null;
 };
 
-// --- ZMĚNA ZDE: Přidána vlastnost completed_outputs ---
 export type Submission = {
   id: string; student_id: string; status: string; link: string | null; file_url: string | null;
   rating: number | null; position: number | null; feedback_comment: string | null; is_favorite: boolean;
-  completed_outputs: string[]; // Přidáno pro ukládání stavu checklistu
+  completed_outputs: string[]; 
   is_public_on_profile: boolean;
   StudentProfile: StudentProfile | null;
 };

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient'; // Ujisti se, že cesta je správná
+import { useState} from 'react';
+import Flag from 'react-world-flags';
 
 type Language = {
   id: string;
@@ -11,35 +11,30 @@ type Language = {
 type LanguageSelectorProps = {
   onSelectionChange: (selectedIds: string[]) => void;
   initialSelectedIds?: string[];
+  allLanguages: Language[];
 };
 
-export default function LanguageSelector({ onSelectionChange, initialSelectedIds = [] }: LanguageSelectorProps) {
-  const [allLanguages, setAllLanguages] = useState<Language[]>([]);
+const languageCountryCodes: { [key: string]: string } = {
+  'Angličtina': 'GB',
+  'Čeština': 'CZ',
+  'Čínština': 'CN',
+  'Francouzština': 'FR',
+  'Italština': 'IT',
+  'Japonština': 'JP',
+  'Korejština': 'KR',
+  'Maďarština': 'HU',
+  'Němčina': 'DE',
+  'Polština': 'PL',
+  'Ruština': 'RU',
+  'Slovenština': 'SK',
+  'Španělština': 'ES',
+  'Ukrajinština': 'UA',
+};
+
+
+export default function LanguageSelector({ onSelectionChange, initialSelectedIds = [], allLanguages }: LanguageSelectorProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    const fetchLanguages = async () => {
-      setLoading(true);
-      // JEDINÁ ZMĚNA: Dotazujeme se do tabulky "Language" místo "Skill"
-      const { data, error } = await supabase
-        .from('Language')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (error) {
-        console.error("Chyba při načítání jazyků:", error);
-        setError("Nepodařilo se načíst jazyky.");
-      } else {
-        setAllLanguages(data);
-      }
-      setLoading(false);
-    };
-
-    fetchLanguages();
-  }, []);
 
   const handleToggleLanguage = (langId: string) => {
     const newSelectedIds = new Set(selectedIds);
@@ -52,7 +47,7 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
     const updatedIds = Array.from(newSelectedIds);
     setSelectedIds(updatedIds);
     onSelectionChange(updatedIds);
-    setSearchTerm(''); // Resetujeme vyhledávání po kliknutí
+    setSearchTerm('');
   };
 
   const filteredLanguages = allLanguages.filter(lang => {
@@ -62,38 +57,50 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
     );
   });
 
-  if (loading) {
-    return <p>Načítám jazyky...</p>;
-  }
-
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
-
   return (
-    <div>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Hledej jazyk (např. Angličtina)"
-        className="flex min-w-[24rem] content-start m-auto mb-12 px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]" // Používáme stejnou třídu jako u ostatních inputů
-      />
+    <div className='flex flex-col items-center w-full'>
+      <div className={`w-full max-w-sm mb-8 sm:mb-12 ${filteredLanguages.length < 5 && 'hidden sm:block'}`}>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Hledej jazyk (např. Angličtina)"
+          className="w-full px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]"
+        />
+      </div>
 
-      <div className="flex flex-wrap justify-center gap-3 min-h-[12rem] content-start">
-        {filteredLanguages.map(lang => (
-          <button
-            key={lang.id}
-            onClick={() => handleToggleLanguage(lang.id)}
-            className={`px-6 py-2 text-[var(--barva-primarni)] rounded-full font-light text-3xl outline-2 transition-colors duration-200 cursor-pointer
-              ${selectedIds.includes(lang.id)
-                ? 'bg-[var(--barva-primarni2)]'
-                : 'bg-white'
-              }`}
-          >
-            {lang.name}
-          </button>
-        ))}
+      <div className="w-full max-w-4xl px-4 sm:px-8 flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 min-h-[12rem] content-start">
+        {filteredLanguages.map(lang => {
+          const countryCode = languageCountryCodes[lang.name];
+          return (
+            <button
+              key={lang.id}
+              type="button"
+              onClick={() => handleToggleLanguage(lang.id)}
+              title={lang.name}
+              className={`
+                flex items-center justify-center 
+                rounded-full transition-all duration-200 cursor-pointer group
+                w-16 h-16 sm:w-auto sm:h-auto
+                sm:px-5 sm:py-2 
+                font-light 
+                ring-2 ring-[var(--barva-primarni)]
+                ${selectedIds.includes(lang.id)
+                  ? 'bg-[var(--barva-primarni2)]'
+                  : 'bg-white hover:bg-gray-100'
+                }`}
+            >
+              <div className="block sm:hidden">
+                {countryCode ? (
+                  <Flag code={countryCode} className="w-10 h-10 rounded-full object-cover shadow-md" />
+                ) : (
+                  <span className="text-xl">{lang.name.charAt(0)}</span>
+                )}
+              </div>
+              <span className="hidden sm:block text-lg sm:text-2xl text-[var(--barva-primarni)]">{lang.name}</span>
+            </button>
+          )
+        })}
       </div>
     </div>
   );

@@ -1,15 +1,13 @@
 "use client";
 import { Award, Sparkles, Star } from "lucide-react";
 
-// Definujeme si, jak vypadá jedna "událost" zisku XP
 type XpEvent = {
 event_type: string;
 xp_gained: number;
 new_level: number | null;
-Skill?: { name: string }; // Skill může být přítomen
+Skill?: { name: string };
 };
 
-// Pomocná komponenta pro zobrazení jednoho řádku
 const XpRow = ({ icon, label, xp, newLevel }: { icon: React.ReactNode, label: string, xp: number, newLevel: number | null }) => (
     <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
         <div className="flex items-center gap-3">
@@ -30,7 +28,6 @@ export default function XpGainedSummary({ events }: { events: XpEvent[] }) {
         <div className="bg-gray-50 p-6 rounded-2xl mt-8 border">
             <h3 className="text-xl font-bold text-center text-[var(--barva-tmava)] mb-4">Shrnutí odměn a progrese</h3>
             <div className="space-y-4 max-w-lg mx-auto">
-                {/* Celkový progress */}
                 {studentXpEvent && (
                     <XpRow
                         icon={<Award className="w-6 h-6 text-blue-500" />}
@@ -39,8 +36,6 @@ export default function XpGainedSummary({ events }: { events: XpEvent[] }) {
                         newLevel={studentXpEvent.new_level}
                     />
                 )}
-
-                {/* Vylepšené dovednosti */}
                 {skillEvents.length > 0 && (
                     <div>
                         <h4 className="font-semibold text-gray-600 mb-2 ml-1">Vylepšené dovednosti:</h4>
@@ -57,8 +52,6 @@ export default function XpGainedSummary({ events }: { events: XpEvent[] }) {
                         </div>
                     </div>
                 )}
-                
-                {/* Nové dovednosti */}
                 {newSkillEvents.length > 0 && (
                     <div>
                         <h4 className="font-semibold text-green-700 mb-2 ml-1">Nové dovednosti odemčeny!</h4>

@@ -5,9 +5,8 @@ import type { Submission } from './SubmissionCard';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent, DragOverlay, useDroppable } from '@dnd-kit/core';
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { User } from 'lucide-react'; // <-- Import ikony
+import { User } from 'lucide-react';
 
-// Typ AnonymousSubmission bude stejný jako v rodičovské komponentě
 type AnonymousSubmission = Submission & { anonymousId: string };
 
 type ChallengeForWinners = {
@@ -22,7 +21,6 @@ type Containers = {
     [key in ContainerId]: AnonymousSubmission[];
 };
 
-// ZMĚNA ZDE: Anonymizujeme komponentu pro zobrazení
 const SubmissionItem = ({ submission }: { submission: AnonymousSubmission }) => {
     return (
         <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border">
@@ -37,7 +35,6 @@ const SubmissionItem = ({ submission }: { submission: AnonymousSubmission }) => 
     );
 };
 
-// Sortable item zůstává funkčně stejný, jen bude renderovat anonymní verzi
 const SortableSubmissionItem = ({ submission }: { submission: AnonymousSubmission }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: submission.id });
 
@@ -55,7 +52,6 @@ const SortableSubmissionItem = ({ submission }: { submission: AnonymousSubmissio
     );
 };
 
-// ... (WinnerDropzone zůstává beze změny)
 const WinnerDropzone = ({ place, submission }: { place: 1 | 2 | 3, submission: AnonymousSubmission | null }) => {
     const { setNodeRef, isOver } = useDroppable({ id: `place-${place}` });
     const placeColors: { [key: number]: string } = { 1: "border-amber-400 bg-amber-50", 2: "border-slate-400 bg-slate-50", 3: "border-orange-600 bg-orange-50" };
@@ -77,8 +73,6 @@ const WinnerDropzone = ({ place, submission }: { place: 1 | 2 | 3, submission: A
     );
 };
 
-
-// ZMĚNA ZDE: Props budou pracovat s AnonymousSubmission
 export default function WinnerSelection({ favorites, challenge, onFinalize }: { favorites: AnonymousSubmission[], challenge: ChallengeForWinners, onFinalize: (winners: { [key: number]: string }) => void }) {
     const [containers, setContainers] = useState<Containers>(() => ({
         candidates: favorites.filter(f => ![1, 2, 3].includes(f.position || 0)),
@@ -92,7 +86,6 @@ export default function WinnerSelection({ favorites, challenge, onFinalize }: { 
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
     
-    // Zbytek logiky zůstává stejný, protože pracuje s IDčky, nikoli se jmény
     const winnerSlots = useMemo(() => {
         const slots: (1 | 2 | 3)[] = [];
         if (challenge.reward_first_place) slots.push(1);
@@ -198,9 +191,9 @@ export default function WinnerSelection({ favorites, challenge, onFinalize }: { 
                     </SortableContext>
                 </div>
                 <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-1 gap-4">
-                     {winnerSlots.includes(1) && <WinnerDropzone place={1} submission={containers.place1[0] || null} />}
-                     {winnerSlots.includes(2) && <WinnerDropzone place={2} submission={containers.place2[0] || null} />}
-                     {winnerSlots.includes(3) && <WinnerDropzone place={3} submission={containers.place3[0] || null} />}
+                    {winnerSlots.includes(1) && <WinnerDropzone place={1} submission={containers.place1[0] || null} />}
+                    {winnerSlots.includes(2) && <WinnerDropzone place={2} submission={containers.place2[0] || null} />}
+                    {winnerSlots.includes(3) && <WinnerDropzone place={3} submission={containers.place3[0] || null} />}
                 </div>
             </div>
             

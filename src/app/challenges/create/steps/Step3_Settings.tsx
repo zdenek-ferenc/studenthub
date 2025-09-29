@@ -3,12 +3,11 @@ import { useFormContext, Controller } from "react-hook-form";
 import { ChallengeFormData } from "../CreateChallengeWizard";
 import SkillSelectorChallenge from "../../../../components/SkillSelectorChallenge";
 
-// OPRAVA: Místo 'any' používáme přesnější typ 'string | boolean'
 const FormSwitch = ({ name, options }: { name: "type" | "has_financial_reward", options: { value: string | boolean; label: string }[] }) => {
     const { control, watch } = useFormContext<ChallengeFormData>();
     const value = watch(name);
     return (
-      <div className="bg-gray-100 p-1.5 rounded-full flex items-center max-w-min">
+    <div className="bg-gray-100 p-1.5 rounded-full flex items-center max-w-min">
         <Controller
             name={name}
             control={control}
@@ -27,7 +26,7 @@ const FormSwitch = ({ name, options }: { name: "type" | "has_financial_reward", 
                 </>
             )}
         />
-      </div>
+    </div>
     );
 };
 
@@ -52,16 +51,14 @@ export default function Step3_Settings() {
                     </select>
                 </div>
             </div>
-
             <div>
-                 <label className="block mb-2 font-semibold text-gray-700">Potřebné dovednosti</label>
-                 <Controller
+                <label className="block mb-2 font-semibold text-gray-700">Potřebné dovednosti</label>
+                <Controller
                     name="skills"
                     control={control}
                     render={({ field }) => <SkillSelectorChallenge onSelectionChange={field.onChange} initialSelectedIds={field.value} />}
                 />
             </div>
-
             <div>
                 <label className="block mb-2 font-semibold text-gray-700">Nabízíte finanční odměnu?</label>
                 <FormSwitch name="has_financial_reward" options={[{value: true, label: 'Ano'}, {value: false, label: 'Ne'}]} />
