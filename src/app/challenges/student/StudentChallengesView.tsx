@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useEffect, useState } from 'react'; // Ujisti se, že je zde useState
+import { useMemo, useEffect, useState } from 'react';
 import { useChallenges } from '../../../contexts/ChallengesContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import StudentChallengeCard from './components/StudentChallengeCard';
 import ChallengeFilterSidebar from './components/ChallengeFilterSidebar';
 import LoadingSpinner from '../../../components/LoadingSpinner';
-import { SlidersHorizontal } from 'lucide-react'; // Ikona pro tlačítko
+import { SlidersHorizontal } from 'lucide-react'; 
 
 export default function StudentChallengesView() {
   const { user } = useAuth();
@@ -24,7 +24,6 @@ export default function StudentChallengesView() {
     refetchChallenges,
   } = useChallenges();
 
-  // TENTO ŘÁDEK JE KLÍČOVÝ: Vytvoří stav pro zobrazení/skrytí filtru
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
@@ -46,7 +45,7 @@ export default function StudentChallengesView() {
   const studentSkillIdsForCard = useMemo(() => studentSkills.map(s => s.id), [studentSkills]);
 
   return (
-    <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 md:py-6">
+    <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-10 md:py-32">
       <ChallengeFilterSidebar
         allSkills={allSkills}
         selectedSkillIds={selectedSkillIds}
@@ -55,7 +54,6 @@ export default function StudentChallengesView() {
         setSearchQuery={setSearchQuery}
         sortBy={sortBy}
         setSortBy={setSortBy}
-        // A TYTO DVA ŘÁDKY JSOU DRUHÁ KLÍČOVÁ ČÁST: Předáváme stav a funkci
         isMobileOpen={isFilterOpen}
         setMobileOpen={setIsFilterOpen}
       />

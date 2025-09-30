@@ -43,7 +43,7 @@ export default function StudentCard({ student }: StudentCardProps) {
 
   return (
       <Link href={`/profile/${student.user_id}`} className="block group">
-        <div className="bg-white rounded-2xl shadow-xs p-6 border border-gray-100 group-hover:shadow-lg group-hover:border-blue-200 transition-all duration-300 ease-in-out flex flex-col h-full">
+        <div className="bg-white rounded-2xl shadow-xs p-6 border border-gray-100 group-hover:shadow-lg transition-all duration-300 ease-in-out flex flex-col h-full">
           <div className="flex items-center gap-4 mb-4">
             {student.profile_picture_url ? (
               <Image 
@@ -70,7 +70,7 @@ export default function StudentCard({ student }: StudentCardProps) {
               </p>
           </div>
 
-          <div className="flex items-center gap-6 mb-5 text-sm font-medium text-gray-500">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mb-5 text-sm font-medium text-gray-500">
             <div className="flex items-center gap-1.5">
               <CheckCircle className="text-green-500" size={18} />
               <span>{completedChallenges} hotové výzvy</span>
@@ -81,7 +81,7 @@ export default function StudentCard({ student }: StudentCardProps) {
             </div>
           </div>
           
-          <div className="flex flex-wrap items-start content-start gap-2 mb-6 h-[72px] overflow-hidden">
+          <div className="flex flex-wrap items-start content-start gap-2 mb-6 h-auto overflow-hidden">
             {sortedSkills.slice(0, 5).map(({ Skill }) => (
               Skill && (
                 <span key={Skill.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-sm font-semibold transition-colors">

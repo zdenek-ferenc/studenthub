@@ -26,7 +26,7 @@ function EditProfilePage() {
   };
 
   return (
-    <div className="container mx-auto py-12 px-4">
+    <div className="container mx-auto py-10 md:py-32 px-4">
         <div className="mb-8">
             <Link href="/profile" className="text-gray-500 hover:text-[var(--barva-primarni)] transition-colors">Zpět na profil</Link>
             <h1 className="text-4xl font-bold text-[var(--barva-tmava)] mt-2">Upravit profil</h1>

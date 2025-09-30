@@ -58,10 +58,16 @@ const FilterContent = ({
   return (
     <div className="bg-white h-full">
       <div className="mb-6">
-        <label htmlFor="startup-search" className="text-sm font-bold text-gray-700 block mb-2">Vyhledej startup</label>
+        <label htmlFor="startup-search" className="text-sm font-bold text-[var(--barva-tmava)] block mb-2">Vyhledej startup</label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-          <input id="startup-search" type="text" placeholder="Název, popis..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full leading-none pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition text-[var(--barva-tmava)]" />
+          <input 
+            id="startup-search" 
+            type="text" 
+            placeholder="Název, popis..." 
+            value={searchQuery} 
+            onChange={(e) => setSearchQuery(e.target.value)} 
+            className="w-full leading-none pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition text-[var(--barva-tmava)]" />
         </div>
       </div>
       <div className="mb-6">
@@ -72,7 +78,7 @@ const FilterContent = ({
         </select>
       </div>
       <div>
-        <label className="text-sm font-bold text-gray-700 block mb-2">Filtruj podle kategorií</label>
+        <label className="text-sm font-bold text-[var(--barva-tmava)] block mb-2">Filtruj podle kategorií</label>
         {selectedCategories.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
             {selectedCategories.map(cat => (
@@ -121,7 +127,7 @@ export default function StartupFilterSidebar(props: FilterSidebarProps) {
           <div className="fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4 text-center">
               <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all p-6">
                   <div className="flex justify-between items-center p-4 border-b">
                     <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-gray-900 flex items-center gap-2"><SlidersHorizontal size={20} /> Filtry</Dialog.Title>
                     <button onClick={() => setMobileOpen(false)} className="p-1 rounded-full hover:bg-gray-100"><X size={20} /></button>

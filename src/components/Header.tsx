@@ -7,8 +7,23 @@ import { useAuth, Profile } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Bell } from 'lucide-react';
+import { Bell, LogIn} from 'lucide-react';
 import BottomNavBar from './BottomNavBar';
+
+
+function LoggedOutBottomNavBar() {
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-40 md:hidden">
+      <div className="w-full h-full max-w-md mx-auto flex items-center justify-around gap-4 px-4">
+        <Link href="/welcome" className="flex-1 flex items-center justify-center gap-3 text-center group py-3 px-6 bg-[var(--barva-primarni)] hover:opacity-90 rounded-xl transition-opacity">
+            <LogIn size={22} className="text-white" />
+            <span className="text-base font-semibold text-white">Přihlásit se / Registrovat</span>
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
 
 function PillSwitch({ role, pathname }: { role: 'student' | 'startup', pathname: string }) {
   const studentLinks = [
@@ -99,7 +114,7 @@ const showBackground = !isHomePage || scrolled;
         <div className="relative container mx-auto px-4 flex justify-between items-center h-30">
           <div className="flex-1 flex justify-start">
             <Link href="/">
-              <Image src="/logo.svg" alt="logo" width={150} height={40} className="w-auto h-8 sm:h-10" />
+              <Image src="/logo.svg" alt="logo" width={200} height={80} className="w-auto h-8 sm:h-10" />
             </Link>
           </div>
           
@@ -118,15 +133,18 @@ const showBackground = !isHomePage || scrolled;
               ) : (
                 <div className="flex items-center space-x-4">
                   <Link href="/login" className="px-5 py-2.5 rounded-full text-base font-medium text-[var(--barva-tmava)] bg-gray-100 hover:bg-gray-200">Přihlásit se</Link>
-                  <Link href="/register/student" className="px-5 py-2.5 rounded-full text-base font-medium bg-[var(--barva-primarni)] text-white hover:opacity-90">Registrovat</Link>
+                  <Link href="/register" className="px-5 py-2.5 rounded-full text-base font-medium bg-[var(--barva-primarni)] text-white hover:opacity-90">Registrovat</Link>
                 </div>
               )
             )}
           </div>
         </div>
       </header>
-      
-      {!loading && user && <BottomNavBar />}
+      {!loading && (
+      user && profile 
+    ? <BottomNavBar /> 
+    : (!pathname.startsWith('/register') && pathname !== '/welcome' && <LoggedOutBottomNavBar />)
+)}
     </>
   );
 }

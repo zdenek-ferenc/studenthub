@@ -81,7 +81,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full min-h-screen my-8 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
+    <div className="w-full min-h-screen py-10 md:py-32 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
       <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden">
         
         {/* Levá část: Formulář */}

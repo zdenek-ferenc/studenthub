@@ -104,7 +104,7 @@ function NotificationsPage() {
     }
 
     return (
-        <div className="container mx-auto py-12 px-4">
+        <div className="container mx-auto py-10 md:py-32 px-4 h-screen">
             <div className="max-w-3xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold text-[var(--barva-tmava)]">Notifikace</h1>

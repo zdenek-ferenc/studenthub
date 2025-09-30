@@ -63,8 +63,8 @@ const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
       <div className="flex items-baseline gap-4">
         {rewards.map(({ place, amount }) => (
           <div key={place} className="text-center">
-             <span className="text-sm font-semibold text-gray-400 block">{place}</span>
-             <span className="font-bold text-lg sm:text-xl">{amount?.toLocaleString('cs-CZ')} Kč</span>
+            <span className="text-sm font-semibold text-gray-400 block">{place}</span>
+            <span className="font-bold text-lg sm:text-xl">{amount?.toLocaleString('cs-CZ')} Kč</span>
           </div>
         ))}
       </div>
@@ -122,7 +122,7 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   const isGraded = userSubmission && ['reviewed', 'winner', 'rejected'].includes(userSubmission.status);
   
   return (
-    <div className="max-w-4xl mx-auto md:my-4 px-4">
+    <div className="max-w-4xl mx-auto md:py-32 px-4">
       <div className="bg-white p-6 sm:p-8 md:p-12 rounded-2xl shadow-xs">
         <div className="text-center mb-8">
             <Image 

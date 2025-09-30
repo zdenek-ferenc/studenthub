@@ -10,7 +10,6 @@ import ProfileSkillsSection from './components/ProfileSkillsSection';
 import { Github, Linkedin, Dribbble, Link as LinkIcon, Briefcase, GraduationCap, Edit, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
-// --- DEFINICE PŘESNÝCH TYPŮ ---
 type Skill = {
     name: string;
 };
@@ -144,7 +143,6 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
     );
 };
 
-// --- HLAVNÍ KOMPONENTA PROFILU STUDENTA ---
 export default function PublicStudentProfileView({ profileId }: { profileId: string }) {
     const { user } = useAuth();
     const [profile, setProfile] = useState<StudentProfile | null>(null);
@@ -197,13 +195,13 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     }));
 
     return (
-        <div className="container mx-auto md:py-12 px-4">
+        <div className="container mx-auto py-5 md:py-32 px-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <aside className="lg:col-span-1 space-y-8 lg:sticky lg:top-28">
                     <ProfileInfoCard profile={profile} isOwner={isOwner} />
                     <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
-                         <h3 className="font-bold text-lg text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
-                         <SkillRadarChart skills={skillsForChart} />
+                        <h3 className="font-bold text-lg text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
+                        <SkillRadarChart skills={skillsForChart} />
                     </div>
                 </aside>
                 <main className="lg:col-span-2 space-y-8">

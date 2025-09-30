@@ -153,11 +153,15 @@ export default function StartupChallengesView() {
     }, [activeFilter, filters, allChallenges]);
 
     if (loading) {
-        return <LoadingSpinner />;
+        return <div className='py-10 md:py-32'>
+                    <LoadingSpinner />;
+                </div>
+
+        
     }
 
     return (
-        <div className="container mx-auto py-12">
+        <div className="container mx-auto py-10 md:py-32">
         {!loading && allChallenges.length === 0 ? (
             <div className="text-center max-w-lg mx-auto">
                 <Image

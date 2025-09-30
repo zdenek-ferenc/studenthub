@@ -24,7 +24,7 @@ function StartupCatalogPage() {
     }
 
     return (
-        <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 md:py-6">
+        <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-10 md:py-32">
             <StartupFilterSidebar
                 allCategories={allCategories}
                 selectedCategoryIds={startupFilters.selectedCategoryIds}
@@ -33,11 +33,10 @@ function StartupCatalogPage() {
                 setSearchQuery={startupFilters.setSearchQuery}
                 sortBy={startupFilters.sortBy}
                 setSortBy={startupFilters.setSortBy}
-                isMobileOpen={isFilterOpen} // <-- PŘEDAT PROPS
-                setMobileOpen={setIsFilterOpen} // <-- PŘEDAT PROPS
+                isMobileOpen={isFilterOpen} 
+                setMobileOpen={setIsFilterOpen} 
             />
             <main className="flex-1 w-full">
-                {/* --- PŘIDANÁ SEKCE S TLAČÍTKEM --- */}
                 <div className="mb-6 lg:hidden flex justify-end">
                     <button 
                         onClick={() => setIsFilterOpen(true)}
@@ -64,7 +63,6 @@ function StartupCatalogPage() {
                                 <p className="text-gray-500 mt-2">Zkuste upravit filtry pro lepší výsledky.</p>
                             </div>
                         )}
-
                         <div className="text-center mt-12">
                             {hasMoreStartups && (
                                 <button onClick={loadMoreStartups} disabled={loadingStartups} className="px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed">

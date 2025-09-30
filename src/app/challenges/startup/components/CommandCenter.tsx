@@ -34,7 +34,7 @@ export default function CommandCenter({ stats }: { stats: CommandCenterStats }) 
   return (
     <div className="mb-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <h1 className="text-4xl font-bold text-[var(--barva-primarni)]">Přehled výzev</h1>
+            <h1 className="text-4xl font-bold text-[var(--barva-tmava)]">Přehled výzev</h1>
             <div className="flex items-center gap-3">
                 <Link href="/profile/recruitment" className="px-5 py-2.5 rounded-full bg-white border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-colors flex items-center gap-2 text-sm">
                     <Settings size={16} />
@@ -48,7 +48,8 @@ export default function CommandCenter({ stats }: { stats: CommandCenterStats }) 
         </div>
 
         <div className="flex flex-wrap gap-6">
-            <Popover className="relative flex-1 min-w-[240px] z-10">
+            {/* ZMĚNA JE POUZE NA NÁSLEDUJÍCÍM ŘÁDKU: z-10 -> z-30 */}
+            <Popover className="relative flex-1 min-w-[240px] z-30">
               {({ open }) => (
                 <>
                   <Popover.Button 

@@ -25,7 +25,7 @@ function RecruitmentHubPage() {
     ];
 
     return (
-        <div className="container mx-auto py-12 px-4">
+        <div className="container mx-auto py-8 md:py-32 px-4">
             {/* --- HORNÍ ČÁST S NÁZVEM STRÁNKY --- */}
             <div className="mb-8">
                 <Link href={`/profile/${profile.id}`} className="text-gray-500 hover:text-[var(--barva-primarni)] transition-colors text-sm">
@@ -43,7 +43,7 @@ function RecruitmentHubPage() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as Tab)}
                             className={`relative flex items-center gap-2 px-4 py-3 text-sm sm:text-base font-semibold transition-colors
-                                ${activeTab === tab.id ? 'text-[var(--barva-primarni)]' : 'text-gray-500 hover:text-[var(--barva-tmava)]'}
+                                ${activeTab === tab.id ? 'text-[var(--barva-primarni)]' : ' cursor-pointer text-gray-500 hover:text-[var(--barva-tmava)]'}
                             `}
                         >
                             <tab.icon size={16} />

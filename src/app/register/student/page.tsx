@@ -16,7 +16,7 @@ import ConfirmationModal from '../../../components/ConfirmationModal';
 type Skill = { id: string; name: string; };
 type Language = { id: string; name: string; };
 
-const IS_DEVELOPMENT_MODE = true;
+const IS_DEVELOPMENT_MODE = false;
 const DEV_START_STEP = 2;
 
 type FormData = {
@@ -218,7 +218,7 @@ export default function StudentRegistrationPage() {
   if (loading && !IS_DEVELOPMENT_MODE) return <p className="text-center py-20">Načítání...</p>;
 
   return (
-    <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4 md:p-4">
+    <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4 py-10 md:py-32">
       {IS_DEVELOPMENT_MODE || session ? (
         <div className="w-full">
           {renderStep()}

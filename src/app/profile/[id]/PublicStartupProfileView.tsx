@@ -11,7 +11,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PlusCircle, Edit } from 'lucide-react';
 
-// --- DEFINICE PŘESNÝCH TYPŮ ---
 type Skill = { id: string; name: string; };
 type Technology = { name: string; };
 type Category = { name: string; };
@@ -35,7 +34,6 @@ type StartupProfile = {
     Challenge: Challenge[];
 };
 
-// --- KOMPONENTA PRO INFO S MOŽNOSTÍ EDITACE ---
 const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwner: boolean }) => {
     const { user, showToast } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
@@ -90,7 +88,6 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
     );
 };
 
-// --- HLAVNÍ KOMPONENTA PROFILU STARTUPU ---
 export default function PublicStartupProfileView({ profileId }: { profileId: string }) {
     const { user, profile: viewerProfile } = useAuth();
     const [profile, setProfile] = useState<StartupProfile | null>(null);
@@ -149,14 +146,12 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
     const now = new Date();
     const activeChallenges = profile.Challenge.filter(c => c.status === 'open' && new Date(c.deadline) >= now);
     
-    // Zjistíme, zda má karta co zobrazit (stačí popis NEBO technologie)
     const hasIdealCandidateInfo = !!profile.ideal_candidate_description || profile.StartupTechnology.length > 0;
     
-    // Rozhodneme, zda se celá sekce vůbec zobrazí (musí mít data NEBO se na ni dívá majitel)
     const showIdealCandidateSection = hasIdealCandidateInfo || isOwner;
 
     return (
-        <div className="container mx-auto md:py-12 px-4">
+        <div className="container mx-auto py-5 md:py-32 px-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <aside className="lg:col-span-1 space-y-8 lg:top-28">
                     <StartupInfoCard profile={profile} isOwner={isOwner} />
@@ -180,7 +175,6 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                 </aside>
 
                 <main className="lg:col-span-2 space-y-8">
-                    {/* Celou sekci obalíme podmínkou, aby se studentům nezobrazoval prázdný div */}
                     {showIdealCandidateSection && (
                         <div className="relative">
                             {isOwner && hasIdealCandidateInfo && (
@@ -198,8 +192,8 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                     )}
                     {activeChallenges.length > 0 && (
                         <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
-                             <h2 className="text-2xl font-bold text-[var(--barva-tmava)] mb-4">Aktivní výzvy</h2>
-                             <div className="space-y-3">
+                            <h2 className="text-2xl font-bold text-[var(--barva-tmava)] mb-4">Aktivní výzvy</h2>
+                            <div className="space-y-3">
                                 {activeChallenges.map(challenge => (
                                     <StartupProfileChallengeCard 
                                         key={challenge.id} 
@@ -208,7 +202,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                                         appliedChallengeIds={appliedChallengeIds}
                                     />
                                 ))}
-                             </div>
+                            </div>
                         </div>
                     )}
                     <div className="relative">

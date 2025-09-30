@@ -135,24 +135,24 @@ export default function StudentEditForm() {
             </aside>
 
             <main className="md:col-span-3">
-                <form onSubmit={handleSubmit(handleProfileSubmit)} className="space-y-4 bg-white p-8 rounded-xl shadow-xs">
+                <form onSubmit={handleSubmit(handleProfileSubmit)} className="space-y-8 bg-white p-8 rounded-xl shadow-xs">
                     {activeTab === 'personal' && (
                         <>
                             <h2 className="text-2xl text-[var(--barva-primarni)] font-bold mb-4">Osobní údaje</h2>
                             <div>
-                                <label htmlFor="first_name" className="block mb-1 font-semibold">Jméno</label>
+                                <label htmlFor="first_name" className="block mb-1 font-semibold text-[var(--barva-tmava)]">Jméno</label>
                                 <input id="first_name" {...register('first_name')} className="input !font-normal" />
                             </div>
                              <div>
-                                <label htmlFor="last_name" className="block mb-1 font-semibold">Příjmení</label>
+                                <label htmlFor="last_name" className="block mb-1 font-semibold text-[var(--barva-tmava)]">Příjmení</label>
                                 <input id="last_name" {...register('last_name')} className="input !font-normal" />
                             </div>
                             <div>
-                                <label htmlFor="username" className="block mb-1 font-semibold">Uživatelské jméno</label>
+                                <label htmlFor="username" className="block mb-1 font-semibold text-[var(--barva-tmava)]">Uživatelské jméno</label>
                                 <input id="username" {...register('username')} className="input !font-normal" />
                             </div>
                             <div>
-                                <label htmlFor="bio" className="block mb-1 font-semibold">Bio (krátký popisek)</label>
+                                <label htmlFor="bio" className="block mb-1 font-semibold text-[var(--barva-tmava)]">Bio (krátký popisek)</label>
                                 <textarea id="bio" {...register('bio')} className="input !font-normal min-h-[120px]" />
                             </div>
                         </>
