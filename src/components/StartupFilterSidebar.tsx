@@ -56,7 +56,7 @@ const FilterContent = ({
   }, [allCategories, selectedCategoryIds, categorySearch, showAll]);
 
   return (
-    <div className="p-6 bg-white h-full">
+    <div className="bg-white h-full">
       <div className="mb-6">
         <label htmlFor="startup-search" className="text-sm font-bold text-gray-700 block mb-2">Vyhledej startup</label>
         <div className="relative">
@@ -93,7 +93,7 @@ const FilterContent = ({
         </div>
         <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
           {availableCategories.map(cat => (
-            <button key={cat.id} onClick={() => handleCategoryToggle(cat.id)} className="cursor-pointer px-3 py-1.5 rounded-full text-sm text-[var(--barva-primarni)] font-normal border bg-white border-[var(--barva-primarni)] hover:bg-[var(--barva-svetle-pozadi)] transition-colors">
+            <button key={cat.id} onClick={() => handleCategoryToggle(cat.id)} className="cursor-pointer px-2 py-1 rounded-full text-sm text-[var(--barva-primarni)] font-normal border bg-white border-[var(--barva-primarni)] hover:bg-[var(--barva-svetle-pozadi)] transition-colors">
               {cat.name}
             </button>
           ))}

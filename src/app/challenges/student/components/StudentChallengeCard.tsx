@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { CheckCircle } from 'lucide-react'; // Import ikony
+import { CheckCircle, ChevronRight } from 'lucide-react';
 
-// Upravíme typy
+// Typy zůstávají stejné
 type Skill = { id: string; name: string; };
 type StartupProfile = { company_name: string; logo_url: string | null; };
 type Challenge = {
@@ -21,7 +21,7 @@ type Challenge = {
   StartupProfile: StartupProfile | null;
 };
 
-// Komponenta pro zobrazení odměny
+// Komponenta pro zobrazení odměny (beze změny)
 const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
     const rewards = [
       challenge.reward_first_place,
@@ -50,7 +50,16 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
   });
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-xs hover:shadow-none transition-all duration-300 ease-in-out border border-gray-100 flex flex-col h-full">
+    <div className="relative bg-white p-6 rounded-2xl shadow-xs hover:shadow-none transition-all duration-300 ease-in-out border border-gray-100 flex flex-col h-full">
+      
+      {/* --- ZMĚNA #1: Štítek je posunutý mimo kartu pomocí "-top-2 -right-2" --- */}
+      {isApplied && (
+        <div className="absolute -top-2 -right-2 z-10 flex-shrink-0 flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-md border-2 border-white">
+          <CheckCircle size={14} />
+          <span>Přihlášeno</span>
+        </div>
+      )}
+
       <div className="flex-grow">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -61,16 +70,9 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
             )}
             <div className='flex flex-col gap-1'>
               <p className="font-semibold text-gray-700">{challenge.StartupProfile?.company_name}</p>
-              <h3 className="text-xl font-bold text-[var(--barva-tmava)] -mt-1">{challenge.title}</h3>
+              <h3 className="xl:text-xl font-bold text-[var(--barva-tmava)] -mt-1">{challenge.title}</h3>
             </div>
           </div>
-          {/* ZDE JE NOVÝ ŠTÍTEK */}
-          {isApplied && (
-            <div className="flex-shrink-0 flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full">
-              <CheckCircle size={14} />
-              <span>Přihlášeno</span>
-            </div>
-          )}
         </div>
 
         <p className="text-gray-600 my-5 line-clamp-2 flex-grow">{challenge.short_description}</p>
@@ -111,10 +113,19 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
                 <span>{challenge.deadline ? new Date(challenge.deadline).toLocaleDateString('cs-CZ') : 'N/A'}</span>
             </div>
         </div>
-        <Link href={`/challenges/${challenge.id}`} className="px-2 py-2 md:px-4 md:py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
-          Detail výzvy
+        
+        {/* --- ZMĚNA #2: Jeden Link, který mění vzhled podle velikosti obrazovky --- */}
+        <Link href={`/challenges/${challenge.id}`} className="flex-shrink-0">
+          {/* Toto se zobrazí na xl a větších obrazovkách */}
+          <div className="hidden xl:flex items-center px-4 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
+              Detail výzvy
+          </div>
+          {/* Toto se zobrazí na obrazovkách menších než xl */}
+          <div className="flex xl:hidden items-center justify-center w-7 h-7 md:w-10 md:h-10 ring-2 ring-[var(--barva-primarni)] text-blue-600 rounded-full hover:bg-[var(--barva-primarni2)] transition-colors">
+              <ChevronRight size={22} />
+          </div>
         </Link>
       </div>
     </div>
   );
-}
+}   

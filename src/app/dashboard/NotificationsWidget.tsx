@@ -64,7 +64,7 @@ export default function NotificationsWidget() {
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col">
-            <h3 className="text-xl font-bold text-[var(--barva-tmava)] mb-4">Nejnovější události</h3>
+            <h3 className="text-xl font-bold text-[var(--barva-tmava)] mb-4 flex justify-center md:justify-start">Nejnovější události</h3>
             {loading && !hasFetched ? (
                 <p className="text-sm text-gray-500">Načítám...</p>
             ) : notifications.length > 0 ? (

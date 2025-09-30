@@ -24,7 +24,7 @@ function StartupCatalogPage() {
     }
 
     return (
-        <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 md:py-12">
+        <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 md:py-6">
             <StartupFilterSidebar
                 allCategories={allCategories}
                 selectedCategoryIds={startupFilters.selectedCategoryIds}

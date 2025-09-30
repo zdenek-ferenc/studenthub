@@ -66,7 +66,7 @@ const FilterContent = ({
 }, [allSkills, selectedSkillIds, skillSearch, showAll]);
 
 return (
-    <div className="p-6 bg-white h-full">
+    <div className="p-6 bg-white h-full rounded-2xl">
         <div className="mb-6">
             <label htmlFor="challenge-search" className="text-sm font-bold text-gray-700 block mb-2">
             Vyhledej výzvu
@@ -109,7 +109,7 @@ return (
                 <button
                     key={`selected-${skill.id}`}
                     onClick={() => handleSkillToggle(skill.id)}
-                    className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-sm font-semibold transition-colors"
+                    className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-2 rounded-full text-sm font-semibold transition-colors"
                 >
                     {skill.name}
                     <X size={14} />
@@ -137,12 +137,12 @@ return (
                     </button>
                 )}
             </div>           
-            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
+            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
             {availableSkills.map(skill => (
                 <button
                 key={skill.id}
                 onClick={() => handleSkillToggle(skill.id)}
-                className="px-3 py-1.5 rounded-full text-sm text-[var(--barva-primarni)] font-normal border bg-white border-[var(--barva-primarni)] hover:bg-[var(--barva-svetle-pozadi)] transition-colors"
+                className="px-2 py-1 rounded-full text-sm text-[var(--barva-primarni)] font-normal border bg-white border-[var(--barva-primarni)] hover:bg-[var(--barva-svetle-pozadi)] transition-colors"
                 >
                 {skill.name}
                 </button>
@@ -164,7 +164,7 @@ const { isMobileOpen, setMobileOpen } = props;
 
 return (
     <>
-        <aside className="hidden lg:block w-full lg:w-80 rounded-2xl shadow-xs border border-gray-100 h-fit sticky top-28 flex-shrink-0">
+        <aside className="hidden lg:block w-full lg:w-80 rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
             <FilterContent {...props} />
         </aside>
         <Transition appear show={isMobileOpen} as={Fragment}>

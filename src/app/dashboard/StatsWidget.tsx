@@ -84,7 +84,7 @@ export default function StatsWidget() {
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
-            <h3 className="text-xl font-bold text-[var(--barva-tmava)] mb-4">Můj přehled</h3>
+            <h3 className="flex justify-center md:justify-start text-xl font-bold text-[var(--barva-tmava)] mb-4">Můj přehled</h3>
             {loading && !hasFetched ? (
                  <p className="text-sm text-gray-500">Načítám přehled...</p>
             ) : (

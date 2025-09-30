@@ -218,7 +218,7 @@ export default function StudentRegistrationPage() {
   if (loading && !IS_DEVELOPMENT_MODE) return <p className="text-center py-20">Načítání...</p>;
 
   return (
-    <div className="w-full min-h-screen md:my-8 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4 md:p-4">
+    <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4 md:p-4">
       {IS_DEVELOPMENT_MODE || session ? (
         <div className="w-full">
           {renderStep()}

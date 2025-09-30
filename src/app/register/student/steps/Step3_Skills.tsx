@@ -18,7 +18,7 @@ export default function Step3_Skills({ onNext, allSkills, isLoading }: StepProps
   };
 
   return (
-    <div className="flex items-center flex-col p-4 sm:p-8 md:py-16 w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl">
+    <div className="flex items-center flex-col py-12 px-8 sm:px-12 w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl">
       <h2 className="text-[var(--barva-primarni)] text-4xl mb-2 text-center">Dovednosti</h2>
       <p className="text-gray-600 mb-6 sm:mb-8 text-center px-4">Vyber vše, co umíš. Pomůže ti to najít relevantní výzvy.</p>
       

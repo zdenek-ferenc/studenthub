@@ -46,7 +46,7 @@ export default function StudentChallengesView() {
   const studentSkillIdsForCard = useMemo(() => studentSkills.map(s => s.id), [studentSkills]);
 
   return (
-    <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 md:py-12">
+    <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 md:py-6">
       <ChallengeFilterSidebar
         allSkills={allSkills}
         selectedSkillIds={selectedSkillIds}
@@ -72,14 +72,14 @@ export default function StudentChallengesView() {
               <div className="lg:hidden">
                   <button 
                     onClick={() => setIsFilterOpen(true)}
-                    className="p-3 rounded-full bg-white shadow-md border text-[var(--barva-primarni)]"
+                    className="p-3 rounded-full bg-white shadow-md border text-[var(--barva-primarni)] cursor-pointer hover:bg-[var(--barva-primarni2)] ease-in-out duration-200"
                   >
                       <SlidersHorizontal size={20} />
                   </button>
               </div>
             </div>
             {displayedChallenges.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {displayedChallenges.map(challenge => {
                   const isApplied = challenge.Submission.some(sub => sub.student_id === user?.id);
                   return (

@@ -18,7 +18,7 @@ export default function Step4_Languages({ onNext, allLanguages, isLoading }: Ste
   };
 
   return (
-    <div className="flex items-center flex-col p-4 sm:p-8 md:py-16 w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl">
+    <div className="flex items-center flex-col py-12 px-8 sm:px-12 w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl">
       <h2 className="text-4xl text-[var(--barva-primarni)] mb-2 text-center">Jazyky</h2>
       <p className="text-gray-600 mb-6 sm:mb-8 text-center">Jakými jazyky se domluvíš?</p>
 
