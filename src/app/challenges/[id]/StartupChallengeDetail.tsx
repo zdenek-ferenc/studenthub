@@ -46,7 +46,7 @@ const EvaluationStatusPanel = ({
     const capacityProgress = maxApplicants ? (applicants / maxApplicants) * 100 : 0;
     if (!canFinalize) {
         return (
-            <div className="bg-white py-10 md:py-32 rounded-2xl shadow-sm border border-gray-100">
+            <div className="py-8 rounded-2xl">
                 <div className="max-w-3xl mx-auto">
                     <h3 className="text-2xl font-bold text-center text-[var(--barva-tmava)] mb-2">
                         {daysRemaining < 0 ? "Výzva je po termínu, čeká se na odevzdání" : "Výzva je v plném proudu"}

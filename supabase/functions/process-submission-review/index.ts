@@ -1,5 +1,7 @@
+// supabase/functions/process-submission-review/index.ts
+
 import { createClient } from '@supabase/supabase-js';
-import { corsHeaders } from '../_shared/cors';
+import { corsHeaders } from '../_shared/cors.ts';
 
 // Helper funkce pro výpočty XP, aby byl kód čistý
 const calculateXpForNextLevel = (level: number, base: number, exponent: number) => {
@@ -29,7 +31,7 @@ async function processXpUpdate(submission: Submission) {
     return;
   }
 
-  // --- 1. Aktualizace celkové úrovně studenta (s novými hodnotami) ---
+  // --- 1. Aktualizace celkové úrovně studenta ---
   const { data: studentProfile, error: profileError } = await supabaseAdmin
     .from('StudentProfile').select('level, xp').eq('user_id', student_id).single();
 
@@ -60,7 +62,7 @@ async function processXpUpdate(submission: Submission) {
       student_id, submission_id, event_type: 'student_xp', xp_gained: totalXpGain, new_level: level > originalLevel ? level : null
   });
 
-  // --- 2. Aktualizace úrovní dovedností (s logikou pro přidání nového skillu) ---
+  // --- 2. Aktualizace úrovní dovedností ---
   const { data: challengeSkills, error: skillsError } = await supabaseAdmin
     .from('ChallengeSkill').select('skill_id').eq('challenge_id', challenge_id);
 
@@ -80,7 +82,7 @@ async function processXpUpdate(submission: Submission) {
     const skillXpGain = Math.floor((rating / 10) * baseMultiplier);
 
     if (studentSkillError && studentSkillError.code === 'PGRST116') { // PGRST116 = not found
-      // NOVÁ LOGIKA: Student skill nemá, tak mu ho vytvoříme
+      // Student skill nemá, tak mu ho vytvoříme
       let newSkillLevel = 1;
       let newSkillXp = skillXpGain;
       let xpForNextSkillLevel = calculateXpForNextLevel(newSkillLevel, 75, 1.4);
@@ -98,7 +100,7 @@ async function processXpUpdate(submission: Submission) {
       });
 
     } else if (studentSkill) {
-      // PŮVODNÍ LOGIKA: Student skill má, tak ho aktualizujeme
+      // Student skill má, tak ho aktualizujeme
       let { level: skillLevel, xp: skillXp } = studentSkill;
       const originalSkillLevel = skillLevel;
       skillXp += skillXpGain;
@@ -117,6 +119,30 @@ async function processXpUpdate(submission: Submission) {
       });
     }
   }
+
+  // --- 3. Vytvoření notifikace pro studenta ---
+  const { data: challenge } = await supabaseAdmin
+    .from('Challenge')
+    .select('title')
+    .eq('id', challenge_id)
+    .single();
+
+  let notificationMessage = '';
+  let notificationType: 'submission_reviewed' | 'submission_winner' = 'submission_reviewed';
+
+  if (position && position <= 3) {
+    notificationMessage = `Gratulujeme! Umístil ses na ${position}. místě ve výzvě "${challenge?.title}".`;
+    notificationType = 'submission_winner';
+  } else {
+    notificationMessage = `Tvoje řešení pro výzvu "${challenge?.title}" bylo ohodnoceno. Podívej se na zpětnou vazbu.`;
+  }
+
+  await supabaseAdmin.from('notifications').insert({
+    user_id: student_id,
+    message: notificationMessage,
+    link_url: `/challenges/${challenge_id}`,
+    type: notificationType
+  });
 }
 
 // Hlavní Deno server, který naslouchá požadavkům
@@ -129,7 +155,7 @@ Deno.serve(async (req: Request) => {
     const { record: submission } = await req.json();
     await processXpUpdate(submission as Submission);
     
-    return new Response(JSON.stringify({ message: "XP processed successfully" }), {
+    return new Response(JSON.stringify({ message: "XP and notification processed successfully" }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });

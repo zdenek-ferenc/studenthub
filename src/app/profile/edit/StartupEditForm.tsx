@@ -13,7 +13,6 @@ type StartupProfile = {
     contact_first_name: string; contact_last_name: string; contact_position: string | null;
 };
 
-// --- ZDE JE ZMĚNA: Odebrali jsme záložky ---
 type Tab = 'company' | 'contact' | 'categories';
 
 export default function StartupEditForm() {
@@ -30,23 +29,31 @@ export default function StartupEditForm() {
     
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-    useEffect(() => {
-        if (!user) return;
-        
-        const fetchData = async () => {
-            setLoading(true);
-            const [profileRes, categoriesRes] = await Promise.all([
-                supabase.from('StartupProfile').select('*').eq('user_id', user.id).single(),
-                supabase.from('StartupCategory').select('category_id').eq('startup_id', user.id),
-            ]);
+const [hasFetched, setHasFetched] = useState(false);
 
-            if (profileRes.data) reset(profileRes.data);
-            if (categoriesRes.data) setSelectedCategories(categoriesRes.data.map(c => c.category_id));
-            
-            setLoading(false);
-        };
-        fetchData();
-    }, [user, reset]);
+useEffect(() => {
+    if (!user || hasFetched) return;
+
+    const fetchData = async () => {
+        setLoading(true);
+        const [profileRes, categoriesRes] = await Promise.all([
+            supabase.from('StartupProfile').select('*').eq('user_id', user.id).single(),
+            supabase.from('StartupCategory').select('category_id').eq('startup_id', user.id),
+        ]);
+
+        if (profileRes.data) reset(profileRes.data);
+        if (categoriesRes.data) setSelectedCategories(categoriesRes.data.map(c => c.category_id));
+        
+        setLoading(false);
+        setHasFetched(true); 
+    };
+
+    fetchData();
+}, [user, reset, hasFetched]);
+
+useEffect(() => {
+    setHasFetched(false);
+}, [user?.id]);
 
     const handleProfileSubmit = async (data: Partial<StartupProfile>) => {
         if (!user) return;
@@ -92,7 +99,6 @@ export default function StartupEditForm() {
                     <TabButton tab="categories" label="Kategorie" />
                 </nav>
             </aside>
-
             <main className="md:col-span-3">
                 <form onSubmit={handleSubmit(handleProfileSubmit)} className="space-y-4 bg-white text-[var(--barva-tmava)] p-8 rounded-xl shadow-md">
                     {activeTab === 'company' && (
@@ -113,7 +119,7 @@ export default function StartupEditForm() {
                         </>
                     )}
                     {activeTab === 'contact' && (
-                       <>
+                    <>
                             <h2 className="text-2xl text-[var(--barva-primarni)] font-bold mb-4">Kontaktní osoba</h2>
                             <div>
                                 <label htmlFor="contact_first_name" className="block mb-1 font-semibold">Jméno</label>
@@ -131,12 +137,11 @@ export default function StartupEditForm() {
                     )}
                     
                     {['company', 'contact'].includes(activeTab) && (
-                         <button type="submit" disabled={!isDirty || isSubmitting} className="px-5 py-2 mt-4 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 disabled:bg-gray-300">
+                        <button type="submit" disabled={!isDirty || isSubmitting} className="px-5 py-2 mt-4 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 disabled:bg-gray-300">
                             {isSubmitting ? 'Ukládám...' : 'Uložit změny'}
                         </button>
                     )}
                 </form>
-
                 {activeTab === 'categories' && (
                     <div className="space-y-4 bg-white p-8 rounded-xl shadow-md">
                         <h2 className="text-2xl text-[var(--barva-primarni)] font-bold mb-4">Kategorie</h2>

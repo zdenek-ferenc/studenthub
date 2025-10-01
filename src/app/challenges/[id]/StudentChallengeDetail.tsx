@@ -8,7 +8,7 @@ import SubmissionForm from './SubmissionForm';
 import { useRouter } from 'next/navigation';
 import StudentChallengeRecap from './StudentChallengeRecap';
 import type { Submission } from './SubmissionCard';
-import { Download, Lock } from 'lucide-react';
+import { Download, Lock, Clock } from 'lucide-react';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
 type Challenge = {
@@ -71,22 +71,59 @@ const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
     );
 };
 
+const WaitingForResults = () => (
+    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs mt-8 text-center">
+        <Clock className="w-12 h-12 mx-auto text-blue-500 mb-4" />
+        <h2 className="text-2xl font-bold text-[var(--barva-tmava)]">Tvoje řešení čeká na vyhodnocení</h2>
+        <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+            Skvělá práce! Tvoje řešení bylo odevzdáno. Startup ho nyní vyhodnotí. Výsledky se dozvíš, jakmile bude výzva kompletně uzavřena.
+        </p>
+    </div>
+);
+
+
 export default function StudentChallengeDetail({ challenge }: { challenge: Challenge }) {
   const { user, loading: authLoading, refetchProfile, showToast } = useAuth();
   const router = useRouter();
   
   const [isApplying, setIsApplying] = useState(false);
   const [userSubmission, setUserSubmission] = useState<Submission | undefined>(undefined);
+  const [studentSkillIds, setStudentSkillIds] = useState<Set<string>>(new Set());
 
   const expectedOutputsArray = useMemo(() => {
     return challenge.expected_outputs.split('\n').filter(line => line.trim() !== '');
   }, [challenge.expected_outputs]);
   
+  // --- ZMĚNA: Přesunuto sem nahoru, před podmínku `if (authLoading)` ---
+  const sortedSkills = useMemo(() => {
+    return [...challenge.ChallengeSkill].sort((a, b) => {
+        const aIsMatch = studentSkillIds.has(a.Skill.id);
+        const bIsMatch = studentSkillIds.has(b.Skill.id);
+        if (aIsMatch && !bIsMatch) return -1;
+        if (!aIsMatch && bIsMatch) return 1;
+        return 0;
+    });
+  }, [challenge.ChallengeSkill, studentSkillIds]);
+
   useEffect(() => {
     if (user && challenge.Submission) {
         const submission = challenge.Submission.find(sub => sub.student_id === user.id);
         setUserSubmission(submission);
     }
+
+    const fetchStudentSkills = async () => {
+        if (user) {
+            const { data } = await supabase
+                .from('StudentSkill')
+                .select('skill_id')
+                .eq('student_id', user.id);
+            if (data) {
+                setStudentSkillIds(new Set(data.map(s => s.skill_id)));
+            }
+        }
+    };
+    fetchStudentSkills();
+
   }, [challenge.Submission, user]);
 
   const handleApply = async () => {
@@ -119,8 +156,9 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   
   const isApplied = !!userSubmission;
   const isChallengeFull = challenge.Submission.length >= challenge.max_applicants;
-  const isGraded = userSubmission && ['reviewed', 'winner', 'rejected'].includes(userSubmission.status);
-  
+  const showResults = challenge.status === 'closed' || challenge.status === 'archived';
+  const isReviewedByStartup = userSubmission && ['reviewed', 'winner', 'rejected'].includes(userSubmission.status);
+
   return (
     <div className="max-w-4xl mx-auto md:py-32 px-4">
       <div className="bg-white p-6 sm:p-8 md:p-12 rounded-2xl shadow-xs">
@@ -140,9 +178,21 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
             <div className="border-t border-b border-gray-100 py-6">
                 <h2 className="text-lg sm:text-xl font-semibold text-[var(--barva-tmava)] mb-4">Potřebné dovednosti</h2>
                 <div className="flex flex-wrap gap-2">
-                {challenge.ChallengeSkill.map(({ Skill }) => (
-                    <span key={Skill.id} className="px-2 py-1 sm:px-4 sm:py-2 rounded-full bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-sm sm:text-base text-[var(--barva-primarni)] md:font-semibold">{Skill.name}</span>
-                ))}
+                {sortedSkills.map(({ Skill }) => {
+                    const isMatch = studentSkillIds.has(Skill.id);
+                    return (
+                        <span 
+                            key={Skill.id} 
+                            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base font-semibold transition-colors ${
+                                isMatch 
+                                ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)]' 
+                                : 'bg-white text-gray-600 border border-gray-300'
+                            }`}
+                        >
+                            {Skill.name}
+                        </span>
+                    );
+                })}
                 </div>
             </div>
             <div className="flex flex-col sm:flex-row justify-between items-center text-[var(--barva-tmava)] py-4 text-base sm:text-lg font-semibold gap-4">
@@ -206,8 +256,8 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
             </div>
         )}
       </div>
-
-      {isApplied && !isGraded && userSubmission && (
+      
+      {isApplied && !showResults && !isReviewedByStartup && userSubmission && (
         <SubmissionForm 
           challengeId={challenge.id} 
           submissionId={userSubmission.id} 
@@ -217,7 +267,11 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
         />
       )}
 
-      {isGraded && userSubmission && (
+      {isApplied && !showResults && isReviewedByStartup && (
+        <WaitingForResults />
+      )}
+
+      {isApplied && showResults && userSubmission && (
         <StudentChallengeRecap 
             submission={userSubmission} 
             challengeStatus={challenge.status} 

@@ -109,7 +109,7 @@ export default function CreateChallengeWizard() {
 
         const isValid = await methods.trigger();
         if (!isValid) {
-            showToast("Prosím, vyplňte všechna povinná pole.", "error");
+            // --- ZMĚNA ZDE: Smazali jsme řádek s obecným toastem ---
             return;
         }
 
