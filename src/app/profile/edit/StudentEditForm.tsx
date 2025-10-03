@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import SkillSelectorEdit from './components/EditSkillSelector';
 import LanguageSelectorEdit from './components/EditLanguageSelector';
 import EditSocialLinks from './components/EditSocialLinks';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 type StudentProfile = {
     first_name: string;
@@ -25,10 +26,13 @@ type StudentProfile = {
 type Tab = 'personal' | 'skills' | 'links';
 
 export default function StudentEditForm() {
-    const { user, showToast } = useAuth();
+    // Používáme původní AuthContext, bez nových proměnných
+    const { user, showToast, loading: authLoading, refetchProfile } = useAuth();
     const searchParams = useSearchParams();
-    const [loading, setLoading] = useState(true);
     
+    const [loading, setLoading] = useState(true);
+    const [hasFetched, setHasFetched] = useState(false); // Naše "pojistka" proti znovunačítání
+
     const initialTab = searchParams.get('tab');
     const [activeTab, setActiveTab] = useState<Tab>(
         initialTab === 'skills' || initialTab === 'links' ? initialTab : 'personal'
@@ -36,92 +40,115 @@ export default function StudentEditForm() {
     
     const { register, handleSubmit, reset, formState: { isDirty, isSubmitting } } = useForm();
     
+    // Budeme si zde držet původní načtené skilly a jazyky pro porovnání
+    const [originalSkills, setOriginalSkills] = useState<string[]>([]);
+    const [originalLanguages, setOriginalLanguages] = useState<string[]>([]);
+
     const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
     const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
 
-const [hasFetched, setHasFetched] = useState(false);
+    useEffect(() => {
+        // Logiku spustíme jen jednou díky `!hasFetched`
+        if (user && !hasFetched) {
+            setLoading(true);
+            Promise.all([
+                supabase.from('StudentProfile').select('*').eq('user_id', user.id).single(),
+                supabase.from('StudentSkill').select('skill_id').eq('student_id', user.id),
+                supabase.from('StudentLanguage').select('language_id').eq('student_id', user.id),
+            ]).then(([profileRes, skillsRes, languagesRes]) => {
+                if (profileRes.data) reset(profileRes.data);
+                
+                const skillIds = skillsRes.data?.map(s => s.skill_id) || [];
+                setSelectedSkills(skillIds);
+                setOriginalSkills(skillIds); // Uložíme si původní stav
 
-useEffect(() => {
-    if (!user || hasFetched) return;
+                const langIds = languagesRes.data?.map(l => l.language_id) || [];
+                setSelectedLanguages(langIds);
+                setOriginalLanguages(langIds); // Uložíme si původní stav
 
-    const fetchData = async () => {
-        setLoading(true);
-        const [profileRes, skillsRes, languagesRes] = await Promise.all([
-            supabase.from('StudentProfile').select('*').eq('user_id', user.id).single(),
-            supabase.from('StudentSkill').select('skill_id').eq('student_id', user.id),
-            supabase.from('StudentLanguage').select('language_id').eq('student_id', user.id),
-        ]);
-
-        if (profileRes.data) {
-            reset(profileRes.data);
+                setHasFetched(true); // Označíme, že máme načteno
+                setLoading(false);
+            });
         }
-        if (skillsRes.data) {
-            setSelectedSkills(skillsRes.data.map(s => s.skill_id));
-        }
-        if (languagesRes.data) {
-            setSelectedLanguages(languagesRes.data.map(l => l.language_id));
-        }
-        setLoading(false);
-        setHasFetched(true); 
-    };
-
-    fetchData();
-}, [user, reset, hasFetched]);
-
-useEffect(() => {
-    setHasFetched(false);
-}, [user?.id]);
+    }, [user, hasFetched, reset]);
 
     const handleProfileSubmit = async (data: Partial<StudentProfile>) => {
         if (!user) return;
-        
         const sanitizedData = Object.fromEntries(
             Object.entries(data).map(([key, value]) => [key, value === '' ? null : value])
         );
-
         const { error } = await supabase.from('StudentProfile').update(sanitizedData).eq('user_id', user.id);
-        
         if (error) {
             showToast(`Chyba: ${error.message}`, 'error');
         } else {
             showToast('Profil byl úspěšně uložen!', 'success');
+            refetchProfile(); // Toto můžeš nechat, refreshuje základní data v kontextu
             reset({}, { keepValues: true }); 
         }
     };
 
     const handleSkillsSubmit = async () => {
         if (!user) return;
-        await supabase.from('StudentSkill').delete().eq('student_id', user.id);
-        const toInsert = selectedSkills.map(skillId => ({ student_id: user.id, skill_id: skillId }));
-        if (toInsert.length > 0) {
-            const { error } = await supabase.from('StudentSkill').insert(toInsert);
-            if (error) {
-                showToast(`Chyba při ukládání dovedností: ${error.message}`, 'error');
-            } else {
-                showToast('Dovednosti byly úspěšně uloženy!', 'success');
+
+        const originalSet = new Set(originalSkills);
+        const newSet = new Set(selectedSkills);
+
+        // Oprava TypeScript chyby: explicitně definujeme typ 'id'
+        const skillsToAdd = selectedSkills.filter((id: string) => !originalSet.has(id));
+        const skillsToRemove = originalSkills.filter((id: string) => !newSet.has(id));
+
+        // Oprava TypeScript chyby: 'error' je typu 'Error'
+        try {
+            if (skillsToRemove.length > 0) {
+                const { error } = await supabase.from('StudentSkill').delete().eq('student_id', user.id).in('skill_id', skillsToRemove);
+                if (error) throw error;
             }
-        } else {
+            if (skillsToAdd.length > 0) {
+                const toInsert = skillsToAdd.map(skillId => ({ student_id: user.id, skill_id: skillId }));
+                const { error } = await supabase.from('StudentSkill').insert(toInsert);
+                if (error) throw error;
+            }
+            
             showToast('Dovednosti byly úspěšně uloženy!', 'success');
+            setOriginalSkills(selectedSkills); // Aktualizujeme "původní stav"
+            refetchProfile();
+        } catch (error: unknown) { // Použijeme 'unknown' místo 'any'
+            showToast(`Chyba při ukládání dovedností: ${(error as Error).message}`, 'error');
         }
     };
     
     const handleLanguagesSubmit = async () => {
         if (!user) return;
-        await supabase.from('StudentLanguage').delete().eq('student_id', user.id);
-        const toInsert = selectedLanguages.map(langId => ({ student_id: user.id, language_id: langId }));
-        if(toInsert.length > 0) {
-            const { error } = await supabase.from('StudentLanguage').insert(toInsert);
-            if (error) {
-                showToast(`Chyba při ukládání jazyků: ${error.message}`, 'error');
-            } else {
-                showToast('Jazyky byly úspěšně uloženy!', 'success');
+        
+        const originalSet = new Set(originalLanguages);
+        const newSet = new Set(selectedLanguages);
+
+        const languagesToAdd = selectedLanguages.filter((id: string) => !originalSet.has(id));
+        const languagesToRemove = originalLanguages.filter((id: string) => !newSet.has(id));
+
+        try {
+            if (languagesToRemove.length > 0) {
+                const { error } = await supabase.from('StudentLanguage').delete().eq('student_id', user.id).in('language_id', languagesToRemove);
+                if (error) throw error;
             }
-        } else {
+            if (languagesToAdd.length > 0) {
+                const toInsert = languagesToAdd.map(langId => ({ student_id: user.id, language_id: langId }));
+                const { error } = await supabase.from('StudentLanguage').insert(toInsert);
+                if (error) throw error;
+            }
+
             showToast('Jazyky byly úspěšně uloženy!', 'success');
+            setOriginalLanguages(selectedLanguages); // Aktualizujeme "původní stav"
+            refetchProfile();
+        } catch (error: unknown) {
+            showToast(`Chyba při ukládání jazyků: ${(error as Error).message}`, 'error');
         }
     };
 
-    if (loading) return <p>Načítám data...</p>;
+    if (loading || authLoading) {
+        return <LoadingSpinner />;
+    }
+
     const TabButton = ({ tab, label }: { tab: Tab, label: string }) => (
         <button
             onClick={() => setActiveTab(tab)}
@@ -140,6 +167,7 @@ useEffect(() => {
                     <TabButton tab="links" label="Odkazy" />
                 </nav>
             </aside>
+
             <main className="md:col-span-3">
                 <form onSubmit={handleSubmit(handleProfileSubmit)} className="space-y-8 bg-white p-8 rounded-xl shadow-xs">
                     {activeTab === 'personal' && (
@@ -149,7 +177,7 @@ useEffect(() => {
                                 <label htmlFor="first_name" className="block mb-1 font-semibold text-[var(--barva-tmava)]">Jméno</label>
                                 <input id="first_name" {...register('first_name')} className="input !font-normal" />
                             </div>
-                            <div>
+                             <div>
                                 <label htmlFor="last_name" className="block mb-1 font-semibold text-[var(--barva-tmava)]">Příjmení</label>
                                 <input id="last_name" {...register('last_name')} className="input !font-normal" />
                             </div>
@@ -184,6 +212,7 @@ useEffect(() => {
                             <EditSocialLinks register={register} />
                         </>
                     )}
+
                     {(activeTab === 'personal' || activeTab === 'links') && (
                         <div className="pt-4">
                             <button type="submit" disabled={!isDirty || isSubmitting} className="px-5 py-2 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-300 disabled:cursor-not-allowed">
