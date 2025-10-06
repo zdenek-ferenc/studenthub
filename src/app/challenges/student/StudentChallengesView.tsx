@@ -45,7 +45,7 @@ export default function StudentChallengesView() {
   const studentSkillIdsForCard = useMemo(() => studentSkills.map(s => s.id), [studentSkills]);
 
   return (
-    <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-10 md:py-32">
+    <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-5 md:py-32">
       <ChallengeFilterSidebar
         allSkills={allSkills}
         selectedSkillIds={selectedSkillIds}
@@ -65,7 +65,7 @@ export default function StudentChallengesView() {
             <div className="mb-6 flex justify-between items-center">
               <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-[var(--barva-tmava)]">Objevuj nové výzvy</h1>
-                  <p className="text-sm md:text-lg text-gray-500 mt-1">Nalezeno {displayedChallenges.length} výzev na základě tvých filtrů.</p>
+                  <p className="text-sm md:text-lg text-gray-500 mt-1">Nalezeno <span className='text-[var(--barva-primarni)] font-bold'>{displayedChallenges.length}</span> výzev na základě tvých filtrů.</p>
               </div>
               <div className="lg:hidden">
                   <button 

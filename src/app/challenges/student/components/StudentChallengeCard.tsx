@@ -121,7 +121,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
               Detail výzvy
           </div>
           {/* Toto se zobrazí na obrazovkách menších než xl */}
-          <div className="flex xl:hidden items-center justify-center w-7 h-7 md:w-10 md:h-10 ring-2 ring-[var(--barva-primarni)] text-blue-600 rounded-full hover:bg-[var(--barva-primarni2)] transition-colors">
+          <div className="flex xl:hidden leading-none items-center justify-center w-7 h-7 md:w-10 md:h-10 ring-2 ring-[var(--barva-primarni)] text-blue-600 rounded-full hover:bg-[var(--barva-primarni2)] transition-colors">
               <ChevronRight size={22} />
           </div>
         </Link>
