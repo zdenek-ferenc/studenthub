@@ -24,7 +24,7 @@ function StartupCatalogPage() {
     }
 
     return (
-        <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-10 md:py-32">
+        <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-5 md:py-32">
             <StartupFilterSidebar
                 allCategories={allCategories}
                 selectedCategoryIds={startupFilters.selectedCategoryIds}
@@ -37,7 +37,11 @@ function StartupCatalogPage() {
                 setMobileOpen={setIsFilterOpen} 
             />
             <main className="flex-1 w-full">
-                <div className="mb-6 lg:hidden flex justify-end">
+                <div className='mb-6 flex justify-between items-center'>
+                    <div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-[var(--barva-tmava)]">Objev inovativní startupy</h1>
+                </div>
+                <div className="lg:hidden flex justify-between items-center">
                     <button 
                         onClick={() => setIsFilterOpen(true)}
                         className="p-3 rounded-full bg-white shadow-md border text-[var(--barva-primarni)]"
@@ -45,6 +49,8 @@ function StartupCatalogPage() {
                         <SlidersHorizontal size={20} />
                     </button>
                 </div>
+                </div>
+                
 
                 {loadingStartups && startups.length === 0 ? (
                     <div className="">

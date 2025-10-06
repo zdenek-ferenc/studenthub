@@ -39,7 +39,7 @@ function PillSwitch({ role, pathname }: { role: 'student' | 'startup', pathname:
   return (
     <div className="p-1 md:p-1.5 gap-2 bg-white rounded-full shadow-md flex items-center">
       {links.map(link => (
-        <Link key={link.id} href={link.href} className={`px-4 py-2 lg:px-8 lg:py-3 rounded-full text-base lg:text-lg font-semibold transition-all duration-300 ease-in-out ${pathname.startsWith(link.href) ? 'bg-[var(--barva-primarni)] text-white' : 'text-[var(--barva-tmava)] hover:inset-shadow-sm hover:bg-gray-50'}`}>{link.label}</Link>
+        <Link key={link.id} href={link.href} className={`px-4 py-2 lg:px-8 lg:py-3 rounded-full text-base lg:text-lg font-semibold transition-all duration-300 ease-in-out ${pathname.startsWith(link.href) ? 'bg-[var(--barva-primarni)] text-white ' : 'text-[var(--barva-tmava)] hover:inset-shadow-sm hover:bg-gray-50'}`}>{link.label}</Link>
       ))}
     </div>
   );
