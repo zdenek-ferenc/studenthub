@@ -58,8 +58,8 @@ export default function StartupQnA({ startupId }: { startupId: string }) {
     };
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
-            <h2 className="text-2xl font-bold text-[var(--barva-tmava)] mb-4">Zeptej se nás</h2>
+        <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
+            <h2 className="text-lg sm:text-2xl font-bold text-[var(--barva-tmava)] mb-4">Zeptej se nás</h2>
             
             {user?.role === 'student' && (
                 <form onSubmit={handleSubmitQuestion} className="flex items-center gap-2 mb-6">

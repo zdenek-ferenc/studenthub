@@ -26,12 +26,12 @@ const ResultTag = ({ rating, position }: { rating: number | null, position: numb
                 <div className="items-center flex gap-1.5 text-sm font-semibold text-yellow-500">
                   <div className="items-center flex gap-1.5">
                     <Trophy size={16} />
-                    <span className='leading-none'>{position}. místo</span>
+                    <span className='leading-none bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent'>{position}. místo</span>
                 </div>
             </div>
                 {/* Zobrazíme i rating, pokud existuje */}
                 {rating && (
-                    <div className="flex items-center gap-1.5 text-sm font-semibold text-blue-600">
+                    <div className="flex items-center gap-1.5 text-sm font-semibold text-[var(--barva-primarni)]">
                         <Star size={16} />
                         <span className='leading-none'>{rating} / 10</span>
                     </div>

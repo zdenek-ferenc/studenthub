@@ -77,7 +77,7 @@ export default function StudentChallengesView() {
               </div>
             </div>
             {displayedChallenges.length > 0 ? (
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-6">
                 {displayedChallenges.map(challenge => {
                   const isApplied = challenge.Submission.some(sub => sub.student_id === user?.id);
                   return (

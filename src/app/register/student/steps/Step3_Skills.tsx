@@ -31,13 +31,16 @@ export default function Step3_Skills({ onNext, allSkills, isLoading }: StepProps
         />
       )}
       
-      <button 
+      <div className='pt-6 flex justify-center'>
+        <button 
         onClick={handleContinue} 
         disabled={isLoading} 
-        className="mt-8 sm:mt-12 px-8 py-3 sm:px-14 sm:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] text-lg sm:text-2xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400"
+        className="px-6 py-3 md:px-8 md:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400"
       >
         Pokračovat
       </button>
+      </div>
+      
     </div>
   );
 }

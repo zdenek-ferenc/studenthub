@@ -54,21 +54,21 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
     };
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
+        <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
             <div className="text-center">
                 <Image src={profile.logo_url || '/logo.svg'} alt={`${profile.company_name} logo`} width={96} height={96}
-                    className="w-24 h-24 rounded-2xl mx-auto mb-4 object-contain"
+                    className="w-24 h-24 rounded-2xl mx-auto mb-2 sm:mb-4 object-contain"
                 />
                 <h1 className="text-2xl font-bold text-[var(--barva-tmava)]">{profile.company_name}</h1>
                 {profile.website && (
                     <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-[var(--barva-primarni)] hover:underline break-all">{profile.website}</a>
                 )}
             </div>
-            <div className="mt-6 pt-4 border-t border-gray-100">
+            <div className="mt-3 sm:mt-6 pt-4 border-t border-gray-100">
                 {isEditing ? (
                     <div className="space-y-2">
                         <textarea value={descriptionText} onChange={(e) => setDescriptionText(e.target.value)} placeholder="Popište vaši firmu..."
-                            className="w-full min-h-[120px] text-sm rounded-lg border border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
+                            className="w-full min-h-[120px] text-sm rounded-lg border text-[var(--barva-tmava)] border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
                         />
                         <div className="flex items-center gap-2">
                             <button onClick={handleSaveDescription} disabled={saving} className="text-sm font-semibold text-[var(--barva-primarni)] disabled:text-gray-400">{saving ? 'Ukládám...' : 'Uložit'}</button>
@@ -140,7 +140,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
     }, [profileId, hasFetched, user, viewerProfile]);
     
     if (loading || !profile) {
-        return <LoadingSpinner />;
+        return <div className='pt-32'><LoadingSpinner /></div>;
     }
 
     const now = new Date();
@@ -152,10 +152,10 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
 
     return (
         <div className="container mx-auto py-5 md:py-32 px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <aside className="lg:col-span-1 space-y-8 lg:top-28">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
+                <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:top-28">
                     <StartupInfoCard profile={profile} isOwner={isOwner} />
-                    <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
+                    <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
                         <div className="flex justify-between items-center mb-3">
                             <h3 className="font-bold text-lg text-[var(--barva-tmava)]">Kategorie</h3>
                             {isOwner && (
@@ -174,7 +174,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                     </div>
                 </aside>
 
-                <main className="lg:col-span-2 space-y-8">
+                <main className="lg:col-span-2 space-y-3 sm:space-y-8">
                     {showIdealCandidateSection && (
                         <div className="relative">
                             {isOwner && hasIdealCandidateInfo && (
@@ -191,8 +191,8 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                         </div>
                     )}
                     {activeChallenges.length > 0 && (
-                        <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
-                            <h2 className="text-2xl font-bold text-[var(--barva-tmava)] mb-4">Aktivní výzvy</h2>
+                        <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
+                            <h2 className="text-lg sm:text-2xl font-bold text-[var(--barva-tmava)] mb-4">Aktivní výzvy</h2>
                             <div className="space-y-3">
                                 {activeChallenges.map(challenge => (
                                     <StartupProfileChallengeCard 

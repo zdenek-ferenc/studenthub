@@ -24,7 +24,7 @@ export default function Step3_Categories({ onNext }: StepProps) {
         <CategorySelector onSelectionChange={setSelectedCategories} />
         
         <div className="pt-6 flex justify-center">
-          <button onClick={handleContinue} className="px-8 py-4 rounded-3xl bg-[var(--barva-primarni)] text-xl text-white font-semibold shadow-sm hover:opacity-90 transition-all duration-300 ease-in-out">
+          <button onClick={handleContinue} className="px-6 py-3 md:px-8 md:py-4 rounded-3xl bg-[var(--barva-primarni)] md:text-xl text-white font-semibold shadow-sm hover:opacity-90 transition-all duration-300 ease-in-out">
             Pokračovat
           </button>
         </div>

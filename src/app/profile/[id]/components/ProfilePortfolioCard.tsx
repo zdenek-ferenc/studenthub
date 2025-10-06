@@ -20,8 +20,7 @@ type PortfolioCardProps = {
     }
 };
 
-// --- ZDE JE TA OPRAVA ---
-// Komponenta nyní zobrazí oba tagy, pokud existují.
+
 const ResultTag = ({ rating, position }: { rating: number | null, position: number | null }) => {
     return (
         <div className="flex items-center gap-2">

@@ -5,8 +5,8 @@ import { PlusCircle, XCircle } from "lucide-react";
 
 const FormField = ({ label, description, children }: { label: string, description: string, children: React.ReactNode }) => (
     <div>
-        <label className="block text-xl font-bold text-gray-800">{label}</label>
-        <p className="text-base text-gray-500 mt-1 mb-4">{description}</p>
+        <label className="block text-xl font-semibold md:font-bold text-[var(--barva-primarni)]">{label}</label>
+        <p className="text-sm md:text-base text-gray-500 mt-1 mb-4">{description}</p>
         {children}
     </div>
 );
@@ -19,10 +19,10 @@ export default function Step2_Details() {
     });
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-4 md:space-y-10">
             <div>
-                <h2 className="text-4xl font-extrabold text-[var(--barva-tmava)]">Detailní zadání</h2>
-                <p className="text-lg text-gray-600 mt-2">Nyní je čas jít do hloubky. Popište studentům kontext a přesně specifikujte, co od nich očekáváte.</p>
+                <h2 className="text-2xl md:text-4xl font-bold md:font-extrabold text-[var(--barva-tmava)]">Detailní zadání</h2>
+                <p className="md:text-lg text-gray-600 mt-2">Nyní je čas jít do hloubky. Popište studentům kontext a přesně specifikujte, co od nich očekáváte.</p>
             </div>
             
             <FormField

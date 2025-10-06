@@ -109,7 +109,6 @@ export default function CreateChallengeWizard() {
 
         const isValid = await methods.trigger();
         if (!isValid) {
-            // --- ZMĚNA ZDE: Smazali jsme řádek s obecným toastem ---
             return;
         }
 
@@ -209,7 +208,7 @@ export default function CreateChallengeWizard() {
     
     return (
         <FormProvider {...methods}>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8">
                 <aside className="md:col-span-1">
                     <nav className="space-y-2 sticky top-28">
                         {STEPS.map((s) => {
@@ -233,14 +232,14 @@ export default function CreateChallengeWizard() {
                                 </button>
                             )
                         })}
-                        <div className="pt-4 text-center text-sm text-gray-500 h-6">
+                        <div className="hidden md:block md:pt-4 text-center text-sm text-gray-500 h-6">
                             {saveStatus === 'saving' && 'Ukládám...'}
-                            {saveStatus === 'saved' && <span className="flex items-center justify-center gap-1 text-green-600"><CheckCircle size={16}/> Koncept uložen</span>}
+                            {saveStatus === 'saved' && <span className="flex md:items-center md:justify-center gap-1 text-green-600"><CheckCircle size={16}/> Koncept uložen</span>}
                         </div>
                     </nav>
                 </aside>
                 <main className="md:col-span-3">
-                    <form onSubmit={(e) => e.preventDefault()} className="bg-white p-8 rounded-2xl shadow-sm">
+                    <form onSubmit={(e) => e.preventDefault()} className="bg-white p-4 md:p-8 rounded-2xl shadow-sm">
                         {renderStepContent()}
                         <div className="mt-8 pt-6 border-t flex justify-between items-center">
                             <button 
@@ -252,11 +251,11 @@ export default function CreateChallengeWizard() {
                                 Zpět
                             </button>
                             {step < 4 ? (
-                                <button type="button" onClick={handleSaveAndContinue} className="px-6 py-2 rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:opacity-90">
+                                <button type="button" onClick={handleSaveAndContinue} className="px-6 py-2 rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 cursor-pointer">
                                     Uložit a pokračovat
                                 </button>
                             ) : (
-                                <button type="button" onClick={handlePublish} className="px-8 py-3 rounded-full font-bold text-white bg-green-600 hover:bg-green-700 text-lg">
+                                <button type="button" onClick={handlePublish} className="px-8 py-3 rounded-full font-bold text-white bg-[var(--barva-primarni)] hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 cursor-pointer text-lg">
                                     Zveřejnit výzvu
                                 </button>
                             )}

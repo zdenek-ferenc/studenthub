@@ -36,7 +36,7 @@ export default function Step3_Settings() {
 
     return (
         <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-[var(--barva-tmava)]">Nastavení a odměny</h2>
+            <h2 className="text-2xl md:text-4xl font-bold md:font-extrabold text-[var(--barva-tmava)]">Nastavení a odměny</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

@@ -13,7 +13,7 @@ import Step3_Categories from './steps/Step3_Categories';
 import Step4_LogoUpload from './steps/Step4_LogoUpload';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 
-const IS_DEVELOPMENT_MODE = false; 
+const IS_DEVELOPMENT_MODE = true; 
 const DEV_START_STEP = 2; 
 
 type FormData = {
@@ -236,7 +236,7 @@ export default function StartupRegistrationPage() {
   if (loading && !IS_DEVELOPMENT_MODE) return <p>Načítání...</p>;
 
   return (
-    <div className="w-full min-h-screen my-8 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
+    <div className="w-full min-h-screen flex py-5 md:py-32 items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
       {IS_DEVELOPMENT_MODE || session ? (
         <div className="w-full">
           {renderStep()}

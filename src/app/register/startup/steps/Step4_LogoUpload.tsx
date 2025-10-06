@@ -68,13 +68,13 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
           />
           <label 
             htmlFor="logoUpload" 
-            className={`cursor-pointer px-12 py-4 rounded-3xl text-xl font-semibold transition-all duration-300 ease-in-out
+            className={`cursor-pointer md:px-12 px-6 py-3 md:py-4 rounded-3xl md:text-xl font-semibold transition-all duration-300 ease-in-out
               ${uploading 
                 ? 'bg-gray-400 text-white' 
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
               }`}
           >
-            {uploading ? 'Nahrávám...' : 'Vybrat soubor z počítače'}
+            {uploading ? 'Nahrávám...' : 'Vybrat soubor'}
           </label>
         </div>
         

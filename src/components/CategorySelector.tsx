@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import LoadingSpinner from './LoadingSpinner';
 
 
 type Category = {
@@ -67,7 +68,7 @@ export default function CategorySelector({ onSelectionChange, initialSelectedIds
 
   if (loading) {
     
-    return <p className='text-center text-[var(--barva-primarni)] text-4xl font-bold'>Načítám kategorie...</p>;
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -85,12 +86,12 @@ export default function CategorySelector({ onSelectionChange, initialSelectedIds
         className="flex min-w-[24rem] content-start m-auto mb-12 px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]"
       />
 
-      <div className="flex flex-wrap justify-center gap-8 px-32">
+      <div className="w-full max-w-4xl sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4">
         {filteredCategories.map(category => (
           <button
             key={category.id}
             onClick={() => handleToggleCategory(category.id)}
-            className={`px-6 py-2 text-[var(--barva-primarni)] rounded-full font-light text-3xl outline-2 transition-colors duration-200 cursor-pointer
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-semibold sm:font-light text-sm sm:text-xl outline-2 transition-colors duration-200 cursor-pointer
               ${selectedIds.includes(category.id)
                 ? 'bg-[var(--barva-primarni2)]' 
                 : 'bg-white' 

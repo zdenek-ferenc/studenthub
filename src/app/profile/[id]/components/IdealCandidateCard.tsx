@@ -70,12 +70,12 @@ export default function IdealCandidateCard({ description, technologies, isOwner,
 
     // Standardní zobrazení, když karta má data na veřejném profilu
     return (
-        <div className="bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white p-6 rounded-2xl shadow-lg border-t border-blue-400/30">
+        <div className="bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white p-3 sm:p-6 rounded-2xl shadow-lg border-t border-blue-400/30">
             <div className="flex items-center gap-3 mb-4">
                 <Target size={24} className="text-[var(--barva-primarni)]" />
-                <h3 className="text-xl font-bold">Hledáme právě tebe!</h3>
+                <h3 className="text-base sm:text-xl font-bold">Hledáme právě tebe!</h3>
             </div>
-            {description && <p className="text-blue-100 mb-4">{description}</p>}
+            {description && <p className="sm:text-base text-sm text-blue-100 mb-4">{description}</p>}
             <div>
                 <h4 className="font-semibold text-sm text-blue-200 mb-2">Klíčové technologie:</h4>
                 <div className="flex flex-wrap gap-2">

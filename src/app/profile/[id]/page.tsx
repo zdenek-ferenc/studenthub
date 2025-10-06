@@ -47,7 +47,7 @@ export default function PublicProfilePage() {
   }, [profileId]);
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <div className='pt-32'><LoadingSpinner /></div>;
   }
 
   if (error || !profileData) {

@@ -43,7 +43,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
   const completedChallenges = startup.Challenge?.filter(c => c.status === 'closed').length ?? 0;
 
   return (
-      <div className="bg-white rounded-2xl shadow-xs p-6 border border-gray-100 hover:shadow-none transition-all duration-300 ease-in-out flex flex-col h-full cursor-pointer">       
+      <div className="bg-white rounded-2xl shadow-xs p-3 sm:p-6 border border-gray-100 hover:shadow-none transition-all duration-300 ease-in-out flex flex-col h-full cursor-pointer">       
         <div className="flex items-center gap-4 mb-4">
           {startup.logo_url ? (
             <Image 
@@ -66,7 +66,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
         <p className="text-gray-600 text-sm mb-5 line-clamp-3 flex-grow">
           {startup.description || 'Tento startup zatím nepřidal žádný popis.'}
         </p>
-        <div className="flex items-center gap-4 mb-5 text-sm font-medium text-gray-500">
+        <div className="flex items-center gap-6 sm:gap-4 mb-5 text-sm font-medium text-gray-500">
           <div className="flex items-center gap-1.5">
             <Briefcase className="text-blue-500" size={18} />
             <span>{formatChallengeText(activeChallenges, 'active')}</span>
@@ -79,21 +79,21 @@ export default function StartupCard({ startup }: StartupCardProps) {
         <div className="flex flex-wrap items-center gap-2 mb-6">
           {startup.StartupCategory?.slice(0, 3).map(({ Category }) => (
             Category && (
-              <span key={Category.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-sm font-semibold transition-colors">
+              <span key={Category.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors">
                 {Category.name}
               </span>
             )
           ))}
           {startup.StartupCategory?.length > 3 && (
-            <span className="text-[var(--barva-primarni)] text-sm">
+            <span className="text-[var(--barva-primarni)] text-xs sm:text-sm">
               +{startup.StartupCategory.length - 3} další
             </span>
           )}
         </div>
         
-        <div className="mt-auto pt-4 border-t border-gray-100 flex justify-center">
+        <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-100 flex justify-center">
           <Link href={`/profile/${startup.user_id}`}>
-            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-2xl hover:opacity-90 transition-opacity">
+            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-3xl hover:opacity-90 transition-opacity">
               Profil startupu
             </div>
           </Link>          

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react'; // Přidán import useEffect
 import { motion, AnimatePresence } from 'framer-motion';
 import withAuth from '../../components/withAuth';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabaseClient'; // Přidán import supabase
 import LoadingSpinner from '../../components/LoadingSpinner';
 import CareerGrowthWidget from './CareerGrowthWidget';
 import StudentChallengesWidget from './StudentChallengesWidget';
@@ -12,8 +13,11 @@ import NotificationsWidget from './NotificationsWidget';
 import StatsWidget from './StatsWidget';
 import { Briefcase, TrendingUp, LayoutGrid } from 'lucide-react';
 
-// ZMĚNA #1: Nový typ pro ID záložek a vylepšená komponenta pro tlačítko
 type TabId = 'challenges' | 'growth' | 'activities';
+
+type StudentProfileData = {
+    username: string;
+};
 
 const PillButton = ({
   id,
@@ -32,16 +36,14 @@ const PillButton = ({
   return (
     <button
       onClick={() => setActiveTab(id)}
-      className="relative flex-1 flex items-center justify-center gap-2 p-3 text-sm font-semibold transition-colors z-10"
+      className="relative flex-1 flex items-center justify-center gap-2 p-2 m-1 text-sm font-semibold transition-colors z-10"
     >
-      {/* Animovaný podklad pro aktivní tlačítko */}
       {isActive && (
         <motion.div
           className="absolute inset-0 bg-[var(--barva-primarni)] rounded-full shadow-md"
           layoutId="activePill"
         />
       )}
-      {/* Ikona a text */}
       <div className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}>
         <Icon size={20} />
       </div>
@@ -53,20 +55,46 @@ const PillButton = ({
 };
 
 function DashboardPage() {
-  const { profile, loading } = useAuth();
-  // ZMĚNA #2: Aktualizovaný výchozí stav
+  const { user, profile, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>('challenges');
+  const [studentProfile, setStudentProfile] = useState<StudentProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const hasFetchedProfile = useRef(false);
 
-  const firstName = profile?.email?.split('@')[0];
-  const displayName = firstName ? firstName.charAt(0).toUpperCase() + firstName.slice(1) : "zpět";
+  useEffect(() => {
+    if (user && !hasFetchedProfile.current) {
+      const fetchStudentProfile = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('StudentProfile')
+          .select('first_name, username')
+          .eq('user_id', user.id)
+          .single();
 
-  if (loading) return <LoadingSpinner />;
+        if (error) {
+          console.error("Error fetching student profile for dashboard:", error);
+        } else {
+          setStudentProfile(data);
+          hasFetchedProfile.current = true; // označíme, že už jsme to načetli
+        }
+        setLoading(false);
+      };
+      fetchStudentProfile();
+    } else if (!authLoading && !user) {
+      setLoading(false);
+    }
+  }, [user, authLoading]); 
+
+  // Použijeme křestní jméno, pokud je k dispozici
+  const displayName = studentProfile?.username ? studentProfile.username : "zpět";
+
+  if (authLoading || loading) return <LoadingSpinner />;
   if (profile?.role !== 'student') return <p className="text-center py-20">Tato stránka je určena pouze pro studenty.</p>;
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-32">
-      <h1 className="text-3xl md:text-4xl font-bold text-[var(--barva-tmava)] mb-6 md:mb-8">
-        Vítej {displayName}!
+      <h1 className="text-3xl md:text-4xl font-bold text-[var(--barva-tmava)] mb-2 md:mb-8">
+        Vítej <span className='text-[var(--barva-primarni)]'>{displayName}</span>!
       </h1>
 
       {/* --- PŮVODNÍ LAYOUT PRO DESKTOP (beze změny) --- */}
@@ -86,14 +114,12 @@ function DashboardPage() {
 
       {/* --- NOVÝ A VYLEPŠENÝ LAYOUT PRO MOBILNÍ ZAŘÍZENÍ --- */}
       <div className="lg:hidden">
-        {/* ZMĚNA #3: Nový "pilulkový" design navigace */}
-        <div className="relative flex items-center justify-around bg-white p-1 rounded-full mb-6">
+        <div className="relative flex items-center justify-around bg-white p-1 rounded-full mb-3 border border-gray-100 shadow-sm" >
           <PillButton id="challenges" label="Výzvy" icon={Briefcase} activeTab={activeTab} setActiveTab={setActiveTab} />
           <PillButton id="growth" label="Růst" icon={TrendingUp} activeTab={activeTab} setActiveTab={setActiveTab} />
           <PillButton id="activities" label="Aktivity" icon={LayoutGrid} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
 
-        {/* ZMĚNA #4: Aktualizovaný obsah záložek s novými ID */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -103,7 +129,7 @@ function DashboardPage() {
             transition={{ duration: 0.2 }}
           >
             {activeTab === 'challenges' && (
-              <div className="space-y-6">
+              <div className="space-y-3">
                 <StudentChallengesWidget />
                 <RecommendedChallengesWidget />
               </div>
@@ -112,7 +138,7 @@ function DashboardPage() {
               <CareerGrowthWidget />
             )}
             {activeTab === 'activities' && (
-              <div className="space-y-6">
+              <div className="space-y-3">
                 <StatsWidget />
                 <NotificationsWidget />
               </div>

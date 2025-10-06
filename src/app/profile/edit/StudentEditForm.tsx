@@ -159,7 +159,7 @@ export default function StudentEditForm() {
     );
 
     return (
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-4 gap-2 sm:gap-8">
             <aside className="md:col-span-1">
                 <nav className="space-y-2">
                     <TabButton tab="personal" label="Osobní údaje" />

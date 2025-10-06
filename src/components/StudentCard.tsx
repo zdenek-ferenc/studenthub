@@ -97,7 +97,7 @@ export default function StudentCard({ student }: StudentCardProps) {
           </div>
           
           <div className="mt-auto pt-4 border-t border-gray-100 flex justify-center">
-            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-2xl group-hover:opacity-90 transition-opacity">
+            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-3xl group-hover:opacity-90 transition-opacity">
               Profil studenta
             </div>
           </div>

@@ -48,16 +48,16 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
         <Link href={`/challenges/${challenge.id}`} className="block group relative">
             {/* --- ZDE JE PŘIDANÁ ANIMACE --- */}
             {isApplied && (
-                <div className={`absolute top-4 -right-3 flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full z-10 shadow-sm
+                <div className={`absolute top-2 -right-2 sm:top-4 sm:-right-3 flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-1 sm:px-2 py-1 rounded-full z-10 shadow-sm
                                 transition-all duration-300 ease-in-out 
                                 group-hover:opacity-0 group-hover:scale-75 group-hover:-translate-y-2`}>
                     <CheckCircle size={14} />
-                    <span>Přihlášeno</span>
+                    <span className='hidden sm:block'>Přihlášeno</span>
                 </div>
             )}
-            <div className="p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md hover:bg-blue-50 transition-all duration-300 flex items-center relative">
+            <div className="p-2 sm:p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md hover:bg-blue-50 transition-all duration-300 flex items-center relative">
                 <div className="flex-grow min-w-0">
-                    <p className="font-bold text-[var(--barva-tmava)] truncate pr-4">{challenge.title}</p>
+                    <p className="font-semibold sm:font-bold text-[var(--barva-tmava)] truncate sm:text-lg pr-4">{challenge.title}</p>
                     
                     <div className="flex items-end justify-between mt-2">
                         <div className="flex items-center gap-x-4 gap-y-1 flex-wrap">

@@ -161,7 +161,7 @@ export default function StartupChallengesView() {
     }
 
     return (
-        <div className="container mx-auto py-10 md:py-32">
+        <div className="container mx-auto px-4 py-10 md:py-32">
         {!loading && allChallenges.length === 0 ? (
             <div className="text-center max-w-lg mx-auto">
                 <Image
@@ -182,7 +182,7 @@ export default function StartupChallengesView() {
         ) : (
             <div>
                 <CommandCenter stats={dashboardStats} />
-                <div className="relative flex items-center border-b border-gray-200 w-fit mb-8">
+                <div className="relative flex flex-row justify-between sm:justify-start items-center md:border-b border-gray-200 mb-8">
                     {filters.map((filter, index) => (
                         <button
                             key={filter.id}

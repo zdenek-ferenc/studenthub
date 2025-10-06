@@ -47,9 +47,41 @@ function PillSwitch({ role, pathname }: { role: 'student' | 'startup', pathname:
 function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: string }) {
     const router = useRouter();
     const { user } = useAuth();
-    const initials = profile?.email?.substring(0, 2).toUpperCase() || '??';
+    const [initials, setInitials] = useState('??');
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (user && profile) {
+            const fetchInitials = async () => {
+                if (profile.role === 'student') {
+                    const { data } = await supabase
+                        .from('StudentProfile')
+                        .select('first_name, last_name')
+                        .eq('user_id', user.id)
+                        .single();
+                    if (data) {
+                        const newInitials = `${data.first_name?.charAt(0) ?? ''}${data.last_name?.charAt(0) ?? ''}`.toUpperCase();
+                        setInitials(newInitials || '??');
+                    }
+                } else if (profile.role === 'startup') {
+                    const { data } = await supabase
+                        .from('StartupProfile')
+                        .select('company_name')
+                        .eq('user_id', user.id)
+                        .single();
+                    if (data) {
+                        const newInitials = data.company_name?.substring(0, 2).toUpperCase() || '??';
+                        setInitials(newInitials);
+                    }
+                } else {
+                     setInitials(profile.email?.substring(0, 2).toUpperCase() || '??');
+                }
+            };
+            fetchInitials();
+        }
+    }, [user, profile]);
+
     const handleLogout = async () => { await supabase.auth.signOut(); router.push('/'); }
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => { if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) { setIsOpen(false); } };
@@ -59,12 +91,12 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
     const isActive = pathname.startsWith('/profile');
     return (
         <div className="relative" ref={dropdownRef}>
-            <button onClick={() => setIsOpen(!isOpen)} className={`w-12 h-12 rounded-full bg-[#86C5FF] text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer text-lg hover:shadow-md transition-all ease-in duration-300 ${isActive ? 'ring-2 ring-[var(--barva-primarni)] leading-none' : ''}`}>{initials}</button>
+            <button onClick={() => setIsOpen(!isOpen)} className={`w-12 h-12 rounded-full bg-gradient-to-b from-[#86C5FF]/30 to-[#86C5FF]/55 text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer text-lg hover:shadow-md transition-all ease-in duration-300 ${isActive ? 'ring-3 ring-[var(--barva-primarni)] leading-none' : ''}`}>{initials}</button>
             <div className={`absolute right-0 pt-2 transition-opacity duration-200 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                <div className="w-48 bg-white rounded-xl shadow-lg py-1 z-10">
-                    <Link href={`/profile/${user?.id}`} className="block px-4 py-2 text-sm text-gray-700 rounded-xl hover:bg-gray-100" onClick={() => setIsOpen(false)}>Můj profil</Link>
-                    <Link href="/profile/edit" className="block px-4 py-2 text-sm text-gray-700 rounded-xl hover:bg-gray-100" onClick={() => setIsOpen(false)}>Upravit profil</Link>
-                    <button onClick={handleLogout} className="w-full cursor-pointer text-left block px-4 py-2 text-sm rounded-xl text-gray-700 hover:bg-gray-100">Odhlásit se</button>
+                <div className="w-48 bg-white rounded-xl shadow-lg z-10">
+                    <Link href={`/profile/${user?.id}`} className="block px-4 py-2 text-sm text-gray-700 rounded-tr-xl rounded-tl-xl hover:bg-sky-50 transition-all ease-in-out duration-100" onClick={() => setIsOpen(false)}>Můj profil</Link>
+                    <Link href="/profile/edit" className="block px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 transition-all ease-in-out duration-100" onClick={() => setIsOpen(false)}>Upravit profil</Link>
+                    <button onClick={handleLogout} className="w-full cursor-pointer text-left block px-4 py-2 text-sm rounded-br-xl rounded-bl-xl text-gray-700 hover:bg-sky-50 transition-all ease-in-out duration-100">Odhlásit se</button>
                 </div>
             </div>
         </div>

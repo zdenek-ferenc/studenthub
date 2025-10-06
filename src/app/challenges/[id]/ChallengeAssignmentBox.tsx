@@ -50,11 +50,11 @@ const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
     if (rewards.length === 1 && rewards[0].amount) return <>{rewards[0].amount.toLocaleString('cs-CZ')} Kč</>;
     
     return (
-      <div className="flex items-baseline gap-4">
+      <div className="flex items-baseline gap-4 sm:mb-6">
         {rewards.map(({ place, amount }) => (
           <div key={place} className="text-center">
-            <span className="text-sm font-semibold text-gray-400 block">{place}</span>
-            <span className="font-bold text-lg sm:text-xl">{amount?.toLocaleString('cs-CZ')} Kč</span>
+            <span className="text-sm font-semibold text-[var(--barva-tmava)] block">{place}</span>
+            <span className="font-bold text-lg sm:text-xl"><span className='text-[var(--barva-primarni)]'>{amount?.toLocaleString('cs-CZ')}</span> Kč</span>
           </div>
         ))}
       </div>
@@ -111,16 +111,16 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
 
             <div className="flex flex-col sm:flex-row justify-between items-center text-[var(--barva-tmava)] py-4 text-base sm:text-lg font-semibold gap-4">
                 <span>Přihlášeno: <strong>{challenge.Submission.length} / {challenge.max_applicants}</strong></span>
-                <span className='flex flex-col items-center gap-1 sm:gap-2 justify-between'>Odměna: <strong><RewardsDisplay challenge={challenge} /></strong></span>
+                <RewardsDisplay challenge={challenge} />
             </div>
             
             <div className="prose max-w-none text-[var(--barva-tmava)] prose-headings:font-semibold prose-h3:text-lg prose-h3:mt-3 prose-h3:border-b-2 prose-h3:pb-2">
-                <p>{challenge.description}</p>
+                <p className='text-sm sm:text-base'>{challenge.description}</p>
                 <h3 className='text-xl md:text-2xl py-4 font-bold'>Cíle výzvy:</h3>
-                <p>{challenge.goals}</p>
+                <p className='text-sm sm:text-base'>{challenge.goals}</p>
                 <h3 className='text-xl md:text-2xl py-4 font-bold'>Co má být odevzdáno:</h3>
-                <ul className='mt-3 list-disc pl-8 space-y-2'>
-                    {expectedOutputsArray.map((output, index) => <li key={index}>{output}</li>)}
+                <ul className='sm:mt-3 list-disc pl-4 space-y-2 '>
+                    {expectedOutputsArray.map((output, index) => <li className='text-sm sm:text-base' key={index}>{output}</li>)}
                 </ul>
                 
                 {challenge.attachments_urls && challenge.attachments_urls.length > 0 && (
@@ -147,7 +147,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                     </>
                 )}
                 
-                <p className='font-semibold text-lg sm:text-xl mt-6'>Termín odevzdání do: <strong className='ml-3'>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></p>
+                <p className='font-semibold text-lg sm:text-xl mt-6'>Termín odevzdání do: <strong className='ml-3 text-[var(--barva-primarni)]'>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></p>
             </div>
             
             {!isApplied && (

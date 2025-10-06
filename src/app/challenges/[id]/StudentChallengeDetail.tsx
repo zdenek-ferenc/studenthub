@@ -110,7 +110,7 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   };
 
   return (
-    <div className="max-w-4xl mx-auto md:py-32 px-4 space-y-8">
+    <div className="max-w-4xl mx-auto py-4 md:py-32 px-4 space-y-8">
       
       {showResults && userSubmission && (
         <StudentChallengeRecap 

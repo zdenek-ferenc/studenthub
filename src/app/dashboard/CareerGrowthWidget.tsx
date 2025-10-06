@@ -102,7 +102,7 @@ const displayedSkills = showAllSkills ? allSkillsSorted : allSkillsSorted.slice(
 
 return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
-    <div className="my-6 text-center">
+    <div className="sm:my-3 md:my-6 text-center">
         <p className="font-semibold text-gray-500">Celková Úroveň</p>
         <div className='relative w-full mx-auto h-20 flex items-center justify-center'>
             <div className="relative flex items-center justify-center">
@@ -114,7 +114,7 @@ return (
                 </AnimatePresence>
             </div>
         </div>
-        <div className="max-w-xs mx-auto"><ProgressBar value={progress.xp} maxValue={xpForNextLevel} colorClass="bg-blue-500" /><p className="text-sm font-semibold text-gray-600 mt-1">{progress.xp} / {xpForNextLevel} XP</p></div>
+        <div className="max-w-xs mx-auto"><ProgressBar value={progress.xp} maxValue={xpForNextLevel} colorClass="bg-gradient-to-r from-[var(--barva-primarni)] to-[var(--barva-primarni)]/60" /><p className="text-sm font-semibold text-gray-600 mt-1">{progress.xp} / {xpForNextLevel} XP</p></div>
     </div>
     <hr className="my-4"/>
     <div>
@@ -152,7 +152,7 @@ return (
                             <span className="text-sm font-bold bg-[var(--barva-primarni2)] text-[var(--barva-primarni)] px-2 py-0.5 rounded-md w-20 text-center">Level {skill.level}</span>
                         </div>
                         </div>
-                        <ProgressBar value={skill.xp} maxValue={xpForNextSkillLevel} colorClass="bg-amber-300" />
+                        <ProgressBar value={skill.xp} maxValue={xpForNextSkillLevel} colorClass="bg-gradient-to-r from-amber-500 to-amber-400" />
                         <p className="text-xs text-right text-gray-500 mt-0.5">{skill.xp} / {xpForNextSkillLevel} XP</p>
                     </motion.div>
                     );

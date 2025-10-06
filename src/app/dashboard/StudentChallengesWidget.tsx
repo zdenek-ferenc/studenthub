@@ -162,8 +162,8 @@ export default function StudentChallengesWidget() {
     );
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex flex-col md:flex-row items-center justify-center lg:justify-between mb-4">
+        <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex flex-row items-center justify-start lg:justify-between mb-4">
             <h3 className="hidden lg:block text-xl pb-2 md:pb-0 font-bold text-[var(--barva-tmava)]">Moje výzvy</h3>
             <div className="flex items-center rounded-lg p-1">
                 <SwitchButton buttonView="active" label="Aktivní" count={activeChallenges.length} />

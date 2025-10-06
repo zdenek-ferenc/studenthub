@@ -6,6 +6,8 @@ import StudentEditForm from './StudentEditForm'; // Tuto komponentu vytvoříme
 import StartupEditForm from './StartupEditForm';   // Tuto komponentu vytvoříme
 import Link from 'next/link';
 import LoadingSpinner from '../../../components/LoadingSpinner'
+import { ChevronLeft } from 'lucide-react'; // <-- Odebrali jsme ikonu Star
+
 
 function EditProfilePage() {
   const { profile, loading } = useAuth();
@@ -27,8 +29,13 @@ function EditProfilePage() {
 
   return (
     <div className="container mx-auto py-10 md:py-32 px-4">
-        <div className="mb-8">
+        <div className="mb-4 sm:mb-8">
+            <div className='flex flex-row items-center gap-1'>
+            <span className='text-[var(--barva-primarni)]'>
+              <ChevronLeft size={25}/>
+            </span>
             <Link href="/profile" className="text-gray-500 hover:text-[var(--barva-primarni)] transition-colors">Zpět na profil</Link>
+            </div>
             <h1 className="text-4xl font-bold text-[var(--barva-tmava)] mt-2">Upravit profil</h1>
         </div>
         {renderForm()}

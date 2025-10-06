@@ -86,7 +86,7 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
             key={skill.id}
             type="button"
             onClick={() => handleToggleSkill(skill.id)}
-            className={`px-2 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-semibold sm:font-light text-sm sm:text-xl outline-2 transition-colors duration-200 cursor-pointer
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-semibold sm:font-light text-sm sm:text-xl outline-2 transition-colors duration-200 cursor-pointer
               ${selectedIds.includes(skill.id)
                 ? 'bg-[var(--barva-primarni2)]'
                 : 'bg-white'

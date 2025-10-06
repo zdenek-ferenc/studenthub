@@ -95,7 +95,7 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
     return (
         <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
             <div className="text-center">
-                <div className="w-24 h-24 rounded-full bg-[var(--barva-primarni2)] text-[var(--barva-primarni)] flex items-center justify-center text-4xl font-bold mx-auto mb-4">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-4xl font-bold mx-auto mb-4">
                     {initials}
                 </div>
                 <h1 className="text-2xl font-bold text-[var(--barva-tmava)]">{profile.first_name} {profile.last_name}</h1>
@@ -185,7 +185,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     }, [profileId, hasFetched]);
 
     if (loading || !profile) {
-        return <LoadingSpinner />;
+        return <div className='pt-32'><LoadingSpinner /></div>;
     }
 
     const skillsForChart = profile.StudentSkill.map(s => ({
@@ -196,15 +196,15 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
 
     return (
         <div className="container mx-auto py-5 md:py-32 px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <aside className="lg:col-span-1 space-y-8 lg:sticky lg:top-28">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
+                <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:sticky lg:top-28">
                     <ProfileInfoCard profile={profile} isOwner={isOwner} />
                     <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
                         <h3 className="font-bold text-lg text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
                         <SkillRadarChart skills={skillsForChart} />
                     </div>
                 </aside>
-                <main className="lg:col-span-2 space-y-8">
+                <main className="lg:col-span-2 space-y-3 sm:space-y-8">
                     <ProfilePortfolioSection submissions={profile.Submission} />
                     <ProfileSkillsSection skills={profile.StudentSkill} languages={profile.StudentLanguage} isOwner={isOwner} />
                 </main>
