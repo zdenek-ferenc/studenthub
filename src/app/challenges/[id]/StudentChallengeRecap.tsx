@@ -43,10 +43,10 @@ const PortfolioToggle = ({ submission, onToggle }: { submission: Submission, onT
             <button
                 onClick={handleToggle}
                 disabled={isLoading}
-                className={`px-5 py-2 rounded-full font-semibold text-sm transition-colors w-full sm:w-auto ${
+                className={`px-5 py-2 rounded-full font-semibold text-sm transition-colors w-full sm:w-auto cursor-pointer ${
                     isPublic 
                         ? 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300' 
-                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                        : 'bg-[var(--barva-primarni)] text-white hover:bg-blue-500 ease-in-out transition-all duration-200'
                 }`}
             >
                 {isLoading ? 'Měním...' : (isPublic ? 'Skrýt z profilu' : 'Zveřejnit na profilu')}
@@ -66,7 +66,7 @@ const XpRow = ({ icon, label, xp, newLevel }: { icon: React.ReactNode, label: st
         <div className="flex items-center gap-3">
             {icon}
             <span className="font-semibold text-gray-700">{label}</span>
-            {newLevel && <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-md">LEVEL UP! &rarr; {newLevel}</span>}
+            {newLevel && <span className="text-xs font-bold bg-[var(--barva-primarni2)] text-[var(--barva-tmava)] px-2 py-0.5 rounded-md">LEVEL UP! &rarr; {newLevel}</span>}
         </div>
         <span className="font-bold text-green-600">+{xp} XP</span>
     </div>
@@ -78,8 +78,8 @@ function XpGainedSummary({ events }: { events: XpEventWithSkill[] }) {
     const newSkillEvents = events.filter(e => e.event_type === 'new_skill');
 
     return (
-        <div className="p-6 rounded-2xl mt-8">
-            <h3 className="text-xl font-bold text-center text-[var(--barva-tmava)] mb-4">Shrnutí odměn a progrese</h3>
+        <div className="p-6 rounded-2xl mt-8 bg-[var(--barva-tmava)]">
+            <h3 className="text-xl font-bold text-center text-white mb-4">Shrnutí odměn a progrese</h3>
             <div className="space-y-4 max-w-lg mx-auto">
                 {studentXpEvent && (
                     <XpRow
@@ -160,10 +160,10 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
         <>
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs mt-8">
                 <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-[var(--barva-tmava)]">
-                        {isFinal ? "Výsledky tvého řešení" : "Tvoje řešení bylo ohodnoceno!"}
+                    <h2 className="text-3xl font-bold uppercase text-[var(--barva-tmava)]">
+                        {isFinal ? "Výsledky" : "Tvoje řešení bylo ohodnoceno!"}
                     </h2>
-                    <p className="text-lg text-gray-600 mt-2">
+                    <p className="text-lg text-gray-600 mt-4">
                         {isFinal ? "Výzva je již uzavřena. Zde je finální zpětná vazba od startupu." : "Skvělá práce! Startup ti poslal zpětnou vazbu."}
                     </p>
                 </div>
@@ -181,19 +181,17 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                 <div className="flex flex-col sm:flex-row justify-around items-center p-4 max-w-lg mx-auto gap-6">
                     {isFinal && submission.position && [1, 2, 3].includes(submission.position) && (
                         <div className="text-center">
-                            <p className="text-sm font-semibold text-gray-500">Tvoje umístění</p>
                             <div className="flex items-center gap-2 mt-1">
                                 <Trophy className="w-8 h-8 text-amber-500" />
-                                <p className="text-2xl font-bold text-gray-800">{submission.position}. místo</p>
+                                <p className="text-2xl md:text-3xl font-bold text-[var(--barva-primarni)]">{submission.position}. místo</p>
                             </div>
                         </div>
                     )}
                     {submission.rating && (
                         <div className="text-center">
-                            <p className="text-sm font-semibold text-gray-500">Hodnocení</p>
                             <div className="flex items-center gap-2 mt-1">
                                 <Star className="w-8 h-8 text-blue-500" />
-                                <p className="text-2xl font-bold text-gray-800">{submission.rating} / 10</p>
+                                <p className="text-2xl md:text-3xl font-bold text-[var(--barva-primarni)]">{submission.rating} / 10</p>
                             </div>
                         </div>
                     )}

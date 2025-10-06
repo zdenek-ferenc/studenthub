@@ -88,11 +88,14 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
 
                 {/* Spodní část se statistikami (odsazená a zalamuje se) */}
                 <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-6 gap-y-2 leading-none">
-                    <InfoTag 
+                    <div className='bg-[var(--barva-primarni)]/90 px-4 py-2 rounded-3xl'>
+                        <InfoTag 
                         icon={Sparkles} 
                         text={<>Shoda dovedností: <strong>{challenge.matchingSkills}/{challenge.requiredSkills}</strong></>}
-                        colorClass="text-blue-500"
-                    />
+                        colorClass="text-white"
+                        />
+                    </div>
+                    
                      <InfoTag 
                         icon={Users} 
                         text={<>{challenge.applicantCount} / {challenge.max_applicants || '∞'}</>}

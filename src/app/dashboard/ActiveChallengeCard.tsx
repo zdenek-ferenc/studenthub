@@ -49,14 +49,14 @@ const StatusInfo = ({ status }: { status: string }) => {
     else if (status === 'submitted' || status === 'reviewed') {
         text = 'Čeká na vyhodnocení';
         icon = <Clock size={14} />;
-        colorClass = 'text-amber-500';
+        colorClass = 'text-[var(--barva-tmava)]/50';
     }
     else {
         return null;
     }
 
     return (
-        <div className={`flex items-center gap-1.5 text-sm font-semibold leading-none ${colorClass}`}>
+        <div className={`flex items-center gap-2 text-sm font-semibold leading-none ${colorClass}`}>
             {icon}
             <span>{text}</span>
         </div>
@@ -110,19 +110,19 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
         <div className="flex-shrink-0 w-full md:w-56 mt-2 md:mt-0 flex flex-col justify-between">
             <div className='w-full'>
                 <div className="flex justify-between items-center text-sm font-semibold text-gray-600">
-                    <span className='flex items-center gap-1.5'><CheckSquare size={14}/> Checklist</span>
+                    <span className='flex items-center gap-1.5'><CheckSquare size={14}/></span>
                     <span>{completedCount} / {totalOutputs}</span>
                 </div>
                 <ProgressBar value={completedCount} maxValue={totalOutputs} />
             </div>
             <div className="w-full flex justify-end md:justify-start items-end mt-3 h-5">
-                <div className="group-hover:opacity-0 opacity-100 transition-opacity duration-200">
+                <div className="transition-opacity duration-200">
                     <StatusInfo status={submission.status} />
                 </div>
                 <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-2 -translate-x-0 transition-all duration-400 text-sm font-bold text-[var(--barva-primarni)]">
                     <ChevronRight size={18} strokeWidth={2.5}/>
                 </div>
-            </div>
+            </div>  
         </div>
       </div>
     </Link>
