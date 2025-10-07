@@ -190,7 +190,7 @@ export default function StartupChallengesView() {
                             buttonsRef.current[index] = el;
                             }}
                             onClick={() => setActiveFilter(filter.id)}
-                            className="flex items-center justify-center gap-2 px-5 py-3 text-md font-semibold z-10 transition-colors duration-200"
+                            className="flex items-center justify-center gap-2 px-5 py-3 text-base md:text-md font-semibold z-10 transition-colors duration-200"
                         >
                             <span className={activeFilter === filter.id ? 'text-[var(--barva-primarni)]' : 'text-gray-500 cursor-pointer hover:text-gray-800'}>
                                 {filter.label}
