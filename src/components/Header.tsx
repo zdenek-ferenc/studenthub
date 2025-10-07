@@ -164,8 +164,8 @@ const showBackground = !isHomePage || scrolled;
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
-                  <Link href="/login" className="px-5 py-2.5 rounded-full text-base font-medium text-[var(--barva-tmava)] bg-gray-100 hover:bg-gray-200">Přihlásit se</Link>
-                  <Link href="/register" className="px-5 py-2.5 rounded-full text-base font-medium bg-[var(--barva-primarni)] text-white hover:opacity-90">Registrovat</Link>
+                  <Link href="/login" className="px-5 py-2.5 rounded-full text-xs lg:text-base font-medium text-[var(--barva-tmava)] bg-gray-100 hover:bg-gray-200">Přihlásit se</Link>
+                  <Link href="/register" className="px-5 py-2.5 rounded-full text-xs lg:text-base font-medium bg-[var(--barva-primarni)] text-white hover:opacity-90">Registrovat</Link>
                 </div>
               )
             )}

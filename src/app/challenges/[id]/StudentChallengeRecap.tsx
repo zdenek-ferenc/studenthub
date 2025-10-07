@@ -78,7 +78,7 @@ function XpGainedSummary({ events }: { events: XpEventWithSkill[] }) {
     const newSkillEvents = events.filter(e => e.event_type === 'new_skill');
 
     return (
-        <div className="p-6 rounded-2xl mt-8 bg-[var(--barva-tmava)]">
+        <div className="p-6 rounded-2xl mt-8 bg-gradient-to-t from-[var(--barva-tmava)]/90 to-[var(--barva-tmava)]">
             <h3 className="text-xl font-bold text-center text-white mb-4">Shrnutí odměn a progrese</h3>
             <div className="space-y-4 max-w-lg mx-auto">
                 {studentXpEvent && (

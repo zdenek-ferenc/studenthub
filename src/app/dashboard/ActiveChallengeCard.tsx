@@ -49,7 +49,7 @@ const StatusInfo = ({ status }: { status: string }) => {
     else if (status === 'submitted' || status === 'reviewed') {
         text = 'Čeká na vyhodnocení';
         icon = <Clock size={14} />;
-        colorClass = 'text-[var(--barva-tmava)]/50';
+        colorClass = 'text-amber-400';
     }
     else {
         return null;
@@ -72,11 +72,16 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
   const { Challenge } = submission;
   const totalOutputs = Challenge.expected_outputs.split('\n').filter(line => line.trim() !== '').length;
   const completedCount = submission.completed_outputs?.length || 0;
+  
+    const borderClass = submission.status === 'applied'
+    ? 'border-2 border-blue-400'
+    : (submission.status === 'submitted' || submission.status === 'reviewed')
+    ? 'border-2 border-amber-400'
+    : 'border-gray-100';
 
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
-      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:bg-blue-50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4">
-        {/* Levá část karty */}
+      <div className={`bg-white p-4 rounded-2xl hover:bg-blue-50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4 ${borderClass}`}>
         <div className="flex items-center gap-4 flex-grow w-full">
             <div className="flex-shrink-0">
                 <Image 
@@ -88,7 +93,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 />
             </div>
             <div className="flex flex-col flex-grow min-w-0">
-                <h4 className="text-md sm:text-lg font-bold text-gray-800 truncate">{Challenge.title}</h4>
+                <h4 className="text-md sm:text-lg font-bold text-gray-800 truncate max-w-2xs sm:max-w-xs lg:max-w-xs">{Challenge.title}</h4>
                 <div className="mt-2">
                     <div className="hidden md:flex xl:hidden flex-wrap gap-1.5">
                         {Challenge.ChallengeSkill.slice(0, 2).map(({ Skill }, index) => (

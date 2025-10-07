@@ -66,7 +66,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
         <p className="text-gray-600 text-sm mb-5 line-clamp-3 flex-grow">
           {startup.description || 'Tento startup zatím nepřidal žádný popis.'}
         </p>
-        <div className="flex items-center gap-6 sm:gap-4 mb-5 text-sm font-medium text-gray-500">
+        <div className="flex items-center gap-2 sm:gap-4 mb-5 text-xs md:text-sm font-medium text-gray-500">
           <div className="flex items-center gap-1.5">
             <Briefcase className="text-blue-500" size={18} />
             <span>{formatChallengeText(activeChallenges, 'active')}</span>

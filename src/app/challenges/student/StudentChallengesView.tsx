@@ -31,11 +31,15 @@ export default function StudentChallengesView() {
   }, [refetchChallenges]);
 
   const displayedChallenges = useMemo(() => {
+    const activeChallenges = challenges.filter(challenge => 
+        challenge.deadline ? new Date(challenge.deadline) >= new Date() : false
+    );
     if (sortBy !== 'recommended' || studentSkills.length === 0) {
-      return challenges;
+      return activeChallenges;
     }
+    
     const studentSkillIds = studentSkills.map(s => s.id);
-    return [...challenges].sort((a, b) => {
+    return [...activeChallenges].sort((a, b) => {
       const aMatches = a.ChallengeSkill.filter(cs => cs.Skill && studentSkillIds.includes(cs.Skill.id)).length;
       const bMatches = b.ChallengeSkill.filter(cs => cs.Skill && studentSkillIds.includes(cs.Skill.id)).length;
       return bMatches - aMatches;

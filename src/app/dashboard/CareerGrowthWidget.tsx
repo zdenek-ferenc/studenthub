@@ -114,7 +114,7 @@ return (
                 </AnimatePresence>
             </div>
         </div>
-        <div className="max-w-xs mx-auto"><ProgressBar value={progress.xp} maxValue={xpForNextLevel} colorClass="bg-gradient-to-r from-[var(--barva-primarni)] to-[var(--barva-primarni)]/60" /><p className="text-sm font-semibold text-gray-600 mt-1">{progress.xp} / {xpForNextLevel} XP</p></div>
+        <div className="max-w-xs mx-auto"><ProgressBar value={progress.xp} maxValue={xpForNextLevel} colorClass="bg-gradient-to-r from-[var(--barva-primarni)]/50 to-[var(--barva-primarni)]" /><p className="text-sm font-semibold text-gray-600 mt-1">{progress.xp} / {xpForNextLevel} XP</p></div>
     </div>
     <hr className="my-4"/>
     <div>
@@ -152,7 +152,7 @@ return (
                             <span className="text-sm font-bold bg-[var(--barva-primarni2)] text-[var(--barva-primarni)] px-2 py-0.5 rounded-md w-20 text-center">Level {skill.level}</span>
                         </div>
                         </div>
-                        <ProgressBar value={skill.xp} maxValue={xpForNextSkillLevel} colorClass="bg-gradient-to-r from-amber-500 to-amber-400" />
+                        <ProgressBar value={skill.xp} maxValue={xpForNextSkillLevel} colorClass="bg-gradient-to-r from-amber-300 to-amber-500" />
                         <p className="text-xs text-right text-gray-500 mt-0.5">{skill.xp} / {xpForNextSkillLevel} XP</p>
                     </motion.div>
                     );

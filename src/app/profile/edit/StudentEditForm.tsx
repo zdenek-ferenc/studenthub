@@ -104,10 +104,10 @@ export default function StudentEditForm() {
                 if (error) throw error;
             }
             if (skillsToAdd.length > 0) {
-                const toInsert = skillsToAdd.map(skillId => ({ student_id: user.id, skill_id: skillId }));
-                const { error } = await supabase.from('StudentSkill').insert(toInsert);
-                if (error) throw error;
-            }
+        const toInsert = skillsToAdd.map(skillId => ({ student_id: user.id, skill_id: skillId, level: 1, xp: 0 }));
+        const { error } = await supabase.from('StudentSkill').insert(toInsert);
+        if (error) throw error;
+    }
             
             showToast('Dovednosti byly úspěšně uloženy!', 'success');
             setOriginalSkills(selectedSkills); // Aktualizujeme "původní stav"
