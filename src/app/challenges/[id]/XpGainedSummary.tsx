@@ -38,7 +38,7 @@ export default function XpGainedSummary({ events }: { events: XpEvent[] }) {
                 )}
                 {skillEvents.length > 0 && (
                     <div>
-                        <h4 className="font-semibold text-gray-600 mb-2 ml-1">Vylepšené dovednosti:</h4>
+                        <h4 className="font-semibold text-white mb-2 ml-1">Vylepšené dovednosti:</h4>
                         <div className="space-y-2">
                             {skillEvents.map((event, i) => (
                                 <XpRow
@@ -54,7 +54,7 @@ export default function XpGainedSummary({ events }: { events: XpEvent[] }) {
                 )}
                 {newSkillEvents.length > 0 && (
                     <div>
-                        <h4 className="font-semibold text-green-700 mb-2 ml-1">Nové dovednosti odemčeny!</h4>
+                        <h4 className="font-semibold text-green-500 mb-2 ml-1">Nové dovednosti odemčeny!</h4>
                         <div className="space-y-2">
                             {newSkillEvents.map((event, i) => (
                                 <XpRow
