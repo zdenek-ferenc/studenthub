@@ -13,7 +13,7 @@ import Step3_Categories from './steps/Step3_Categories';
 import Step4_LogoUpload from './steps/Step4_LogoUpload';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 
-const IS_DEVELOPMENT_MODE = true; 
+const IS_DEVELOPMENT_MODE = false; 
 const DEV_START_STEP = 2; 
 
 type FormData = {
