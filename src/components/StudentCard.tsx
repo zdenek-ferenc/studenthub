@@ -117,7 +117,7 @@ export default function StudentCard({ student }: StudentCardProps) {
           <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mb-5 text-sm font-medium text-gray-500">
             {/* --- ZMĚNA ZDE: Zobrazení statistik ze stavu --- */}
             {stats ? (
-              <>
+              <div className='flex flex-col gap-4'>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle className="text-green-500" size={18} />
                   <span>{formatChallengeText(stats.completed, 'completed')}</span>
@@ -126,7 +126,7 @@ export default function StudentCard({ student }: StudentCardProps) {
                   <Trophy className="text-amber-500" size={18} />
                   <span>{formatChallengeText(stats.won, 'won')}</span>
                 </div>
-              </>
+              </div>
             ) : (
               // Placeholder během načítání
               <div className="h-5 bg-gray-200 rounded-md animate-pulse w-3/4"></div>
