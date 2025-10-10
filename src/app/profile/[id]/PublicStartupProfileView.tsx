@@ -64,7 +64,7 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
                     <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-[var(--barva-primarni)] hover:underline break-all">{profile.website}</a>
                 )}
             </div>
-            <div className="mt-3 sm:mt-6 pt-4 border-t border-gray-100">
+            <div className="p-2 sm:p-0 mt-3 sm:mt-6 pt-4 border-t border-gray-100">
                 {isEditing ? (
                     <div className="space-y-2">
                         <textarea value={descriptionText} onChange={(e) => setDescriptionText(e.target.value)} placeholder="Popište vaši firmu..."

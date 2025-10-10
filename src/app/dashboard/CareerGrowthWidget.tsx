@@ -7,7 +7,6 @@ import { ChevronDown } from 'lucide-react';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { motion, AnimatePresence} from 'framer-motion';
 
-// --- Datové typy ---
 type SkillFromDB = {
 id: string;
 name: string;
@@ -25,7 +24,6 @@ xp: number;
 StudentSkill: StudentSkillFromDB[];
 };
 
-// --- Komponenty ---
 const ProgressBar = ({ value, maxValue, colorClass }: { value: number, maxValue: number, colorClass: string }) => {
 const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
 return (
@@ -40,7 +38,6 @@ return (
 );
 };
 
-// --- Hlavní komponenta ---
 export default function CareerGrowthWidget() {
 const { user } = useAuth();
 const [progress, setProgress] = useState<ProfileProgress | null>(null);

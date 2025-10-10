@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../../../lib/supabaseClient';
-import { X } from 'lucide-react'; // Ikona pro lepší UX při odstraňování
+import { X } from 'lucide-react';
 
 type Skill = {
   id: string;
@@ -19,8 +19,6 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
   const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Efekt pro synchronizaci, pokud se změní initialSelectedIds zvenčí
   useEffect(() => {
     setSelectedIds(initialSelectedIds);
   }, [initialSelectedIds]);
@@ -55,10 +53,9 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
     
     const updatedIds = Array.from(newSelectedIds);
     setSelectedIds(updatedIds);
-    onSelectionChange(updatedIds); // Informujeme rodičovskou komponentu o změně
+    onSelectionChange(updatedIds); 
   };
 
-  // Memoizované seznamy pro lepší výkon
   const selectedSkillsObjects = useMemo(() => {
     return allSkills.filter(skill => selectedIds.includes(skill.id));
   }, [allSkills, selectedIds]);
@@ -79,7 +76,6 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
 
   return (
     <div className='w-full space-y-6'>
-      {/* Sekce pro již vybrané dovednosti */}
       <div>
         <h4 className="text-md font-semibold text-[var(--barva-tmava)] mb-2">Tvoje dovednosti</h4>
         <div className="p-3 bg-gray-50 rounded-lg min-h-[4rem] flex flex-wrap gap-2 border">
@@ -100,8 +96,6 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
           )}
         </div>
       </div>
-
-      {/* Sekce pro přidání nových dovedností */}
       <div>
         <h4 className="text-md font-semibold text-[var(--barva-tmava)] mb-2">Přidat dovednosti</h4>
         <input

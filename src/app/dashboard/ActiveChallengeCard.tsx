@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckSquare, Clock, Edit3, ChevronRight } from 'lucide-react'; // <-- Odebrali jsme ikonu Star
+import { CheckSquare, Clock, Edit3, ChevronRight } from 'lucide-react';
 
 export type ActiveChallengeData = {
   id: string;
@@ -33,7 +33,6 @@ const ProgressBar = ({ value, maxValue }: { value: number, maxValue: number }) =
   );
 };
 
-// --- ZDE JE KLÍČOVÁ ZMĚNA LOGIKY ---
 const StatusInfo = ({ status }: { status: string }) => {
     let text = '';
     let icon = null;
@@ -44,8 +43,6 @@ const StatusInfo = ({ status }: { status: string }) => {
         icon = <Edit3 size={14} />;
         colorClass = 'text-blue-500';
     } 
-    // Spojili jsme podmínky: pokud je odevzdáno NEBO už ohodnoceno (ale výzva stále běží),
-    // zobrazíme stejný status.
     else if (status === 'submitted' || status === 'reviewed') {
         text = 'Čeká na vyhodnocení';
         icon = <Clock size={14} />;
@@ -101,7 +98,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                         ))}
                         {Challenge.ChallengeSkill.length > 2 && <span className="text-xs font-bold  self-center text-[var(--barva-primarni)] px-2 py-1 rounded-xl">+{Challenge.ChallengeSkill.length - 2}</span>}
                     </div>
-                     <div className="hidden xl:flex flex-wrap gap-1.5">
+                    <div className="hidden xl:flex flex-wrap gap-1.5">
                         {Challenge.ChallengeSkill.slice(0, 4).map(({ Skill }, index) => (
                             <span key={index} className="text-xs font-bold border-1  text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
                         ))}
@@ -110,8 +107,6 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 </div>
             </div>
         </div>
-        
-        {/* Pravá část karty */}
         <div className="flex-shrink-0 w-full md:w-56 mt-2 md:mt-0 flex flex-col justify-between">
             <div className='w-full'>
                 <div className="flex justify-between items-center text-sm font-semibold text-gray-600">

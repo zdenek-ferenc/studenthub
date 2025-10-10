@@ -17,7 +17,7 @@ export default function QnaManagement() {
     const [answeredQuestions, setAnsweredQuestions] = useState<Question[]>([]);
     const [editingAnswer, setEditingAnswer] = useState<{ [key: string]: string }>({});
     const [loading, setLoading] = useState(true);
-    const [hasFetched, setHasFetched] = useState(false); // <-- NOVÁ POJISTKA
+    const [hasFetched, setHasFetched] = useState(false);
 
     const fetchQuestions = useCallback(async () => {
         if (!user) return;
@@ -36,12 +36,11 @@ export default function QnaManagement() {
     }, [user]);
 
     useEffect(() => {
-        // Načteme data jen jednou, díky pojistce
         if (user && !hasFetched) {
             setLoading(true);
             fetchQuestions().then(() => {
                 setLoading(false);
-                setHasFetched(true); // <-- ZAMČENÍ POJISTKY
+                setHasFetched(true);
             });
         }
     }, [user, fetchQuestions, hasFetched]);
@@ -61,7 +60,7 @@ export default function QnaManagement() {
         if (error) showToast('Uložení odpovědi selhalo.', 'error');
         else {
             showToast('Odpověď byla zveřejněna!', 'success');
-            fetchQuestions(); // Znovu načteme otázky pro aktualizaci UI
+            fetchQuestions();
         }
     };
 
@@ -100,14 +99,14 @@ export default function QnaManagement() {
             </div>
             <div>
                 <h3 className="text-lg font-bold text-[var(--barva-tmava)]">Zveřejněné dotazy ({answeredQuestions.length})</h3>
-                 <div className="space-y-4 mt-4">
+                <div className="space-y-4 mt-4">
                     {answeredQuestions.map(q => (
                         <div key={q.id} className="p-4 bg-blue-50/50 rounded-lg border border-blue-100">
-                             <p className="font-semibold text-gray-800">Otázka: {q.question_text}</p>
-                             <p className="mt-2 text-gray-600">Odpověď: {q.answer_text}</p>
+                            <p className="font-semibold text-gray-800">Otázka: {q.question_text}</p>
+                            <p className="mt-2 text-gray-600">Odpověď: {q.answer_text}</p>
                         </div>
                     ))}
-                 </div>
+                </div>
             </div>
         </div>
     );

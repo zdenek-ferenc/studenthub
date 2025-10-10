@@ -1,19 +1,18 @@
 "use client";
 
-import { useState } from 'react'; // <-- PŘIDAT IMPORT
+import { useState } from 'react';
 import StartupCard from '../../components/StartupCard';
 import StartupFilterSidebar from '../../components/StartupFilterSidebar';
 import { useAuth } from '../../contexts/AuthContext';
 import withAuth from '../../components/withAuth';
 import { useData } from '../../contexts/DataContext';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { SlidersHorizontal } from 'lucide-react'; // <-- PŘIDAT IMPORT
-
+import { SlidersHorizontal } from 'lucide-react';
 
 function StartupCatalogPage() {
     const { profile, loading: authLoading } = useAuth();
-    const { startups, allCategories, startupFilters, loadingStartups, loadMoreStartups, hasMoreStartups } = useData();
-    const [isFilterOpen, setIsFilterOpen] = useState(false); // <-- PŘIDAT STAV
+    const { startups, allCategories, startupFilters, loadingStartups, loadMoreStartups, hasMoreStartups, loadingFilters } = useData();
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     if (authLoading) {
         return <LoadingSpinner />;
@@ -25,17 +24,23 @@ function StartupCatalogPage() {
 
     return (
         <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-5 md:py-32">
-            <StartupFilterSidebar
-                allCategories={allCategories}
-                selectedCategoryIds={startupFilters.selectedCategoryIds}
-                setSelectedCategoryIds={startupFilters.setSelectedCategoryIds}
-                searchQuery={startupFilters.searchQuery}
-                setSearchQuery={startupFilters.setSearchQuery}
-                sortBy={startupFilters.sortBy}
-                setSortBy={startupFilters.setSortBy}
-                isMobileOpen={isFilterOpen} 
-                setMobileOpen={setIsFilterOpen} 
-            />
+            {loadingFilters ? (
+                <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit sticky top-28 flex-shrink-0">
+                    <p className="text-gray-500">Načítám filtry...</p>
+                </aside>
+            ) : (
+                <StartupFilterSidebar
+                    allCategories={allCategories}
+                    selectedCategoryIds={startupFilters.selectedCategoryIds}
+                    setSelectedCategoryIds={startupFilters.setSelectedCategoryIds}
+                    searchQuery={startupFilters.searchQuery}
+                    setSearchQuery={startupFilters.setSearchQuery}
+                    sortBy={startupFilters.sortBy}
+                    setSortBy={startupFilters.setSortBy}
+                    isMobileOpen={isFilterOpen} 
+                    setMobileOpen={setIsFilterOpen} 
+                />
+            )}
             <main className="flex-1 w-full">
                 <div className='mb-6 flex justify-between items-center'>
                     <div>
@@ -51,7 +56,6 @@ function StartupCatalogPage() {
                 </div>
                 </div>
                 
-
                 {loadingStartups && startups.length === 0 ? (
                     <div className="">
                     </div>

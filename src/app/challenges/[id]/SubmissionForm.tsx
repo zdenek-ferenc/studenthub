@@ -24,6 +24,15 @@ type SubmissionFormProps = {
   onSuccess: (updatedSubmission: Submission) => void;
 };
 
+const sanitizeFileName = (filename: string) => {
+  const withoutDiacritics = filename.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return withoutDiacritics
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-._]/g, '');
+};
+
+
 const ChecklistItem = ({ text, isChecked, onToggle, isSubmitted }: { text: string; isChecked: boolean; onToggle: () => void; isSubmitted: boolean; }) => {
   return (
     <div 
@@ -106,7 +115,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
   useEffect(() => {
     if (initialSubmission?.file_url) {
       const url = initialSubmission.file_url;
-      const name = url.split('/').pop()?.split('-').slice(1).join('-') || 'Odevzdaný soubor';
+      const name = decodeURIComponent(url.split('/').pop()?.split('-').slice(1).join('-') || 'Odevzdaný soubor');
       setUploadedFile({ name, url });
     }
   }, [initialSubmission]);
@@ -126,7 +135,9 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
     if (!event.target.files || !user) return;
     setIsUploading(true);
     const file = event.target.files[0];
-    const filePath = `${user.id}/${challengeId}/${Date.now()}-${file.name}`;
+    const cleanFileName = sanitizeFileName(file.name);
+    const filePath = `${user.id}/${challengeId}/${Date.now()}-${cleanFileName}`;
+
     const { data: storageData, error: storageError } = await supabase.storage.from('submission-files').upload(filePath, file);
     if (storageError) {
       showToast(`Nahrávání selhalo: ${storageError.message}`, 'error');
@@ -134,17 +145,17 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
       return;
     }
     const { data: { publicUrl } } = supabase.storage.from('submission-files').getPublicUrl(storageData.path);
-    const { error: dbError } = await supabase.from('Submission').update({ file_url: publicUrl }).eq('id', submissionId);
+    const { error: dbError } = await supabase.from('Submission').update({ file_url: publicUrl, file_name_original: file.name }).eq('id', submissionId); 
     if (dbError) {
         showToast("Soubor se nahrál, ale nepodařilo se ho uložit k odevzdání.", "error");
     } else {
-        setUploadedFile({ name: file.name, url: publicUrl });
+        setUploadedFile({ name: file.name, url: publicUrl }); 
         setValue('file_url', publicUrl);
         showToast("Soubor byl úspěšně nahrán a uložen!", 'success');
     }
     setIsUploading(false);
   };
-
+  
   const handleFileDelete = async () => {
     if (!uploadedFile) return;
     const filePath = uploadedFile.url.split('/submission-files/')[1];

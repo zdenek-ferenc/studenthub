@@ -75,7 +75,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     getSessionAndProfile();
   }, [getSessionAndProfile]);
 
-  // --- OPRAVA ZDE: Zabalení funkcí do useCallback ---
   const showToast = useCallback((message: string, type: 'success' | 'error') => {
     const newToast = {
       id: Date.now(),
@@ -87,11 +86,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setTimeout(() => {
       setToasts((currentToasts) => currentToasts.filter((toast) => toast.id !== newToast.id));
     }, 4000);
-  }, []); // Prázdné pole závislostí znamená, že se funkce vytvoří jen jednou
+  }, []); 
 
   const hideToast = useCallback((id: number) => {
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
-  }, []); // Prázdné pole závislostí znamená, že se funkce vytvoří jen jednou
+  }, []);
 
   const value = useMemo(() => ({
     user,

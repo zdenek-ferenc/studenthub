@@ -13,14 +13,16 @@ import { AlertCircle, CheckCircle, Lock, Clock, Users,} from 'lucide-react';
 import { differenceInDays, format } from 'date-fns';
 
 type Challenge = {
-  id: string; status: 'draft' | 'open' | 'closed' | 'archived'; title: string;
-  description: string; goals: string; expected_outputs: string;
-  reward_first_place: number | null; reward_second_place: number | null; reward_third_place: number | null;
-  max_applicants: number | null; deadline: string;
-  Submission: { id: string, student_id: string }[];
-  ChallengeSkill: { Skill: { id: string, name: string } }[];
-  StartupProfile: { company_name: string, logo_url: string | null } | null;
+id: string; status: 'draft' | 'open' | 'closed' | 'archived'; title: string;
+description: string; goals: string; expected_outputs: string;
+reward_first_place: number | null; reward_second_place: number | null; reward_third_place: number | null;
+number_of_winners: number | null; 
+max_applicants: number | null; deadline: string;
+Submission: { id: string, student_id: string }[];
+ChallengeSkill: { Skill: { id: string, name: string } }[];
+StartupProfile: { company_name: string, logo_url: string | null } | null;
 };
+
 
 const EvaluationStatusPanel = ({
     canFinalize,

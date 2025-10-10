@@ -70,16 +70,14 @@ export default function StudentRegistrationPage() {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      setInitialDataLoading(true);
+      setInitialDataLoading(true); 
       try {
         const [skillsRes, languagesRes] = await Promise.all([
           supabase.from('Skill').select('id, name').order('name', { ascending: true }),
           supabase.from('Language').select('id, name').order('name', { ascending: true })
         ]);
-
         if (skillsRes.error) throw skillsRes.error;
         if (languagesRes.error) throw languagesRes.error;
-
         setAllSkills(skillsRes.data || []);
         setAllLanguages(languagesRes.data || []);
       } catch (error) {
@@ -88,11 +86,12 @@ export default function StudentRegistrationPage() {
         setInitialDataLoading(false);
       }
     };
-
-    if (session || IS_DEVELOPMENT_MODE) {
+    if ((session || IS_DEVELOPMENT_MODE) && allSkills.length === 0) {
       fetchInitialData();
+    } else if (!session && !IS_DEVELOPMENT_MODE) {
+        setInitialDataLoading(false);
     }
-  }, [session]);
+  }, [session, allSkills.length]);
 
   const handleUserSignedIn = useCallback(async (session: Session) => {
     const userId = session.user.id;

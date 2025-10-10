@@ -74,9 +74,7 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
             </div>
         </div>
       </div>
-      
-      {/* --- POZNÁMKA STUDENTA (vždy zabírá místo) --- */}
-      <div className="text-sm min-h-[88px]"> {/* min-h-XX je klíčová třída */}
+      <div className="text-sm min-h-[88px]"> 
           <h5 className="font-semibold text-gray-700 mb-1">Poznámka studenta</h5>
           {submission.link ? (
             <blockquote className="bg-gray-50 border-l-4 border-gray-200 text-gray-800 p-3 rounded-r-lg italic">
@@ -88,8 +86,6 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
             </div>
           )}
       </div>
-
-      {/* --- TLAČÍTKO PRO AKCI (vždy na stejném místě) --- */}
       <div>
         {submission.status === 'submitted' || isReviewed ? (
           <a href={submission.file_url || '#'} target="_blank" rel="noopener noreferrer" className="w-full text-center block px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:bg-blue-700 transition-colors">
@@ -101,8 +97,6 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
           </button>
         )}
       </div>
-      
-      {/* --- FORMULÁŘ HODNOCENÍ (flex-grow vyplní zbytek místa) --- */}
       <form onSubmit={handleSubmit(onConfirmFeedback)} className="border-t border-gray-100 pt-4 space-y-3 flex-grow flex flex-col">
           {submission.status !== 'applied' ? (
             <>
@@ -113,8 +107,7 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
                     <Edit size={12} /> Upravit
                   </button>
                 )}
-              </div>
-              
+              </div>             
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700">Hodnocení (1-10):</label>
                 <Controller
@@ -138,7 +131,6 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
                     )}
                 />
               </div>
-              
               <div className="flex-grow flex flex-col">
                   <label className="text-sm font-medium text-gray-700">Komentář:</label>
                   <Controller
@@ -148,7 +140,6 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
                       )}
                   />
               </div>
-              
               {isEditing && (
                   <div className='flex justify-center pt-2 gap-4'>
                       {isReviewed && <button type="button" onClick={handleCancelEdit} className="px-6 py-2 rounded-full text-gray-600 font-semibold">Zrušit</button>}

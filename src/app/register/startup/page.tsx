@@ -13,6 +13,8 @@ import Step3_Categories from './steps/Step3_Categories';
 import Step4_LogoUpload from './steps/Step4_LogoUpload';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 
+type Category = { id: string; name: string; };
+
 const IS_DEVELOPMENT_MODE = false; 
 const DEV_START_STEP = 2; 
 
@@ -27,7 +29,7 @@ type FormData = {
   contact_last_name?: string;
   contact_position?: string;
   categories?: string[];
-  logo_url?: string | null; // OPRAVA: Povolíme i `null` pro logo_url
+  logo_url?: string | null;
 };
 
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
@@ -60,6 +62,30 @@ export default function StartupRegistrationPage() {
   const [error, setError] = useState<string | null>(null);
   const [showEmailRegister, setShowEmailRegister] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [initialDataLoading, setInitialDataLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      setInitialDataLoading(true);
+      try {
+        const { data, error } = await supabase.from('Category').select('id, name').order('name', { ascending: true });
+        if (error) throw error;
+        setAllCategories(data || []);
+      } catch (error) {
+        console.error("Chyba při načítání kategorií:", error);
+      } finally {
+        setInitialDataLoading(false);
+      }
+    };
+    if ((session || IS_DEVELOPMENT_MODE) && allCategories.length === 0) {
+      fetchInitialData();
+    } else if (!session && !IS_DEVELOPMENT_MODE) {
+        setInitialDataLoading(false);
+    }
+  }, [session, allCategories.length]);
+
 
   const handleUserSignedIn = useCallback(async (session: Session) => {
     const userId = session.user.id;
@@ -85,7 +111,7 @@ export default function StartupRegistrationPage() {
             .single();
         
         const currentStep = profile?.registration_step || 1;
-        if(currentStep > 5) { // Startup má 4 kroky formuláře (2 až 5)
+        if(currentStep > 5) {
             router.push('/');
         } else {
             setStep(currentStep);
@@ -174,29 +200,34 @@ export default function StartupRegistrationPage() {
     }
     setLoading(false);
   };
-
-  // OPRAVA: Změnili jsme typ `FormData` na `Partial<FormData>`,
-  // protože každý krok posílá jen část celkových dat.
+  
   const handleNextStep = async (formData: Partial<FormData>) => {
     if (!user) return;
     setLoading(true);
     let error;
     const nextStep = step + 1;
 
-    if (step === 2 || step === 3) {
-      ({ error } = await supabase.from('StartupProfile').update(formData).eq('user_id', user.id));
-    }
-    if (step === 4) {
-      if (formData.categories) {
+    if (step === 2) {
+      ({ error } = await supabase.from('StartupProfile').update({
+          company_name: formData.company_name,
+          ico: formData.ico,
+          website: formData.website,
+          phone_number: formData.phone_number,
+          contact_email: formData.contact_email,
+          address: formData.address,
+      }).eq('user_id', user.id));
+    } else if (step === 3) {
+      ({ error } = await supabase.from('StartupProfile').update({
+          contact_first_name: formData.contact_first_name,
+          contact_last_name: formData.contact_last_name,
+          contact_position: formData.contact_position,
+      }).eq('user_id', user.id));
+    } else if (step === 4 && formData.categories) {
         await supabase.from('StartupCategory').delete().eq('startup_id', user.id);
         const toInsert = formData.categories.map((catId: string) => ({ startup_id: user.id, category_id: catId }));
         if (toInsert.length > 0) ({ error } = await supabase.from('StartupCategory').insert(toInsert));
-      }
-    }
-    if (step === 5) {
-      if (typeof formData.logo_url !== 'undefined') {
+    } else if (step === 5) {
         ({ error } = await supabase.from('StartupProfile').update({ logo_url: formData.logo_url }).eq('user_id', user.id));
-      }
     }
 
     if (error) {
@@ -218,13 +249,17 @@ export default function StartupRegistrationPage() {
     setLoading(false);
   };
 
+
   const renderStep = () => {
+    // Tato kontrola zajistí, že dál už `user` nemůže být `null`
     if (!user) return <p>Chyba: Uživatel nebyl nalezen.</p>;
     
     switch (step) {
       case 2: return <Step1_CompanyInfo onNext={handleNextStep} />;
       case 3: return <Step2_ContactPerson onNext={handleNextStep} />;
-      case 4: return <Step3_Categories onNext={handleNextStep} />;
+      case 4: return <Step3_Categories onNext={handleNextStep} allCategories={allCategories} isLoading={initialDataLoading} />;
+      // --- OPRAVA CHYBY ZDE ---
+      // Použijeme `user.id` - díky kontrole výše je to bezpečné
       case 5: return <Step4_LogoUpload onNext={handleNextStep} userId={user.id} />;
       default: return null;
     }
@@ -321,4 +356,3 @@ export default function StartupRegistrationPage() {
     </div>
   );
 }
-

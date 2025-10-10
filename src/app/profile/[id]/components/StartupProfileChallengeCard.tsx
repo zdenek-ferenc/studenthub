@@ -5,7 +5,6 @@ import { useAuth } from '../../../../contexts/AuthContext';
 import { differenceInCalendarDays } from 'date-fns';
 import { Sparkles, Clock, ChevronRight, CheckCircle } from 'lucide-react';
 
-// Typ pro data, která komponenta potřebuje
 type Challenge = {
     id: string;
     title: string;
@@ -46,7 +45,6 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
 
     return (
         <Link href={`/challenges/${challenge.id}`} className="block group relative">
-            {/* --- ZDE JE PŘIDANÁ ANIMACE --- */}
             {isApplied && (
                 <div className={`absolute top-2 -right-2 sm:top-4 sm:-right-3 flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-1 sm:px-2 py-1 rounded-full z-10 shadow-sm
                                 transition-all duration-300 ease-in-out 
@@ -61,7 +59,7 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
                     
                     <div className="flex items-end justify-between mt-2">
                         <div className="flex items-center gap-x-4 gap-y-1 flex-wrap">
-                             {isStudentViewer && (
+                            {isStudentViewer && (
                                 <div className={`flex items-center gap-1.5 text-xs font-semibold ${matchingSkillCount > 0 ? 'text-blue-500' : 'text-gray-500'}`}>
                                     <Sparkles size={14} />
                                     <span>Shoda {matchingSkillCount}/{requiredSkillIds.length}</span>
@@ -78,7 +76,6 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
                                 )}
                             </div>
                         </div>
-
                         {deadlineText && (
                             <div className={`flex items-center gap-1.5 text-xs font-semibold ${deadlineColor} flex-shrink-0 ml-4`}>
                                 <Clock size={14} />

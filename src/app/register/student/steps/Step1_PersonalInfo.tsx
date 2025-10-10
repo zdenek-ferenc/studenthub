@@ -2,8 +2,8 @@
 import { useForm } from 'react-hook-form';
 import { supabase } from '../../../../lib/supabaseClient';
 import { useState, useEffect } from 'react';
-import { useDebounce } from '../../../../hooks/useDebounce'; // <-- 1. Importujeme debounce hook
-import { CheckCircle, XCircle, Loader } from 'lucide-react'; // <-- Ikonky pro UI
+import { useDebounce } from '../../../../hooks/useDebounce'; 
+import { CheckCircle, XCircle, Loader } from 'lucide-react'; 
 
 type FormData = {
   first_name: string;
@@ -20,39 +20,40 @@ type StepProps = {
 export default function Step1_PersonalInfo({ onNext }: StepProps) {
   const { register, handleSubmit, formState: { errors }, watch, trigger } = useForm<FormData>({ mode: 'onChange' });
 
-  // --- 2. NOVÁ ČÁST: Stavy pro real-time validaci ---
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
-  const usernameValue = watch('username'); // Sledujeme hodnotu inputu
-  const debouncedUsername = useDebounce(usernameValue, 500); // Vytvoříme zpožděnou hodnotu
+  const usernameValue = watch('username'); 
+  const debouncedUsername = useDebounce(usernameValue, 500); 
 
-  // --- 3. NOVÁ ČÁST: useEffect pro kontrolu jména v databázi ---
   useEffect(() => {
+    let isActive = true;
+
     const checkUsername = async () => {
-      // Nekontrolujeme, pokud je pole prázdné nebo příliš krátké
       if (!debouncedUsername || debouncedUsername.length < 3) {
-        setUsernameStatus('idle');
+        if (isActive) setUsernameStatus('idle');
         return;
       }
 
-      setUsernameStatus('checking');
+      if (isActive) setUsernameStatus('checking');
+
       const { data, error } = await supabase
         .from('StudentProfile')
         .select('username')
         .eq('username', debouncedUsername)
         .single();
-
-      if (error && error.code !== 'PGRST116') { // PGRST116 = not found, což je v pořádku
+      if (!isActive) return;
+      if (error && error.code !== 'PGRST116') {
         console.error("Chyba při validaci jména:", error);
-        setUsernameStatus('idle'); // V případě chyby neblokujeme uživatele
+        setUsernameStatus('idle');
         return;
       }
-
       setUsernameStatus(data ? 'taken' : 'available');
-      // Znovu spustíme validaci react-hook-form, aby se aktualizoval stav chyby
       trigger('username');
     };
-
     checkUsername();
+
+    return () => {
+      isActive = false;
+    };
   }, [debouncedUsername, trigger]);
 
 
@@ -83,7 +84,6 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
         </div>
 
         <div>
-          {/* --- 4. NOVÁ ČÁST: Input s ikonkami a zprávami --- */}
           <div className="relative">
             <input 
               id="username" 
@@ -97,7 +97,7 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
                   },
                   validate: () => usernameStatus !== 'taken' || 'Uživatelské jméno je již zabrané.'
               })} 
-              className="input pr-10" // Přidáme padding vpravo pro ikonku
+              className="input pr-10"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               {usernameStatus === 'checking' && <Loader className="h-5 w-5 text-blue-400 animate-spin" />}
@@ -105,7 +105,6 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
               {usernameStatus === 'taken' && <XCircle className="h-5 w-5 text-red-500" />}
             </div>
           </div>
-          {/* Zobrazíme chybovou hlášku z react-hook-form */}
           {errors.username && <p className="error pt-2 text-blue-400 text-center">{errors.username.message}</p>}
         </div>
 

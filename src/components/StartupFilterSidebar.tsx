@@ -20,7 +20,6 @@ type FilterSidebarProps = {
 
 const popularCategoriesList = ['Informační technologie', 'Marketing a reklama', 'E-commerce', 'Fintech', 'Software (SaaS)', 'Mobilní aplikace', 'Zdravotnictví a wellness', 'Vzdělávání a e-learning'];
 
-// Sdílený obsah filtru
 const FilterContent = ({
   allCategories,
   selectedCategoryIds,

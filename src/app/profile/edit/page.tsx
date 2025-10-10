@@ -2,11 +2,11 @@
 
 import { useAuth } from '../../../contexts/AuthContext';
 import withAuth from '../../../components/withAuth';
-import StudentEditForm from './StudentEditForm'; // Tuto komponentu vytvoříme
-import StartupEditForm from './StartupEditForm';   // Tuto komponentu vytvoříme
+import StudentEditForm from './StudentEditForm';
+import StartupEditForm from './StartupEditForm';   
 import Link from 'next/link';
 import LoadingSpinner from '../../../components/LoadingSpinner'
-import { ChevronLeft } from 'lucide-react'; // <-- Odebrali jsme ikonu Star
+import { ChevronLeft } from 'lucide-react'; 
 
 
 function EditProfilePage() {
@@ -16,7 +16,6 @@ function EditProfilePage() {
     return <LoadingSpinner />;
   }
 
-  // "Výhybka" - podle role zobrazíme správný formulář
   const renderForm = () => {
     if (profile?.role === 'student') {
       return <StudentEditForm />;

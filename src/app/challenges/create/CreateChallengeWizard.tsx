@@ -13,23 +13,24 @@ import Step4_Summary from './steps/Step4_Summary';
 import { CheckCircle, Check } from 'lucide-react';
 
 export type ChallengeFormData = {
-id?: string;
-title: string;
-short_description: string;
-description: string;
-goals: string;
-expected_outputs: { value: string }[];
-has_financial_reward: boolean;
-reward_first_place?: number;
-reward_second_place?: number;
-reward_third_place?: number;
-reward_description?: string;
-skills: string[];
-attachments_urls: string[];
-deadline: string;
-max_applicants: number;
-type: 'public' | 'anonymous';
-status: 'draft' | 'open';
+    id?: string;
+    title: string;
+    short_description: string;
+    description: string;
+    goals: string;
+    expected_outputs: { value: string }[];
+    has_financial_reward: boolean;
+    reward_first_place?: number;
+    reward_second_place?: number;
+    reward_third_place?: number;
+    reward_description?: string;
+    skills: string[];
+    attachments_urls: string[];
+    deadline: string;
+    max_applicants: number;
+    type: 'public' | 'anonymous';
+    status: 'draft' | 'open';
+    number_of_winners?: number; 
 };
 
 const STEPS = [
@@ -63,6 +64,7 @@ export default function CreateChallengeWizard() {
             max_applicants: 10,
             type: 'public',
             status: 'draft',
+            number_of_winners: 1, 
         }
     });
 
@@ -114,6 +116,14 @@ export default function CreateChallengeWizard() {
 
         setSaveStatus('saving');
         const formData = methods.getValues();
+
+        let numberOfWinners = 1;
+        if (formData.has_financial_reward) {
+            numberOfWinners = [formData.reward_first_place, formData.reward_second_place, formData.reward_third_place].filter(Boolean).length;
+        } else {
+            numberOfWinners = formData.number_of_winners || 1;
+        }
+        if (numberOfWinners === 0) numberOfWinners = 1; 
         
         const challengeDataToSave = {
             title: formData.title,
@@ -131,8 +141,8 @@ export default function CreateChallengeWizard() {
             max_applicants: formData.max_applicants,
             type: formData.type,
             status: formData.status,
+            number_of_winners: numberOfWinners,
         };
-
         let currentChallengeId = challengeId;
 
         if (currentChallengeId) {
@@ -181,10 +191,11 @@ export default function CreateChallengeWizard() {
     };
 
     const handlePublish = async () => {
-        if (methods.formState.isDirty) {
-            await handleSaveAndContinue();
+        await handleSaveAndContinue();
+        if (!challengeId || !methods.formState.isValid) {
+            showToast('Před zveřejněním prosím doplňte všechny povinné údaje.', 'error');
+            return;
         }
-        if (!challengeId) return;
 
         const { error } = await supabase.from('Challenge').update({ status: 'open' }).eq('id', challengeId);
         if (error) {

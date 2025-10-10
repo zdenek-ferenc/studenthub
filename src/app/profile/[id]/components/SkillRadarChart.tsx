@@ -15,7 +15,7 @@ type SkillRadarChartProps = {
 export default function SkillRadarChart({ skills }: SkillRadarChartProps) {
     const topSkills = skills
         .sort((a, b) => b.level - a.level || b.xp - a.xp)
-        .slice(0, 6) // Zobrazíme max 6 pro přehlednost
+        .slice(0, 6)
         .map(skill => ({
             subject: skill.name,
             level: skill.level,
@@ -31,7 +31,6 @@ export default function SkillRadarChart({ skills }: SkillRadarChartProps) {
     }
 
     return (
-        // Zmenšili jsme výšku kontejneru
         <div style={{ width: '100%', height: 250 }}> 
             <ResponsiveContainer>
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={topSkills}>

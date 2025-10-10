@@ -1,49 +1,21 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import LoadingSpinner from './LoadingSpinner';
-
+import { useState, useMemo } from 'react';
 
 type Category = {
   id: string;
   name: string;
 };
 
-
 type CategorySelectorProps = {
   onSelectionChange: (selectedIds: string[]) => void;
   initialSelectedIds?: string[];
+  allCategories: Category[];
 };
 
-export default function CategorySelector({ onSelectionChange, initialSelectedIds = [] }: CategorySelectorProps) {
-  
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
+export default function CategorySelector({ onSelectionChange, initialSelectedIds = [], allCategories }: CategorySelectorProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setLoading(true);
-      
-      const { data, error } = await supabase
-        .from('Category')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (error) {
-        console.error("Chyba při načítání kategorií:", error);
-        setError("Nepodařilo se načíst kategorie.");
-      } else {
-        setAllCategories(data);
-      }
-      setLoading(false);
-    };
-
-    fetchCategories();
-  }, []);
 
   const handleToggleCategory = (categoryId: string) => {
     const newSelectedIds = new Set(selectedIds);
@@ -59,21 +31,14 @@ export default function CategorySelector({ onSelectionChange, initialSelectedIds
     setSearchTerm('');
   };
 
-  const filteredCategories = allCategories.filter(category => {
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return category.name.toLowerCase().split(' ').some(word => 
-      word.startsWith(lowerCaseSearchTerm)
-    );
-  });
-
-  if (loading) {
-    
-    return <LoadingSpinner />;
-  }
-
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+  const filteredCategories = useMemo(() => {
+    return allCategories.filter(category => {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      return category.name.toLowerCase().split(' ').some(word => 
+        word.startsWith(lowerCaseSearchTerm)
+      );
+    });
+  }, [allCategories, searchTerm]);
 
   return (
     <div className='flex flex-col items-center'>
@@ -81,12 +46,11 @@ export default function CategorySelector({ onSelectionChange, initialSelectedIds
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        
         placeholder="Hledej kategorii"
         className="flex min-w-[24rem] content-start m-auto mb-12 px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]"
       />
 
-      <div className="w-full max-w-4xl sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4">
+      <div className="w-full max-w-4xl sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4 min-h-[12rem] content-start">
         {filteredCategories.map(category => (
           <button
             key={category.id}

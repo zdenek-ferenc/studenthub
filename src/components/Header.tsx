@@ -75,7 +75,7 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
                         setInitials(newInitials);
                     }
                 } else {
-                     setInitials(profile.email?.substring(0, 2).toUpperCase() || '??');
+                    setInitials(profile.email?.substring(0, 2).toUpperCase() || '??');
                 }
             };
             fetchInitials();

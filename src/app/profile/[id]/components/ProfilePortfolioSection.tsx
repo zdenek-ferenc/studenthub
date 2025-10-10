@@ -3,7 +3,6 @@
 import { Award } from 'lucide-react';
 import ProfilePortfolioCard from './ProfilePortfolioCard';
 
-// Typ pro submission, který přichází z hlavní komponenty
 type Submission = {
     rating: number | null;
     position: number | null;

@@ -11,19 +11,14 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 
 type View = 'active' | 'completed';
 
-// --- TYPY PRO DATA (FINÁLNÍ OPRAVA) ---
-
-// Typ pro Skill, jak ho vrací Supabase (pole v poli)
 type RawSkill = { name: string };
 type RawChallengeSkill = { Skill: RawSkill | RawSkill[] | null };
 
-// Typ pro StartupProfile, jak ho vrací Supabase (pole)
 type RawStartupProfile = {
     company_name: string;
     logo_url: string | null;
 };
 
-// Typ pro Challenge, jak ho vrací Supabase (pole)
 type RawChallenge = {
     id: string;
     title: string;
@@ -34,7 +29,6 @@ type RawChallenge = {
     ChallengeSkill: RawChallengeSkill[];
 };
 
-// Typ pro "surová" data, jak přijdou ze Supabase, bez 'any'
 type RawSubmissionFromDB = {
     id: string;
     completed_outputs: string[];
@@ -44,7 +38,6 @@ type RawSubmissionFromDB = {
     Challenge: RawChallenge | RawChallenge[] | null;
 };
 
-// Typ pro naše "čistá" data, se kterými chceme pracovat
 type CleanSubmission = {
     id: string;
     completed_outputs: string[];
@@ -96,7 +89,6 @@ export default function StudentChallengesWidget() {
                 console.error("Chyba při načítání všech výzev:", error);
                 setAllSubmissions([]);
             } else if (data) {
-                // Tady je ta magie: převedeme zkurvená data na čistá
                 const cleanedData = (data as RawSubmissionFromDB[]).map((sub): CleanSubmission => {
                     const challengeRaw = Array.isArray(sub.Challenge) ? sub.Challenge[0] : sub.Challenge;
                     
@@ -105,12 +97,10 @@ export default function StudentChallengesWidget() {
                     if (challengeRaw) {
                         const startupProfileRaw = Array.isArray(challengeRaw.StartupProfile) ? challengeRaw.StartupProfile[0] : challengeRaw.StartupProfile;
                         
-                        // "Rozbalíme" i zanořené Skilly
                         const cleanChallengeSkills = challengeRaw.ChallengeSkill.map(cs => {
                             const skillRaw = Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill;
                             return { Skill: skillRaw };
                         });
-
                         cleanChallenge = {
                             ...challengeRaw,
                             StartupProfile: startupProfileRaw || null,

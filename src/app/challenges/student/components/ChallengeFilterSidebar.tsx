@@ -4,29 +4,25 @@ import { Search, X, SlidersHorizontal } from 'lucide-react';
 import { useState, useMemo, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
-
-// Typy
 type Skill = {
-  id: string;
-  name: string;
+id: string;
+name: string;
 };
 
 type ChallengeFilterSidebarProps = {
-  allSkills: Skill[];
-  selectedSkillIds: string[];
-  setSelectedSkillIds: (ids: string[]) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  sortBy: string;
-  setSortBy: (sort: string) => void;
-  // Nové props pro mobilní verzi
-  isMobileOpen: boolean;
-  setMobileOpen: (isOpen: boolean) => void;
+allSkills: Skill[];
+selectedSkillIds: string[];
+setSelectedSkillIds: (ids: string[]) => void;
+searchQuery: string;
+setSearchQuery: (query: string) => void;
+sortBy: string;
+setSortBy: (sort: string) => void;
+isMobileOpen: boolean;
+setMobileOpen: (isOpen: boolean) => void;
 };
 
 const popularSkillsList = ['Marketing', 'React', 'Python', 'UX Design', 'Figma', 'Copywriting', 'SEO', 'Frontend', 'Backend', 'Analýza dat'];
 
-// Obsah filtru, který budeme sdílet
 const FilterContent = ({
     allSkills,
     selectedSkillIds,
@@ -36,26 +32,25 @@ const FilterContent = ({
     sortBy,
     setSortBy,
 }: Omit<ChallengeFilterSidebarProps, 'isMobileOpen' | 'setMobileOpen'>) => {
-    
-  const [skillSearch, setSkillSearch] = useState('');
-  const [showAll, setShowAll] = useState(false);
+const [skillSearch, setSkillSearch] = useState('');
+const [showAll, setShowAll] = useState(false);
 
-  const handleSkillToggle = (skillId: string) => {
+const handleSkillToggle = (skillId: string) => {
     const newSelectedIds = new Set(selectedSkillIds);
     if (newSelectedIds.has(skillId)) {
-      newSelectedIds.delete(skillId);
+    newSelectedIds.delete(skillId);
     } else {
-      newSelectedIds.add(skillId);
+    newSelectedIds.add(skillId);
     }
     setSelectedSkillIds(Array.from(newSelectedIds));
-  };
+};
 
-  const selectedSkills = useMemo(() => 
+const selectedSkills = useMemo(() => 
     allSkills.filter(skill => selectedSkillIds.includes(skill.id)),
     [allSkills, selectedSkillIds]
-  );
-  
-  const availableSkills = useMemo(() => {
+);
+
+const availableSkills = useMemo(() => {
     let sourceSkills = showAll ? allSkills : allSkills.filter(skill => popularSkillsList.includes(skill.name));
     if (skillSearch) {
     sourceSkills = allSkills.filter(skill => 

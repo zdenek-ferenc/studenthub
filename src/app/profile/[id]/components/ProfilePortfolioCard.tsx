@@ -78,8 +78,6 @@ export default function ProfilePortfolioCard({ submission }: PortfolioCardProps)
                         )}
                     </div>
                 </div>
-                
-                {/* Upravili jsme layout, aby se tagy zobrazovaly vedle sebe */}
                 <div className="mt-auto pt-4 border-t border-gray-100 flex justify-end">
                     <ResultTag rating={rating} position={position} />
                 </div>

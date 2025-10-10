@@ -19,8 +19,6 @@ export default function CategorySelectorEdit({ onSelectionChange, initialSelecte
   const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Efekt pro synchronizaci, pokud se změní initialSelectedIds zvenčí
   useEffect(() => {
     setSelectedIds(initialSelectedIds);
   }, [initialSelectedIds]);
@@ -77,7 +75,6 @@ export default function CategorySelectorEdit({ onSelectionChange, initialSelecte
 
   return (
     <div className='w-full space-y-6'>
-      {/* Sekce pro již vybrané kategorie */}
       <div>
         <h4 className="text-md font-semibold text-[var(--barva-tmava)] mb-2">Vaše kategorie</h4>
         <div className="p-3 bg-gray-50 rounded-lg min-h-[4rem] flex flex-wrap gap-2 border">
@@ -98,8 +95,6 @@ export default function CategorySelectorEdit({ onSelectionChange, initialSelecte
           )}
         </div>
       </div>
-
-      {/* Sekce pro přidání nových kategorií */}
       <div>
         <h4 className="text-md font-semibold text-[var(--barva-tmava)] mb-2">Přidat kategorie</h4>
         <input

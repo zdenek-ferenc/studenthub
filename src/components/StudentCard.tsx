@@ -70,7 +70,7 @@ export default function StudentCard({ student }: StudentCardProps) {
               </p>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mb-5 text-sm font-medium text-gray-500">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mb-2 md:mb-5 text-sm font-medium text-gray-500">
             <div className="flex items-center gap-1.5">
               <CheckCircle className="text-green-500" size={18} />
               <span>{completedChallenges} hotové výzvy</span>
@@ -97,7 +97,7 @@ export default function StudentCard({ student }: StudentCardProps) {
           </div>
           
           <div className="mt-auto pt-4 border-t border-gray-100 flex justify-center">
-            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-3xl group-hover:opacity-90 transition-opacity">
+            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-semibold md:font-bold py-2 px-5 rounded-3xl group-hover:opacity-90 transition-opacity">
               Profil studenta
             </div>
           </div>

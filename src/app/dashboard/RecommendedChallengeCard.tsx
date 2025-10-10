@@ -5,9 +5,6 @@ import Image from 'next/image';
 import { Sparkles, ChevronRight, Users, Clock, AlertTriangle } from 'lucide-react';
 import { differenceInCalendarDays } from 'date-fns';
 
-/**
- * Typ pro data, která karta potřebuje.
- */
 export type RecommendedChallenge = {
     id: string;
     title: string;
@@ -22,7 +19,6 @@ export type RecommendedChallenge = {
     requiredSkills: number;
 };
 
-// Pomocná komponenta pro zobrazení jednoho "tagu" s informací
 const InfoTag = ({ icon: Icon, text, colorClass, className }: { icon: React.ElementType, text: string | React.ReactNode, colorClass?: string, className?: string }) => (
     <div className={`flex items-center gap-1.5 text-xs md:text-sm font-semibold ${colorClass || 'text-gray-600'} ${className}`}>
         <Icon size={14} className="flex-shrink-0" />
@@ -30,10 +26,6 @@ const InfoTag = ({ icon: Icon, text, colorClass, className }: { icon: React.Elem
     </div>
 );
 
-
-/**
- * Finální, plně responzivní a funkční karta pro doporučenou výzvu.
- */
 export default function RecommendedChallengeCard({ challenge }: { challenge: RecommendedChallenge }) {
     const daysRemaining = challenge.deadline ? differenceInCalendarDays(new Date(challenge.deadline), new Date()) : null;
     let deadlineText: string | null = null;
@@ -62,9 +54,7 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
 
     return (
         <Link href={`/challenges/${challenge.id}`} className="group block bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:bg-blue-50 transition-all duration-300 h-full">
-            {/* --- ZMĚNA ZDE: Nová struktura pro perfektní responzivitu --- */}
             <div className="flex flex-col justify-between h-full">
-                {/* Horní část s logem a názvem (vždy vedle sebe) */}
                 <div className="flex items-start gap-4">
                     <Image 
                         src={challenge.StartupProfile?.logo_url || '/logo.svg'} 
@@ -73,20 +63,14 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
                         height={48} 
                         className="rounded-lg w-12 h-12 object-cover flex-shrink-0" 
                     />
-                    
-                    {/* Kontejner pro text, který se správně zalamuje */}
                     <div className="flex-grow min-w-0">
                         <p className="text-sm font-semibold text-gray-500 truncate">{challenge.StartupProfile?.company_name}</p>
                         <h5 className="text-sm md:text-lg font-bold text-gray-800 break-words">{challenge.title}</h5>
                     </div>
-
-                    {/* Šipka se zobrazí jen na větších obrazovkách */}
                     <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-300 self-center">
                         <ChevronRight size={24} strokeWidth={2.5} className="text-blue-500" />
                     </div>
                 </div>
-
-                {/* Spodní část se statistikami (odsazená a zalamuje se) */}
                 <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-6 gap-y-2 leading-none">
                     <div className='bg-[var(--barva-primarni)]/90 px-4 py-2 rounded-3xl'>
                         <InfoTag 
@@ -95,8 +79,7 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
                         colorClass="text-white"
                         />
                     </div>
-                    
-                     <InfoTag 
+                    <InfoTag 
                         icon={Users} 
                         text={<>{challenge.applicantCount} / {challenge.max_applicants || '∞'}</>}
                         className="hidden sm:flex"

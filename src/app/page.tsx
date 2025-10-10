@@ -6,13 +6,10 @@ import { ArrowRight, Check, Users, TrendingUp, DollarSign } from 'lucide-react';
 import ScrollAnimator from '../components/ScrollAnimator';
 import StatsSection from '../components/StatsSection';
 
-// --- HLAVNÍ KOMPONENTA STRÁNKY ---
 export default function HomePage() {
   return (
     <>
         <div className="w-full overflow-x-hidden text-[var(--barva-tmava)] !pt-0">
-            
-            {/* --- 1. HERO SEKCE --- */}
             <header className="relative h-screen min-h-[700px] flex items-center justify-center text-white bg-[var(--barva-tmava)] overflow-hidden">
                 <div className="absolute inset-0 z-0 opacity-20">
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[var(--barva-primarni)] via-[var(--barva-tmava)] to-black"></div>
@@ -31,12 +28,11 @@ export default function HomePage() {
                         </div>
                     </h1>
                     <div className="overflow-hidden mt-6">
-                        <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed"> {/* Responzivní velikost textu */}
+                        <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed"> 
                             Propojujeme nejlepší studenty s inovativními startupy skrze reálné projekty. Přestaň snít o kariéře, začni ji budovat.
                         </p>
                     </div>
                     <div className="overflow-hidden mt-10">
-                        {/* Na mobilu budou tlačítka pod sebou */}
                         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 flex-wrap">
                             <Link href="/register/student" className="w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center">
                                 Chci výzvu
@@ -51,8 +47,7 @@ export default function HomePage() {
             </header>
 
             <main>
-                {/* --- 2. BENTO GRID - KLÍČOVÉ VLASTNOSTI --- */}
-                <section className="py-16 md:py-24 bg-[var(--barva-svetle-pozadi)]"> {/* Upraven padding */}
+                <section className="py-16 md:py-24 bg-[var(--barva-svetle-pozadi)]"> 
                     <div className="container mx-auto px-4 sm:px-6">
                         <ScrollAnimator>
                             <div className="text-center mb-12 md:mb-16">
@@ -108,7 +103,6 @@ export default function HomePage() {
                     </div>
                 </section>
                 
-                {/* --- 3. SEKCE "JAK TO FUNGUJE" --- */}
                 <section className="py-16 md:py-24">
                     <div className="container mx-auto px-4 sm:px-6">
                         <ScrollAnimator>
@@ -116,7 +110,6 @@ export default function HomePage() {
                                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Jednoduchý proces, maximální dopad</h2>
                             </div>
                         </ScrollAnimator>
-                        {/* Na mobilu se čára skryje a kroky budou pod sebou */}
                         <div className="relative">
                             <div className="hidden md:block absolute top-8 left-0 w-full h-0.5 bg-gray-200"></div>
                             <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0">
@@ -151,8 +144,6 @@ export default function HomePage() {
                         </div>
                     </div>
                 </section>
-
-                {/* --- 4. FINÁLNÍ CTA --- */}
                 <section className="bg-white py-16 md:py-24">
                     <div className="container mx-auto text-center px-4 sm:px-6">
                         <ScrollAnimator>
@@ -171,5 +162,5 @@ export default function HomePage() {
             </main>
         </div>
     </>
-  );
+);
 }

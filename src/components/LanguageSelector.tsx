@@ -59,7 +59,6 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
 
   return (
     <div className='flex flex-col items-center w-full'>
-      {/* --- ZMĚNA ZDE: Odstraněna problematická podmínka pro schování --- */}
       <div className="w-full max-w-sm mb-8 sm:mb-12">
         <input
           type="text"
@@ -69,7 +68,6 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
           className="w-full px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]"
         />
       </div>
-
       <div className="w-full max-w-4xl px-4 sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4 min-h-[12rem] content-start">
         {filteredLanguages.map(lang => {
           const countryCode = languageCountryCodes[lang.name];

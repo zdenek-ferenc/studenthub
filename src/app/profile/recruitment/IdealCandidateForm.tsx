@@ -11,10 +11,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Trash2 } from 'lucide-react';
 
-// Zod schéma pro validaci
 const idealCandidateSchema = z.object({
-  ideal_candidate_description: z.string().min(10, { message: "Popis musí mít alespoň 10 znaků." }),
-  technologies: z.array(z.string()).min(1, { message: "Vyberte alespoň jednu technologii." })
+ideal_candidate_description: z.string().min(10, { message: "Popis musí mít alespoň 10 znaků." }),
+technologies: z.array(z.string()).min(1, { message: "Vyberte alespoň jednu technologii." })
 });
 
 type FormData = z.infer<typeof idealCandidateSchema>;
@@ -122,15 +121,15 @@ export default function IdealCandidateForm() {
                         {errors.ideal_candidate_description && <p className="text-red-500 text-sm mt-1">{errors.ideal_candidate_description.message}</p>}
                     </div>
                     <div className="space-y-4 pt-6 border-t">
-                         <h3 className="text-lg font-bold text-[var(--barva-tmava)]">Klíčové technologie (Tech Stack)</h3>
-                         <Controller
+                        <h3 className="text-lg font-bold text-[var(--barva-tmava)]">Klíčové technologie (Tech Stack)</h3>
+                        <Controller
                             name="technologies"
                             control={control}
                             render={({ field }) => (
                                 <TechnologySelectorEdit onSelectionChange={field.onChange} initialSelectedIds={field.value} />
                             )}
-                         />
-                         {errors.technologies && <p className="text-red-500 text-sm">{errors.technologies.message}</p>}
+                        />
+                        {errors.technologies && <p className="text-red-500 text-sm">{errors.technologies.message}</p>}
                     </div>
                     <div className="flex items-center gap-4 pt-4 border-t">
                         <button type="submit" disabled={isSubmitting || !Object.keys(dirtyFields).length} className="flex-grow px-5 py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed">

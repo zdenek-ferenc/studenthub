@@ -27,6 +27,7 @@ type Challenge = {
   deadline: string;
   created_at: string;
   max_applicants: number;
+  number_of_winners: number | null; // <-- TOTO JE NOVÉ
   ChallengeSkill: { Skill: { id: string, name: string } }[]; 
   StartupProfile: { company_name: string, logo_url: string | null } | null;
   Submission: Submission[];

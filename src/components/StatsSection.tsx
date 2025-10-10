@@ -17,8 +17,6 @@ export default function StatsSection() {
         </p>
         <p className="text-2xl sm:text-3xl">Hotových výzev</p>
       </div>
-      
-      {/* Druhá statistika */}
       <div className='flex justify-center items-center gap-4'>
         <p className="text-4xl font-bold">
           <CountUp

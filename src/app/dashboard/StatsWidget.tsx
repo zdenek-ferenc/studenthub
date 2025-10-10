@@ -27,11 +27,9 @@ export default function StatsWidget() {
         totalWins: 0,
     });
     const [loading, setLoading] = useState(true);
-    // --- ZMĚNA ZDE: Přidána "pojistka", která sleduje, zda už jsme data načetli ---
     const [hasFetched, setHasFetched] = useState(false);
 
     useEffect(() => {
-        // Data načteme pouze pokud máme uživatele A ZÁROVEŇ jsme je ještě nenačetli
         if (user && !hasFetched) {
             const fetchAllStats = async () => {
                 setLoading(true);
@@ -44,8 +42,6 @@ export default function StatsWidget() {
                         .in('status', ['reviewed', 'winner', 'rejected']),
                     supabase.rpc('get_student_rewards', { p_student_id: user.id })
                 ]);
-
-                // ... (zbytek logiky pro zpracování dat zůstává stejný)
                 let performanceStats = { avgRating: 0, completedCount: 0, successRate: 0 };
                 if (!performanceRes.error && performanceRes.data) {
                     const ratedSubmissions = performanceRes.data.filter(s => s.rating !== null);
@@ -73,20 +69,18 @@ export default function StatsWidget() {
                 
                 setStats({ ...performanceStats, ...rewardStats });
                 setLoading(false);
-                // --- ZMĚNA ZDE: Po úspěšném načtení si poznačíme, že máme hotovo ---
                 setHasFetched(true);
             };
 
             fetchAllStats();
         }
-    // Závislost je teď na obou proměnných, hook se znovu nespustí
     }, [user, hasFetched]);
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
             <h3 className="flex justify-center md:justify-start text-xl font-bold text-[var(--barva-tmava)] mb-4">Můj přehled</h3>
             {loading && !hasFetched ? (
-                 <p className="text-sm text-gray-500">Načítám přehled...</p>
+                <p className="text-sm text-gray-500">Načítám přehled...</p>
             ) : (
                 <div className="space-y-5">
                     <StatItem icon={CheckCircle} value={String(stats.completedCount)} label="Dokončené výzvy" colorClass="bg-gradient-to-t from-green-500 to-green-400" />

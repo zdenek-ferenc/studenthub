@@ -98,7 +98,6 @@ export default function StartupChallengesView() {
         const getNeedsAttention = (challenge: Challenge) => {
             if (challenge.status === 'draft') return true;
             const isPastDeadline = challenge.deadline ? new Date() > new Date(challenge.deadline) : false;
-            // --- ZMĚNA ZDE: Odstraněn status 'applied' ---
             const hasUnreviewedSubmissions = challenge.Submission.some((s: {status: string}) => s.status === 'submitted');
             return isPastDeadline && hasUnreviewedSubmissions;
         };

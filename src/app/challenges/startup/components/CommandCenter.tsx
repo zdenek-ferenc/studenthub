@@ -48,7 +48,6 @@ export default function CommandCenter({ stats }: { stats: CommandCenterStats }) 
         </div>
 
         <div className="flex flex-wrap gap-6">
-            {/* ZMĚNA JE POUZE NA NÁSLEDUJÍCÍM ŘÁDKU: z-10 -> z-30 */}
             <Popover className="relative flex-1 min-w-[240px] z-30">
               {({ open }) => (
                 <>
@@ -96,7 +95,6 @@ export default function CommandCenter({ stats }: { stats: CommandCenterStats }) 
                 </>
               )}
             </Popover>
-
             <StatWidget 
                 value={stats.activeChallengesCount}
                 label="Aktivní výzvy"

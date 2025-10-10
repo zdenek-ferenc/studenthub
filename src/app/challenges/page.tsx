@@ -1,9 +1,8 @@
 "use client";
 
-import { useAuth } from '../../contexts/AuthContext'; // Uprav cestu
-import withAuth from '../../components/withAuth'; // Uprav cestu
+import { useAuth } from '../../contexts/AuthContext'; 
+import withAuth from '../../components/withAuth'; 
 
-// Importujeme nové komponenty pro jednotlivé pohledy
 import StartupChallengesView from './startup/StartupChallengesView';
 import StudentChallengesView from './student/StudentChallengesView';
 import LoadingSpinner from '../../components/LoadingSpinner'
@@ -15,7 +14,6 @@ function ChallengesPage() {
     return <LoadingSpinner />;
   }
 
-  // --- Tady je ta "výhybka" ---
   if (profile?.role === 'startup') {
     return <StartupChallengesView />;
   }

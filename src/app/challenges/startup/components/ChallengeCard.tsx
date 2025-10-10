@@ -121,11 +121,9 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
                     )}
                 </div>
             </div>
-
             <p className="text-gray-500 text-base min-h-[40px] line-clamp-2 my-4 flex-grow">
                 {challenge.short_description || <span className="italic text-gray-400">Zatím bez popisu...</span>}
             </p>        
-
             <div className="space-y-3 mb-4">
                 <div className="flex justify-between items-center">
                     <StatItem icon={Users} text={`${applicantCount} / ${challenge.max_applicants || '∞'} přihlášeno`} />
@@ -141,8 +139,6 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
             <div className="mt-auto border-t-2 border-[var(--barva-svetle-pozadi)] pt-4 flex justify-between items-center">
                 <div className="text-xs text-gray-400 space-y-1">
                     <p>Vytvořeno: {new Date(challenge.created_at).toLocaleDateString('cs-CZ')}</p>
-                    
-                    {/* --- ZDE JE TA ZMĚNA --- */}
                     {challenge.deadline && (
                         <p className={isPastDeadline && !isCompleted ? 'text-red-500 font-semibold' : ''}>
                             Konec: {new Date(challenge.deadline).toLocaleDateString('cs-CZ')}

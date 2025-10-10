@@ -68,7 +68,6 @@ export default function Step4_Summary({ setStep }: { setStep: (step: number) => 
         if (!data.skills || allSkills.length === 0) return [];
         return data.skills
             .map(skillId => allSkills.find(s => s.id === skillId)?.name)
-            // OPRAVA: Přidán typ pro 'name', aby se předešlo implicitnímu 'any'
             .filter((name: string | undefined): name is string => !!name);
     }, [data.skills, allSkills]);
 

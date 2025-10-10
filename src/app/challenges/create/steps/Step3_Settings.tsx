@@ -78,13 +78,22 @@ export default function Step3_Settings() {
                         </div>
                     </div>
                 ) : (
-                    <div className="mt-4">
-                        <label htmlFor="reward_description" className="block mb-1 font-semibold text-gray-700">Popis nefinanční odměny</label>
-                        <input id="reward_description" {...register('reward_description')} className="input" placeholder="Např. Stáž, mentoring, hodnotná reference..." />
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-1">
+                            <label htmlFor="number_of_winners" className="block mb-1 font-semibold text-gray-700">Počet výherců</label>
+                            <select id="number_of_winners" {...register('number_of_winners', { valueAsNumber: true, required: 'Vyberte počet výherců' })} className="input bg-white">
+                                <option value={1}>1 výherce</option>
+                                <option value={2}>2 výherci</option>
+                                <option value={3}>3 výherci</option>
+                            </select>
+                        </div>
+                        <div className="md:col-span-2">
+                            <label htmlFor="reward_description" className="block mb-1 font-semibold text-gray-700">Popis nefinanční odměny</label>
+                            <input id="reward_description" {...register('reward_description')} className="input" placeholder="Např. Stáž, mentoring, balíček merche..." />
+                        </div>
                     </div>
                 )}
             </div>
         </div>
     );
 }
-

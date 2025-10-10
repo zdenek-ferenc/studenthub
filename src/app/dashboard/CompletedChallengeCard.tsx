@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { CheckCircle, Star, Trophy, ChevronRight } from 'lucide-react';
 
-// Typ pro data, která karta potřebuje
 export type CompletedChallengeData = {
   Challenge: {
     id: string;
@@ -18,7 +17,6 @@ export type CompletedChallengeData = {
   position: number | null;
 };
 
-// --- ZMĚNA ZDE: Vylepšená logika pro zobrazení výsledku ---
 const ResultTag = ({ rating, position }: { rating: number | null, position: number | null }) => {
     if (position && position <= 3) {
         return (
@@ -29,7 +27,6 @@ const ResultTag = ({ rating, position }: { rating: number | null, position: numb
                     <span className='leading-none bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent'>{position}. místo</span>
                 </div>
             </div>
-                {/* Zobrazíme i rating, pokud existuje */}
                 {rating && (
                     <div className="flex items-center gap-1.5 text-sm font-semibold text-[var(--barva-primarni)]">
                         <Star size={16} />

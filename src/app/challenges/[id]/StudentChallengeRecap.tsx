@@ -55,10 +55,10 @@ const PortfolioToggle = ({ submission, onToggle }: { submission: Submission, onT
     );
 };
 type XpEventWithSkill = {
-  event_type: string;
-  xp_gained: number;
-  new_level: number | null;
-  Skill: { name: string } | null;
+event_type: string;
+xp_gained: number;
+new_level: number | null;
+Skill: { name: string } | null;
 };
 
 const XpRow = ({ icon, label, xp, newLevel }: { icon: React.ReactNode, label: string, xp: number, newLevel: number | null }) => (
@@ -106,7 +106,7 @@ function XpGainedSummary({ events }: { events: XpEventWithSkill[] }) {
                     </div>
                 )}
                 {newSkillEvents.length > 0 && (
-                     <div>
+                    <div>
                         <h4 className="font-semibold text-green-700 mb-2 ml-1">Nové dovednosti odemčeny!</h4>
                         <div className="space-y-2">
                             {newSkillEvents.map((event, i) => (
@@ -146,16 +146,13 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                 setXpEvents(data as XpEventWithSkill[]);
             }
         };
-
         if (isFinal) {
             fetchXpEvents();
         }
     }, [submission, isFinal]);
-
     const handlePortfolioToggle = (isPublic: boolean) => {
         setCurrentSubmission(prev => ({...prev, is_public_on_profile: isPublic}));
     };
-
     return (
         <>
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs mt-8">
@@ -167,7 +164,6 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                         {isFinal ? "Výzva je již uzavřena. Zde je finální zpětná vazba od startupu." : "Skvělá práce! Startup ti poslal zpětnou vazbu."}
                     </p>
                 </div>
-
                 {!isFinal && (
                     <div className="max-w-2xl mx-auto mb-8 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg flex items-start gap-3">
                         <Info className="w-8 h-8 text-blue-500 flex-shrink-0" />
@@ -177,7 +173,6 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                         </div>
                     </div>
                 )}
-
                 <div className="flex flex-col sm:flex-row justify-around items-center p-4 max-w-lg mx-auto gap-6">
                     {isFinal && submission.position && [1, 2, 3].includes(submission.position) && (
                         <div className="text-center">

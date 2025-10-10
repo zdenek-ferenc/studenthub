@@ -10,7 +10,6 @@ import { format, isToday, isYesterday, parseISO } from 'date-fns';
 import { cs } from 'date-fns/locale';
 import LoadingSpinner from '../../components/LoadingSpinner'
 
-// Typ pro jednu notifikaci
 type Notification = {
     id: string;
     message: string;
@@ -20,7 +19,6 @@ type Notification = {
     type: 'new_submission' | 'submission_reviewed' | 'submission_winner' | null;
 };
 
-// Ikonky pro různé typy notifikací
 const NotificationIcon = ({ type }: { type: Notification['type'] }) => {
     switch (type) {
         case 'new_submission':
@@ -34,7 +32,6 @@ const NotificationIcon = ({ type }: { type: Notification['type'] }) => {
     }
 };
 
-// Formátování data pro hezčí zobrazení
 const formatDateGroup = (dateString: string) => {
     const date = parseISO(dateString);
     if (isToday(date)) return 'Dnes';
@@ -81,15 +78,10 @@ function NotificationsPage() {
             .in('id', unreadIds);
 
         if (!error) {
-            // Lokální aktualizace pro okamžitou vizuální změnu
             setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-            // Poznámka: Po této akci se počítadlo v Headeru samo neaktualizuje.
-            // Aktualizuje se až při příštím načtení Headeru (změna stránky, refresh).
-            // Pro plnou synchronizaci by bylo potřeba spravovat stav v AuthContextu.
         }
     };
 
-    // Seskupení notifikací podle data
     const groupedNotifications = notifications.reduce((acc, notification) => {
         const dateGroup = formatDateGroup(notification.created_at);
         if (!acc[dateGroup]) {

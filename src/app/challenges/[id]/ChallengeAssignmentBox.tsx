@@ -31,7 +31,6 @@ type Props = {
     isChallengeFull: boolean;
 };
 
-// Pomocné komponenty (přesunuty sem)
 const getFileNameFromUrl = (url: string) => {
     try {
         const name = url.split('/').pop()?.split('-').slice(1).join('-') || 'Soubor';
@@ -41,23 +40,23 @@ const getFileNameFromUrl = (url: string) => {
 
 const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
     const rewards = [
-      { place: '1. místo', amount: challenge.reward_first_place },
-      { place: '2. místo', amount: challenge.reward_second_place },
-      { place: '3. místo', amount: challenge.reward_third_place },
+    { place: '1. místo', amount: challenge.reward_first_place },
+    { place: '2. místo', amount: challenge.reward_second_place },
+    { place: '3. místo', amount: challenge.reward_third_place },
     ].filter(r => r.amount);
 
     if (rewards.length === 0) return <>{challenge.reward_description || 'Nefinanční'}</>;
     if (rewards.length === 1 && rewards[0].amount) return <>{rewards[0].amount.toLocaleString('cs-CZ')} Kč</>;
     
     return (
-      <div className="flex items-baseline gap-4 sm:mb-6">
+    <div className="flex items-baseline gap-4 sm:mb-6">
         {rewards.map(({ place, amount }) => (
-          <div key={place} className="text-center">
+        <div key={place} className="text-center">
             <span className="text-sm font-semibold text-[var(--barva-tmava)] block">{place}</span>
             <span className="font-bold text-lg sm:text-xl"><span className='text-[var(--barva-primarni)]'>{amount?.toLocaleString('cs-CZ')}</span> Kč</span>
-          </div>
+        </div>
         ))}
-      </div>
+    </div>
     );
 };
 
@@ -87,7 +86,6 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                 <p className="font-semibold text-gray-800">{challenge.StartupProfile?.company_name}</p>
                 <h1 className="text-3xl sm:text-4xl font-bold text-[var(--barva-tmava)]">{challenge.title}</h1>
             </div>
-
             <div className="border-t border-b border-gray-100 py-6">
                 <h2 className="text-lg sm:text-xl font-semibold text-[var(--barva-tmava)] mb-4">Potřebné dovednosti</h2>
                 <div className="flex flex-wrap gap-2">
@@ -148,8 +146,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                 )}
                 
                 <p className='font-semibold text-lg sm:text-xl mt-6'>Termín odevzdání do: <strong className='ml-3 text-[var(--barva-primarni)]'>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></p>
-            </div>
-            
+            </div>            
             {!isApplied && (
                 <div className="mt-10 text-center">
                     <button onClick={onApply} disabled={isApplying || isChallengeFull} className="px-6 py-3 sm:px-7 sm:py-3 text-white bg-[var(--barva-primarni)] rounded-full font-normal text-xl sm:text-2xl outline-2 transition-colors duration-200 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed">

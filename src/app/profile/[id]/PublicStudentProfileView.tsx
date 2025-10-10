@@ -60,7 +60,6 @@ type StudentProfile = {
     Submission: Submission[];
 };
 
-// --- SUB-KOMPONENTY ---
 const SocialLink = ({ href, Icon, label }: { href: string | null, Icon: React.ElementType, label: string }) => {
     if (!href) return null;
     const validHref = href.startsWith('http://') || href.startsWith('https://') ? href : `https://${href}`;

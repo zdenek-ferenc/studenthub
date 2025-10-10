@@ -20,7 +20,6 @@ export default function LanguageSelectorEdit({ onSelectionChange, initialSelecte
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Efekt pro synchronizaci, pokud se změní initialSelectedIds zvenčí
   useEffect(() => {
     setSelectedIds(initialSelectedIds);
   }, [initialSelectedIds]);
@@ -77,7 +76,6 @@ export default function LanguageSelectorEdit({ onSelectionChange, initialSelecte
 
   return (
     <div className='w-full space-y-6'>
-      {/* Sekce pro již vybrané jazyky */}
       <div>
         <h4 className="text-md font-semibold text-[var(--barva-tmava)] mb-2">Tvoje jazyky</h4>
         <div className="p-3 bg-gray-50 rounded-lg min-h-[4rem] flex flex-wrap gap-2 border">
@@ -98,8 +96,6 @@ export default function LanguageSelectorEdit({ onSelectionChange, initialSelecte
           )}
         </div>
       </div>
-
-      {/* Sekce pro přidání nových jazyků */}
       <div>
         <h4 className="text-md font-semibold text-[var(--barva-tmava)] mb-2">Přidat jazyky</h4>
         <input

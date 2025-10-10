@@ -10,9 +10,8 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 
 import StudentChallengeRecap from './StudentChallengeRecap';
 import SubmissionForm from './SubmissionForm';
-import ChallengeAssignmentBox from './ChallengeAssignmentBox'; // Náš nový soubor
+import ChallengeAssignmentBox from './ChallengeAssignmentBox';
 
-// Typ pro data výzvy
 type Challenge = {
   id: string;
   status: 'draft' | 'open' | 'closed' | 'archived';
@@ -34,7 +33,6 @@ type Challenge = {
   Submission: Submission[];
 };
 
-// Komponenta pro zobrazení čekání na výsledky
 const WaitingForResults = () => (
     <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs mt-8 text-center">
         <Clock className="w-12 h-12 mx-auto text-blue-500 mb-4" />
@@ -118,9 +116,7 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
             challengeStatus={challenge.status} 
         />
       )}
-
       <ChallengeAssignmentBox {...assignmentBoxProps} />
-
       {!showResults && isApplied && (
         <>
           {!isReviewedByStartup && userSubmission ? (

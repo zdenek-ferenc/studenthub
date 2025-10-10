@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Target, UserPlus } from "lucide-react";
 
-// Přesné typy pro props
 type Technology = {
     Technology: { name: string };
 };
@@ -17,10 +16,6 @@ export type IdealCandidateCardProps = {
 };
 
 export default function IdealCandidateCard({ description, technologies, isOwner, hasData, isPreview = false }: IdealCandidateCardProps) {
-    // --- ZDE JE KLÍČOVÁ OPRAVA LOGIKY ---
-
-    // Pokud je komponenta použita v živém náhledu, VŽDY zobrazíme finální modrou kartu.
-    // Pro prázdné hodnoty použijeme zástupný text (placeholder).
     if (isPreview) {
         return (
             <div className="bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white p-6 rounded-2xl shadow-lg border-t border-blue-400/30">
@@ -46,10 +41,7 @@ export default function IdealCandidateCard({ description, technologies, isOwner,
             </div>
         );
     }
-
-    // Následující logika se uplatní POUZE na veřejném profilu (kde isPreview = false)
     if (!hasData) {
-        // Pokud se dívá majitel a data nejsou, zobrazí se call-to-action
         if (isOwner) {
             return (
                 <div className="bg-white p-6 rounded-2xl shadow-xs border-2 border-dashed border-gray-300 text-center flex flex-col items-center justify-center h-full">
@@ -64,11 +56,9 @@ export default function IdealCandidateCard({ description, technologies, isOwner,
                 </div>
             );
         }
-        // Pokud se dívá kdokoliv jiný a data nejsou, nezobrazí se nic
         return null;
     }
 
-    // Standardní zobrazení, když karta má data na veřejném profilu
     return (
         <div className="bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white p-3 sm:p-6 rounded-2xl shadow-lg border-t border-blue-400/30">
             <div className="flex items-center gap-3 mb-4">

@@ -3,9 +3,8 @@
 import { createContext, useContext, useState, ReactNode, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
-import { useDebounce } from '../hooks/useDebounce'; // <-- 1. IMPORTUJEME NÁŠ HOOK
+import { useDebounce } from '../hooks/useDebounce'; 
 
-// ... (typy zůstávají stejné)
 type Skill = { id: string; name: string; };
 type StartupProfile = { company_name: string; logo_url: string | null; };
 
@@ -50,8 +49,6 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('recommended');
-  
-  // <-- 2. VYTVOŘÍME "ZPOŽDĚNOU" HODNOTU
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const refetchChallenges = useCallback(async () => {
@@ -70,12 +67,10 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
     }
 
     let query = supabase.from('Challenge').select(`*, ChallengeSkill(Skill(*)), Submission(student_id), StartupProfile(*)`);
-
-    // <-- 3. V DOTAZU POUŽIJEME ZPOŽDĚNOU HODNOTU
     if (selectedSkillIds.length > 0) {
         const { data: rpcData } = await supabase.rpc('get_challenges_with_skills', {
             p_skill_ids: selectedSkillIds,
-            p_search_term: debouncedSearchQuery // <-- ZMĚNA ZDE
+            p_search_term: debouncedSearchQuery
         });
         const challengeIds = rpcData?.map((c: {id: string}) => c.id) || [];
         if (challengeIds.length === 0) {
@@ -84,7 +79,7 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
           return;
         }
         query = query.in('id', challengeIds);
-    } else if (debouncedSearchQuery) { // <-- ZMĚNA ZDE
+    } else if (debouncedSearchQuery) {
         query = query.or(`title.ilike.%${debouncedSearchQuery}%,short_description.ilike.%${debouncedSearchQuery}%`);
     }
 
@@ -113,7 +108,6 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
     refetchChallenges();
   }, [debouncedSearchQuery, selectedSkillIds, sortBy, refetchChallenges]); // <-- ZMĚNA ZDE
 
-  // ... zbytek souboru zůstává stejný
   const value = useMemo(() => ({
     challenges,
     loading,

@@ -13,8 +13,7 @@ const SingleWinnerCard = ({ submission }: { submission: Submission }) => {
                 {student?.first_name?.[0]}{student?.last_name?.[0]}
             </div>
             <p className="text-2xl font-bold text-gray-800">{student?.first_name} {student?.last_name}</p>
-            <p className="text-md text-gray-500 mb-6">@{student?.username}</p>
-            
+            <p className="text-md text-gray-500 mb-6">@{student?.username}</p>          
             {submission.feedback_comment && (
                 <div className="text-left mb-6">
                     <h5 className="font-semibold text-gray-700 flex items-center gap-2 mb-2">
@@ -66,7 +65,6 @@ const WinnerListItem = ({ submission }: { submission: Submission }) => {
         </div>
     );
 };
-
 export default function ChallengeRecapView({ submissions }: { submissions: Submission[] }) {
     
     const winners = useMemo(() => {
@@ -74,13 +72,11 @@ export default function ChallengeRecapView({ submissions }: { submissions: Submi
             .filter(s => s.position && [1, 2, 3].includes(s.position))
             .sort((a, b) => a.position! - b.position!);
     }, [submissions]);
-
     const podiumOrder = [
         winners.find(w => w.position === 2),
         winners.find(w => w.position === 1),
         winners.find(w => w.position === 3)
     ].filter(Boolean) as Submission[];
-
     const barHeights: { [key: number]: string } = { 1: 'h-48', 2: 'h-40', 3: 'h-32' };
 
     const renderContent = () => {

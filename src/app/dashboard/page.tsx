@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react'; // Přidán import useEffect
+import { useState, useEffect, useRef } from 'react'; 
 import { motion, AnimatePresence } from 'framer-motion';
 import withAuth from '../../components/withAuth';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabaseClient'; // Přidán import supabase
+import { supabase } from '../../lib/supabaseClient'; 
 import LoadingSpinner from '../../components/LoadingSpinner';
 import CareerGrowthWidget from './CareerGrowthWidget';
 import StudentChallengesWidget from './StudentChallengesWidget';
@@ -75,7 +75,7 @@ function DashboardPage() {
           console.error("Error fetching student profile for dashboard:", error);
         } else {
           setStudentProfile(data);
-          hasFetchedProfile.current = true; // označíme, že už jsme to načetli
+          hasFetchedProfile.current = true;
         }
         setLoading(false);
       };
@@ -85,7 +85,6 @@ function DashboardPage() {
     }
   }, [user, authLoading]); 
 
-  // Použijeme křestní jméno, pokud je k dispozici
   const displayName = studentProfile?.username ? studentProfile.username : "zpět";
 
   if (authLoading || loading) return <LoadingSpinner />;
@@ -96,8 +95,6 @@ function DashboardPage() {
       <h1 className="text-3xl md:text-4xl font-bold text-[var(--barva-tmava)] mb-2 md:mb-8">
         Vítej <span className='text-[var(--barva-primarni)]'>{displayName}</span>!
       </h1>
-
-      {/* --- PŮVODNÍ LAYOUT PRO DESKTOP (beze změny) --- */}
       <div className="hidden lg:flex flex-col lg:flex-row items-start gap-6 md:gap-8">
         <div className="w-full lg:w-2/3 space-y-6 md:space-y-8">
             <StudentChallengesWidget />
@@ -111,15 +108,12 @@ function DashboardPage() {
             <CareerGrowthWidget />
         </div>
       </div>
-
-      {/* --- NOVÝ A VYLEPŠENÝ LAYOUT PRO MOBILNÍ ZAŘÍZENÍ --- */}
       <div className="lg:hidden">
         <div className="relative flex items-center justify-around bg-white p-1 rounded-full mb-3 border border-gray-100 shadow-sm" >
           <PillButton id="challenges" label="Výzvy" icon={Briefcase} activeTab={activeTab} setActiveTab={setActiveTab} />
           <PillButton id="growth" label="Růst" icon={TrendingUp} activeTab={activeTab} setActiveTab={setActiveTab} />
           <PillButton id="activities" label="Aktivity" icon={LayoutGrid} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
-
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

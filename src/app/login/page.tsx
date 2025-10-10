@@ -3,12 +3,10 @@ import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-// Přidali jsme useEffect
 import { useState, useEffect, ReactNode } from 'react';
 import { Provider } from '@supabase/supabase-js';
 
 
-// Komponenta pro tlačítko se sociální sítí, upravený design
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
   const handleLogin = async () => {
     await supabase.auth.signInWithOAuth({
@@ -27,7 +25,6 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
   );
 };
 
-// --- NOVÁ KOMPONENTA PRO PROLÍNÁNÍ OBRÁZKŮ ---
 const ImageSlideshow = () => {
   const images = ['/login.png', '/login2.png'];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -35,9 +32,9 @@ const ImageSlideshow = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
-    }, 5000); // Mění se každých 5 sekund
+    }, 5000);
 
-    return () => clearInterval(interval); // Důležité pro vyčištění
+    return () => clearInterval(interval); 
   }, [images.length]);
 
   return (
@@ -83,8 +80,6 @@ export default function LoginPage() {
   return (
     <div className="w-full min-h-screen py-10 md:py-32 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
       <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden">
-        
-        {/* Levá část: Formulář */}
         <div className="p-8 sm:p-12 flex flex-col justify-center">
           <div>
             <h1 className="text-3xl font-bold text-[var(--barva-tmava)]">Vítej zpět!</h1>
@@ -125,9 +120,7 @@ export default function LoginPage() {
               <SocialButton provider="google" label="Google" icon={<svg className="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C41.38,36.151,44,30.63,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>} />
             </div>
           </div>
-
           {error && <p className="text-red-500 text-sm text-center mt-4">{error}</p>}
-
           <p className="text-center text-sm text-gray-600 mt-8">
             Ještě nemáš účet?{' '}
             <Link href="/register/student" className="font-semibold text-[var(--barva-primarni)] hover:underline">
@@ -135,8 +128,6 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-
-        {/* Pravá část: Obrázek */}
         <div className="hidden lg:block bg-[var(--barva-primarni)] relative">
             <ImageSlideshow />
         </div>

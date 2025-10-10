@@ -17,14 +17,12 @@ type FilterSidebarProps = {
   setSearchQuery: (query: string) => void;
   sortBy: string;
   setSortBy: (sort: string) => void;
-  // Nové props pro mobilní verzi
   isMobileOpen: boolean;
   setMobileOpen: (isOpen: boolean) => void;
 };
 
 const popularSkillsList = ['Marketing', 'React', 'Python', 'UX Design', 'Figma', 'Copywriting', 'SEO', 'Frontend', 'Backend', 'Analýza dat'];
 
-// Sdílený obsah filtru
 const FilterContent = ({
   allSkills,
   selectedSkillIds,
@@ -108,7 +106,7 @@ const FilterContent = ({
           </div>
         )}
         
-         <div className="relative mb-3 mt-6">
+        <div className="relative mb-3 mt-6">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input type="text" placeholder="Hledej dovednost..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]" />
         </div>
@@ -126,7 +124,7 @@ const FilterContent = ({
               {skill.name}
             </button>
           ))}
-           {availableSkills.length === 0 && <p className="text-sm text-gray-500 w-full text-center py-4">{skillSearch ? 'Žádná dovednost nenalezena.' : 'Všechny populární dovednosti jsou vybrány.'}</p>}
+          {availableSkills.length === 0 && <p className="text-sm text-gray-500 w-full text-center py-4">{skillSearch ? 'Žádná dovednost nenalezena.' : 'Všechny populární dovednosti jsou vybrány.'}</p>}
         </div>
       </div>
     </div>
@@ -156,7 +154,7 @@ export default function FilterSidebar(props: FilterSidebarProps) {
                                     <button onClick={() => setMobileOpen(false)} className="p-1 rounded-full hover:bg-gray-100"><X size={20} /></button>
                                 </div>
                                 <div className="max-h-[80vh] overflow-y-auto">
-                                   <FilterContent {...props} />
+                                <FilterContent {...props} />
                                 </div>
                                 <div className="p-4 border-t">
                                     <button onClick={() => setMobileOpen(false)} className="w-full px-6 py-2.5 rounded-full bg-[var(--barva-primarni)] text-white font-semibold">Zobrazit výsledky</button>

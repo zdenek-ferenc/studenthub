@@ -26,7 +26,7 @@ export default function StartupQnA({ startupId }: { startupId: string }) {
                 .from('StartupQuestion')
                 .select('id, question_text, answer_text, created_at')
                 .eq('startup_id', startupId)
-                .not('answer_text', 'is', null) // Zobrazíme jen zodpovězené
+                .not('answer_text', 'is', null)
                 .order('created_at', { ascending: false });
             
             setQuestions(data || []);

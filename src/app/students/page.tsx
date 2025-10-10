@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react'; // <-- PŘIDAT IMPORT
+import { useState } from 'react';
 import StudentCard from '../../components/StudentCard';
 import FilterSidebar from '../../components/FilterSidebar';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,12 +8,12 @@ import withAuth from '../../components/withAuth';
 import { useData } from '../../contexts/DataContext';
 import StudentCardSkeleton from '../../components/skeletons/StudentCardSkeleton';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { SlidersHorizontal } from 'lucide-react'; // <-- PŘIDAT IMPORT
+import { SlidersHorizontal } from 'lucide-react';
 
 function StudentCatalogPage() {
     const { profile, loading: authLoading } = useAuth();
-    const { students, allSkills, studentFilters, loadingStudents, loadMoreStudents, hasMoreStudents } = useData();
-    const [isFilterOpen, setIsFilterOpen] = useState(false); // <-- PŘIDAT STAV
+    const { students, allSkills, studentFilters, loadingStudents, loadMoreStudents, hasMoreStudents, loadingFilters } = useData();
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     if (authLoading) {
         return <LoadingSpinner />;
@@ -25,19 +25,24 @@ function StudentCatalogPage() {
 
     return (
         <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-5 md:py-32">
-            <FilterSidebar
-                allSkills={allSkills}
-                selectedSkillIds={studentFilters.selectedSkillIds}
-                setSelectedSkillIds={studentFilters.setSelectedSkillIds}
-                searchQuery={studentFilters.searchQuery}
-                setSearchQuery={studentFilters.setSearchQuery}
-                sortBy={studentFilters.sortBy}
-                setSortBy={studentFilters.setSortBy}
-                isMobileOpen={isFilterOpen} // <-- PŘEDAT PROPS
-                setMobileOpen={setIsFilterOpen} // <-- PŘEDAT PROPS
-            />
+            {loadingFilters ? (
+                <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit sticky top-28 flex-shrink-0">
+                    <p className="text-gray-500">Načítám filtry...</p>
+                </aside>
+            ) : (
+                <FilterSidebar
+                    allSkills={allSkills}
+                    selectedSkillIds={studentFilters.selectedSkillIds}
+                    setSelectedSkillIds={studentFilters.setSelectedSkillIds}
+                    searchQuery={studentFilters.searchQuery}
+                    setSearchQuery={studentFilters.setSearchQuery}
+                    sortBy={studentFilters.sortBy}
+                    setSortBy={studentFilters.setSortBy}
+                    isMobileOpen={isFilterOpen}
+                    setMobileOpen={setIsFilterOpen}
+                />
+            )}
             <main className="flex-1 w-full">
-                {/* --- PŘIDANÁ SEKCE S TLAČÍTKEM --- */}
                 <div className="mb-6 lg:hidden flex justify-end">
                     <button 
                         onClick={() => setIsFilterOpen(true)}
@@ -46,7 +51,6 @@ function StudentCatalogPage() {
                         <SlidersHorizontal size={20} />
                     </button>
                 </div>
-
                 {loadingStudents && students.length === 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         <StudentCardSkeleton /><StudentCardSkeleton /><StudentCardSkeleton />

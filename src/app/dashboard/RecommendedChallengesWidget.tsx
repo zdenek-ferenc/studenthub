@@ -31,15 +31,12 @@ export default function RecommendedChallengesWidget() {
             const { data: openChallengesData } = await supabase
                 .from('Challenge')
                 .select(`id, title, deadline, max_applicants, StartupProfile(company_name, logo_url), ChallengeSkill(Skill(id)), Submission(count)`)
-                .eq('status', 'open'); // Načteme jen ty, co mají status 'open'
+                .eq('status', 'open'); 
 
             if (!openChallengesData) { setLoading(false); return; }
 
             const scoredChallenges = openChallengesData
                 .map(challenge => {
-                    // --- ZDE JE KLÍČOVÁ OPRAVA ---
-                    // Přidali jsme kontrolu, zda je deadline v budoucnosti.
-                    // Pokud není, výzvu přeskočíme (return null).
                     const isStillActive = challenge.deadline ? new Date(challenge.deadline) >= new Date() : false;
                     if (!isStillActive) {
                         return null;
@@ -49,21 +46,17 @@ export default function RecommendedChallengesWidget() {
                     if (appliedChallengeIds.includes(challenge.id) || (challenge.max_applicants && submissionCount >= challenge.max_applicants)) {
                         return null;
                     }
-
                     const requiredSkillIds = challenge.ChallengeSkill
                         .map(cs => {
                             const skill = Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill;
                             return skill?.id;
                         })
                         .filter(Boolean);
-
                     if (requiredSkillIds.length === 0) return null;
-
                     const matchingSkills = requiredSkillIds.filter(id => studentSkillIds.includes(id));
                     if (matchingSkills.length === 0) return null;
                     
                     const startupProfile = Array.isArray(challenge.StartupProfile) ? challenge.StartupProfile[0] : challenge.StartupProfile;
-
                     return {
                         id: challenge.id,
                         title: challenge.title,
@@ -77,18 +70,16 @@ export default function RecommendedChallengesWidget() {
                     };
                 })
                 .filter((c): c is NonNullable<typeof c> => c !== null);
-
             scoredChallenges.sort((a, b) => b.score - a.score);
             
             setRecommendations(scoredChallenges.slice(0, 3));
             setLoading(false);
         };
-
         fetchRecommendations();
     }, [user]);
 
     return (
-      <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+    <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
         <h3 className="flex justify-start sm:text-xl font-semibold sm:font-bold text-[var(--barva-tmava)] mb-4">Doporučené výzvy pro tebe</h3>
         {loading ? (
             <p className="text-sm text-gray-500">Hledám nejlepší výzvy...</p>
@@ -105,6 +96,6 @@ export default function RecommendedChallengesWidget() {
                 <p className="text-sm text-gray-500 mt-1">Doplň si dovednosti v profilu, abychom ti mohli najít výzvy na míru.</p>
             </div>
         )}
-      </div>
+    </div>
     );
 }

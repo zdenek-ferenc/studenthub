@@ -26,12 +26,11 @@ type StudentProfile = {
 type Tab = 'personal' | 'skills' | 'links';
 
 export default function StudentEditForm() {
-    // Používáme původní AuthContext, bez nových proměnných
     const { user, showToast, loading: authLoading, refetchProfile } = useAuth();
     const searchParams = useSearchParams();
     
     const [loading, setLoading] = useState(true);
-    const [hasFetched, setHasFetched] = useState(false); // Naše "pojistka" proti znovunačítání
+    const [hasFetched, setHasFetched] = useState(false);
 
     const initialTab = searchParams.get('tab');
     const [activeTab, setActiveTab] = useState<Tab>(
@@ -39,8 +38,6 @@ export default function StudentEditForm() {
     );
     
     const { register, handleSubmit, reset, formState: { isDirty, isSubmitting } } = useForm();
-    
-    // Budeme si zde držet původní načtené skilly a jazyky pro porovnání
     const [originalSkills, setOriginalSkills] = useState<string[]>([]);
     const [originalLanguages, setOriginalLanguages] = useState<string[]>([]);
 
@@ -48,7 +45,6 @@ export default function StudentEditForm() {
     const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
 
     useEffect(() => {
-        // Logiku spustíme jen jednou díky `!hasFetched`
         if (user && !hasFetched) {
             setLoading(true);
             Promise.all([
@@ -60,13 +56,11 @@ export default function StudentEditForm() {
                 
                 const skillIds = skillsRes.data?.map(s => s.skill_id) || [];
                 setSelectedSkills(skillIds);
-                setOriginalSkills(skillIds); // Uložíme si původní stav
-
+                setOriginalSkills(skillIds); 
                 const langIds = languagesRes.data?.map(l => l.language_id) || [];
                 setSelectedLanguages(langIds);
-                setOriginalLanguages(langIds); // Uložíme si původní stav
-
-                setHasFetched(true); // Označíme, že máme načteno
+                setOriginalLanguages(langIds); 
+                setHasFetched(true); 
                 setLoading(false);
             });
         }
@@ -82,7 +76,7 @@ export default function StudentEditForm() {
             showToast(`Chyba: ${error.message}`, 'error');
         } else {
             showToast('Profil byl úspěšně uložen!', 'success');
-            refetchProfile(); // Toto můžeš nechat, refreshuje základní data v kontextu
+            refetchProfile();
             reset({}, { keepValues: true }); 
         }
     };
@@ -93,11 +87,9 @@ export default function StudentEditForm() {
         const originalSet = new Set(originalSkills);
         const newSet = new Set(selectedSkills);
 
-        // Oprava TypeScript chyby: explicitně definujeme typ 'id'
         const skillsToAdd = selectedSkills.filter((id: string) => !originalSet.has(id));
         const skillsToRemove = originalSkills.filter((id: string) => !newSet.has(id));
 
-        // Oprava TypeScript chyby: 'error' je typu 'Error'
         try {
             if (skillsToRemove.length > 0) {
                 const { error } = await supabase.from('StudentSkill').delete().eq('student_id', user.id).in('skill_id', skillsToRemove);
@@ -110,9 +102,9 @@ export default function StudentEditForm() {
     }
             
             showToast('Dovednosti byly úspěšně uloženy!', 'success');
-            setOriginalSkills(selectedSkills); // Aktualizujeme "původní stav"
+            setOriginalSkills(selectedSkills); 
             refetchProfile();
-        } catch (error: unknown) { // Použijeme 'unknown' místo 'any'
+        } catch (error: unknown) { 
             showToast(`Chyba při ukládání dovedností: ${(error as Error).message}`, 'error');
         }
     };
@@ -138,7 +130,7 @@ export default function StudentEditForm() {
             }
 
             showToast('Jazyky byly úspěšně uloženy!', 'success');
-            setOriginalLanguages(selectedLanguages); // Aktualizujeme "původní stav"
+            setOriginalLanguages(selectedLanguages);
             refetchProfile();
         } catch (error: unknown) {
             showToast(`Chyba při ukládání jazyků: ${(error as Error).message}`, 'error');
@@ -177,7 +169,7 @@ export default function StudentEditForm() {
                                 <label htmlFor="first_name" className="block mb-1 font-semibold text-[var(--barva-tmava)]">Jméno</label>
                                 <input id="first_name" {...register('first_name')} className="input !font-normal" />
                             </div>
-                             <div>
+                            <div>
                                 <label htmlFor="last_name" className="block mb-1 font-semibold text-[var(--barva-tmava)]">Příjmení</label>
                                 <input id="last_name" {...register('last_name')} className="input !font-normal" />
                             </div>
@@ -212,7 +204,6 @@ export default function StudentEditForm() {
                             <EditSocialLinks register={register} />
                         </>
                     )}
-
                     {(activeTab === 'personal' || activeTab === 'links') && (
                         <div className="pt-4">
                             <button type="submit" disabled={!isDirty || isSubmitting} className="px-5 py-2 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-300 disabled:cursor-not-allowed">

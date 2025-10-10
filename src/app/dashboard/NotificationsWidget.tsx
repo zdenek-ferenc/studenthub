@@ -34,7 +34,6 @@ export default function NotificationsWidget() {
     const { user } = useAuth();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
-    // --- ZMĚNA ZDE: Přidána "pojistka" i sem ---
     const [hasFetched, setHasFetched] = useState(false);
 
     useEffect(() => {
@@ -54,7 +53,6 @@ export default function NotificationsWidget() {
                     setNotifications(data as Notification[]);
                 }
                 setLoading(false);
-                // --- ZMĚNA ZDE: Označíme, že máme načteno ---
                 setHasFetched(true);
             };
 

@@ -24,7 +24,6 @@ const ChoiceSection = ({
     className?: string 
 }) => (
     <Link href={href} className={`relative flex flex-col justify-center items-center text-white text-center p-4 overflow-hidden group ${className}`}>
-        {/* Animované pozadí */}
         <div className={`absolute inset-0 z-0 ${animationClass}`}>
             <Image
                 src={bgImage}
@@ -56,7 +55,7 @@ const ChoiceSection = ({
 
 
 export default function RegisterChoicePage() {
-  return (
+return (
     <div className="flex flex-col md:flex-row h-screen bg-[var(--barva-tmava)]">
         <ChoiceSection 
             href="/register/student"
@@ -79,5 +78,5 @@ export default function RegisterChoicePage() {
             className="w-full md:w-1/2 h-1/2 md:h-full"
         />
     </div>
-  );
+);
 }

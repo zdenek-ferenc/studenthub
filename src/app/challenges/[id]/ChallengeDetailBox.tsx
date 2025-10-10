@@ -38,8 +38,8 @@ const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
     <div className="flex items-baseline gap-4">
       {rewards.map(({ place, amount }) => (
         <div key={place} className="text-center">
-           <span className="text-sm sm:text-base font-semibold text-[var(--barva-podtext)] block">{place}</span>
-           <span className="font-bold text-base sm:text-lg text-[var(--barva-tmava)]">{amount?.toLocaleString('cs-CZ')} Kč</span>
+          <span className="text-sm sm:text-base font-semibold text-[var(--barva-podtext)] block">{place}</span>
+          <span className="font-bold text-base sm:text-lg text-[var(--barva-tmava)]">{amount?.toLocaleString('cs-CZ')} Kč</span>
         </div>
       ))}
     </div>
@@ -48,7 +48,6 @@ const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
 
 export default function ChallengeDetailBox({ challenge }: { challenge: Challenge }) {
   const [isDetailsVisible, setIsDetailsVisible] = useState(false);
-
   return (
     <div className="p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl shadow-xs bg-white">
       <div className="bg-white px-4 pt-6 sm:px-10 sm:pt-10 rounded-xl sm:rounded-2xl">
@@ -67,7 +66,6 @@ export default function ChallengeDetailBox({ challenge }: { challenge: Challenge
           <p className="font-semibold text-gray-700 text-sm sm:text-base">{challenge.StartupProfile?.company_name}</p>
           <h1 className="text-2xl sm:text-3xl font-bold text-[var(--barva-tmava)] -mt-1">{challenge.title}</h1>
         </div>
-
         <div className="mt-6 flex flex-col justify-center items-center">
           <p className="text-center text-base sm:text-lg font-semibold text-[var(--barva-tmava)] mb-3">Dovednosti</p>
           <div className="flex flex-wrap justify-center gap-2 max-w-2/3">
@@ -78,14 +76,12 @@ export default function ChallengeDetailBox({ challenge }: { challenge: Challenge
             ))}
           </div>
         </div>
-
         <div className="flex justify-center items-baseline gap-8 text-center mt-8">
           <div className='flex items-center flex-col gap-2'>
             <p className="text-base sm:text-lg font-semibold text-[var(--barva-tmava)]">Odměna:</p>
             <RewardsDisplay challenge={challenge} />
           </div>
         </div>
-
         <div className="mt-8 border-t border-gray-200">
         <button 
         onClick={() => setIsDetailsVisible(!isDetailsVisible)} 

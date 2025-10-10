@@ -8,7 +8,12 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Star, ThumbsDown, ArrowLeft } from 'lucide-react';
 
 type AnonymousSubmission = Submission & { anonymousId: string };
-type ChallengeForWinners = { reward_first_place: number | null; reward_second_place: number | null; reward_third_place: number | null; };
+type ChallengeForWinners = { 
+    reward_first_place: number | null; 
+    reward_second_place: number | null; 
+    reward_third_place: number | null; 
+    number_of_winners: number | null; 
+};
 type ContainerId = 'shortlist' | 'place1' | 'place2' | 'place3';
 
 const FinalistItem = ({ submission, isOverlay = false }: { submission: AnonymousSubmission, isOverlay?: boolean }) => (
@@ -39,7 +44,8 @@ const WinnerDropzone = ({ place, submission, reward }: { place: 1 | 2 | 3, submi
     return (
         <div ref={setNodeRef} className={`p-4 rounded-2xl border-2 border-dashed h-28 flex flex-col justify-center items-center transition-colors ${placeColors[place]} ${isOver ? 'bg-opacity-50 scale-[1.02]' : ''}`}>
             <p className="font-bold text-lg text-gray-700">{place}. Místo</p>
-            <p className="text-sm text-gray-500 mb-2">{reward ? `${reward} Kč` : 'Nefinanční odměna'}</p>
+            {/* Zobrazíme odměnu, jen pokud je finanční */}
+            {reward ? <p className="text-sm text-gray-500 mb-2">{reward} Kč</p> : <p className="text-sm text-gray-500 mb-2">Nefinanční odměna</p>}
             <SortableContext items={items} strategy={verticalListSortingStrategy}>
                 <div className="w-full px-2">{submission && <SortableFinalistItem submission={submission} />}</div>
             </SortableContext>
@@ -60,14 +66,26 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
         const unplaced = submissions.filter(s => !placedIds.includes(s.id));
         setShortlist(unplaced.sort((a, b) => (b.rating || 0) - (a.rating || 0)));
     }, [submissions, place1, place2, place3]);
-
+    
     const winnerSlots = useMemo(() => {
         const slots: (1 | 2 | 3)[] = [];
         if (challenge.reward_first_place !== null) slots.push(1);
         if (challenge.reward_second_place !== null) slots.push(2);
         if (challenge.reward_third_place !== null) slots.push(3);
+
+        // Pokud není finanční a máme počet vítězů, použijeme ten
+        if (slots.length === 0 && challenge.number_of_winners) {
+            for (let i = 1; i <= challenge.number_of_winners; i++) {
+                slots.push(i as 1 | 2 | 3);
+            }
+        }
+        if (slots.length === 0) {
+            return [1];
+        }
+
         return slots;
     }, [challenge]);
+    // --- KONEC OPRAVY ---
     
     const findContainer = (id: string): ContainerId | undefined => {
         if (place1.some(item => item.id === id)) return 'place1';
@@ -175,4 +193,3 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
         </DndContext>
     );
 }
-
