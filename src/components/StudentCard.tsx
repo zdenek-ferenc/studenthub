@@ -2,11 +2,10 @@
 
 import { CheckCircle, Trophy } from 'lucide-react';
 import Image from 'next/image';
-import { useMemo, useState, useEffect } from 'react'; // Přidán import
+import { useMemo, useState, useEffect } from 'react'; 
 import Link from 'next/link';
-import { supabase } from '../lib/supabaseClient'; // Přidán import
+import { supabase } from '../lib/supabaseClient'; 
 
-// Původní, jednoduchý typ pro studenta
 type Skill = {
   id: string;
   name: string;
@@ -30,7 +29,6 @@ const getInitials = (firstName: string, lastName:string) => {
   return `${firstName?.charAt(0) ?? ''}${lastName?.charAt(0) ?? ''}`.toUpperCase();
 };
 
-// Funkce pro správné skloňování
 const formatChallengeText = (count: number, type: 'completed' | 'won') => {
     const nouns = {
       completed: { one: 'hotová výzva', few: 'hotové výzvy', other: 'hotových výzev' },
@@ -46,7 +44,6 @@ const formatChallengeText = (count: number, type: 'completed' | 'won') => {
 
 
 export default function StudentCard({ student }: StudentCardProps) {
-  // --- ZMĚNA ZDE: Nový stav pro ukládání statistik ---
   const [stats, setStats] = useState<{ completed: number; won: number } | null>(null);
 
   const sortedSkills = useMemo(() => {
@@ -115,14 +112,20 @@ export default function StudentCard({ student }: StudentCardProps) {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mb-5 text-sm font-medium text-gray-500">
-            <div className="flex items-center gap-1.5">
-              <CheckCircle className="text-green-500" size={18} />
-              <span>{completedChallenges} hotové výzvy</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Trophy className="text-amber-500" size={18} />
-              <span>{wonChallenges} vyhraná výzva</span>
-            </div>
+            {stats ? (
+              <div className='flex flex-col gap-4'>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle className="text-green-500" size={18} />
+                  <span>{formatChallengeText(stats.completed, 'completed')}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Trophy className="text-amber-500" size={18} />
+                  <span>{formatChallengeText(stats.won, 'won')}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="h-5 bg-gray-200 rounded-md animate-pulse w-3/4"></div>
+            )}
           </div>
           
           <div className="flex flex-wrap items-start content-start gap-2 mb-6 h-auto overflow-hidden">
@@ -141,7 +144,7 @@ export default function StudentCard({ student }: StudentCardProps) {
           </div>
           
           <div className="mt-auto pt-4 border-t border-gray-100 flex justify-center">
-            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-3xl group-hover:opacity-90 transition-opacity">
+            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-2xl group-hover:opacity-90 transition-opacity">
               Profil studenta
             </div>
           </div>
