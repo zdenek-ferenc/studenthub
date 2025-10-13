@@ -90,7 +90,7 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
     }, [dropdownRef]);
     const isActive = pathname.startsWith('/profile');
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative bg-white rounded-full" ref={dropdownRef}>
             <button onClick={() => setIsOpen(!isOpen)} className={`w-12 h-12 rounded-full bg-gradient-to-b from-[#86C5FF]/30 to-[#86C5FF]/55 text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer text-lg hover:shadow-md transition-all ease-in duration-300 ${isActive ? 'ring-3 ring-[var(--barva-primarni)] leading-none' : ''}`}>{initials}</button>
             <div className={`absolute right-0 pt-2 transition-opacity duration-200 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                 <div className="w-48 bg-white rounded-xl shadow-lg z-10">
@@ -117,7 +117,7 @@ function NotificationBell() {
     return (
         <div className="relative" ref={notificationRef}>
             <button onClick={onBellClick} className="relative p-2 rounded-full cursor-pointer transition-colors"><Bell className="w-6 h-6 text-gray-500 hover:text-[var(--barva-primarni)] transition-all ease-in duration-100" />{unreadCount > 0 && (<span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>)}</button>
-            {isOpen && (<div className="absolute right-0 mt-2 w-80 rounded-xl shadow-lg z-20 bg-white border border-gray-100"><div className="py-2 px-4 rounded-t-xl font-semibold text-gray-800 border-b">Notifikace</div><div className="flex flex-col">{isLoading ? (<p className="p-4 text-sm text-gray-500">Načítám...</p>) : notifications.length > 0 ? (notifications.map(notif => (<Link key={notif.id} href={notif.link_url} onClick={() => setIsOpen(false)} className="p-4 text-sm text-gray-700 hover:bg-gray-50 border-b last:border-b-0">{notif.message}</Link>))) : (<p className="p-4 text-sm text-gray-500">Zatím žádné novinky.</p>)}</div><div className="p-2 bg-gray-50 flex justify-center items-center rounded-b-xl leading-none"><Link href="/notifications" onClick={() => setIsOpen(false)} className="text-sm font-semibold text-[var(--barva-primarni)]">Zobrazit všechny</Link></div></div>)}
+            {isOpen && (<div className="absolute right-0 mt-2 w-80 rounded-xl shadow-lg z-20 bg-white border border-gray-100"><div className="py-2 px-4 rounded-t-xl font-semibold text-white bg-[var(--barva-primarni)] border-b border-[var(--barva-primarni2)]">Notifikace</div><div className="flex flex-col">{isLoading ? (<p className="p-4 text-sm text-gray-500">Načítám...</p>) : notifications.length > 0 ? (notifications.map(notif => (<Link key={notif.id} href={notif.link_url} onClick={() => setIsOpen(false)} className="p-4 text-sm text-gray-700 hover:bg-[var(--barva-primarni2)] border-b border-[var(--barva-primarni2)] last:border-b-0">{notif.message}</Link>))) : (<p className="p-4 text-sm text-gray-500">Zatím žádné novinky.</p>)}</div><div className="p-2 bg-gray-50 flex justify-center items-center rounded-b-xl leading-none"><Link href="/notifications" onClick={() => setIsOpen(false)} className="text-sm font-semibold text-[var(--barva-primarni)]">Zobrazit všechny</Link></div></div>)}
         </div>
     );
 }

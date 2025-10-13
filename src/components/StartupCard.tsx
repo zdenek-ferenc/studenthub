@@ -63,18 +63,17 @@ export default function StartupCard({ startup }: StartupCardProps) {
             {startup.website && <p className="text-sm text-blue-500 hover:underline">{startup.website}</p>}
           </div>
         </div>
-        <p className="text-gray-600 text-sm mb-5 line-clamp-3 flex-grow">
-          {startup.description || 'Tento startup zatím nepřidal žádný popis.'}
-        </p>
         <div className="flex items-center gap-2 sm:gap-4 mb-5 text-xs md:text-sm font-medium text-gray-500">
-          <div className="flex items-center gap-1.5">
-            <Briefcase className="text-blue-500" size={18} />
-            <span>{formatChallengeText(activeChallenges, 'active')}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <CheckCircle className="text-green-500" size={18} />
-            <span>{formatChallengeText(completedChallenges, 'completed')}</span>
-          </div>
+          <div className='flex flex-col gap-4'>
+            <div className="flex items-center gap-1.5">
+              <Briefcase className="text-blue-500" size={18} />
+              <span>{formatChallengeText(activeChallenges, 'active')}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle className="text-green-500" size={18} />
+              <span>{formatChallengeText(completedChallenges, 'completed')}</span>
+            </div>
+          </div>    
         </div>
         <div className="flex flex-wrap items-center gap-2 mb-6">
           {startup.StartupCategory?.slice(0, 3).map(({ Category }) => (

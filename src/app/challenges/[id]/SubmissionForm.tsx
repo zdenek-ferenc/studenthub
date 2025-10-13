@@ -210,7 +210,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
 
   return (
     <>
-      <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-lg border border-gray-100 mt-8">
+      <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-xs border border-gray-100 mt-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-[var(--barva-tmava)] mb-6">
           {isSubmitted ? 'Tvoje odevzdané řešení' : 'Odevzdat řešení'}
         </h2>

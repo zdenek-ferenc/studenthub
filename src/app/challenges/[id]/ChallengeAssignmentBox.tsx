@@ -86,7 +86,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                 <p className="font-semibold text-gray-800">{challenge.StartupProfile?.company_name}</p>
                 <h1 className="text-3xl sm:text-4xl font-bold text-[var(--barva-tmava)]">{challenge.title}</h1>
             </div>
-            <div className="border-t border-b border-gray-100 py-6">
+            <div className="border-b border-gray-100 py-6">
                 <h2 className="text-lg sm:text-xl font-semibold text-[var(--barva-tmava)] mb-4">Potřebné dovednosti</h2>
                 <div className="flex flex-wrap gap-2">
                     {sortedSkills.map(({ Skill }) => {

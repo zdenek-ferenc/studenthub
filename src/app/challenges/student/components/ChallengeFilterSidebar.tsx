@@ -127,7 +127,7 @@ return (
                     {skillSearch ? 'Výsledky hledání' : (showAll ? 'Všechny dovednosti' : 'Populární dovednosti')}
                 </h4>
                 {!skillSearch && (
-                    <button onClick={() => setShowAll(!showAll)} className="text-xs font-bold text-[var(--barva-primarni)] hover:underline">
+                    <button onClick={() => setShowAll(!showAll)} className="text-xs font-bold text-[var(--barva-primarni)] hover:underline cursor-pointer">
                         {showAll ? 'Zobrazit méně' : 'Zobrazit vše'}
                     </button>
                 )}

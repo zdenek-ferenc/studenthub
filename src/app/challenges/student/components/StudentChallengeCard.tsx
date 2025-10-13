@@ -68,7 +68,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
             </div>
           </div>
         </div>
-        <p className="text-gray-600 mb-4 px-4 md:px-6 line-clamp-2 flex-grow min-h-[3em]">{challenge.short_description}</p>
+        <p className="text-gray-600 mb-3 px-4 text-sm md:text-base md:px-6 line-clamp-3 flex-grow min-h-[3em]">{challenge.short_description}</p>
         <div className="flex flex-wrap px-4 md:px-5 py-2 gap-2">
           {(
             [
@@ -101,7 +101,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
           )}
         </div>
       </div>
-      <div className="border-t border-gray-100 mt-4 pt-4 p-6 flex items-end justify-between">
+      <div className="border-t border-gray-100 mt-3 pt-4 p-6 flex items-end justify-between">
         <div className="grid grid-cols-2 gap-x-2 gap-y-1 lg:gap-x-4 lg:gap-y-2 text-sm text-gray-800 font-medium">
             <div className="flex items-center gap-2">
                 <Image src="/icons/users.svg" alt="" width={16} height={16} />
