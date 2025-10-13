@@ -36,7 +36,6 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        
         redirectTo: `${window.location.origin}/register/startup`,
       },
     });
@@ -80,22 +79,15 @@ export default function StartupRegistrationPage() {
     fetchInitialData();
   }, []);
 
-  
   const handleSocialSignIn = useCallback(async (sessionUser: User) => {
     const provider = sessionUser.app_metadata.provider;
-    
     if (provider && provider !== 'email') {
         const { data: existingUser } = await supabase.from('User').select('id').eq('id', sessionUser.id).single();
-
         if (!existingUser) {
-            
             const { error: userError } = await supabase.from('User').insert({ id: sessionUser.id, email: sessionUser.email, role: 'startup' });
-            if (userError) { setError("Nepodařilo se vytvořit hlavní záznam uživatele."); return; }
-
+            if (userError) { setError(`Chyba při vytváření záznamu User: ${userError.message}`); return; }
             const { error: profileError } = await supabase.from('StartupProfile').insert({ user_id: sessionUser.id, contact_email: sessionUser.email, registration_step: 2 });
-            if (profileError) { setError("Nepodařilo se vytvořit startupový profil."); return; }
-
-            
+            if (profileError) { setError(`Chyba při vytváření záznamu StartupProfile: ${profileError.message}`); return; }
             await refetchProfile();
         }
     }
@@ -119,7 +111,7 @@ export default function StartupRegistrationPage() {
         email,
         password,
         options: {
-            data: { role: 'startup' }, 
+            data: { role: 'startup' },
             emailRedirectTo: `${window.location.origin}/`
         }
     });
