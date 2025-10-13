@@ -87,24 +87,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [getSessionAndProfile]);
 
   useEffect(() => {
-    
     if (loading) {
       return;
     }
+
+    // Paths that are always allowed, even with incomplete registration
+    const allowedPaths = ['/login', '/register', '/welcome'];
+    const isOnAllowedPath = allowedPaths.some(path => pathname.startsWith(path));
+
     if (profile) {
-      const registration_step = profile.registration_step;
-      const isRegistrationIncomplete = registration_step && registration_step < 6; 
-      const isOnRegistrationPage = pathname.startsWith('/register');
-      
-      if (isRegistrationIncomplete && !isOnRegistrationPage) {
-        
-        if (profile.role === 'student') {
-          router.push('/register/student');
-        } else if (profile.role === 'startup') {
-          router.push('/register/startup');
-        }
+      // User is logged in, check their registration status
+      const step = profile.registration_step;
+      const isRegistrationIncomplete = step && step < 6; // Assuming 6 is the "completed" state
+
+      if (isRegistrationIncomplete && !isOnAllowedPath) {
+        // If registration is incomplete and they try to access a protected page,
+        // force them back to the correct registration flow.
+        const redirectPath = profile.role === 'student' ? '/register/student' : '/register/startup';
+        router.push(redirectPath);
       }
     }
+    // If there's no profile (user not logged in), we do nothing.
+    // The `withAuth` HOC will handle redirecting protected pages to /login.
   }, [profile, loading, pathname, router]);
   
   const refetchProfile = useCallback(() => {
