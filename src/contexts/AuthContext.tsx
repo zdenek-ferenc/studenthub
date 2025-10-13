@@ -5,23 +5,20 @@ import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
-
 export type Profile = {
   id: string;
   email: string;
   role: 'student' | 'startup' | 'admin';
-  registration_step?: number; 
-  StudentProfile?: { registration_step: number }[]; 
-  StartupProfile?: { registration_step: number }[]; 
+  registration_step?: number;
+  StudentProfile?: { registration_step: number }[];
+  StartupProfile?: { registration_step: number }[];
 };
-
 
 export type Toast = {
   id: number;
   message: string;
   type: 'success' | 'error';
 };
-
 
 type AuthContextType = {
   user: User | null;
@@ -45,7 +42,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   const getSessionAndProfile = useCallback(async () => {
-    
     const { data: { session } } = await supabase.auth.getSession();
     const currentUser = session?.user ?? null;
     setUser(currentUser);
@@ -60,36 +56,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         `)
         .eq('id', currentUser.id)
         .single();
-
+      
       if (userProfile) {
-          const registration_step = userProfile.role === 'student'
-              ? userProfile.StudentProfile?.[0]?.registration_step
-              : userProfile.StartupProfile?.[0]?.registration_step;
-          
-          const finalProfile = { ...userProfile, registration_step } as Profile;
-          setProfile(finalProfile);
-          
-          const isRegistrationIncomplete = registration_step && registration_step < 6;
-          const isOnRegistrationPage = pathname.startsWith('/register');
-          
-          if (isRegistrationIncomplete && !isOnRegistrationPage) {
-              if (finalProfile.role === 'student') {
-                  router.push('/register/student');
-              } else if (finalProfile.role === 'startup') {
-                  router.push('/register/startup');
-              }
-          }
+        const registration_step = userProfile.role === 'student'
+            ? userProfile.StudentProfile?.[0]?.registration_step
+            : userProfile.StartupProfile?.[0]?.registration_step;
+        
+        const finalProfile = { ...userProfile, registration_step } as Profile;
+        setProfile(finalProfile);
+      } else {
+        setProfile(null);
       }
+    } else {
+      setProfile(null);
     }
+    
     setLoading(false);
-  }, [router, pathname]);
+  }, []);
 
   useEffect(() => {
-    
     getSessionAndProfile();
-    
+
     const { data: authListener } = supabase.auth.onAuthStateChange(() => {
-        
         getSessionAndProfile();
     });
 
@@ -97,18 +85,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authListener.subscription.unsubscribe();
     };
   }, [getSessionAndProfile]);
+
+  useEffect(() => {
+    
+    if (loading) {
+      return;
+    }
+    if (profile) {
+      const registration_step = profile.registration_step;
+      const isRegistrationIncomplete = registration_step && registration_step < 6; 
+      const isOnRegistrationPage = pathname.startsWith('/register');
+      
+      if (isRegistrationIncomplete && !isOnRegistrationPage) {
+        
+        if (profile.role === 'student') {
+          router.push('/register/student');
+        } else if (profile.role === 'startup') {
+          router.push('/register/startup');
+        }
+      }
+    }
+  }, [profile, loading, pathname, router]);
+  
   const refetchProfile = useCallback(() => {
     getSessionAndProfile();
   }, [getSessionAndProfile]);
 
   const showToast = useCallback((message: string, type: 'success' | 'error') => {
-    const newToast = {
-      id: Date.now(),
-      message,
-      type,
-    };
+    const newToast = { id: Date.now(), message, type };
     setToasts((prevToasts) => [...prevToasts, newToast]);
-
     setTimeout(() => {
       setToasts((currentToasts) => currentToasts.filter((toast) => toast.id !== newToast.id));
     }, 4000);
