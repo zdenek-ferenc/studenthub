@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabaseClient';
-import { Provider } from '@supabase/supabase-js';
+import { Session, User, Provider } from '@supabase/supabase-js';
 import { useAuth } from '../../../contexts/AuthContext';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
@@ -37,7 +37,7 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/register/student`,
       },
     });
   };
@@ -51,7 +51,7 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
 };
 
 export default function StudentRegistrationPage() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, refetchProfile } = useAuth();
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -67,98 +67,142 @@ export default function StudentRegistrationPage() {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      if (allSkills.length === 0 || allLanguages.length === 0) {
-        setInitialDataLoading(true);
-        try {
-          const [skillsRes, languagesRes] = await Promise.all([
-            supabase.from('Skill').select('id, name').order('name', { ascending: true }),
-            supabase.from('Language').select('id, name').order('name', { ascending: true })
-          ]);
-          if (skillsRes.error) throw skillsRes.error;
-          if (languagesRes.error) throw languagesRes.error;
-          setAllSkills(skillsRes.data || []);
-          setAllLanguages(languagesRes.data || []);
-        } catch (error) {
-          console.error("Chyba při přednačítání dat pro registraci:", error);
-        } finally {
-          setInitialDataLoading(false);
-        }
-      } else {
+      if (!initialDataLoading) return;
+      try {
+        const [skillsRes, languagesRes] = await Promise.all([
+          supabase.from('Skill').select('id, name').order('name', { ascending: true }),
+          supabase.from('Language').select('id, name').order('name', { ascending: true })
+        ]);
+        if (skillsRes.data) setAllSkills(skillsRes.data);
+        if (languagesRes.data) setAllLanguages(languagesRes.data);
+      } catch (error) {
+        console.error("Chyba při načítání dat:", error);
+      } finally {
         setInitialDataLoading(false);
       }
     };
     fetchInitialData();
-  }, [allSkills.length, allLanguages.length]);
+  }, [initialDataLoading]);
+
+  
+  const handleUserSignedIn = useCallback(async (sessionUser: User) => {
+      const { data: existingUser } = await supabase.from('User').select('id, role').eq('id', sessionUser.id).single();
+
+      if (existingUser) {
+          
+          refetchProfile(); 
+          return;
+      }
+      
+      
+      const { error: userError } = await supabase.from('User').insert({ id: sessionUser.id, email: sessionUser.email, role: 'student' });
+      if (userError) {
+          setError("Nepodařilo se vytvořit hlavní záznam uživatele.");
+          return;
+      }
+
+      const { error: profileError } = await supabase.from('StudentProfile').insert({ user_id: sessionUser.id, registration_step: 2, level: 1, xp: 0 });
+      if (profileError) {
+          setError("Nepodařilo se vytvořit studentský profil.");
+          return;
+      }
+
+      
+      refetchProfile();
+  }, [refetchProfile]);
+
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        
+        if (event === 'SIGNED_IN' && session?.user) {
+            
+            const { data: userProfile } = await supabase.from('User').select('id').eq('id', session.user.id).single();
+            if (!userProfile) {
+                await handleUserSignedIn(session.user);
+            }
+        }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [handleUserSignedIn]);
+
 
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
-
+    
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`
+        emailRedirectTo: `${window.location.origin}/register/student`
       }
     });
 
     if (signUpError) {
-      if (signUpError.message.includes('User already registered')) {
-        setError("Uživatel s tímto e-mailem již existuje. Zkuste se přihlásit.");
-      } else {
-        setError(signUpError.message);
-      }
+        if (signUpError.message.includes("User already registered")) {
+            setError("Uživatel s tímto e-mailem již existuje. Zkuste se přihlásit.");
+        } else {
+            setError("Registrace se nezdařila. Zkuste to prosím znovu.");
+        }
+    } else {
+      setIsModalOpen(true);
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleNextStep = async (formData: FormData) => {
+    if (!user || !profile) return;
+    setIsSubmitting(true);
+    const nextStep = (profile.registration_step || 1) + 1;
+    let updateError;
+
+    
+    switch(profile.registration_step) {
+        case 2:
+            ({ error: updateError } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id));
+            break;
+        case 3:
+            ({ error: updateError } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id));
+            break;
+        case 4:
+            if (formData.skills) {
+                await supabase.from('StudentSkill').delete().eq('student_id', user.id);
+                const skillsToInsert = formData.skills.map(skillId => ({ student_id: user.id, skill_id: skillId, level: 1, xp: 0 }));
+                if (skillsToInsert.length > 0) ({ error: updateError } = await supabase.from('StudentSkill').insert(skillsToInsert));
+            }
+            break;
+        case 5:
+            if (formData.languages) {
+                await supabase.from('StudentLanguage').delete().eq('student_id', user.id);
+                const languagesToInsert = formData.languages.map(langId => ({ student_id: user.id, language_id: langId }));
+                if (languagesToInsert.length > 0) ({ error: updateError } = await supabase.from('StudentLanguage').insert(languagesToInsert));
+            }
+            break;
+    }
+
+    if (updateError) {
+      alert('Něco se pokazilo: ' + updateError.message);
       setIsSubmitting(false);
       return;
     }
-    
-    setIsModalOpen(true); // Show confirmation modal
+
+    const { error: stepError } = await supabase.from('StudentProfile').update({ registration_step: nextStep }).eq('user_id', user.id);
+    if (stepError) {
+      alert('Chyba při ukládání postupu: ' + stepError.message);
+    } else if (nextStep >= 6) {
+      router.push('/dashboard'); 
+    }
+    refetchProfile();
     setIsSubmitting(false);
   };
-  
-    const handleNextStep = async (formData: FormData) => {
-        if (!user || !profile) return;
-        setIsSubmitting(true);
-        let error;
-        const nextStep = (profile.registration_step || 1) + 1;
-        const currentStep = profile.registration_step;
 
-        // Determine which update to perform based on the current step
-        if (currentStep === 2) { 
-            ({ error } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id));
-        } else if (currentStep === 3) {
-            ({ error } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id)); 
-        } else if (currentStep === 4 && formData.skills) {
-          await supabase.from('StudentSkill').delete().eq('student_id', user.id);
-          const skillsToInsert = formData.skills.map((skillId: string) => ({ student_id: user.id, skill_id: skillId, level: 1, xp: 0 }));
-          if (skillsToInsert.length > 0) ({ error } = await supabase.from('StudentSkill').insert(skillsToInsert));
-        } else if (currentStep === 5 && formData.languages) {
-          await supabase.from('StudentLanguage').delete().eq('student_id', user.id);
-          const languagesToInsert = formData.languages.map((langId: string) => ({ student_id: user.id, language_id: langId }));
-          if (languagesToInsert.length > 0) ({ error } = await supabase.from('StudentLanguage').insert(languagesToInsert));
-        }
-        
-        if (error) {
-          alert('Něco se pokazilo: ' + error.message);
-          setIsSubmitting(false);
-          return;
-        }
-
-        // Update registration step
-        const { error: stepError } = await supabase.from('StudentProfile').update({ registration_step: nextStep }).eq('user_id', user.id);
-
-        if (stepError) {
-            alert('Chyba při ukládání postupu: ' + stepError.message);
-        } else if (nextStep > 5) {
-            router.push('/');
-        }
-        // AuthContext will automatically update the profile and trigger re-render
-        setIsSubmitting(false);
-  };
-  
   const renderStep = () => {
-    if (!profile) return <LoadingSpinner />;
+    if (!profile) return <div className="py-20"><LoadingSpinner /></div>;
     
     switch (profile.registration_step) {
       case 2: return <Step1_PersonalInfo onNext={handleNextStep} />;
@@ -166,18 +210,17 @@ export default function StudentRegistrationPage() {
       case 4: return <Step3_Skills onNext={handleNextStep} allSkills={allSkills} isLoading={initialDataLoading} />;
       case 5: return <Step4_Languages onNext={handleNextStep} allLanguages={allLanguages} isLoading={initialDataLoading} />;
       default:
-        // If registration is complete, redirect away
         if (profile.registration_step && profile.registration_step >= 6) {
-            router.push('/');
-            return <LoadingSpinner />;
+            router.push('/dashboard');
+            return <div className="py-20"><LoadingSpinner /></div>;
         }
         return <p>Načítání kroku registrace...</p>;
     }
   };
-  
-    if (authLoading) return <div className="py-20"><LoadingSpinner /></div>;
-  
-    return (
+
+  if (authLoading) return <div className="py-20"><LoadingSpinner /></div>;
+
+  return (
     <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4 py-10 md:py-32">
       {user && profile ? (
         <div className="w-full">

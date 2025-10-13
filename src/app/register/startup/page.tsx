@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabaseClient';
-import { Provider } from '@supabase/supabase-js';
+import { Provider, Session, User } from '@supabase/supabase-js';
 import { useAuth } from '../../../contexts/AuthContext';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
@@ -36,7 +36,7 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/register/startup`,
       },
     });
   };
@@ -50,7 +50,7 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
 };
 
 export default function StartupRegistrationPage() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, refetchProfile } = useAuth();
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -65,23 +65,60 @@ export default function StartupRegistrationPage() {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      if (allCategories.length === 0) {
-        setInitialDataLoading(true);
-        try {
-          const { data, error } = await supabase.from('Category').select('id, name').order('name', { ascending: true });
-          if (error) throw error;
-          setAllCategories(data || []);
-        } catch (error) {
-          console.error("Chyba při načítání kategorií:", error);
-        } finally {
-          setInitialDataLoading(false);
-        }
-      } else {
+      if(allCategories.length > 0) {
+        setInitialDataLoading(false);
+        return;
+      }
+      setInitialDataLoading(true);
+      try {
+        const { data, error } = await supabase.from('Category').select('id, name').order('name', { ascending: true });
+        if (error) throw error;
+        setAllCategories(data || []);
+      } catch (error) {
+        console.error("Chyba při načítání kategorií:", error);
+      } finally {
         setInitialDataLoading(false);
       }
     };
     fetchInitialData();
   }, [allCategories.length]);
+
+  const handleUserSignedIn = useCallback(async (sessionUser: User) => {
+    const { data: existingUser } = await supabase.from('User').select('id').eq('id', sessionUser.id).single();
+    if (existingUser) {
+        refetchProfile();
+        return;
+    }
+
+    const { error: userError } = await supabase.from('User').insert({ id: sessionUser.id, email: sessionUser.email, role: 'startup' });
+    if (userError) {
+        setError("Nepodařilo se vytvořit hlavní záznam uživatele.");
+        return;
+    }
+
+    const { error: profileError } = await supabase.from('StartupProfile').insert({ user_id: sessionUser.id, contact_email: sessionUser.email, registration_step: 2 });
+    if (profileError) {
+        setError("Nepodařilo se vytvořit startupový profil.");
+        return;
+    }
+    refetchProfile();
+  }, [refetchProfile]);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+            const { data: userProfile } = await supabase.from('User').select('id').eq('id', session.user.id).single();
+            if (!userProfile) {
+                await handleUserSignedIn(session.user);
+            }
+        }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [handleUserSignedIn]);
+
 
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,18 +129,18 @@ export default function StartupRegistrationPage() {
         email,
         password,
         options: {
-            emailRedirectTo: `${window.location.origin}/`
+            emailRedirectTo: `${window.location.origin}/register/startup`
         }
     });
 
     if (signUpError) {
-        if (signUpError.message.includes('User already registered')) {
+        if (signUpError.message.includes("User already registered")) {
             setError("Uživatel s tímto e-mailem již existuje. Zkuste se přihlásit.");
         } else {
-            setError(signUpError.message);
+            setError("Registrace se nezdařila. Zkuste to prosím znovu.");
         }
     } else {
-        setIsModalOpen(true);
+      setIsModalOpen(true);
     }
     setIsSubmitting(false);
   };
@@ -138,13 +175,14 @@ export default function StartupRegistrationPage() {
     if (stepError) {
         alert('Chyba při ukládání postupu: ' + stepError.message);
     } else if (nextStep > 5) {
-        router.push('/');
+        router.push('/dashboard');
     }
+    refetchProfile();
     setIsSubmitting(false);
   };
 
   const renderStep = () => {
-    if (!user || !profile) return <LoadingSpinner />;
+    if (!user || !profile) return <div className="py-20"><LoadingSpinner /></div>;
 
     switch (profile.registration_step) {
       case 2: return <Step1_CompanyInfo onNext={handleNextStep} />;
@@ -153,8 +191,8 @@ export default function StartupRegistrationPage() {
       case 5: return <Step4_LogoUpload onNext={handleNextStep} userId={user.id} />;
       default:
         if (profile.registration_step && profile.registration_step >= 6) {
-            router.push('/');
-            return <LoadingSpinner />;
+            router.push('/dashboard');
+            return <div className="py-20"><LoadingSpinner /></div>;
         }
         return <p>Načítání kroku registrace...</p>;
     }
