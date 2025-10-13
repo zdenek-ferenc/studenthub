@@ -1,25 +1,28 @@
 "use client";
 
-// Přidali jsme 'useEffect' a 'useCallback'
 import { createContext, useContext, useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
-// Typ pro profil zůstává stejný
+
 export type Profile = {
   id: string;
   email: string;
   role: 'student' | 'startup' | 'admin';
+  registration_step?: number; 
+  StudentProfile?: { registration_step: number }[]; 
+  StartupProfile?: { registration_step: number }[]; 
 };
 
-// Vylepšená definice pro Toast
+
 export type Toast = {
   id: number;
   message: string;
   type: 'success' | 'error';
 };
 
-// Aktualizovaný typ pro kontext
+
 type AuthContextType = {
   user: User | null;
   profile: Profile | null;
@@ -38,39 +41,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const getSessionAndProfile = useCallback(async () => {
-    setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    setUser(session?.user ?? null);
+  const router = useRouter();
+  const pathname = usePathname();
 
-    if (session?.user) {
+  const getSessionAndProfile = useCallback(async () => {
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    const currentUser = session?.user ?? null;
+    setUser(currentUser);
+
+    if (currentUser) {
       const { data: userProfile } = await supabase
         .from('User')
-        .select('*')
-        .eq('id', session.user.id)
+        .select(`
+          *,
+          StudentProfile(registration_step),
+          StartupProfile(registration_step)
+        `)
+        .eq('id', currentUser.id)
         .single();
-      setProfile(userProfile);
+
+      if (userProfile) {
+          const registration_step = userProfile.role === 'student'
+              ? userProfile.StudentProfile?.[0]?.registration_step
+              : userProfile.StartupProfile?.[0]?.registration_step;
+          
+          const finalProfile = { ...userProfile, registration_step } as Profile;
+          setProfile(finalProfile);
+          
+          const isRegistrationIncomplete = registration_step && registration_step < 6;
+          const isOnRegistrationPage = pathname.startsWith('/register');
+          
+          if (isRegistrationIncomplete && !isOnRegistrationPage) {
+              if (finalProfile.role === 'student') {
+                  router.push('/register/student');
+              } else if (finalProfile.role === 'startup') {
+                  router.push('/register/startup');
+              }
+          }
+      }
     }
     setLoading(false);
-  }, []);
+  }, [router, pathname]);
 
   useEffect(() => {
+    
     getSessionAndProfile();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        supabase.from('User').select('*').eq('id', session.user.id).single().then(({ data }) => setProfile(data));
-      } else {
-        setProfile(null);
-      }
+    
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+        
+        getSessionAndProfile();
     });
 
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, [getSessionAndProfile]);
-
   const refetchProfile = useCallback(() => {
     getSessionAndProfile();
   }, [getSessionAndProfile]);

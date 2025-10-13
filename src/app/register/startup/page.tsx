@@ -143,20 +143,32 @@ export default function StartupRegistrationPage() {
     }
   }, [router]);
 
+
   useEffect(() => {
     if (IS_DEVELOPMENT_MODE) {
         setLoading(false);
         return;
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (_event === 'SIGNED_IN' && session) {
-        await handleUserSignedIn(session);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setUser(session.user ?? null);
+        setSession(session);
+        handleUserSignedIn(session);
       }
       setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (_event === 'SIGNED_IN' && session) {
+        setUser(session.user ?? null);
+        setSession(session);
+        await handleUserSignedIn(session);
+      } else if (_event === 'SIGNED_OUT') {
+        setUser(null);
+        setSession(null);
+        setStep(1);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -249,17 +261,13 @@ export default function StartupRegistrationPage() {
     setLoading(false);
   };
 
-
   const renderStep = () => {
-    // Tato kontrola zajistí, že dál už `user` nemůže být `null`
-    if (!user) return <p>Chyba: Uživatel nebyl nalezen.</p>;
     
+    if (!user) return <p>Chyba: Uživatel nebyl nalezen.</p>;
     switch (step) {
       case 2: return <Step1_CompanyInfo onNext={handleNextStep} />;
       case 3: return <Step2_ContactPerson onNext={handleNextStep} />;
       case 4: return <Step3_Categories onNext={handleNextStep} allCategories={allCategories} isLoading={initialDataLoading} />;
-      // --- OPRAVA CHYBY ZDE ---
-      // Použijeme `user.id` - díky kontrole výše je to bezpečné
       case 5: return <Step4_LogoUpload onNext={handleNextStep} userId={user.id} />;
       default: return null;
     }
