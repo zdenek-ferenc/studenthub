@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabaseClient';
-import { Provider } from '@supabase/supabase-js';
+import { Provider, User } from '@supabase/supabase-js';
 import { useAuth } from '../../../contexts/AuthContext';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
@@ -90,14 +90,13 @@ export default function StudentRegistrationPage() {
     setIsSubmitting(true);
     
     const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        // The trigger will handle profile creation based on this role
+    email,
+    password,
+    options: {
         data: { role: 'student' },
-        emailRedirectTo: `${window.location.origin}/`
-      }
-    });
+        emailRedirectTo: `${window.location.origin}/register/student`
+    }
+});
 
     if (signUpError) {
       if (signUpError.message.includes("User already registered")) {
@@ -150,9 +149,31 @@ export default function StudentRegistrationPage() {
       } else if (nextStep >= 6) {
         router.push('/dashboard');
       }
-      refetchProfile(); // Tell AuthContext to get the new step number
+      refetchProfile();
       setIsSubmitting(false);
   };
+    const handleSocialSignIn = useCallback(async (sessionUser: User) => {
+    const provider = sessionUser.app_metadata.provider;
+    if (provider && provider !== 'email') {
+        const { data: existingUser } = await supabase.from('User').select('id').eq('id', sessionUser.id).single();
+        if (!existingUser) {
+            const { error: userError } = await supabase.from('User').insert({ id: sessionUser.id, email: sessionUser.email, role: 'student' });
+            if (userError) { setError(`Chyba při vytváření záznamu User: ${userError.message}`); return; }
+            const { error: profileError } = await supabase.from('StudentProfile').insert({ user_id: sessionUser.id, registration_step: 2 });
+            if (profileError) { setError(`Chyba při vytváření záznamu StudentProfile: ${profileError.message}`); return; }
+            await refetchProfile();
+        }
+    }
+  }, [refetchProfile]);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+            await handleSocialSignIn(session.user);
+        }
+    });
+    return () => subscription.unsubscribe();
+  }, [handleSocialSignIn]);
   
   const renderStep = () => {
     if (!profile) return <div className="py-20"><LoadingSpinner /></div>;
@@ -163,7 +184,6 @@ export default function StudentRegistrationPage() {
       case 4: return <Step3_Skills onNext={handleNextStep} allSkills={allSkills} isLoading={initialDataLoading} />;
       case 5: return <Step4_Languages onNext={handleNextStep} allLanguages={allLanguages} isLoading={initialDataLoading} />;
       default:
-        // AuthContext now handles redirection, but as a fallback:
         if (profile.registration_step && profile.registration_step >= 6) {
             router.push('/dashboard');
             return <div className="py-20"><LoadingSpinner /></div>;
@@ -181,7 +201,6 @@ export default function StudentRegistrationPage() {
           {renderStep()}
         </div>
       ) : (
-        // Login/Signup form
         <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="p-8 flex flex-col justify-center gap-12">
              <div>

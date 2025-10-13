@@ -108,13 +108,13 @@ export default function StartupRegistrationPage() {
     setError(null);
     setIsSubmitting(true);
     const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            data: { role: 'startup' },
-            emailRedirectTo: `${window.location.origin}/`
-        }
-    });
+    email,
+    password,
+    options: {
+        data: { role: 'startup' },
+        emailRedirectTo: `${window.location.origin}/register/startup`
+    }
+});
     if (signUpError) {
         setError(signUpError.message.includes("User already registered") ? "Uživatel s tímto e-mailem již existuje." : "Registrace se nezdařila.");
     } else {
