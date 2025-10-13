@@ -36,7 +36,7 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/register/startup`,
+        redirectTo: `${window.location.origin}/`,
       },
     });
   };
@@ -88,56 +88,32 @@ export default function StartupRegistrationPage() {
     setError(null);
     setIsSubmitting(true);
 
-    const { data: existingUser, error: checkError } = await supabase.from('User').select('email').eq('email', email).single();
-    if (checkError && checkError.code !== 'PGRST116') {
-        setError("Došlo k chybě při ověřování e-mailu.");
-        setIsSubmitting(false);
-        return;
-    }
-    if (existingUser) {
-      setError("Uživatel s tímto e-mailem již existuje. Zkuste se přihlásit.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-            data: { role: 'startup' },
             emailRedirectTo: `${window.location.origin}/`
         }
     });
 
     if (signUpError) {
-        setError(signUpError.message);
-    } else if (signUpData.user) {
-        const userId = signUpData.user.id;
-        const { error: userError } = await supabase.from('User').insert({ id: userId, email, role: 'startup' });
-        if (userError) {
-            setError("Nepodařilo se dokončit vytvoření účtu.");
-            setIsSubmitting(false);
-            return;
+        if (signUpError.message.includes('User already registered')) {
+            setError("Uživatel s tímto e-mailem již existuje. Zkuste se přihlásit.");
+        } else {
+            setError(signUpError.message);
         }
-
-        const { error: profileError } = await supabase.from('StartupProfile').insert({ user_id: userId, contact_email: email, registration_step: 2 });
-        if (profileError) {
-            setError("Nepodařilo se vytvořit profil.");
-            setIsSubmitting(false);
-            return;
-        }
-
+    } else {
         setIsModalOpen(true);
     }
     setIsSubmitting(false);
   };
   
   const handleNextStep = async (formData: Partial<FormData>) => {
-    if (!user) return;
+    if (!user || !profile) return;
     setIsSubmitting(true);
     let error;
-    const nextStep = (profile?.registration_step || 1) + 1;
-    const currentStep = profile?.registration_step;
+    const nextStep = (profile.registration_step || 1) + 1;
+    const currentStep = profile.registration_step;
 
     if (currentStep === 2) {
       ({ error } = await supabase.from('StartupProfile').update(formData).eq('user_id', user.id));
@@ -184,7 +160,7 @@ export default function StartupRegistrationPage() {
     }
   };
 
-  if (authLoading) return <LoadingSpinner />;
+  if (authLoading) return <div className="py-20"><LoadingSpinner /></div>;
 
   return (
     <div className="w-full min-h-screen flex py-5 md:py-32 items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
