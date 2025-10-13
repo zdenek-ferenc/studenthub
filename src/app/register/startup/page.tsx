@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabaseClient';
-import { Provider, Session, User } from '@supabase/supabase-js';
-import { useAuth } from '../../../contexts/AuthContext';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import { Session, User, Provider } from '@supabase/supabase-js';
 
 import Step1_CompanyInfo from './steps/Step1_CompanyInfo';
 import Step2_ContactPerson from './steps/Step2_ContactPerson';
@@ -16,6 +14,9 @@ import Step4_LogoUpload from './steps/Step4_LogoUpload';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 
 type Category = { id: string; name: string; };
+
+const IS_DEVELOPMENT_MODE = false; 
+const DEV_START_STEP = 2; 
 
 type FormData = {
   company_name?: string;
@@ -50,13 +51,15 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
 };
 
 export default function StartupRegistrationPage() {
-  const { user, profile, loading: authLoading, refetchProfile } = useAuth();
+  const [session, setSession] = useState<Session | null>(IS_DEVELOPMENT_MODE ? ({} as Session) : null);
+  const [user, setUser] = useState<User | null>(IS_DEVELOPMENT_MODE ? ({id: 'dev-user-startup'} as User) : null);
+  const [step, setStep] = useState(IS_DEVELOPMENT_MODE ? DEV_START_STEP : 1);
+  const [loading, setLoading] = useState(!IS_DEVELOPMENT_MODE);
   const router = useRouter();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEmailRegister, setShowEmailRegister] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -70,104 +73,226 @@ export default function StartupRegistrationPage() {
         const { data, error } = await supabase.from('Category').select('id, name').order('name', { ascending: true });
         if (error) throw error;
         setAllCategories(data || []);
-      } catch (err) {
-        console.error("Chyba při načítání kategorií:", err);
+      } catch (error) {
+        console.error("Chyba při načítání kategorií:", error);
       } finally {
         setInitialDataLoading(false);
       }
     };
-    fetchInitialData();
-  }, []);
-
-  const handleSocialSignIn = useCallback(async (sessionUser: User) => {
-    const provider = sessionUser.app_metadata.provider;
-    if (provider && provider !== 'email') {
-        const { data: existingUser } = await supabase.from('User').select('id').eq('id', sessionUser.id).single();
-        if (!existingUser) {
-            const { error: userError } = await supabase.from('User').insert({ id: sessionUser.id, email: sessionUser.email, role: 'startup' });
-            if (userError) { setError(`Chyba při vytváření záznamu User: ${userError.message}`); return; }
-            const { error: profileError } = await supabase.from('StartupProfile').insert({ user_id: sessionUser.id, contact_email: sessionUser.email, registration_step: 2 });
-            if (profileError) { setError(`Chyba při vytváření záznamu StartupProfile: ${profileError.message}`); return; }
-            await refetchProfile();
-        }
+    if ((session || IS_DEVELOPMENT_MODE) && allCategories.length === 0) {
+      fetchInitialData();
+    } else if (!session && !IS_DEVELOPMENT_MODE) {
+        setInitialDataLoading(false);
     }
-  }, [refetchProfile]);
+  }, [session, allCategories.length]);
+
+
+  const handleUserSignedIn = useCallback(async (session: Session) => {
+    const userId = session.user.id;
+    const userEmail = session.user.email;
+
+    const { data: existingUser } = await supabase
+      .from('User')
+      .select('id, role')
+      .eq('id', userId)
+      .single();
+
+    if (existingUser) {
+        if (existingUser.role !== 'startup') {
+            setError(`Účet s e-mailem ${userEmail} je již registrován s jinou rolí.`);
+            await supabase.auth.signOut();
+            return;
+        }
+
+        const { data: profile } = await supabase
+            .from('StartupProfile')
+            .select('registration_step')
+            .eq('user_id', userId)
+            .single();
+        
+        const currentStep = profile?.registration_step || 1;
+        if(currentStep > 5) {
+            router.push('/');
+        } else {
+            setStep(currentStep);
+        }
+
+    } else {
+        const { error: userError } = await supabase.from('User').insert({
+            id: userId,
+            email: userEmail,
+            role: 'startup'
+        });
+        if (userError) {
+            console.error("Chyba při vytváření záznamu v tabulce User:", userError);
+            setError("Nepodařilo se vytvořit uživatelský účet.");
+            return;
+        }
+        
+        const { error: profileError } = await supabase.from('StartupProfile').insert({
+            user_id: userId,
+            contact_email: userEmail,
+            registration_step: 2
+        });
+        if (profileError) {
+            console.error("Chyba při vytváření startup profilu:", profileError);
+            setError("Nepodařilo se vytvořit profil.");
+            return;
+        }
+        setStep(2);
+    }
+  }, [router]);
+
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-            await handleSocialSignIn(session.user);
-        }
-    });
-    return () => subscription.unsubscribe();
-  }, [handleSocialSignIn]);
+    if (IS_DEVELOPMENT_MODE) {
+        setLoading(false);
+        return;
+    };
 
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setUser(session.user ?? null);
+        setSession(session);
+        handleUserSignedIn(session);
+      }
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (_event === 'SIGNED_IN' && session) {
+        setUser(session.user ?? null);
+        setSession(session);
+        await handleUserSignedIn(session);
+      } else if (_event === 'SIGNED_OUT') {
+        setUser(null);
+        setSession(null);
+        setStep(1);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [handleUserSignedIn]);
 
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsSubmitting(true);
+    setLoading(true);
+
+    const { data: existingUser, error: checkError } = await supabase
+      .from('User')
+      .select('email')
+      .eq('email', email)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+        setError("Došlo k chybě při ověřování e-mailu.");
+        setLoading(false);
+        return;
+    }
+      
+    if (existingUser) {
+      setError("Uživatel s tímto e-mailem již existuje.");
+      setLoading(false);
+      return;
+    }
+
     const { error: signUpError } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-        data: { role: 'startup' },
-        emailRedirectTo: `${window.location.origin}/register/startup`
-    }
-});
+        email,
+        password,
+        options: {
+            emailRedirectTo: `${window.location.origin}/register/startup`
+        }
+    });
+
     if (signUpError) {
-        setError(signUpError.message.includes("User already registered") ? "Uživatel s tímto e-mailem již existuje." : "Registrace se nezdařila.");
+        setError("Registrace se nezdařila. Zkuste to prosím znovu.");
     } else {
-      setIsModalOpen(true);
+        setIsModalOpen(true);
     }
-    setIsSubmitting(false);
+    setLoading(false);
   };
   
   const handleNextStep = async (formData: Partial<FormData>) => {
-    if (!user || !profile) return;
-    setIsSubmitting(true);
-    const nextStep = (profile.registration_step || 1) + 1;
-    let updateError;
-    switch(profile.registration_step) {
-        case 2: case 3:
-            ({ error: updateError } = await supabase.from('StartupProfile').update(formData).eq('user_id', user.id)); break;
-        case 4:
-            if (formData.categories) {
-                await supabase.from('StartupCategory').delete().eq('startup_id', user.id);
-                const toInsert = formData.categories.map(catId => ({ startup_id: user.id, category_id: catId }));
-                if (toInsert.length > 0) ({ error: updateError } = await supabase.from('StartupCategory').insert(toInsert));
-            } break;
-        case 5:
-             if (formData.logo_url !== undefined) ({ error: updateError } = await supabase.from('StartupProfile').update({ logo_url: formData.logo_url }).eq('user_id', user.id)); break;
+    if (!user) return;
+    setLoading(true);
+    let error;
+    const nextStep = step + 1;
+
+    if (step === 2) {
+      ({ error } = await supabase.from('StartupProfile').update({
+          company_name: formData.company_name,
+          ico: formData.ico,
+          website: formData.website,
+          phone_number: formData.phone_number,
+          contact_email: formData.contact_email,
+          address: formData.address,
+      }).eq('user_id', user.id));
+    } else if (step === 3) {
+      ({ error } = await supabase.from('StartupProfile').update({
+          contact_first_name: formData.contact_first_name,
+          contact_last_name: formData.contact_last_name,
+          contact_position: formData.contact_position,
+      }).eq('user_id', user.id));
+    } else if (step === 4 && formData.categories) {
+        await supabase.from('StartupCategory').delete().eq('startup_id', user.id);
+        const toInsert = formData.categories.map((catId: string) => ({ startup_id: user.id, category_id: catId }));
+        if (toInsert.length > 0) ({ error } = await supabase.from('StartupCategory').insert(toInsert));
+    } else if (step === 5) {
+        ({ error } = await supabase.from('StartupProfile').update({ logo_url: formData.logo_url }).eq('user_id', user.id));
     }
-    if (updateError) { alert('Něco se pokazilo: ' + updateError.message); setIsSubmitting(false); return; }
+
+    if (error) {
+      alert('Něco se pokazilo: ' + error.message);
+      setLoading(false);
+      return;
+    }
+
     const { error: stepError } = await supabase.from('StartupProfile').update({ registration_step: nextStep }).eq('user_id', user.id);
-    if (stepError) { alert('Chyba při ukládání postupu: ' + stepError.message); } 
-    else if (nextStep >= 6) { router.push('/dashboard'); }
-    refetchProfile();
-    setIsSubmitting(false);
+
+    if (stepError) {
+        alert('Chyba při ukládání postupu: ' + stepError.message);
+    } else if (nextStep > 5) {
+        router.push('/');
+    } else {
+        setStep(nextStep);
+    }
+
+    setLoading(false);
   };
 
   const renderStep = () => {
-    if (!user || !profile) return <div className="py-20"><LoadingSpinner /></div>;
-    switch (profile.registration_step) {
+    
+    if (!user) return <p>Chyba: Uživatel nebyl nalezen.</p>;
+    switch (step) {
       case 2: return <Step1_CompanyInfo onNext={handleNextStep} />;
       case 3: return <Step2_ContactPerson onNext={handleNextStep} />;
       case 4: return <Step3_Categories onNext={handleNextStep} allCategories={allCategories} isLoading={initialDataLoading} />;
       case 5: return <Step4_LogoUpload onNext={handleNextStep} userId={user.id} />;
-      default:
-        if (profile.registration_step && profile.registration_step >= 6) { router.push('/dashboard'); }
-        return <p>Načítání kroku registrace...</p>;
+      default: return null;
     }
   };
 
-  if (authLoading) return <div className="py-20"><LoadingSpinner /></div>;
+  const handleDevPrev = () => setStep(prev => Math.max(2, prev - 1));
+  const handleDevNext = () => setStep(prev => Math.min(5, prev + 1));
+
+  if (loading && !IS_DEVELOPMENT_MODE) return <p>Načítání...</p>;
 
   return (
     <div className="w-full min-h-screen flex py-5 md:py-32 items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
-      {user && profile ? (
+      {IS_DEVELOPMENT_MODE || session ? (
         <div className="w-full">
           {renderStep()}
+          {IS_DEVELOPMENT_MODE && (
+            <div className="flex justify-center gap-24 my-12">
+              <button onClick={handleDevPrev} className="bg-[var(--barva-primarni)] text-white w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
+                🢀
+              </button>
+              <button onClick={handleDevNext} className="bg-[var(--barva-primarni)] text-white w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
+                🢂
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden">
@@ -177,6 +302,7 @@ export default function StartupRegistrationPage() {
                 <h1 className="text-3xl font-bold text-[var(--barva-tmava)]">Zaregistrujte svou firmu</h1>
                 <p className="text-gray-500 mt-2 text-sm">Najděte ty nejlepší talenty pro vaše projekty.</p>
               </div>
+
               <div className="mt-8 space-y-4">
                 {error && <p className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg">{error}</p>}
                 {!showEmailRegister ? (
@@ -192,14 +318,17 @@ export default function StartupRegistrationPage() {
                         <input type="email" placeholder="Firemní email" value={email} onChange={(e) => setEmail(e.target.value)} required className="input w-full" />
                         <input type="password" placeholder="Heslo (min. 6 znaků)" value={password} onChange={(e) => setPassword(e.target.value)} required className="input w-full" />
                         <div className='flex justify-center'>
-                          <button type="submit" disabled={isSubmitting} className="mt-3 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
-                              {isSubmitting ? 'Registruji...' : 'Vytvořit účet'}
+                          <button type="submit" disabled={loading} className="mt-3 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
+                              {loading ? 'Registruji...' : 'Vytvořit účet'}
                           </button>
                         </div>
+                        
                         <button type="button" onClick={() => setShowEmailRegister(false)} className="w-full text-sm text-gray-500 hover:underline">Zpět na ostatní možnosti</button>
                     </form>
                 )}
+                
               </div>
+
               <p className="text-center text-sm text-gray-600 mt-8">
                 Už máte účet?{' '}
                 <Link href="/login" className="font-semibold text-[var(--barva-primarni)] hover:underline">
@@ -208,6 +337,7 @@ export default function StartupRegistrationPage() {
               </p>
             </div>
           </div>
+
           <div className="hidden lg:block bg-[var(--barva-primarni)]">
               <Image 
                   src="/login2.png" 
@@ -219,13 +349,18 @@ export default function StartupRegistrationPage() {
           </div>
         </div>
       )}
+      
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={() => { setIsModalOpen(false); setShowEmailRegister(false); }}
+        onConfirm={() => {
+            setIsModalOpen(false);
+            setShowEmailRegister(false);
+        }}
         title="E-mail odeslán"
         message="Potvrzovací e-mail byl odeslán na vaši adresu. Zkontrolujte si prosím schránku a dokončete registraci."
       />
+
     </div>
   );
 }

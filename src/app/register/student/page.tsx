@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabaseClient';
-import { Provider, User } from '@supabase/supabase-js';
-import { useAuth } from '../../../contexts/AuthContext';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import { Session, User, Provider } from '@supabase/supabase-js';
 
 import Step1_PersonalInfo from './steps/Step1_PersonalInfo';
 import Step2_EducationInfo from './steps/Step2_EducationInfo';
@@ -17,6 +15,9 @@ import ConfirmationModal from '../../../components/ConfirmationModal';
 
 type Skill = { id: string; name: string; };
 type Language = { id: string; name: string; };
+
+const IS_DEVELOPMENT_MODE = false;
+const DEV_START_STEP = 2;
 
 type FormData = {
   first_name?: string;
@@ -51,13 +52,15 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
 };
 
 export default function StudentRegistrationPage() {
-  const { user, profile, loading: authLoading, refetchProfile } = useAuth();
+  const [session, setSession] = useState<Session | null>(IS_DEVELOPMENT_MODE ? ({} as Session) : null);
+  const [user, setUser] = useState<User | null>(IS_DEVELOPMENT_MODE ? ({} as User) : null);
+  const [step, setStep] = useState(IS_DEVELOPMENT_MODE ? DEV_START_STEP : 1);
+  const [loading, setLoading] = useState(!IS_DEVELOPMENT_MODE);
   const router = useRouter();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEmailRegister, setShowEmailRegister] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -67,143 +70,172 @@ export default function StudentRegistrationPage() {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      setInitialDataLoading(true);
+      setInitialDataLoading(true); 
       try {
         const [skillsRes, languagesRes] = await Promise.all([
           supabase.from('Skill').select('id, name').order('name', { ascending: true }),
           supabase.from('Language').select('id, name').order('name', { ascending: true })
         ]);
-        if (skillsRes.data) setAllSkills(skillsRes.data);
-        if (languagesRes.data) setAllLanguages(languagesRes.data);
+        if (skillsRes.error) throw skillsRes.error;
+        if (languagesRes.error) throw languagesRes.error;
+        setAllSkills(skillsRes.data || []);
+        setAllLanguages(languagesRes.data || []);
       } catch (error) {
-        console.error("Chyba při načítání dat:", error);
+        console.error("Chyba při přednačítání dat pro registraci:", error);
       } finally {
         setInitialDataLoading(false);
       }
     };
-    fetchInitialData();
-  }, []);
+    if ((session || IS_DEVELOPMENT_MODE) && allSkills.length === 0) {
+      fetchInitialData();
+    } else if (!session && !IS_DEVELOPMENT_MODE) {
+        setInitialDataLoading(false);
+    }
+  }, [session, allSkills.length]);
+
+  const handleUserSignedIn = useCallback(async (session: Session) => {
+    const userId = session.user.id;
+    const userEmail = session.user.email;
+    const { data: existingUser } = await supabase.from('User').select('id, role').eq('id', userId).single();
+
+    if (existingUser) {
+      if (existingUser.role !== 'student') {
+        setError(`Účet s e-mailem ${userEmail} je již registrován s jinou rolí.`);
+        await supabase.auth.signOut();
+        return;
+      }
+      const { data: profile } = await supabase.from('StudentProfile').select('registration_step').eq('user_id', userId).single();
+      const currentStep = profile?.registration_step || 1;
+      if (currentStep > 5) {
+        router.push('/');
+      } else {
+        setStep(currentStep);
+      }
+    } else {
+      const { error: userError } = await supabase.from('User').insert({ id: userId, email: userEmail, role: 'student' });
+      if (userError) {
+        console.error("Chyba při vytváření záznamu v tabulce User:", userError);
+        setError("Nepodařilo se vytvořit uživatelský účet.");
+        return;
+      }
+      const { error: profileError } = await supabase.from('StudentProfile').insert({ user_id: userId, registration_step: 2, level: 1, xp: 0 });
+      if (profileError) {
+        console.error("Chyba při vytváření studentského profilu:", profileError);
+        setError("Nepodařilo se vytvořit profil.");
+        return;
+      }
+      setStep(2);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (IS_DEVELOPMENT_MODE) {
+      setLoading(false);
+      return;
+    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (_event === 'SIGNED_IN' && session) {
+        await handleUserSignedIn(session);
+      }
+      setLoading(false);
+    });
+    return () => subscription.unsubscribe();
+  }, [handleUserSignedIn]);
 
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsSubmitting(true);
-    
-    const { error: signUpError } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-        data: { role: 'student' },
-        emailRedirectTo: `${window.location.origin}/register/student`
+    setLoading(true);
+    const { data: existingUser, error: checkError } = await supabase.from('User').select('email').eq('email', email).single();
+    if (checkError && checkError.code !== 'PGRST116') {
+      setError("Došlo k chybě při ověřování e-mailu.");
+      setLoading(false);
+      return;
     }
-});
-
+    if (existingUser) {
+      setError("Uživatel s tímto e-mailem již existuje.");
+      setLoading(false);
+      return;
+    }
+    const { error: signUpError } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/register/student` } });
     if (signUpError) {
-      if (signUpError.message.includes("User already registered")) {
-        setError("Uživatel s tímto e-mailem již existuje. Zkuste se přihlásit.");
-      } else {
-         setError("Registrace se nezdařila. Zkuste to prosím znovu.");
-      }
+      setError("Registrace se nezdařila. Zkuste to prosím znovu.");
     } else {
       setIsModalOpen(true);
     }
-    setIsSubmitting(false);
+    setLoading(false);
   };
-  
+
   const handleNextStep = async (formData: FormData) => {
-      if (!user || !profile) return;
-      setIsSubmitting(true);
-      const nextStep = (profile.registration_step || 1) + 1;
-      let updateError;
-
-      switch(profile.registration_step) {
-          case 2:
-          case 3:
-              ({ error: updateError } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id));
-              break;
-          case 4:
-              if (formData.skills) {
-                  await supabase.from('StudentSkill').delete().eq('student_id', user.id);
-                  const skillsToInsert = formData.skills.map(skillId => ({ student_id: user.id, skill_id: skillId, level: 1, xp: 0 }));
-                  if (skillsToInsert.length > 0) ({ error: updateError } = await supabase.from('StudentSkill').insert(skillsToInsert));
-              }
-              break;
-          case 5:
-               if (formData.languages) {
-                  await supabase.from('StudentLanguage').delete().eq('student_id', user.id);
-                  const languagesToInsert = formData.languages.map(langId => ({ student_id: user.id, language_id: langId }));
-                  if (languagesToInsert.length > 0) ({ error: updateError } = await supabase.from('StudentLanguage').insert(languagesToInsert));
-              }
-              break;
-      }
-
-      if (updateError) {
-        alert('Něco se pokazilo: ' + updateError.message);
-        setIsSubmitting(false);
-        return;
-      }
-
-      const { error: stepError } = await supabase.from('StudentProfile').update({ registration_step: nextStep }).eq('user_id', user.id);
-      if (stepError) {
-        alert('Chyba při ukládání postupu: ' + stepError.message);
-      } else if (nextStep >= 6) {
-        router.push('/dashboard');
-      }
-      refetchProfile();
-      setIsSubmitting(false);
-  };
-    const handleSocialSignIn = useCallback(async (sessionUser: User) => {
-    const provider = sessionUser.app_metadata.provider;
-    if (provider && provider !== 'email') {
-        const { data: existingUser } = await supabase.from('User').select('id').eq('id', sessionUser.id).single();
-        if (!existingUser) {
-            const { error: userError } = await supabase.from('User').insert({ id: sessionUser.id, email: sessionUser.email, role: 'student' });
-            if (userError) { setError(`Chyba při vytváření záznamu User: ${userError.message}`); return; }
-            const { error: profileError } = await supabase.from('StudentProfile').insert({ user_id: sessionUser.id, registration_step: 2 });
-            if (profileError) { setError(`Chyba při vytváření záznamu StudentProfile: ${profileError.message}`); return; }
-            await refetchProfile();
-        }
+    if (!user) return;
+    setLoading(true);
+    let error;
+    const nextStep = step + 1;
+    if (step === 2 || step === 3) { ({ error } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id)); }
+    if (step === 4 && formData.skills) {
+      await supabase.from('StudentSkill').delete().eq('student_id', user.id);
+      const skillsToInsert = formData.skills.map((skillId: string) => ({ student_id: user.id, skill_id: skillId }));
+      if (skillsToInsert.length > 0) ({ error } = await supabase.from('StudentSkill').insert(skillsToInsert));
     }
-  }, [refetchProfile]);
+    if (step === 5 && formData.languages) {
+      await supabase.from('StudentLanguage').delete().eq('student_id', user.id);
+      const languagesToInsert = formData.languages.map((langId: string) => ({ student_id: user.id, language_id: langId }));
+      if (languagesToInsert.length > 0) ({ error } = await supabase.from('StudentLanguage').insert(languagesToInsert));
+    }
+    if (error) {
+      alert('Něco se pokazilo: ' + error.message);
+      setLoading(false);
+      return;
+    }
+    const { error: stepError } = await supabase.from('StudentProfile').update({ registration_step: nextStep }).eq('user_id', user.id);
+    if (stepError) {
+      alert('Chyba při ukládání postupu: ' + stepError.message);
+    } else if (nextStep > 5) {
+      router.push('/');
+    } else {
+      setStep(nextStep);
+    }
+    setLoading(false);
+  };
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-            await handleSocialSignIn(session.user);
-        }
-    });
-    return () => subscription.unsubscribe();
-  }, [handleSocialSignIn]);
-  
   const renderStep = () => {
-    if (!profile) return <div className="py-20"><LoadingSpinner /></div>;
-    
-    switch (profile.registration_step) {
+    if (!user && !IS_DEVELOPMENT_MODE) return <p>Chyba: Uživatel nebyl nalezen.</p>;
+    switch (step) {
       case 2: return <Step1_PersonalInfo onNext={handleNextStep} />;
       case 3: return <Step2_EducationInfo onNext={handleNextStep} />;
       case 4: return <Step3_Skills onNext={handleNextStep} allSkills={allSkills} isLoading={initialDataLoading} />;
       case 5: return <Step4_Languages onNext={handleNextStep} allLanguages={allLanguages} isLoading={initialDataLoading} />;
-      default:
-        if (profile.registration_step && profile.registration_step >= 6) {
-            router.push('/dashboard');
-            return <div className="py-20"><LoadingSpinner /></div>;
-        }
-        return <p>Načítání kroku registrace...</p>;
+      default: return null;
     }
   };
-  
-    if (authLoading) return <div className="py-20"><LoadingSpinner /></div>;
-  
-    return (
+
+  const handleDevPrev = () => setStep(prev => Math.max(2, prev - 1));
+  const handleDevNext = () => setStep(prev => Math.min(5, prev + 1));
+
+  if (loading && !IS_DEVELOPMENT_MODE) return <p className="text-center py-20">Načítání...</p>;
+
+  return (
     <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4 py-10 md:py-32">
-      {user && profile ? (
+      {IS_DEVELOPMENT_MODE || session ? (
         <div className="w-full">
           {renderStep()}
+          {IS_DEVELOPMENT_MODE && (
+            <div className="flex justify-center gap-24 my-12">
+              <button onClick={handleDevPrev} className="bg-[var(--barva-primarni)] text-white w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
+                🢀
+              </button>
+              <button onClick={handleDevNext} className="bg-[var(--barva-primarni)] text-white w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
+                🢂
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="p-8 flex flex-col justify-center gap-12">
-             <div>
+            <div>
               <div className="text-center">
                 <h1 className="text-3xl font-bold text-[var(--barva-tmava)]">Zaregistruj se</h1>
                 <p className="text-gray-500 mt-2 text-sm">Začni budovat svou budoucnost už dnes!</p>
@@ -223,8 +255,8 @@ export default function StudentRegistrationPage() {
                     <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="input w-full" />
                     <input type="password" placeholder="Heslo (min. 6 znaků)" value={password} onChange={(e) => setPassword(e.target.value)} required className="input w-full" />
                     <div className='flex justify-center'>
-                      <button type="submit" disabled={isSubmitting} className="mt-3 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
-                        {isSubmitting ? 'Registruji...' : 'Vytvořit účet'}
+                      <button type="submit" disabled={loading} className="mt-3 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
+                        {loading ? 'Registruji...' : 'Vytvořit účet'}
                       </button>
                     </div>
                     <button type="button" onClick={() => setShowEmailRegister(false)} className="w-full text-sm text-gray-500 hover:underline">Zpět na ostatní možnosti</button>
