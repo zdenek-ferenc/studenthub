@@ -62,7 +62,7 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
                             {isStudentViewer && (
                                 <div className={`flex items-center gap-1.5 text-xs font-semibold ${matchingSkillCount > 0 ? 'text-blue-500' : 'text-gray-500'}`}>
                                     <Sparkles size={14} />
-                                    <span>Shoda {matchingSkillCount}/{requiredSkillIds.length}</span>
+                                    <span className='font-semibold'>Shoda {matchingSkillCount}/{requiredSkillIds.length}</span>
                                 </div>
                             )}
                             <div className="hidden md:flex items-center gap-1.5 flex-wrap">
