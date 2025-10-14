@@ -35,7 +35,7 @@ const formatChallengeText = (count: number, type: 'active' | 'completed') => {
 
 
 export default function StartupCard({ startup }: StartupCardProps) {
-  if (!startup) {
+  if (!startup || !startup.company_name) {
     return null;
   }
 
