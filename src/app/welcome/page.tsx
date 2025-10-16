@@ -8,10 +8,25 @@ import { Provider } from '@supabase/supabase-js';
 
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
   const handleLogin = async () => {
+    
+    // Cíl: Domovská stránka, kde AuthContext převezme řízení.
+    const redirectPath = '/'; 
+
+    const isLocalhost = 
+        typeof window !== 'undefined' && 
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    const localBaseUrl = process.env.NEXT_PUBLIC_LOCAL_REDIRECT_BASE_URL;
+
+    // Sestavíme URL
+    const redirectToUrl = (isLocalhost && localBaseUrl) 
+        ? `${localBaseUrl}${redirectPath}` 
+        : `${window.location.origin}${redirectPath}`;
+
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: redirectToUrl,
       },
     });
   };
