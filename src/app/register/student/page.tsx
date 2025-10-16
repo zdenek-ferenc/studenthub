@@ -35,10 +35,22 @@ type FormData = {
 
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
   const handleLogin = async () => {
+    const redirectPath = '/register/student'; 
+    
+    const isLocalhost = 
+        typeof window !== 'undefined' && 
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    const localBaseUrl = process.env.NEXT_PUBLIC_LOCAL_REDIRECT_BASE_URL;
+
+    const redirectToUrl = (isLocalhost && localBaseUrl) 
+        ? `${localBaseUrl}${redirectPath}` 
+        : `${window.location.origin}${redirectPath}`;
+
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/register/student`,
+        redirectTo: redirectToUrl,
       },
     });
   };
