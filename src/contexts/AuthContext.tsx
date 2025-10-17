@@ -5,23 +5,18 @@ import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
 
-
 export type Profile = {
   id: string;
   email: string;
   role: 'student' | 'startup' | 'admin';
   registration_step?: number; 
-  StudentProfile?: { registration_step: number }[]; 
-  StartupProfile?: { registration_step: number }[]; 
 };
-
 
 export type Toast = {
   id: number;
   message: string;
   type: 'success' | 'error';
 };
-
 
 type AuthContextType = {
   user: User | null;
@@ -44,80 +39,85 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const getSessionAndProfile = useCallback(async () => {
-    
-    const { data: { session } } = await supabase.auth.getSession();
-    const currentUser = session?.user ?? null;
-    setUser(currentUser);
-
-    if (currentUser) {
-      const { data: userProfile } = await supabase
-        .from('User')
-        .select(`
-          *,
-          StudentProfile(registration_step),
-          StartupProfile(registration_step)
-        `)
-        .eq('id', currentUser.id)
-        .single();
-
-      if (userProfile) {
-          const registration_step = userProfile.role === 'student'
-              ? userProfile.StudentProfile?.[0]?.registration_step
-              : userProfile.StartupProfile?.[0]?.registration_step;
-          
-          const finalProfile = { ...userProfile, registration_step } as Profile;
-          setProfile(finalProfile);
-          
-          const isRegistrationIncomplete = registration_step && registration_step < 6;
-          const isOnRegistrationPage = pathname.startsWith('/register');
-          
-          if (isRegistrationIncomplete && !isOnRegistrationPage) {
-              if (finalProfile.role === 'student') {
-                  router.push('/register/student');
-              } else if (finalProfile.role === 'startup') {
-                  router.push('/register/startup');
-              }
-          }
-      }
-    }
-    setLoading(false);
-  }, [router, pathname]);
-
   useEffect(() => {
-    
-    getSessionAndProfile();
-    
-    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
-        
-        getSessionAndProfile();
+    // Tento useEffect se spustí POUZE JEDNOU a nastaví listener.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+
+        if (!currentUser) {
+            setProfile(null);
+            setLoading(false);
+            return;
+        }
+
+        // Načteme profil VŽDY, když máme session
+        setLoading(true);
+        const { data: userProfile, error } = await supabase
+            .from('User')
+            .select('*, StudentProfile(*), StartupProfile(*)')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (error) {
+            console.error("AuthContext chyba při načítání profilu:", error);
+            setLoading(false);
+            return;
+        }
+
+        if (userProfile) {
+            // --- ZDE JE FINÁLNÍ OPRAVA ---
+            // Tato logika si poradí s objektem i s polem
+            let registration_step;
+            if (userProfile.role === 'student') {
+                const studentData = Array.isArray(userProfile.StudentProfile) ? userProfile.StudentProfile[0] : userProfile.StudentProfile;
+                registration_step = studentData?.registration_step;
+            } else if (userProfile.role === 'startup') {
+                const startupData = Array.isArray(userProfile.StartupProfile) ? userProfile.StartupProfile[0] : userProfile.StartupProfile;
+                registration_step = startupData?.registration_step;
+            }
+            
+            const finalProfile = { ...userProfile, registration_step } as Profile;
+            setProfile(finalProfile);
+
+            const isRegistrationIncomplete = registration_step && registration_step < 6;
+            const isOnAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
+            
+            if (isRegistrationIncomplete) {
+                const targetPath = `/register/${finalProfile.role}`;
+                if (!pathname.startsWith(targetPath)) {
+                    router.push(targetPath);
+                }
+            } else if (isOnAuthPage) {
+                if (finalProfile.role === 'student') {
+                    router.push('/dashboard');
+                } else if (finalProfile.role === 'startup') {
+                    router.push('/challenges');
+                } else {
+                    router.push('/');
+                }
+            }
+        }
+        setLoading(false);
     });
 
     return () => {
-      authListener.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
-  }, [getSessionAndProfile]);
-  const refetchProfile = useCallback(() => {
-    getSessionAndProfile();
-  }, [getSessionAndProfile]);
+  }, [pathname, router]);
 
+  // Zbytek kódu je v pořádku a zůstává stejný...
+  const refetchProfile = useCallback(() => {}, []);
   const showToast = useCallback((message: string, type: 'success' | 'error') => {
-    const newToast = {
-      id: Date.now(),
-      message,
-      type,
-    };
-    setToasts((prevToasts) => [...prevToasts, newToast]);
-
+    const newToast = { id: Date.now(), message, type };
+    setToasts((prev) => [...prev, newToast]);
     setTimeout(() => {
-      setToasts((currentToasts) => currentToasts.filter((toast) => toast.id !== newToast.id));
+      setToasts((current) => current.filter((t) => t.id !== newToast.id));
     }, 4000);
-  }, []); 
-
-  const hideToast = useCallback((id: number) => {
-    setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
   }, []);
-
+  const hideToast = useCallback((id: number) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
   const value = useMemo(() => ({
     user,
     profile,

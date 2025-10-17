@@ -71,10 +71,10 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setError("Neplatné přihlašovací údaje.");
+      setLoading(false);
     } else {
       router.push('/');
     }
-    setLoading(false);
   };
 
   return (

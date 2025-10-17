@@ -129,14 +129,24 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const isHomePage = pathname === '/';
 
-useEffect(() => {
+  const isRegistrationFlow = pathname.startsWith('/register');
+
+  useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
-const showBackground = !isHomePage || scrolled;
+
+  const showBackground = !isHomePage || scrolled;
+
+  if (loading) {
+    return null;
+  }
+
+  if (user && isRegistrationFlow) {
+    return null;
+  }
 
   return (
     <>
@@ -145,9 +155,15 @@ const showBackground = !isHomePage || scrolled;
         
         <div className="relative container mx-auto px-4 flex justify-between items-center h-30">
           <div className="flex-1 flex justify-start">
-            <Link href="/">
-              <Image src="/logo.svg" alt="logo" width={200} height={80} className="w-auto h-6 lg:h-10" />
-            </Link>
+            {isRegistrationFlow ? (
+              <div className="cursor-default">
+                <Image src="/logo.svg" alt="logo" width={200} height={80} className="w-auto h-6 lg:h-10" />
+              </div>
+            ) : (
+              <Link href="/">
+                <Image src="/logo.svg" alt="logo" width={200} height={80} className="w-auto h-6 lg:h-10" />
+              </Link>
+            )}
           </div>
           
           <div className="hidden md:flex flex-1 justify-center">

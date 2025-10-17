@@ -104,7 +104,7 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
               {usernameStatus === 'available' && <CheckCircle className="h-5 w-5 text-green-500" />}
               {usernameStatus === 'taken' && <XCircle className="h-5 w-5 text-red-500" />}
             </div>
-          </div>
+          </div> 
           {errors.username && <p className="error pt-2 text-blue-400 text-center">{errors.username.message}</p>}
         </div>
 
@@ -114,15 +114,6 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
             type="tel" 
             placeholder="Telefonní číslo"
             {...register('phone_number')} 
-            className="input" 
-          />
-        </div>
-
-        <div>
-          <input 
-            id="date_of_birth" 
-            type="date"
-            {...register('date_of_birth')} 
             className="input" 
           />
         </div>

@@ -103,11 +103,17 @@ export default function StartupRegistrationPage() {
     const userId = session.user.id;
     const userEmail = session.user.email;
 
-    const { data: existingUser } = await supabase
-      .from('User')
-      .select('id, role')
-      .eq('id', userId)
-      .single();
+    const { data: existingUser, error: existingUserError } = await supabase
+        .from('User')
+        .select('id, role')
+        .eq('id', userId)
+        .single();
+
+    if (existingUserError && existingUserError.code !== 'PGRST116') {
+        console.error("Chyba při ověřování existence uživatele:", existingUserError);
+        setError("Došlo k chybě při zpracování vašeho účtu.");
+        return;
+    }
 
     if (existingUser) {
         if (existingUser.role !== 'startup') {
@@ -124,20 +130,21 @@ export default function StartupRegistrationPage() {
         
         const currentStep = profile?.registration_step || 1;
         if(currentStep > 5) {
-            router.push('/');
+            router.push('/challenges'); // Startup jde na /challenges
         } else {
             setStep(currentStep);
         }
 
     } else {
-        const { error: userError } = await supabase.from('User').insert({
+        const { data: newUser, error: userError } = await supabase.from('User').insert({
             id: userId,
             email: userEmail,
             role: 'startup'
-        });
-        if (userError) {
+        }).select().single();
+
+        if (userError || !newUser) {
             console.error("Chyba při vytváření záznamu v tabulce User:", userError);
-            setError("Nepodařilo se vytvořit uživatelský účet.");
+            setError(`Nepodařilo se vytvořit uživatelský účet: ${userError?.message || 'Neznámá chyba'}`);
             return;
         }
         
@@ -146,9 +153,11 @@ export default function StartupRegistrationPage() {
             contact_email: userEmail,
             registration_step: 2
         });
+
         if (profileError) {
             console.error("Chyba při vytváření startup profilu:", profileError);
-            setError("Nepodařilo se vytvořit profil.");
+            setError(`Nepodařilo se vytvořit profil: ${profileError.message}`);
+            await supabase.from('User').delete().eq('id', userId);
             return;
         }
         setStep(2);
@@ -265,7 +274,7 @@ export default function StartupRegistrationPage() {
     if (stepError) {
         alert('Chyba při ukládání postupu: ' + stepError.message);
     } else if (nextStep > 5) {
-        router.push('/');
+        router.push('/challenges'); // Po dokončení jde startup na /challenges
     } else {
         setStep(nextStep);
     }
@@ -290,6 +299,7 @@ export default function StartupRegistrationPage() {
 
   if (loading && !IS_DEVELOPMENT_MODE) return <p>Načítání...</p>;
 
+  // JSX pro zobrazení přihlášení/registrace zůstává stejné
   return (
     <div className="w-full min-h-screen flex py-5 md:py-32 items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
       {IS_DEVELOPMENT_MODE || session ? (

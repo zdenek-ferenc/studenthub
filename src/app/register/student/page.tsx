@@ -65,7 +65,7 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
 
 export default function StudentRegistrationPage() {
   const [session, setSession] = useState<Session | null>(IS_DEVELOPMENT_MODE ? ({} as Session) : null);
-  const [user, setUser] = useState<User | null>(IS_DEVELOPMENT_MODE ? ({} as User) : null);
+  const [user, setUser] = useState<User | null>(IS_DEVELOPMENT_MODE ? ({id: 'dev-user-student'} as User) : null);
   const [step, setStep] = useState(IS_DEVELOPMENT_MODE ? DEV_START_STEP : 1);
   const [loading, setLoading] = useState(!IS_DEVELOPMENT_MODE);
   const router = useRouter();
@@ -108,7 +108,13 @@ export default function StudentRegistrationPage() {
   const handleUserSignedIn = useCallback(async (session: Session) => {
     const userId = session.user.id;
     const userEmail = session.user.email;
-    const { data: existingUser } = await supabase.from('User').select('id, role').eq('id', userId).single();
+    const { data: existingUser, error: existingUserError } = await supabase.from('User').select('id, role').eq('id', userId).single();
+
+    if (existingUserError && existingUserError.code !== 'PGRST116') {
+        console.error("Chyba při ověřování existence uživatele:", existingUserError);
+        setError("Došlo k chybě při zpracování vašeho účtu.");
+        return;
+    }
 
     if (existingUser) {
       if (existingUser.role !== 'student') {
@@ -124,16 +130,17 @@ export default function StudentRegistrationPage() {
         setStep(currentStep);
       }
     } else {
-      const { error: userError } = await supabase.from('User').insert({ id: userId, email: userEmail, role: 'student' });
-      if (userError) {
+      const { data: newUser, error: userError } = await supabase.from('User').insert({ id: userId, email: userEmail, role: 'student' }).select().single();
+      if (userError || !newUser) {
         console.error("Chyba při vytváření záznamu v tabulce User:", userError);
-        setError("Nepodařilo se vytvořit uživatelský účet.");
+        setError(`Nepodařilo se vytvořit uživatelský účet: ${userError?.message || 'Neznámá chyba'}`);
         return;
       }
       const { error: profileError } = await supabase.from('StudentProfile').insert({ user_id: userId, registration_step: 2, level: 1, xp: 0 });
       if (profileError) {
         console.error("Chyba při vytváření studentského profilu:", profileError);
-        setError("Nepodařilo se vytvořit profil.");
+        setError(`Nepodařilo se vytvořit profil: ${profileError.message}`);
+        await supabase.from('User').delete().eq('id', userId);
         return;
       }
       setStep(2);
@@ -145,13 +152,26 @@ export default function StudentRegistrationPage() {
       setLoading(false);
       return;
     };
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (_event === 'SIGNED_IN' && session) {
-        await handleUserSignedIn(session);
+    
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setUser(session.user ?? null);
+        setSession(session);
+        handleUserSignedIn(session);
       }
       setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (_event === 'SIGNED_IN' && session) {
+        setUser(session.user ?? null);
+        setSession(session);
+        await handleUserSignedIn(session);
+      } else if (_event === 'SIGNED_OUT') {
+        setUser(null);
+        setSession(null);
+        setStep(1);
+      }
     });
     return () => subscription.unsubscribe();
   }, [handleUserSignedIn]);
@@ -185,22 +205,30 @@ export default function StudentRegistrationPage() {
     setLoading(true);
     let error;
     const nextStep = step + 1;
-    if (step === 2 || step === 3) { ({ error } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id)); }
+
+    // Krok 2 (PersonalInfo) a 3 (EducationInfo) aktualizují StudentProfile
+    if (step === 2 || step === 3) { 
+        ({ error } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id)); 
+    }
+    // Krok 4 (Skills) aktualizuje StudentSkill
     if (step === 4 && formData.skills) {
       await supabase.from('StudentSkill').delete().eq('student_id', user.id);
-      const skillsToInsert = formData.skills.map((skillId: string) => ({ student_id: user.id, skill_id: skillId }));
+      const skillsToInsert = formData.skills.map((skillId: string) => ({ student_id: user.id, skill_id: skillId, level: 1, xp: 0 }));
       if (skillsToInsert.length > 0) ({ error } = await supabase.from('StudentSkill').insert(skillsToInsert));
     }
+    // Krok 5 (Languages) aktualizuje StudentLanguage
     if (step === 5 && formData.languages) {
       await supabase.from('StudentLanguage').delete().eq('student_id', user.id);
       const languagesToInsert = formData.languages.map((langId: string) => ({ student_id: user.id, language_id: langId }));
       if (languagesToInsert.length > 0) ({ error } = await supabase.from('StudentLanguage').insert(languagesToInsert));
     }
+
     if (error) {
       alert('Něco se pokazilo: ' + error.message);
       setLoading(false);
       return;
     }
+
     const { error: stepError } = await supabase.from('StudentProfile').update({ registration_step: nextStep }).eq('user_id', user.id);
     if (stepError) {
       alert('Chyba při ukládání postupu: ' + stepError.message);
