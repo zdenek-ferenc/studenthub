@@ -29,21 +29,21 @@ export default function Step2_EducationInfo({ onNext, initialData }: StepProps) 
       <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-8">Vzdělání</h2>
       
       <form onSubmit={handleSubmit(onNext)} className="space-y-4">
-        
+        <p className="text-sm text-gray-400 text-center">Položky označené <span className='text-red-400'>*</span> jsou povinné.</p>
         <div>
           <input 
             id="university" 
-            placeholder="Škola / Univerzita"
+            placeholder="Škola / Univerzita *"
             {...register('university', { required: 'Škola je povinná' })} 
             className="input" 
           />
-          {errors.university && <p className="error text-center">{errors.university.message}</p>}
+          {errors.university && <p className="error pt-2 text-blue-400 text-center">{errors.university.message}</p>}
         </div>
 
         <div>
           <input 
             id="field_of_study" 
-            placeholder="Obor"
+            placeholder="Fakulta"
             {...register('field_of_study')} 
             className="input" 
           />
@@ -52,7 +52,7 @@ export default function Step2_EducationInfo({ onNext, initialData }: StepProps) 
         <div>
           <input 
             id="specialization" 
-            placeholder="Specializace"
+            placeholder="Obor"
             {...register('specialization')} 
             className="input" 
           />
@@ -60,12 +60,18 @@ export default function Step2_EducationInfo({ onNext, initialData }: StepProps) 
 
         <div>
           <input 
-            id="year_of_study" 
-            type="number" 
+            id="year_of_study"
+            type="number"
             placeholder="Ročník"
-            {...register('year_of_study', { valueAsNumber: true })} 
-            className="input" 
-          />
+            {...register('year_of_study', { 
+              valueAsNumber: true,
+              min: 1,
+              max: 10  // nebo 8, podle toho, co zvolíš
+            })}
+            className="input"
+            min={1}
+            max={10}
+  />
         </div>
 
         <div className="pt-6 flex justify-center">

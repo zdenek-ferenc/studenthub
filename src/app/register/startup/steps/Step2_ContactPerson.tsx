@@ -26,25 +26,25 @@ export default function Step2_ContactPerson({ onNext, initialData }: StepProps) 
       <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-8">Kontaktní osoba</h2>
       
       <form onSubmit={handleSubmit(onNext)} className="space-y-4">
-        
+        <p className="text-sm text-gray-400 text-center">Položky označené <span className='text-red-400'>*</span> jsou povinné.</p>
         <div>
           <input 
             id="contact_first_name" 
-            placeholder="Jméno"
+            placeholder="Jméno *"
             {...register('contact_first_name', { required: 'Jméno je povinné' })} 
             className="input" 
           />
-          {errors.contact_first_name && <p className="error text-center">{errors.contact_first_name.message}</p>}
+          {errors.contact_first_name && <p className="error pt-2 text-blue-400 text-center">{errors.contact_first_name.message}</p>}
         </div>
 
         <div>
           <input 
             id="contact_last_name" 
-            placeholder="Příjmení"
+            placeholder="Příjmení *"
             {...register('contact_last_name', { required: 'Příjmení je povinné' })} 
             className="input" 
           />
-          {errors.contact_last_name && <p className="error text-center">{errors.contact_last_name.message}</p>}
+          {errors.contact_last_name && <p className="error pt-2 text-blue-400 text-center">{errors.contact_last_name.message}</p>}
         </div>
 
         <div>

@@ -76,11 +76,11 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
       <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-8">Vytvoř si profil</h2>
       
       <form onSubmit={handleSubmit(onNext)} className="space-y-4">
-        
+        <p className="text-sm text-gray-400 text-center">Položky označené <span className='text-red-400'>*</span> jsou povinné.</p>
         <div>
           <input 
             id="first_name" 
-            placeholder="Jméno"
+            placeholder="Jméno *"
             {...register('first_name', { required: 'Jméno je povinné' })} 
             className="input" 
           />
@@ -90,7 +90,7 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
         <div>
           <input 
             id="last_name" 
-            placeholder="Příjmení"
+            placeholder="Příjmení *"
             {...register('last_name', { required: 'Příjmení je povinné' })} 
             className="input" 
           />
@@ -101,7 +101,7 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
           <div className="relative">
             <input 
               id="username" 
-              placeholder="Uživatelské jméno"
+              placeholder="Uživatelské jméno *"
               {...register('username', { 
                   required: 'Uživatelské jméno je povinné',
                   minLength: { value: 3, message: 'Jméno musí mít alespoň 3 znaky.' },
@@ -124,7 +124,7 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
 
         <div>
           <input 
-            id="phone_number" 
+            id="phone_number *" 
             type="tel" 
             placeholder="Telefonní číslo"
             {...register('phone_number')} 

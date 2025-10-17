@@ -145,7 +145,6 @@ body {
   animation-delay: 0.5s;
 }
 
-/* Animující překryv */
 .logo-reveal-container::after {
   content: '';
   position: absolute;
@@ -162,7 +161,6 @@ body {
   pointer-events: none;
 }
 
-/* Jemné objevení loga */
 @keyframes logoFadeIn {
   0% {
     opacity: 0;
@@ -174,7 +172,6 @@ body {
   }
 }
 
-/* Efekt “wipe” překryvu */
 @keyframes wipeReveal {
   0% {
     transform: scaleX(1);
@@ -184,10 +181,6 @@ body {
   }
 }
 
-
-/* ... (všechny tvoje stávající animace) ... */
-
-/* --- NOVÉ ANIMACE PRO STRÁNKU REGISTRACE --- */
 @keyframes slide-in-from-left {
   from {
     transform: translateX(-100%);
