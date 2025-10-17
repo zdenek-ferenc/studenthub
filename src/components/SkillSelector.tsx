@@ -78,7 +78,7 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Hledej dovednost"
-        className="px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-text"
+        className="px-3 py-1.5 sm:px-5 sm:py-2 text-[var(--barva-primarni)] rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-text focus:outline-2 outline-[var(--barva-primarni)]"
       />
       {selectedSkillsObjects.length > 0 && (
         <div className="w-full max-w-4xl sm:px-8 flex flex-wrap gap-3 md:gap-4 md:mb-6 pt-4">

@@ -69,7 +69,7 @@ return (
         />
         <ChoiceSection 
             href="/register/startup"
-            titleStart="Jsem"
+            titleStart="Jsme"
             titleHighlight="firma"
             highlightBgClass="bg-[var(--barva-tmava)]"
             description="Chci zadávat výzvy a najít nové talenty."

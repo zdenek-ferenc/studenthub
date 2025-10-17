@@ -1,9 +1,9 @@
 "use client";
 import { useForm } from 'react-hook-form';
 import { supabase } from '../../../../lib/supabaseClient';
-import { useState, useEffect } from 'react';
-import { useDebounce } from '../../../../hooks/useDebounce'; 
-import { CheckCircle, XCircle, Loader } from 'lucide-react'; 
+import { useState, useEffect, useCallback } from 'react';
+import { useDebounce } from '../../../../hooks/useDebounce';
+import { CheckCircle, XCircle, Loader } from 'lucide-react';
 
 type FormData = {
   first_name: string;
@@ -19,57 +19,66 @@ type StepProps = {
 };
 
 export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
-  const { register, handleSubmit, formState: { errors }, watch, trigger } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors, isSubmitting, isValidating }, watch } = useForm<FormData>({
       mode: 'onChange',
+      reValidateMode: 'onChange',
       defaultValues: {
           first_name: initialData.first_name || '',
           last_name: initialData.last_name || '',
           username: initialData.username || '',
           phone_number: initialData.phone_number || '',
-          gdpr_consent: false, 
+          gdpr_consent: false,
       }
   });
 
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
-  const usernameValue = watch('username'); 
-  const debouncedUsername = useDebounce(usernameValue, 500); 
+  const [displayError, setDisplayError] = useState<string | null>(null);
+
+  const usernameValue = watch('username');
+  const debouncedUsername = useDebounce(usernameValue, 500);
+
+  const validateUsername = useCallback(async (username: string) => {
+    if (username.length < 5) return true;
+    if (username === initialData.username) return true;
+
+    const { data, error } = await supabase
+      .from('StudentProfile')
+      .select('username')
+      .eq('username', username)
+      .single();
+
+    if (data) return 'Uživatelské jméno je již zabrané.';
+    if (error && error.code !== 'PGRST116') return 'Chyba při ověřování.';
+    
+    return true;
+  }, [initialData.username]);
 
   useEffect(() => {
-    let isActive = true;
+    const userHasStoppedTyping = usernameValue === debouncedUsername;
 
-    const checkUsername = async () => {
-      if (!debouncedUsername || debouncedUsername.length < 3) {
-        if (isActive) setUsernameStatus('idle');
-        return;
+    // Řízení ikonky
+    if (isValidating) {
+      setUsernameStatus('checking');
+    } else if (!debouncedUsername || debouncedUsername.length < 5) {
+      setUsernameStatus('idle');
+    } else if (errors.username) {
+      setUsernameStatus('taken');
+    } else {
+      setUsernameStatus('available');
+    }
+
+    const usernameError = errors.username;
+    if (usernameError) {
+      if (usernameError.type === 'minLength') {
+        setDisplayError(userHasStoppedTyping ? usernameError.message || null : null);
+      } else {
+        setDisplayError(usernameError.message || null);
       }
-      if (debouncedUsername === initialData.username) {
-          if (isActive) setUsernameStatus('available');
-          return;
-      }
+    } else {
+      setDisplayError(null);
+    }
 
-      if (isActive) setUsernameStatus('checking');
-
-      const { data, error } = await supabase
-        .from('StudentProfile')
-        .select('username')
-        .eq('username', debouncedUsername)
-        .single();
-      if (!isActive) return;
-      if (error && error.code !== 'PGRST116') {
-        console.error("Chyba při validaci jména:", error);
-        setUsernameStatus('idle');
-        return;
-      }
-      setUsernameStatus(data ? 'taken' : 'available');
-      trigger('username');
-    };
-    checkUsername();
-
-    return () => {
-      isActive = false;
-    };
-  }, [debouncedUsername, trigger, initialData.username]);
-
+  }, [isValidating, errors.username, debouncedUsername, usernameValue]);
 
   return (
     <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
@@ -84,7 +93,7 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
             {...register('first_name', { required: 'Jméno je povinné' })} 
             className="input" 
           />
-          {errors.first_name && <p className="error pt-2 text-blue-400 text-center">{errors.first_name.message}</p>}
+          {errors.first_name && <p className="error pt-2 text-red-500 text-center">{errors.first_name.message}</p>}
         </div>
 
         <div>
@@ -94,7 +103,7 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
             {...register('last_name', { required: 'Příjmení je povinné' })} 
             className="input" 
           />
-          {errors.last_name && <p className="error pt-2 text-blue-400 text-center">{errors.last_name.message}</p>}
+          {errors.last_name && <p className="error pt-2 text-red-500 text-center">{errors.last_name.message}</p>}
         </div>
 
         <div>
@@ -104,27 +113,27 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
               placeholder="Uživatelské jméno *"
               {...register('username', { 
                   required: 'Uživatelské jméno je povinné',
-                  minLength: { value: 3, message: 'Jméno musí mít alespoň 3 znaky.' },
+                  minLength: { value: 5, message: 'Jméno musí mít alespoň 5 znaků.' },
                   pattern: {
                     value: /^[a-zA-Z0-9_.]+$/,
                     message: 'Jméno může obsahovat jen písmena, čísla, tečky a podtržítka.'
                   },
-                  validate: (value) => value === initialData.username || usernameStatus !== 'taken' || 'Uživatelské jméno je již zabrané.'
+                  validate: validateUsername
               })} 
               className="input pr-10"
             />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               {usernameStatus === 'checking' && <Loader className="h-5 w-5 text-blue-400 animate-spin" />}
               {usernameStatus === 'available' && <CheckCircle className="h-5 w-5 text-green-500" />}
-              {usernameStatus === 'taken' && <XCircle className="h-5 w-5 text-red-500" />}
+              {usernameStatus === 'taken' && usernameValue === debouncedUsername && <XCircle className="h-5 w-5 text-red-500" />}
             </div>
           </div> 
-          {errors.username && <p className="error pt-2 text-blue-400 text-center">{errors.username.message}</p>}
+          {displayError && <p className="error pt-2 text-red-500 text-center">{displayError}</p>}
         </div>
 
         <div>
           <input 
-            id="phone_number *" 
+            id="phone_number" 
             type="tel" 
             placeholder="Telefonní číslo"
             {...register('phone_number')} 
@@ -151,10 +160,15 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
           </p>
         </div>
       </div>
-      {errors.gdpr_consent && <p className="error text-blue-400 text-center mt-2">{errors.gdpr_consent.message}</p>}
+      {errors.gdpr_consent && <p className="error text-red-500 text-center mt-2">{errors.gdpr_consent.message}</p>}
     </div>
         <div className="pt-6 flex justify-center">
-          <button type="submit" className="px-6 py-3 md:px-8 md:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400">Pokračovat</button>
+          <button 
+            type="submit" 
+            disabled={isSubmitting || isValidating || usernameValue !== debouncedUsername}
+            className="px-6 py-3 md:px-8 md:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed">
+              {isValidating || usernameValue !== debouncedUsername ? 'Ověřuji...' : 'Pokračovat'}
+          </button>
         </div>
       </form>
     </div>

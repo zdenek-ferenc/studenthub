@@ -39,75 +39,76 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const fetchAndSetProfile = useCallback(async (currentUser: User) => {
+    const { data: userProfile, error } = await supabase
+        .from('User')
+        .select('*, StudentProfile(*), StartupProfile(*)')
+        .eq('id', currentUser.id)
+        .single();
+    if (error && error.code !== 'PGRST116') {
+        console.error("AuthContext chyba při načítání profilu:", error);
+        setProfile(null);
+        return null;
+    }
+
+    if (userProfile) {
+        let registration_step;
+        if (userProfile.role === 'student') {
+            const studentData = Array.isArray(userProfile.StudentProfile) ? userProfile.StudentProfile[0] : userProfile.StudentProfile;
+            registration_step = studentData?.registration_step;
+        } else if (userProfile.role === 'startup') {
+            const startupData = Array.isArray(userProfile.StartupProfile) ? userProfile.StartupProfile[0] : userProfile.StartupProfile;
+            registration_step = startupData?.registration_step;
+        }
+        
+        const finalProfile = { ...userProfile, registration_step } as Profile;
+        setProfile(finalProfile);
+        return finalProfile;
+    }
+    setProfile(null);
+    return null;
+  }, []);
+
+
   useEffect(() => {
-    // Tento useEffect se spustí POUZE JEDNOU a nastaví listener.
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+        if (session) {
+            setUser(session.user);
+            await fetchAndSetProfile(session.user);
+        }
+        setLoading(false);
+    });
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
 
-        if (!currentUser) {
+        if (currentUser) {
+            const fetchedProfile = await fetchAndSetProfile(currentUser);
+            if (fetchedProfile) {
+                const isRegistrationIncomplete = fetchedProfile.registration_step && fetchedProfile.registration_step < 6;
+                 if (isRegistrationIncomplete) {
+                    const targetPath = `/register/${fetchedProfile.role}`;
+                    if (window.location.pathname !== targetPath) {
+                       router.push(targetPath);
+                    }
+                }
+            }
+        } else {
             setProfile(null);
-            setLoading(false);
-            return;
         }
-
-        // Načteme profil VŽDY, když máme session
-        setLoading(true);
-        const { data: userProfile, error } = await supabase
-            .from('User')
-            .select('*, StudentProfile(*), StartupProfile(*)')
-            .eq('id', currentUser.id)
-            .single();
-
-        if (error) {
-            console.error("AuthContext chyba při načítání profilu:", error);
-            setLoading(false);
-            return;
-        }
-
-        if (userProfile) {
-            // --- ZDE JE FINÁLNÍ OPRAVA ---
-            // Tato logika si poradí s objektem i s polem
-            let registration_step;
-            if (userProfile.role === 'student') {
-                const studentData = Array.isArray(userProfile.StudentProfile) ? userProfile.StudentProfile[0] : userProfile.StudentProfile;
-                registration_step = studentData?.registration_step;
-            } else if (userProfile.role === 'startup') {
-                const startupData = Array.isArray(userProfile.StartupProfile) ? userProfile.StartupProfile[0] : userProfile.StartupProfile;
-                registration_step = startupData?.registration_step;
-            }
-            
-            const finalProfile = { ...userProfile, registration_step } as Profile;
-            setProfile(finalProfile);
-
-            const isRegistrationIncomplete = registration_step && registration_step < 6;
-            const isOnAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
-            
-            if (isRegistrationIncomplete) {
-                const targetPath = `/register/${finalProfile.role}`;
-                if (!pathname.startsWith(targetPath)) {
-                    router.push(targetPath);
-                }
-            } else if (isOnAuthPage) {
-                if (finalProfile.role === 'student') {
-                    router.push('/dashboard');
-                } else if (finalProfile.role === 'startup') {
-                    router.push('/challenges');
-                } else {
-                    router.push('/');
-                }
-            }
-        }
-        setLoading(false);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [pathname, router]);
+  }, [fetchAndSetProfile, router]);
 
-  // Zbytek kódu je v pořádku a zůstává stejný...
-  const refetchProfile = useCallback(() => {}, []);
+
+  const refetchProfile = useCallback(async () => {
+    if (user) {
+        await fetchAndSetProfile(user);
+    }
+  }, [user, fetchAndSetProfile]);
   const showToast = useCallback((message: string, type: 'success' | 'error') => {
     const newToast = { id: Date.now(), message, type };
     setToasts((prev) => [...prev, newToast]);
@@ -115,9 +116,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToasts((current) => current.filter((t) => t.id !== newToast.id));
     }, 4000);
   }, []);
+
   const hideToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
+
   const value = useMemo(() => ({
     user,
     profile,
