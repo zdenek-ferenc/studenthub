@@ -106,7 +106,7 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
             )}
         </div>
 
-      <div className="w-full max-w-4xl pt-4 md:pt-12 sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4 min-h-[12rem] content-start">
+      <div className="w-full max-w-4xl pt-4 sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4 min-h-[12rem] content-start">
         {availableSkills.map(skill => (
           <button
             key={skill.id}
