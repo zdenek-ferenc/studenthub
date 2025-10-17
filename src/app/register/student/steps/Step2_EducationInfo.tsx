@@ -10,10 +10,18 @@ type FormData = {
 
 type StepProps = {
   onNext: (data: FormData) => void;
+  initialData: FormData;
 };
 
-export default function Step2_EducationInfo({ onNext }: StepProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+export default function Step2_EducationInfo({ onNext, initialData }: StepProps) {
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+      defaultValues: {
+          university: initialData.university || '',
+          field_of_study: initialData.field_of_study || '',
+          specialization: initialData.specialization || '',
+          year_of_study: initialData.year_of_study || undefined,
+      }
+  });
 
   return (
     

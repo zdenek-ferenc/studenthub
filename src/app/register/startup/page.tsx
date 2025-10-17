@@ -12,25 +12,88 @@ import Step2_ContactPerson from './steps/Step2_ContactPerson';
 import Step3_Categories from './steps/Step3_Categories';
 import Step4_LogoUpload from './steps/Step4_LogoUpload';
 import ConfirmationModal from '../../../components/ConfirmationModal';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { ChevronLeft, ChevronRight } from 'lucide-react'; 
 
 type Category = { id: string; name: string; };
 
 const IS_DEVELOPMENT_MODE = false; 
 const DEV_START_STEP = 2; 
 
-type FormData = {
-  company_name?: string;
-  ico?: string;
-  website?: string;
-  phone_number?: string;
-  contact_email?: string;
-  address?: string;
-  contact_first_name?: string;
-  contact_last_name?: string;
-  contact_position?: string;
-  categories?: string[];
-  logo_url?: string | null;
+type StartupRegistrationData = {
+  company_name: string;
+  ico: string;
+  website: string;
+  phone_number: string;
+  contact_email: string;
+  address: string;
+  contact_first_name: string;
+  contact_last_name: string;
+  contact_position: string;
+  categories: string[]; 
+  logo_url: string | null;
+  gdpr_consent: boolean; 
 };
+
+type FormDataStep = Partial<Omit<StartupRegistrationData, 'categories' | 'logo_url'>> & {
+    categories?: string[];
+    logo_url?: string | null;
+};
+
+const FORM_STEPS = [2, 3, 4, 5];
+
+const StepNavigation = ({ currentStep, setStep, isLoading }: { currentStep: number, setStep: (step: number) => void, isLoading: boolean }) => {
+    
+    const stepIndex = FORM_STEPS.indexOf(currentStep);
+    const isCompleted = (stepNumber: number) => stepNumber < currentStep;
+    
+    const handleJump = (stepNumber: number) => {
+        if (!isLoading && stepNumber < currentStep) {
+            setStep(stepNumber);
+        }
+    };
+    
+    const handleGoToPrev = () => {
+        if (stepIndex > 0) setStep(FORM_STEPS[stepIndex - 1]);
+    };
+
+    return (
+        <div className="flex justify-center items-center gap-12 mt-8">
+            <button
+                onClick={handleGoToPrev}
+                disabled={stepIndex === 0 || isLoading}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${stepIndex > 0 ? 'cursor-pointer bg-[var(--barva-primarni)] text-white hover:opacity-80' : 'bg-gray-300 text-gray-500 cursor-auto'}`}
+            >
+                <ChevronLeft size={24} />
+            </button>
+
+            <div className="flex gap-4">
+                {FORM_STEPS.map(stepNumber => (
+                    <button
+                        key={stepNumber}
+                        onClick={() => handleJump(stepNumber)}
+                        disabled={stepNumber >= currentStep || isLoading}
+                        className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                            stepNumber === currentStep ? 'bg-[var(--barva-primarni)] scale-125' : 
+                            isCompleted(stepNumber) ? 'bg-[var(--barva-primarni)]/50 hover:bg-[var(--barva-primarni)]/70 cursor-pointer hover:scale-105 transition-all duration-200 ease-in-out' : 
+                            'bg-gray-300 cursor-not-allowed'
+                        }`}
+                    >
+                        <span className="sr-only">Krok {stepNumber - 1}</span>
+                    </button>
+                ))}
+            </div>
+
+            <button
+                disabled={true} 
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-gray-300 text-gray-500 cursor-auto`}
+            >
+                <ChevronRight size={24} />
+            </button>
+        </div>
+    );
+};
+
 
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
   const handleLogin = async () => {
@@ -77,10 +140,29 @@ export default function StartupRegistrationPage() {
   
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
+  const [formDataCache, setFormDataCache] = useState<StartupRegistrationData>({
+      company_name: '', ico: '', website: '', phone_number: '', contact_email: '', address: '',
+      contact_first_name: '', contact_last_name: '', contact_position: '',
+      categories: [], logo_url: null, gdpr_consent: false,
+  });
+
+  const loadInitialProfileData = useCallback(async (userId: string) => {
+    const [profileRes, categoriesRes] = await Promise.all([
+        supabase.from('StartupProfile').select('*').eq('user_id', userId).single(),
+        supabase.from('StartupCategory').select('category_id').eq('startup_id', userId),
+    ]);
+
+    if (profileRes.data) {
+        setFormDataCache(prev => ({
+            ...prev,
+            ...profileRes.data,
+            categories: categoriesRes.data?.map(c => c.category_id) || [],
+        }));
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchInitialData = async () => {
-      setInitialDataLoading(true);
+    const fetchStaticData = async () => {
       try {
         const { data, error } = await supabase.from('Category').select('id, name').order('name', { ascending: true });
         if (error) throw error;
@@ -91,13 +173,8 @@ export default function StartupRegistrationPage() {
         setInitialDataLoading(false);
       }
     };
-    if ((session || IS_DEVELOPMENT_MODE) && allCategories.length === 0) {
-      fetchInitialData();
-    } else if (!session && !IS_DEVELOPMENT_MODE) {
-        setInitialDataLoading(false);
-    }
-  }, [session, allCategories.length]);
-
+    fetchStaticData();
+  }, []);
 
   const handleUserSignedIn = useCallback(async (session: Session) => {
     const userId = session.user.id;
@@ -130,10 +207,11 @@ export default function StartupRegistrationPage() {
         
         const currentStep = profile?.registration_step || 1;
         if(currentStep > 5) {
-            router.push('/challenges'); // Startup jde na /challenges
+            router.push('/challenges'); 
         } else {
             setStep(currentStep);
         }
+        await loadInitialProfileData(userId); 
 
     } else {
         const { data: newUser, error: userError } = await supabase.from('User').insert({
@@ -161,8 +239,12 @@ export default function StartupRegistrationPage() {
             return;
         }
         setStep(2);
-    }
-  }, [router]);
+
+        setFormDataCache(prev => ({
+        ...prev,
+        contact_email: userEmail ?? ''
+        }));    }
+  }, [router, loadInitialProfileData]);
 
 
   useEffect(() => {
@@ -234,33 +316,35 @@ export default function StartupRegistrationPage() {
     setLoading(false);
   };
   
-  const handleNextStep = async (formData: Partial<FormData>) => {
+  const handleNextStep = async (formData: FormDataStep) => {
     if (!user) return;
     setLoading(true);
+    
+    const newCache: StartupRegistrationData = { ...formDataCache, ...formData };
+    setFormDataCache(newCache);
+    
     let error;
     const nextStep = step + 1;
 
     if (step === 2) {
-      ({ error } = await supabase.from('StartupProfile').update({
-          company_name: formData.company_name,
-          ico: formData.ico,
-          website: formData.website,
-          phone_number: formData.phone_number,
-          contact_email: formData.contact_email,
-          address: formData.address,
-      }).eq('user_id', user.id));
+      const dataToSave = {
+          company_name: newCache.company_name, ico: newCache.ico, website: newCache.website, 
+          phone_number: newCache.phone_number, contact_email: newCache.contact_email, address: newCache.address,
+      };
+      ({ error } = await supabase.from('StartupProfile').update(dataToSave).eq('user_id', user.id));
     } else if (step === 3) {
-      ({ error } = await supabase.from('StartupProfile').update({
-          contact_first_name: formData.contact_first_name,
-          contact_last_name: formData.contact_last_name,
-          contact_position: formData.contact_position,
-      }).eq('user_id', user.id));
-    } else if (step === 4 && formData.categories) {
+      const dataToSave = {
+          contact_first_name: newCache.contact_first_name, contact_last_name: newCache.contact_last_name, 
+          contact_position: newCache.contact_position,
+      };
+      ({ error } = await supabase.from('StartupProfile').update(dataToSave).eq('user_id', user.id));
+    } else if (step === 4) { 
         await supabase.from('StartupCategory').delete().eq('startup_id', user.id);
-        const toInsert = formData.categories.map((catId: string) => ({ startup_id: user.id, category_id: catId }));
+        const toInsert = newCache.categories.map((catId: string) => ({ startup_id: user.id, category_id: catId }));
         if (toInsert.length > 0) ({ error } = await supabase.from('StartupCategory').insert(toInsert));
-    } else if (step === 5) {
-        ({ error } = await supabase.from('StartupProfile').update({ logo_url: formData.logo_url }).eq('user_id', user.id));
+    } else if (step === 5) { 
+        const dataToSave = { logo_url: newCache.logo_url };
+        ({ error } = await supabase.from('StartupProfile').update(dataToSave).eq('user_id', user.id));
     }
 
     if (error) {
@@ -274,7 +358,7 @@ export default function StartupRegistrationPage() {
     if (stepError) {
         alert('Chyba při ukládání postupu: ' + stepError.message);
     } else if (nextStep > 5) {
-        router.push('/challenges'); // Po dokončení jde startup na /challenges
+        router.push('/challenges'); 
     } else {
         setStep(nextStep);
     }
@@ -286,34 +370,29 @@ export default function StartupRegistrationPage() {
     
     if (!user) return <p>Chyba: Uživatel nebyl nalezen.</p>;
     switch (step) {
-      case 2: return <Step1_CompanyInfo onNext={handleNextStep} />;
-      case 3: return <Step2_ContactPerson onNext={handleNextStep} />;
-      case 4: return <Step3_Categories onNext={handleNextStep} allCategories={allCategories} isLoading={initialDataLoading} />;
+      case 2: return <Step1_CompanyInfo onNext={handleNextStep} initialData={formDataCache} />;
+      case 3: return <Step2_ContactPerson onNext={handleNextStep} initialData={formDataCache} />;
+      case 4: return <Step3_Categories onNext={handleNextStep} allCategories={allCategories} isLoading={initialDataLoading} initialSelectedIds={formDataCache.categories} />;
       case 5: return <Step4_LogoUpload onNext={handleNextStep} userId={user.id} />;
       default: return null;
     }
   };
 
-  const handleDevPrev = () => setStep(prev => Math.max(2, prev - 1));
-  const handleDevNext = () => setStep(prev => Math.min(5, prev + 1));
 
-  if (loading && !IS_DEVELOPMENT_MODE) return <p>Načítání...</p>;
+  if (loading && !IS_DEVELOPMENT_MODE) return <LoadingSpinner/>;
 
-  // JSX pro zobrazení přihlášení/registrace zůstává stejné
   return (
-    <div className="w-full min-h-screen flex py-5 md:py-32 items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
+    <div className="w-full min-h-screen flex py-5 md:py-12 items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
       {IS_DEVELOPMENT_MODE || session ? (
         <div className="w-full">
           {renderStep()}
-          {IS_DEVELOPMENT_MODE && (
-            <div className="flex justify-center gap-24 my-12">
-              <button onClick={handleDevPrev} className="bg-[var(--barva-primarni)] text-white w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
-                🢀
-              </button>
-              <button onClick={handleDevNext} className="bg-[var(--barva-primarni)] text-white w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
-                🢂
-              </button>
-            </div>
+          
+          {step >= 2 && step <= 5 && (
+            <StepNavigation 
+                currentStep={step} 
+                setStep={setStep} 
+                isLoading={loading}
+            />
           )}
         </div>
       ) : (

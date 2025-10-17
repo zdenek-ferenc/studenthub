@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CategorySelector from '../../../../components/CategorySelector';
 
 type Category = { id: string; name: string; };
@@ -8,17 +8,22 @@ type StepProps = {
   onNext: (data: { categories: string[] }) => void;
   allCategories: Category[];
   isLoading: boolean;
+  initialSelectedIds: string[];
 };
 
-export default function Step3_Categories({ onNext, allCategories, isLoading }: StepProps) {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+export default function Step3_Categories({ onNext, allCategories, isLoading, initialSelectedIds }: StepProps) {
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialSelectedIds);
+
+  useEffect(() => {
+    setSelectedCategories(initialSelectedIds);
+  }, [initialSelectedIds]);
 
   const handleContinue = () => {
     onNext({ categories: selectedCategories });
   };
 
   return (
-    <div className='mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
+    <div className='flex items-center flex-col py-12 px-8 sm:px-12 w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl'>
       <div className="space-y-6">
         <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-4">Kategorie</h2>
         <p className="text-gray-600 text-center mb-6">Vyberte kategorie, které nejlépe vystihují vaši firmu.</p>
@@ -29,6 +34,7 @@ export default function Step3_Categories({ onNext, allCategories, isLoading }: S
           <CategorySelector 
             onSelectionChange={setSelectedCategories} 
             allCategories={allCategories}
+            initialSelectedIds={initialSelectedIds}
           />
         )}
         

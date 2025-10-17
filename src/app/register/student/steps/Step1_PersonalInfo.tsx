@@ -10,15 +10,25 @@ type FormData = {
   last_name: string;
   username: string;
   phone_number: string;
-  date_of_birth: string;
+  gdpr_consent: boolean;
 };
 
 type StepProps = {
   onNext: (data: FormData) => void;
+  initialData: FormData;
 };
 
-export default function Step1_PersonalInfo({ onNext }: StepProps) {
-  const { register, handleSubmit, formState: { errors }, watch, trigger } = useForm<FormData>({ mode: 'onChange' });
+export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
+  const { register, handleSubmit, formState: { errors }, watch, trigger } = useForm<FormData>({
+      mode: 'onChange',
+      defaultValues: {
+          first_name: initialData.first_name || '',
+          last_name: initialData.last_name || '',
+          username: initialData.username || '',
+          phone_number: initialData.phone_number || '',
+          gdpr_consent: false, 
+      }
+  });
 
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const usernameValue = watch('username'); 
@@ -31,6 +41,10 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
       if (!debouncedUsername || debouncedUsername.length < 3) {
         if (isActive) setUsernameStatus('idle');
         return;
+      }
+      if (debouncedUsername === initialData.username) {
+          if (isActive) setUsernameStatus('available');
+          return;
       }
 
       if (isActive) setUsernameStatus('checking');
@@ -54,7 +68,7 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
     return () => {
       isActive = false;
     };
-  }, [debouncedUsername, trigger]);
+  }, [debouncedUsername, trigger, initialData.username]);
 
 
   return (
@@ -95,7 +109,7 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
                     value: /^[a-zA-Z0-9_.]+$/,
                     message: 'Jméno může obsahovat jen písmena, čísla, tečky a podtržítka.'
                   },
-                  validate: () => usernameStatus !== 'taken' || 'Uživatelské jméno je již zabrané.'
+                  validate: (value) => value === initialData.username || usernameStatus !== 'taken' || 'Uživatelské jméno je již zabrané.'
               })} 
               className="input pr-10"
             />
@@ -118,6 +132,27 @@ export default function Step1_PersonalInfo({ onNext }: StepProps) {
           />
         </div>
 
+      <div className="pt-4">
+      <div className="flex items-start">
+        <div className="flex items-center h-5">
+          <input
+            id="gdpr_consent"
+            type="checkbox"
+            {...register('gdpr_consent', { required: 'Pro pokračování je nutné udělit souhlas.' })}
+            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+          />
+        </div>
+        <div className="ml-3 text-sm">
+          <label htmlFor="gdpr_consent" className="font-medium text-gray-700">
+            Souhlasím se zpracováním osobních údajů
+          </label>
+          <p className="text-gray-500 text-xs">
+            Pro více informací o tom, jak nakládáme s vašimi daty, si přečtěte naše <a href="/zasady-ochrany-udaju" target="_blank" className="underline hover:text-indigo-600">Zásady ochrany osobních údajů</a>.
+          </p>
+        </div>
+      </div>
+      {errors.gdpr_consent && <p className="error text-blue-400 text-center mt-2">{errors.gdpr_consent.message}</p>}
+    </div>
         <div className="pt-6 flex justify-center">
           <button type="submit" className="px-6 py-3 md:px-8 md:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400">Pokračovat</button>
         </div>

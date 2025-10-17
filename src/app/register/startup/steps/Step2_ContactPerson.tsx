@@ -1,7 +1,6 @@
 "use client";
 import { useForm } from 'react-hook-form';
 
-// Typ pro data z tohoto kroku
 type FormData = {
   contact_first_name: string;
   contact_last_name: string;
@@ -10,13 +9,19 @@ type FormData = {
 
 type StepProps = {
   onNext: (data: FormData) => void;
+  initialData: FormData; 
 };
 
-export default function Step2_ContactPerson({ onNext }: StepProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+export default function Step2_ContactPerson({ onNext, initialData }: StepProps) {
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+      defaultValues: {
+          contact_first_name: initialData.contact_first_name || '',
+          contact_last_name: initialData.contact_last_name || '',
+          contact_position: initialData.contact_position || '',
+      }
+  });
 
   return (
-    // Používáme stejný hlavní kontejner pro konzistentní vzhled
     <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
       <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-8">Kontaktní osoba</h2>
       

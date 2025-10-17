@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LanguageSelector from '../../../../components/LanguageSelector';
 
 type Language = { id: string; name: string; };
@@ -8,10 +8,15 @@ type StepProps = {
   onNext: (data: { languages: string[] }) => void;
   allLanguages: Language[];
   isLoading: boolean;
+  initialSelectedIds: string[]; 
 };
 
-export default function Step4_Languages({ onNext, allLanguages, isLoading }: StepProps) {
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+export default function Step4_Languages({ onNext, allLanguages, isLoading, initialSelectedIds }: StepProps) {
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(initialSelectedIds);
+
+  useEffect(() => {
+    setSelectedLanguages(initialSelectedIds);
+  }, [initialSelectedIds]);
 
   const handleContinue = () => {
     onNext({ languages: selectedLanguages });
@@ -28,6 +33,7 @@ export default function Step4_Languages({ onNext, allLanguages, isLoading }: Ste
         <LanguageSelector 
           onSelectionChange={setSelectedLanguages} 
           allLanguages={allLanguages}
+          initialSelectedIds={initialSelectedIds} 
         />
       )}
       

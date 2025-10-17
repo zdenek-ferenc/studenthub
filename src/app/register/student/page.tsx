@@ -11,26 +11,83 @@ import Step1_PersonalInfo from './steps/Step1_PersonalInfo';
 import Step2_EducationInfo from './steps/Step2_EducationInfo';
 import Step3_Skills from './steps/Step3_Skills';
 import Step4_Languages from './steps/Step4_Languages';
-import ConfirmationModal from '../../../components/ConfirmationModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { ChevronLeft, ChevronRight } from 'lucide-react'; 
 
 type Skill = { id: string; name: string; };
 type Language = { id: string; name: string; };
 
-const IS_DEVELOPMENT_MODE = false;
+const IS_DEVELOPMENT_MODE = false; 
 const DEV_START_STEP = 2;
 
-type FormData = {
-  first_name?: string;
-  last_name?: string;
-  username?: string;
-  phone_number?: string;
-  date_of_birth?: string;
-  university?: string;
-  field_of_study?: string;
-  specialization?: string;
-  year_of_study?: number;
-  skills?: string[];
-  languages?: string[];
+type StudentRegistrationData = {
+    first_name: string;
+    last_name: string;
+    username: string;
+    phone_number: string;
+    university: string;
+    field_of_study: string;
+    specialization: string;
+    year_of_study: number;
+    skills: string[]; 
+    languages: string[]; 
+    gdpr_consent: boolean;
+};
+
+type FormDataStep = Partial<Omit<StudentRegistrationData, 'skills' | 'languages'>> & {
+    skills?: string[];
+    languages?: string[];
+};
+
+const FORM_STEPS = [2, 3, 4, 5];
+const StepNavigation = ({ currentStep, setStep, isLoading }: { currentStep: number, setStep: (step: number) => void, isLoading: boolean }) => {
+    
+    const stepIndex = FORM_STEPS.indexOf(currentStep);
+    const isCompleted = (stepNumber: number) => stepNumber < currentStep;
+    const handleJump = (stepNumber: number) => {
+        if (!isLoading && stepNumber < currentStep) {
+            setStep(stepNumber);
+        }
+    };
+    
+    const handleGoToPrev = () => {
+        if (stepIndex > 0) setStep(FORM_STEPS[stepIndex - 1]);
+    };
+
+    return (
+        <div className="flex justify-center items-center gap-12 mt-8">
+            <button
+                onClick={handleGoToPrev}
+                disabled={stepIndex === 0 || isLoading}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${stepIndex > 0 ? 'cursor-pointer bg-[var(--barva-primarni)] text-white hover:opacity-80' : 'bg-gray-300 text-gray-500 cursor-auto'}`}
+            >
+                <ChevronLeft size={24} />
+            </button>
+            <div className="flex gap-4">
+                {FORM_STEPS.map(stepNumber => (
+                    <button
+                        key={stepNumber}
+                        onClick={() => handleJump(stepNumber)}
+                        disabled={stepNumber >= currentStep || isLoading}
+                        className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                            stepNumber === currentStep ? 'bg-[var(--barva-primarni)] scale-125' : 
+                            isCompleted(stepNumber) ? 'bg-[var(--barva-primarni)]/50 hover:bg-[var(--barva-primarni)]/70 cursor-pointer hover:scale-105 transition-all duration-200 ease-in-out' : 
+                            'bg-gray-300 cursor-not-allowed'
+                        }`}
+                    >
+                        <span className="sr-only">Krok {stepNumber - 1}</span>
+                    </button>
+                ))}
+            </div>
+            <button
+                disabled={true} 
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-gray-300 text-gray-500 cursor-auto`}
+            >
+                <ChevronRight size={24} />
+            </button>
+        </div>
+    );
 };
 
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
@@ -79,10 +136,32 @@ export default function StudentRegistrationPage() {
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [allLanguages, setAllLanguages] = useState<Language[]>([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
+  const [formDataCache, setFormDataCache] = useState<StudentRegistrationData>({
+    first_name: '', last_name: '', username: '', phone_number: '',
+    university: '', field_of_study: '', specialization: '', year_of_study: 0,
+    skills: [], languages: [], gdpr_consent: false,
+  });
+
+  const loadInitialProfileData = useCallback(async (userId: string) => {
+    const [profileRes, skillsRes, languagesRes] = await Promise.all([
+        supabase.from('StudentProfile').select('*').eq('user_id', userId).single(),
+        supabase.from('StudentSkill').select('skill_id').eq('student_id', userId),
+        supabase.from('StudentLanguage').select('language_id').eq('student_id', userId),
+    ]);
+
+    if (profileRes.data) {
+        setFormDataCache(prev => ({
+            ...prev,
+            ...profileRes.data,
+            skills: skillsRes.data?.map(s => s.skill_id) || [],
+            languages: languagesRes.data?.map(l => l.language_id) || [],
+            gdpr_consent: false,
+        }));
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchInitialData = async () => {
-      setInitialDataLoading(true); 
+    const fetchStaticData = async () => {
       try {
         const [skillsRes, languagesRes] = await Promise.all([
           supabase.from('Skill').select('id, name').order('name', { ascending: true }),
@@ -95,15 +174,11 @@ export default function StudentRegistrationPage() {
       } catch (error) {
         console.error("Chyba při přednačítání dat pro registraci:", error);
       } finally {
-        setInitialDataLoading(false);
+        setInitialDataLoading(false); 
       }
     };
-    if ((session || IS_DEVELOPMENT_MODE) && allSkills.length === 0) {
-      fetchInitialData();
-    } else if (!session && !IS_DEVELOPMENT_MODE) {
-        setInitialDataLoading(false);
-    }
-  }, [session, allSkills.length]);
+    fetchStaticData();
+  }, []);
 
   const handleUserSignedIn = useCallback(async (session: Session) => {
     const userId = session.user.id;
@@ -129,6 +204,7 @@ export default function StudentRegistrationPage() {
       } else {
         setStep(currentStep);
       }
+      await loadInitialProfileData(userId);
     } else {
       const { data: newUser, error: userError } = await supabase.from('User').insert({ id: userId, email: userEmail, role: 'student' }).select().single();
       if (userError || !newUser) {
@@ -145,7 +221,7 @@ export default function StudentRegistrationPage() {
       }
       setStep(2);
     }
-  }, [router]);
+  }, [router, loadInitialProfileData]);
 
   useEffect(() => {
     if (IS_DEVELOPMENT_MODE) {
@@ -200,26 +276,30 @@ export default function StudentRegistrationPage() {
     setLoading(false);
   };
 
-  const handleNextStep = async (formData: FormData) => {
+  const handleNextStep = async (formData: FormDataStep) => {
     if (!user) return;
     setLoading(true);
+    const newCache: StudentRegistrationData = { ...formDataCache, ...formData };
+    setFormDataCache(newCache);
     let error;
     const nextStep = step + 1;
 
-    // Krok 2 (PersonalInfo) a 3 (EducationInfo) aktualizují StudentProfile
     if (step === 2 || step === 3) { 
-        ({ error } = await supabase.from('StudentProfile').update(formData).eq('user_id', user.id)); 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { gdpr_consent, skills, languages, ...profileData } = newCache;
+        const cleanedProfileData = Object.fromEntries(
+            Object.entries(profileData).map(([key, value]) => [key, value === '' ? null : value])
+        );
+        ({ error } = await supabase.from('StudentProfile').update(cleanedProfileData).eq('user_id', user.id)); 
     }
-    // Krok 4 (Skills) aktualizuje StudentSkill
-    if (step === 4 && formData.skills) {
+    if (step === 4) {
       await supabase.from('StudentSkill').delete().eq('student_id', user.id);
-      const skillsToInsert = formData.skills.map((skillId: string) => ({ student_id: user.id, skill_id: skillId, level: 1, xp: 0 }));
+      const skillsToInsert = newCache.skills.map((skillId: string) => ({ student_id: user.id, skill_id: skillId, level: 1, xp: 0 }));
       if (skillsToInsert.length > 0) ({ error } = await supabase.from('StudentSkill').insert(skillsToInsert));
     }
-    // Krok 5 (Languages) aktualizuje StudentLanguage
-    if (step === 5 && formData.languages) {
+    if (step === 5) {
       await supabase.from('StudentLanguage').delete().eq('student_id', user.id);
-      const languagesToInsert = formData.languages.map((langId: string) => ({ student_id: user.id, language_id: langId }));
+      const languagesToInsert = newCache.languages.map((langId: string) => ({ student_id: user.id, language_id: langId }));
       if (languagesToInsert.length > 0) ({ error } = await supabase.from('StudentLanguage').insert(languagesToInsert));
     }
 
@@ -243,33 +323,28 @@ export default function StudentRegistrationPage() {
   const renderStep = () => {
     if (!user && !IS_DEVELOPMENT_MODE) return <p>Chyba: Uživatel nebyl nalezen.</p>;
     switch (step) {
-      case 2: return <Step1_PersonalInfo onNext={handleNextStep} />;
-      case 3: return <Step2_EducationInfo onNext={handleNextStep} />;
-      case 4: return <Step3_Skills onNext={handleNextStep} allSkills={allSkills} isLoading={initialDataLoading} />;
-      case 5: return <Step4_Languages onNext={handleNextStep} allLanguages={allLanguages} isLoading={initialDataLoading} />;
+      case 2: return <Step1_PersonalInfo onNext={handleNextStep} initialData={formDataCache} />; 
+      case 3: return <Step2_EducationInfo onNext={handleNextStep} initialData={formDataCache} />; 
+      case 4: return <Step3_Skills onNext={handleNextStep} allSkills={allSkills} isLoading={initialDataLoading} initialSelectedIds={formDataCache.skills} />; 
+      case 5: return <Step4_Languages onNext={handleNextStep} allLanguages={allLanguages} isLoading={initialDataLoading} initialSelectedIds={formDataCache.languages} />; 
       default: return null;
     }
   };
 
-  const handleDevPrev = () => setStep(prev => Math.max(2, prev - 1));
-  const handleDevNext = () => setStep(prev => Math.min(5, prev + 1));
-
-  if (loading && !IS_DEVELOPMENT_MODE) return <p className="text-center py-20">Načítání...</p>;
+  if (loading && !IS_DEVELOPMENT_MODE) return <LoadingSpinner/>;
 
   return (
     <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4 py-10 md:py-32">
       {IS_DEVELOPMENT_MODE || session ? (
         <div className="w-full">
           {renderStep()}
-          {IS_DEVELOPMENT_MODE && (
-            <div className="flex justify-center gap-24 my-12">
-              <button onClick={handleDevPrev} className="bg-[var(--barva-primarni)] text-white w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
-                🢀
-              </button>
-              <button onClick={handleDevNext} className="bg-[var(--barva-primarni)] text-white w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
-                🢂
-              </button>
-            </div>
+          
+          {step >= 2 && step <= 5 && (
+            <StepNavigation 
+                currentStep={step} 
+                setStep={setStep} 
+                isLoading={loading}
+            />
           )}
         </div>
       ) : (

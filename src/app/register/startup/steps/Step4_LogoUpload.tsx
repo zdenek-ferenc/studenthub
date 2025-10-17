@@ -39,7 +39,7 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
       onNext({ logo_url: publicUrl });
       showToast("Logo bylo úspěšně nahráno!", 'success');
 
-    } catch (error: unknown) { // <-- ZMĚNA ZDE
+    } catch (error: unknown) { 
       let errorMessage = 'Nahrávání selhalo. Zkuste to prosím znovu.';
       if (error instanceof Error) {
         errorMessage = `Nahrávání selhalo: ${error.message}`;

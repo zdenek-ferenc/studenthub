@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState,useRef, useMemo, useEffect } from 'react';
+import { X, ChevronDown } from 'lucide-react'; 
 
 type Skill = {
   id: string;
@@ -20,9 +21,17 @@ const popularSkills = [
 ];
 
 export default function SkillSelector({ onSelectionChange, initialSelectedIds = [], allSkills }: SkillSelectorProps) {
-  const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
+  const didInit = useRef(false); 
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    if (!didInit.current) {
+      setSelectedIds(initialSelectedIds);
+      didInit.current = true;
+    }
+  }, [initialSelectedIds]);
 
   const handleToggleSkill = (skillId: string) => {
     const newSelectedIds = new Set(selectedIds);
@@ -35,22 +44,26 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
     const updatedIds = Array.from(newSelectedIds);
     setSelectedIds(updatedIds);
     onSelectionChange(updatedIds);
-    setSearchTerm('');
   };
 
-  const displayedSkills = useMemo(() => {
+  const selectedSkillsObjects = useMemo(() => {
+    return allSkills.filter(skill => selectedIds.includes(skill.id));
+  }, [allSkills, selectedIds]);
+
+  const availableSkills = useMemo(() => {
+    const sourceSkills = showAll ? allSkills : allSkills.filter(skill => popularSkills.includes(skill.name));
+    let filteredSkills = sourceSkills.filter(skill => !selectedIds.includes(skill.id));
+
     if (searchTerm) {
-      return allSkills.filter(skill => 
+      filteredSkills = allSkills.filter(skill => 
+        !selectedIds.includes(skill.id) &&
         skill.name.toLowerCase().split(' ').some(word => 
           word.startsWith(searchTerm.toLowerCase())
         )
       );
     }
-    if (showAll) {
-      return allSkills;
-    }
-    return allSkills.filter(skill => popularSkills.includes(skill.name));
-  }, [searchTerm, allSkills, showAll]);
+    return filteredSkills;
+  }, [searchTerm, allSkills, showAll, selectedIds]);
 
   const getSkillsTitle = () => {
     if (searchTerm) return "Výsledky vyhledávání";
@@ -65,36 +78,50 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Hledej dovednost"
-        className="w-full max-w-sm mb-8 sm:mb-12 px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]"
+        className="px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer"
       />
+      {selectedSkillsObjects.length > 0 && (
+        <div className="w-full max-w-4xl sm:px-8 flex flex-wrap gap-3 md:gap-4 md:mb-6 pt-4">
+            {selectedSkillsObjects.map(skill => (
+                <button
+                    key={`selected-${skill.id}`}
+                    type="button"
+                    onClick={() => handleToggleSkill(skill.id)}
+                    className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] bg-sky-100 rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer"
+                >
+                    {skill.name}
+                    <X size={20} className='w-4 h-4' />
+                </button>
+            ))}
+        </div>
+      )}
 
       <div className="w-full max-w-4xl md:px-4 sm:px-8 flex justify-between items-center mb-8">
             <h4 className="text-xs sm:text-lg font-semibold opacity-70 text-[var(--barva-primarni)]">{getSkillsTitle()}</h4>
             {!searchTerm && (
                 <button type="button" onClick={() => setShowAll(!showAll)} className="text-xs sm:text-lg font-semibold text-[var(--barva-primarni)] flex items-center gap-1">
                     {showAll ? 'Skrýt' : 'Zobrazit vše'}
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${showAll ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <ChevronDown className={`h-5 w-5 transition-transform ${showAll ? 'rotate-180' : ''}`} />
                 </button>
             )}
         </div>
 
-      <div className="w-full max-w-4xl sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4">
-        {displayedSkills.map(skill => (
+      <div className="w-full max-w-4xl md:pt-12 sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4 min-h-[12rem] content-start">
+        {availableSkills.map(skill => (
           <button
             key={skill.id}
             type="button"
             onClick={() => handleToggleSkill(skill.id)}
-            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-semibold sm:font-light text-sm sm:text-xl outline-2 transition-colors duration-200 cursor-pointer
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-semibold sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer
               ${selectedIds.includes(skill.id)
                 ? 'bg-[var(--barva-primarni2)]'
-                : 'bg-white'
+                : 'bg-white hover:bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni2)]'
               }`}
           >
             {skill.name}
           </button>
         ))}
+        {searchTerm && availableSkills.length === 0 && <p className="text-sm text-gray-500 py-4">Dovednost nenalezena.</p>}
       </div>
     </div>
   );

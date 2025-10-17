@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SkillSelector from '../../../../components/SkillSelector';
 
 type Skill = { id: string; name: string; };
@@ -8,10 +8,15 @@ type StepProps = {
   onNext: (data: { skills: string[] }) => void;
   allSkills: Skill[];
   isLoading: boolean;
+  initialSelectedIds: string[]; 
 };
 
-export default function Step3_Skills({ onNext, allSkills, isLoading }: StepProps) {
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+export default function Step3_Skills({ onNext, allSkills, isLoading, initialSelectedIds }: StepProps) {
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialSelectedIds);
+  useEffect(() => {
+    setSelectedSkills(initialSelectedIds);
+  }, [initialSelectedIds]);
+
 
   const handleContinue = () => {
     onNext({ skills: selectedSkills });
@@ -28,6 +33,7 @@ export default function Step3_Skills({ onNext, allSkills, isLoading }: StepProps
         <SkillSelector 
           onSelectionChange={setSelectedSkills} 
           allSkills={allSkills} 
+          initialSelectedIds={initialSelectedIds} 
         />
       )}
       

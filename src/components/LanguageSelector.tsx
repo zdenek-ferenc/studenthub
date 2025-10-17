@@ -1,7 +1,8 @@
 "use client";
 
-import { useState} from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import Flag from 'react-world-flags';
+import { X } from 'lucide-react';
 
 type Language = {
   id: string;
@@ -33,8 +34,16 @@ const languageCountryCodes: { [key: string]: string } = {
 
 
 export default function LanguageSelector({ onSelectionChange, initialSelectedIds = [], allLanguages }: LanguageSelectorProps) {
-  const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
-  const [searchTerm, setSearchTerm] = useState('');
+  const didInit = useRef(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [searchTerm] = useState('');
+
+  useEffect(() => {
+    if (!didInit.current) {
+      setSelectedIds(initialSelectedIds);
+      didInit.current = true;
+    }
+  }, [initialSelectedIds]);
 
   const handleToggleLanguage = (langId: string) => {
     const newSelectedIds = new Set(selectedIds);
@@ -47,29 +56,50 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
     const updatedIds = Array.from(newSelectedIds);
     setSelectedIds(updatedIds);
     onSelectionChange(updatedIds);
-    setSearchTerm('');
   };
 
-  const filteredLanguages = allLanguages.filter(lang => {
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return lang.name.toLowerCase().split(' ').some(word => 
-      word.startsWith(lowerCaseSearchTerm)
-    );
-  });
+  const selectedLanguagesObjects = useMemo(() => {
+    return allLanguages.filter(lang => selectedIds.includes(lang.id));
+  }, [allLanguages, selectedIds]);
+  const availableLanguages = useMemo(() => {
+    const languages = allLanguages.filter(lang => !selectedIds.includes(lang.id));
+    if (searchTerm) {
+      return languages.filter(lang => {
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        return lang.name.toLowerCase().split(' ').some(word => 
+          word.startsWith(lowerCaseSearchTerm)
+        );
+      });
+    }
+    return languages; 
+  }, [allLanguages, selectedIds, searchTerm]);
 
   return (
-    <div className='flex flex-col items-center w-full'>
-      <div className="w-full max-w-sm mb-8 sm:mb-12">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Hledej jazyk (např. Angličtina)"
-          className="w-full px-6 py-3 border text-black border-gray-300 rounded-2xl focus:outline-none focus:bg-white focus:border-[var(--barva-primarni)]"
-        />
-      </div>
+    <div className='flex flex-col items-center w-full'>      
+      {availableLanguages.length === 0 && !searchTerm && selectedLanguagesObjects.length > 0 && (
+          <p className="text-sm text-gray-500 py-4">Všechny jazyky jsou již vybrány.</p>
+      )}
+      {selectedLanguagesObjects.length > 0 && (
+        <div className="w-full max-w-4xl sm:px-8 flex flex-wrap gap-3 md:gap-4 pb-6">
+            {selectedLanguagesObjects.map(lang => {
+                const countryCode = languageCountryCodes[lang.name];
+                return (
+                    <button
+                        key={`selected-${lang.id}`}
+                        type="button"
+                        onClick={() => handleToggleLanguage(lang.id)}
+                        className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] bg-sky-100 rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer"
+                    >
+                        {countryCode && <Flag code={countryCode} className="w-6 h-6 rounded-full object-cover" />}
+                        <span className='hidden sm:block'>{lang.name}</span>
+                        <X size={20} className='w-4 h-4' />
+                    </button>
+                );
+            })}
+        </div>
+      )}
       <div className="w-full max-w-4xl px-4 sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4 min-h-[12rem] content-start">
-        {filteredLanguages.map(lang => {
+        {availableLanguages.map(lang => {
           const countryCode = languageCountryCodes[lang.name];
           return (
             <button
@@ -77,21 +107,11 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
               type="button"
               onClick={() => handleToggleLanguage(lang.id)}
               title={lang.name}
-              className={`
-                flex items-center justify-center 
-                rounded-full transition-all duration-200 cursor-pointer group
-                w-14 h-14 sm:w-auto sm:h-auto
-                sm:px-5 sm:py-2 
-                font-light 
-                ring-2 ring-[var(--barva-primarni)]
-                ${selectedIds.includes(lang.id)
-                  ? 'bg-[var(--barva-primarni2)]'
-                  : 'bg-white hover:bg-gray-100'
-                }`}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-base sm:font-light text-sm sm:text-xl sm:outline-2 transition-colors duration-200 cursor-pointer`}
             >
               <div className="block sm:hidden">
                 {countryCode ? (
-                  <Flag code={countryCode} className="w-8 h-8 rounded-full object-cover shadow-md" />
+                  <Flag code={countryCode} className="w-10 h-10 rounded-full object-cover outline-1 md:outline-2 outline-offset-2" />
                 ) : (
                   <span className="text-xl">{lang.name.charAt(0)}</span>
                 )}
@@ -100,6 +120,7 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
             </button>
           )
         })}
+        {searchTerm && availableLanguages.length === 0 && <p className="text-sm text-gray-500 py-4">Jazyk nenalezen.</p>}
       </div>
     </div>
   );
