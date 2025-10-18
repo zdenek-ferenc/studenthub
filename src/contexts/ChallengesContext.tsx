@@ -52,13 +52,10 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const refetchChallenges = useCallback(() => {
-    // Tato funkce zůstává pro případné manuální obnovení,
-    // ale hlavní logika je v useEffect.
   }, []);
 
   useEffect(() => {
     if (authLoading) {
-      // Pokud se stále ověřuje uživatel, nic neděláme.
       return;
     }
 

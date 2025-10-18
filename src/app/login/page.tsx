@@ -73,7 +73,7 @@ export default function LoginPage() {
       setError("Neplatné přihlašovací údaje.");
       setLoading(false);
     } else {
-      router.push('/');
+      router.push('/challenges');
     }
   };
 

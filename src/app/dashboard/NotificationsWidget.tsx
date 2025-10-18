@@ -1,5 +1,3 @@
-// src/app/dashboard/NotificationsWidget.tsx
-
 "use client";
 
 import { useDashboard, Notification } from '../../contexts/DashboardContext';

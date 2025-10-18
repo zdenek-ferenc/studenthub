@@ -1,5 +1,3 @@
-// src/app/dashboard/StatsWidget.tsx
-
 "use client";
 
 import { useDashboard } from '../../contexts/DashboardContext';

@@ -64,14 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Jediný useEffect, který se stará o všechno
     const initializeAuth = async () => {
-      // 1. Zjistíme úvodní session
       const { data: { session } } = await supabase.auth.getSession();
       const currentUser = session?.user ?? null;
       setUser(currentUser);
 
-      // 2. Na základě session načteme profil a zkontrolujeme redirect
       if (currentUser) {
         const fetchedProfile = await fetchAndSetProfile(currentUser);
         if (fetchedProfile) {
@@ -82,14 +79,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
       }
-      
-      // 3. AŽ TEĎ, když je vše hotovo, ukončíme načítání
       setLoading(false);
     };
 
     initializeAuth();
 
-    // Listener pro budoucí změny
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       fetchAndSetProfile(session?.user ?? null);

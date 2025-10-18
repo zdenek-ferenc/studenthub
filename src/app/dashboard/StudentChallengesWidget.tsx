@@ -1,5 +1,3 @@
-// src/app/dashboard/StudentChallengesWidget.tsx
-
 "use client";
 
 import { useMemo, useState } from 'react';

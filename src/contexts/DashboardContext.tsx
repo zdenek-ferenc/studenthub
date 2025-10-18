@@ -1,12 +1,9 @@
-// src/contexts/DashboardContext.tsx
-
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 
-// --- TYPY DAT (zůstávají stejné) ---
 export type CleanSubmission = {
     id: string;
     completed_outputs: string[];
@@ -86,7 +83,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             supabase.from('StudentProfile').select('username').eq('user_id', userId).single(),
         ]);
         
-        // --- OPRAVA: Důkladné čištění dat ---
         if (submissionsRes.data) {
             const cleanedSubmissions = submissionsRes.data.map(sub => {
                 const challengeData = sub.Challenge ? (Array.isArray(sub.Challenge) ? sub.Challenge[0] : sub.Challenge) : null;
@@ -127,7 +123,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         } else {
             setProgress(null);
         }
-        // --- KONEC OPRAVY ---
         
         setNotifications(notificationsRes.data as Notification[] || []);
         

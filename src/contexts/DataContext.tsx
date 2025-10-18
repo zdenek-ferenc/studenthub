@@ -5,13 +5,11 @@ import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { useDebounce } from '../hooks/useDebounce';
 
-// --- Základní typy ---
 type Category = { id: string; name: string; };
 type Skill = { id: string; name: string; };
 type Language = { id: string; name: string; };
 type ChallengeStatus = { status: 'open' | 'closed' | 'draft' | 'archived'; };
 
-// --- Typy pro Startup a Student (cílové typy) ---
 export type Startup = {
     user_id: string;
     company_name: string;
@@ -32,14 +30,12 @@ export type Student = {
     university: string | null;
     bio: string | null;
     created_at: string;
-    // level_progress už zde není, protože sloupec neexistuje v DB
     level: number | null;
     xp: number | null;
     StudentSkill: { Skill: Skill }[];
     StudentLanguage: { Language: Language }[];
 };
 
-// --- Typy pro filtry ---
 type StartupFiltersType = {
     searchQuery: string;
     setSearchQuery: (query: string) => void;
@@ -58,17 +54,14 @@ type StudentFiltersType = {
     setSortBy: (sort: string) => void;
 };
 
-// --- Přesnější typ pro data PŘÍMO ZE SUPABASE (bez level_progress) ---
 type RawStudentSkillFromDB = { Skill: Skill | Skill[] | null };
 type RawStudentLanguageFromDB = { Language: Language | Language[] | null };
 
-// Odebrán level_progress i z tohoto typu
 type RawStudentProfileFromDB = Omit<Student, 'StudentSkill' | 'StudentLanguage' | 'level_progress'> & {
     StudentSkill: RawStudentSkillFromDB[] | null;
     StudentLanguage: RawStudentLanguageFromDB[] | null;
 };
 
-// --- Typ kontextu ---
 type DataContextType = {
     startups: Startup[];
     students: Student[];
@@ -126,8 +119,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         try {
             if (startupCategories.length > 0) {
                 const { data: rpcData, error: rpcError } = await supabase.rpc('get_startups_with_categories', { category_ids: startupCategories, search_term: debouncedStartupSearch });
-                 if (rpcError) throw rpcError;
-                 const startupIds = rpcData?.map((s: { user_id: string }) => s.user_id) || [];
+                if (rpcError) throw rpcError;
+                const startupIds = rpcData?.map((s: { user_id: string }) => s.user_id) || [];
                 if (startupIds.length === 0) { setStartups([]); setHasMoreStartups(false); setLoadingStartups(false); return; }
                 query = query.in('user_id', startupIds);
             } else if (debouncedStartupSearch) {
@@ -138,19 +131,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
             else query = query.order('company_name', { ascending: true });
 
             const { data, error } = await query.range(from, to);
-             if (error) throw error;
+            if (error) throw error;
 
             if (data) {
                 setStartups(prev => (currentPage === 0 ? data as Startup[] : [...prev, ...data as Startup[]]));
                 setHasMoreStartups(data.length === ITEMS_PER_PAGE);
             } else {
-                 if (currentPage === 0) setStartups([]); setHasMoreStartups(false);
+                if (currentPage === 0) setStartups([]); setHasMoreStartups(false);
             }
         } catch (error) {
-             console.error("Chyba při načítání startupů:", error instanceof Error ? error.message : JSON.stringify(error));
-             if (currentPage === 0) setStartups([]); setHasMoreStartups(false);
+            console.error("Chyba při načítání startupů:", error instanceof Error ? error.message : JSON.stringify(error));
+            if (currentPage === 0) setStartups([]); setHasMoreStartups(false);
         } finally {
-             setLoadingStartups(false);
+            setLoadingStartups(false);
         }
     }, [authLoading, debouncedStartupSearch, startupCategories, startupSortBy]);
 
@@ -162,7 +155,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const from = currentPage * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
 
-        // *** OPRAVA ZDE: Odebrán sloupec 'level_progress' ze selectu ***
         let query = supabase.from('StudentProfile').select(`
             user_id, first_name, last_name, username, profile_picture_url, university, bio, created_at, level, xp,
             StudentSkill ( Skill ( id, name ) ),
@@ -174,20 +166,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 const { data: rpcData, error: rpcError } = await supabase.rpc('get_students_with_skills', { skill_ids: studentSkills, search_term: debouncedStudentSearch });
                 if (rpcError) throw rpcError;
                 const studentIds = rpcData?.map((s: { user_id: string }) => s.user_id) || [];
-                 if (studentIds.length === 0) { setStudents([]); setHasMoreStudents(false); setLoadingStudents(false); return; }
+                if (studentIds.length === 0) { setStudents([]); setHasMoreStudents(false); setLoadingStudents(false); return; }
                 query = query.in('user_id', studentIds);
             } else if (debouncedStudentSearch) {
                 query = query.or(`first_name.ilike.%${debouncedStudentSearch}%,last_name.ilike.%${debouncedStudentSearch}%,bio.ilike.%${debouncedStudentSearch}%`);
             }
 
-            // Použití nullsFirst: false
             if (studentSortBy === 'newest') query = query.order('created_at', { ascending: false });
             else if (studentSortBy === 'level') query = query.order('level', { ascending: false, nullsFirst: false })
-                                                       .order('xp', { ascending: false, nullsFirst: false });
+                                                    .order('xp', { ascending: false, nullsFirst: false });
             else query = query.order('last_name', { ascending: true });
 
             const { data, error } = await query.range(from, to);
-             if (error) throw error;
+            if (error) throw error;
 
             if (data) {
                 const rawDataFromDB = data as RawStudentProfileFromDB[];
@@ -213,7 +204,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
                         })
                         .filter((item): item is { Language: Language } => item !== null);
 
-                    // *** OPRAVA ZDE: level_progress nastaven na null ***
                     return {
                         user_id: student.user_id,
                         first_name: student.first_name,
@@ -236,14 +226,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 if (currentPage === 0) setStudents([]); setHasMoreStudents(false);
             }
         } catch(error) {
-             console.error("Chyba při načítání studentů:", error instanceof Error ? error.message : JSON.stringify(error));
-             if (currentPage === 0) setStudents([]); setHasMoreStudents(false);
+            console.error("Chyba při načítání studentů:", error instanceof Error ? error.message : JSON.stringify(error));
+            if (currentPage === 0) setStudents([]); setHasMoreStudents(false);
         } finally {
-             setLoadingStudents(false);
+            setLoadingStudents(false);
         }
     }, [authLoading, debouncedStudentSearch, studentSkills, studentSortBy]);
 
-    // ... useEffecty a loadMore funkce zůstávají stejné ...
     useEffect(() => {
         if (!authLoading) {
             setStartupPage(0);
@@ -261,7 +250,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const fetchFiltersData = async () => {
             if (allCategories.length > 0 && allSkills.length > 0) {
-                 setLoadingFilters(false); return;
+                setLoadingFilters(false); return;
             }
             if (authLoading) return;
             setLoadingFilters(true);
@@ -295,7 +284,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         refetchStudents(nextPage);
     }, [studentPage, refetchStudents, loadingStudents, authLoading]);
 
-     const value = useMemo(() => ({
+    const value = useMemo(() => ({
         startups, students, allCategories, allSkills,
         loadingStartups, loadingStudents, loadingFilters,
         hasMoreStartups, hasMoreStudents,
