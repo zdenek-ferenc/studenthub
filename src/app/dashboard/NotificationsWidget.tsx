@@ -1,20 +1,12 @@
+// src/app/dashboard/NotificationsWidget.tsx
+
 "use client";
 
-import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabaseClient';
-import { useAuth } from '../../contexts/AuthContext';
+import { useDashboard, Notification } from '../../contexts/DashboardContext';
 import Link from 'next/link';
 import { Bell, MessageSquareText, Trophy, Zap } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cs } from 'date-fns/locale';
-
-type Notification = {
-    id: string;
-    message: string;
-    link_url: string;
-    created_at: string;
-    type: 'new_submission' | 'submission_reviewed' | 'submission_winner' | null;
-};
 
 const NotificationIcon = ({ type }: { type: Notification['type'] }) => {
     switch (type) {
@@ -29,41 +21,13 @@ const NotificationIcon = ({ type }: { type: Notification['type'] }) => {
     }
 };
 
-
 export default function NotificationsWidget() {
-    const { user } = useAuth();
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [hasFetched, setHasFetched] = useState(false);
-
-    useEffect(() => {
-        if (user && !hasFetched) {
-            const fetchNotifications = async () => {
-                setLoading(true);
-                const { data, error } = await supabase
-                    .from('notifications')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .order('created_at', { ascending: false })
-                    .limit(4); 
-
-                if (error) {
-                    console.error("Chyba při načítání notifikací:", error);
-                } else {
-                    setNotifications(data as Notification[]);
-                }
-                setLoading(false);
-                setHasFetched(true);
-            };
-
-            fetchNotifications();
-        }
-    }, [user, hasFetched]);
+    const { notifications, loading } = useDashboard();
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col">
             <h3 className="text-xl font-bold text-[var(--barva-tmava)] mb-4 flex justify-center md:justify-start">Nejnovější události</h3>
-            {loading && !hasFetched ? (
+            {loading ? (
                 <p className="text-sm text-gray-500">Načítám...</p>
             ) : notifications.length > 0 ? (
                 <div className="space-y-3 flex-grow">

@@ -51,31 +51,24 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
   const [sortBy, setSortBy] = useState('recommended');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const refetchChallenges = useCallback(async () => {
-    // Pokud stále probíhá autentizace, počkáme
+const refetchChallenges = useCallback(() => {
+    // Tuto funkci necháme prázdnou, ale existující pro kompatibilitu,
+    // pokud by ji nějaká komponenta volala přímo.
+    // Hlavní logiku přesuneme do useEffect.
+  }, []);
+
+  useEffect(() => {
+    // Pokud stále probíhá autentizace, nic neděláme a počkáme.
     if (authLoading) {
-      setLoading(false); // Ukončíme lokální loading, protože čekáme na auth
+      setLoading(false);
       return;
     }
 
-    // Pokud potřebujeme uživatele pro řazení a není k dispozici, nehledáme
-    if (sortBy === 'recommended' && !user) {
-        setChallenges([]);
-        setStudentSkills([]); // Vyčistíme i skilly studenta
-        setLoading(false);
-        return;
-    }
+    const fetchAllData = async () => {
+      setLoading(true);
 
-    setLoading(true); // Zahájíme načítání
-
-    try {
-        // Načtení všech skillů, pokud ještě nejsou
-        if (allSkills.length === 0) {
-          const { data: skillsData } = await supabase.from('Skill').select('id, name');
-          setAllSkills(skillsData || []);
-        }
-
-        // Načtení skillů studenta, pokud je přihlášen a ještě nejsou načteny
+      try {
+        // Načtení skillů studenta (pokud je přihlášen)
         if (user && studentSkills.length === 0) {
             const { data: studentSkillsData } = await supabase.from('StudentSkill').select('Skill(id, name)').eq('student_id', user.id);
             const skills = studentSkillsData?.flatMap(item => item.Skill || []) || [];
@@ -83,19 +76,28 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
         } else if (!user) {
             setStudentSkills([]); // Reset skillů pokud není uživatel přihlášen
         }
+        
+        // Načtení všech dostupných skillů pro filtry
+        if (allSkills.length === 0) {
+          const { data: skillsData } = await supabase.from('Skill').select('id, name');
+          setAllSkills(skillsData || []);
+        }
 
-        // Sestavení dotazu na výzvy
+        // Sestavení a spuštění hlavního dotazu na výzvy
         let query = supabase.from('Challenge').select(`*, ChallengeSkill(Skill(*)), Submission(student_id), StartupProfile(*)`);
 
         if (selectedSkillIds.length > 0) {
-            const { data: rpcData } = await supabase.rpc('get_challenges_with_skills', {
+            const { data: rpcData, error: rpcError } = await supabase.rpc('get_challenges_with_skills', {
                 p_skill_ids: selectedSkillIds,
                 p_search_term: debouncedSearchQuery
             });
+
+            if (rpcError) throw rpcError;
+
             const challengeIds = rpcData?.map((c: {id: string}) => c.id) || [];
             if (challengeIds.length === 0) {
               setChallenges([]);
-              setLoading(false); // Ukončíme načítání zde, protože nic nenajdeme
+              setLoading(false);
               return;
             }
             query = query.in('id', challengeIds);
@@ -109,34 +111,34 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
             case 'newest': query = query.order('created_at', { ascending: false }); break;
             case 'ending_soon': query = query.order('deadline', { ascending: true }); break;
             case 'highest_reward': query = query.order('reward_first_place', { ascending: false, nullsFirst: false }); break;
-            // 'recommended' řazení se provede až po načtení dat, pokud je potřeba (viz useMemo níže)
             default: break;
         }
 
         const { data: challengesData, error: challengesError } = await query;
 
-        if (challengesError) {
-          console.error("Chyba při načítání výzev:", challengesError);
+        if (challengesError) throw challengesError;
+
+        setChallenges((challengesData as Challenge[]) ?? []);
+
+      } catch (error) {
+          console.error("Chyba při načítání dat pro výzvy:", error);
           setChallenges([]);
-        } else {
-          setChallenges((challengesData as Challenge[]) ?? []);
-        }
+      } finally {
+          setLoading(false);
+      }
+    };
 
-    } catch (error) {
-        console.error("Neočekávaná chyba v refetchChallenges:", error);
-        setChallenges([]);
-    } finally {
-        setLoading(false); // Ukončíme načítání vždy
-    }
-
-  }, [user, authLoading, debouncedSearchQuery, selectedSkillIds, sortBy, allSkills.length, studentSkills.length]); // Odebráno challenges.length
+    fetchAllData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, authLoading, debouncedSearchQuery, selectedSkillIds, sortBy]);
 
   useEffect(() => {
     // Spustíme načítání, až když je AuthContext hotový
     if (!authLoading) {
       refetchChallenges();
     }
-  }, [authLoading, refetchChallenges]); // Závislost na authLoading a refetchChallenges
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user?.id, debouncedSearchQuery, selectedSkillIds, sortBy]);// Závislost na authLoading a refetchChallenges
 
   const value = useMemo(() => ({
     challenges,

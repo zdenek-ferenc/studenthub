@@ -1,10 +1,12 @@
+// src/app/dashboard/page.tsx
+
 "use client";
 
-import { useState, useEffect, useRef } from 'react'; 
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import withAuth from '../../components/withAuth';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabaseClient'; 
+import { useDashboard } from '../../contexts/DashboardContext'; // <-- Změna importu
 import LoadingSpinner from '../../components/LoadingSpinner';
 import CareerGrowthWidget from './CareerGrowthWidget';
 import StudentChallengesWidget from './StudentChallengesWidget';
@@ -15,79 +17,25 @@ import { Briefcase, TrendingUp, LayoutGrid } from 'lucide-react';
 
 type TabId = 'challenges' | 'growth' | 'activities';
 
-type StudentProfileData = {
-    username: string;
-};
-
-const PillButton = ({
-  id,
-  label,
-  icon: Icon,
-  activeTab,
-  setActiveTab
-}: {
-  id: TabId,
-  label: string,
-  icon: React.ElementType,
-  activeTab: TabId,
-  setActiveTab: (id: TabId) => void
-}) => {
+const PillButton = ({ id, label, icon: Icon, activeTab, setActiveTab }: { id: TabId, label: string, icon: React.ElementType, activeTab: TabId, setActiveTab: (id: TabId) => void }) => {
   const isActive = activeTab === id;
   return (
-    <button
-      onClick={() => setActiveTab(id)}
-      className="relative flex-1 flex items-center justify-center gap-2 p-2 m-1 text-sm font-semibold transition-colors z-10"
-    >
-      {isActive && (
-        <motion.div
-          className="absolute inset-0 bg-[var(--barva-primarni)] rounded-full shadow-md"
-          layoutId="activePill"
-        />
-      )}
-      <div className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}>
-        <Icon size={20} />
-      </div>
-      <span className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}>
-        {label}
-      </span>
+    <button onClick={() => setActiveTab(id)} className="relative flex-1 flex items-center justify-center gap-2 p-2 m-1 text-sm font-semibold transition-colors z-10">
+      {isActive && ( <motion.div className="absolute inset-0 bg-[var(--barva-primarni)] rounded-full shadow-md" layoutId="activePill" /> )}
+      <div className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}><Icon size={20} /></div>
+      <span className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}>{label}</span>
     </button>
   );
 };
 
 function DashboardPage() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { profile, loading: authLoading } = useAuth();
+  const { studentProfile, loading: dashboardLoading } = useDashboard(); // <-- Použij data z kontextu
   const [activeTab, setActiveTab] = useState<TabId>('challenges');
-  const [studentProfile, setStudentProfile] = useState<StudentProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const hasFetchedProfile = useRef(false);
-
-  useEffect(() => {
-    if (user && !hasFetchedProfile.current) {
-      const fetchStudentProfile = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('StudentProfile')
-          .select('first_name, username')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error) {
-          console.error("Error fetching student profile for dashboard:", error);
-        } else {
-          setStudentProfile(data);
-          hasFetchedProfile.current = true;
-        }
-        setLoading(false);
-      };
-      fetchStudentProfile();
-    } else if (!authLoading && !user) {
-      setLoading(false);
-    }
-  }, [user, authLoading]); 
-
+  
   const displayName = studentProfile?.username ? studentProfile.username : "zpět";
 
-  if (authLoading || loading) return <LoadingSpinner />;
+  if (authLoading || dashboardLoading) return <LoadingSpinner />;
   if (profile?.role !== 'student') return <p className="text-center py-20">Tato stránka je určena pouze pro studenty.</p>;
 
   return (
@@ -115,28 +63,10 @@ function DashboardPage() {
           <PillButton id="activities" label="Aktivity" icon={LayoutGrid} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
         <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            {activeTab === 'challenges' && (
-              <div className="space-y-3">
-                <StudentChallengesWidget />
-                <RecommendedChallengesWidget />
-              </div>
-            )}
-            {activeTab === 'growth' && (
-              <CareerGrowthWidget />
-            )}
-            {activeTab === 'activities' && (
-              <div className="space-y-3">
-                <StatsWidget />
-                <NotificationsWidget />
-              </div>
-            )}
+          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+            {activeTab === 'challenges' && ( <div className="space-y-3"><StudentChallengesWidget /><RecommendedChallengesWidget /></div> )}
+            {activeTab === 'growth' && ( <CareerGrowthWidget /> )}
+            {activeTab === 'activities' && ( <div className="space-y-3"><StatsWidget /><NotificationsWidget /></div> )}
           </motion.div>
         </AnimatePresence>
       </div>

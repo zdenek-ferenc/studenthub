@@ -3,6 +3,7 @@
 import { AuthProvider } from '../contexts/AuthContext';
 import { ChallengesProvider } from '../contexts/ChallengesContext';
 import { DataProvider } from '../contexts/DataContext';
+import { DashboardProvider } from '../contexts/DashboardContext';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import MainContent from '../components/MainContent';
@@ -24,16 +25,18 @@ export default function RootLayout({
     <html lang="cs">
       <body className={sora.variable}>
         <AuthProvider>
-          <ChallengesProvider>
-            <DataProvider>
-              <Header />
-              <MainContent>
-                {children}
-              </MainContent>
-              <Footer />
-              <ToastContainer />
-            </DataProvider>
-          </ChallengesProvider>
+          <DashboardProvider>
+            <ChallengesProvider>
+              <DataProvider>
+                <Header />
+                <MainContent>
+                  {children}
+                </MainContent>
+                <Footer />
+                <ToastContainer />
+              </DataProvider>
+            </ChallengesProvider>
+          </DashboardProvider>
         </AuthProvider>
       </body>
     </html>
