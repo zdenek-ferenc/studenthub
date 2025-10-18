@@ -2,13 +2,16 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from './AuthContext';
 import { useDebounce } from '../hooks/useDebounce';
 
+// --- Základní typy ---
 type Category = { id: string; name: string; };
 type Skill = { id: string; name: string; };
 type Language = { id: string; name: string; };
 type ChallengeStatus = { status: 'open' | 'closed' | 'draft' | 'archived'; };
 
+// --- Typy pro Startup a Student (cílové typy) ---
 export type Startup = {
     user_id: string;
     company_name: string;
@@ -29,11 +32,14 @@ export type Student = {
     university: string | null;
     bio: string | null;
     created_at: string;
-    level_progress: number | null;
+    // level_progress už zde není, protože sloupec neexistuje v DB
+    level: number | null;
+    xp: number | null;
     StudentSkill: { Skill: Skill }[];
     StudentLanguage: { Language: Language }[];
 };
 
+// --- Typy pro filtry ---
 type StartupFiltersType = {
     searchQuery: string;
     setSearchQuery: (query: string) => void;
@@ -52,33 +58,40 @@ type StudentFiltersType = {
     setSortBy: (sort: string) => void;
 };
 
-type RawStudentData = Omit<Student, 'StudentSkill' | 'StudentLanguage'> & {
-    StudentSkill: { Skill: Skill[] }[];
-    StudentLanguage: { Language: Language[] }[];
+// --- Přesnější typ pro data PŘÍMO ZE SUPABASE (bez level_progress) ---
+type RawStudentSkillFromDB = { Skill: Skill | Skill[] | null };
+type RawStudentLanguageFromDB = { Language: Language | Language[] | null };
+
+// Odebrán level_progress i z tohoto typu
+type RawStudentProfileFromDB = Omit<Student, 'StudentSkill' | 'StudentLanguage' | 'level_progress'> & {
+    StudentSkill: RawStudentSkillFromDB[] | null;
+    StudentLanguage: RawStudentLanguageFromDB[] | null;
 };
 
+// --- Typ kontextu ---
 type DataContextType = {
-startups: Startup[];
-students: Student[];
-allCategories: Category[];
-allSkills: Skill[];
-startupFilters: StartupFiltersType;
-studentFilters: StudentFiltersType;
-loadingFilters: boolean;
-loadingStartups: boolean;
-loadingStudents: boolean;
-hasMoreStartups: boolean;
-hasMoreStudents: boolean;
-refetchStartups: () => void;
-refetchStudents: () => void;
-loadMoreStartups: () => void;
-loadMoreStudents: () => void;
+    startups: Startup[];
+    students: Student[];
+    allCategories: Category[];
+    allSkills: Skill[];
+    startupFilters: StartupFiltersType;
+    studentFilters: StudentFiltersType;
+    loadingFilters: boolean;
+    loadingStartups: boolean;
+    loadingStudents: boolean;
+    hasMoreStartups: boolean;
+    hasMoreStudents: boolean;
+    refetchStartups: () => void;
+    refetchStudents: () => void;
+    loadMoreStartups: () => void;
+    loadMoreStudents: () => void;
 };
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 const ITEMS_PER_PAGE = 12;
 
 export function DataProvider({ children }: { children: ReactNode }) {
+    const { loading: authLoading } = useAuth();
     const [startups, setStartups] = useState<Startup[]>([]);
     const [students, setStudents] = useState<Student[]>([]);
     const [allCategories, setAllCategories] = useState<Category[]>([]);
@@ -97,10 +110,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const [studentSkills, setStudentSkills] = useState<string[]>([]);
     const [studentSortBy, setStudentSortBy] = useState('match');
 
-    const debouncedStartupSearch = useDebounce(startupSearch, 500); 
+    const debouncedStartupSearch = useDebounce(startupSearch, 500);
     const debouncedStudentSearch = useDebounce(studentSearch, 500);
 
+
     const refetchStartups = useCallback(async (currentPage = 0) => {
+        if (authLoading) { setLoadingStartups(false); return; }
         if (currentPage === 0) setStartups([]);
         setLoadingStartups(true);
         const from = currentPage * ITEMS_PER_PAGE;
@@ -108,95 +123,155 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         let query = supabase.from('StartupProfile').select(`*, StartupCategory(Category(id, name)), Challenge(status)`);
 
-        if (startupCategories.length > 0) {
-            const { data: rpcData } = await supabase.rpc('get_startups_with_categories', { category_ids: startupCategories, search_term: debouncedStartupSearch });
-            const startupIds = rpcData?.map((s: { user_id: string }) => s.user_id) || [];
-            if (startupIds.length === 0) {
-                setStartups([]);
-                setHasMoreStartups(false);
-                setLoadingStartups(false);
-                return;
+        try {
+            if (startupCategories.length > 0) {
+                const { data: rpcData, error: rpcError } = await supabase.rpc('get_startups_with_categories', { category_ids: startupCategories, search_term: debouncedStartupSearch });
+                 if (rpcError) throw rpcError;
+                 const startupIds = rpcData?.map((s: { user_id: string }) => s.user_id) || [];
+                if (startupIds.length === 0) { setStartups([]); setHasMoreStartups(false); setLoadingStartups(false); return; }
+                query = query.in('user_id', startupIds);
+            } else if (debouncedStartupSearch) {
+                query = query.or(`company_name.ilike.%${debouncedStartupSearch}%,description.ilike.%${debouncedStartupSearch}%`);
             }
-            query = query.in('user_id', startupIds);
-        } else if (debouncedStartupSearch) { 
-            query = query.or(`company_name.ilike.%${debouncedStartupSearch}%,description.ilike.%${debouncedStartupSearch}%`);
-        }
 
-        if (startupSortBy === 'newest') query = query.order('created_at', { ascending: false });
-        else query = query.order('company_name', { ascending: true });
+            if (startupSortBy === 'newest') query = query.order('created_at', { ascending: false });
+            else query = query.order('company_name', { ascending: true });
 
-        const { data } = await query.range(from, to);
-        if (data) {
-            setStartups(prev => (currentPage === 0 ? data as Startup[] : [...prev, ...data as Startup[]]));
-            setHasMoreStartups(data.length === ITEMS_PER_PAGE);
+            const { data, error } = await query.range(from, to);
+             if (error) throw error;
+
+            if (data) {
+                setStartups(prev => (currentPage === 0 ? data as Startup[] : [...prev, ...data as Startup[]]));
+                setHasMoreStartups(data.length === ITEMS_PER_PAGE);
+            } else {
+                 if (currentPage === 0) setStartups([]); setHasMoreStartups(false);
+            }
+        } catch (error) {
+             console.error("Chyba při načítání startupů:", error instanceof Error ? error.message : JSON.stringify(error));
+             if (currentPage === 0) setStartups([]); setHasMoreStartups(false);
+        } finally {
+             setLoadingStartups(false);
         }
-        setLoadingStartups(false);
-    }, [debouncedStartupSearch, startupCategories, startupSortBy]); 
+    }, [authLoading, debouncedStartupSearch, startupCategories, startupSortBy]);
+
 
     const refetchStudents = useCallback(async (currentPage = 0) => {
+        if (authLoading) { setLoadingStudents(false); return; }
         if (currentPage === 0) setStudents([]);
         setLoadingStudents(true);
         const from = currentPage * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
-        
-        let query = supabase.from('StudentProfile').select(`*, StudentSkill(Skill(id, name)), StudentLanguage(Language(id, name))`);
-        if (studentSkills.length > 0) {
-            const { data: rpcData } = await supabase.rpc('get_students_with_skills', { skill_ids: studentSkills, search_term: debouncedStudentSearch });
-            const studentIds = rpcData?.map((s: { user_id: string }) => s.user_id) || [];
-             if (studentIds.length === 0) {
-                setStudents([]);
-                setHasMoreStudents(false);
-                setLoadingStudents(false);
-                return;
+
+        // *** OPRAVA ZDE: Odebrán sloupec 'level_progress' ze selectu ***
+        let query = supabase.from('StudentProfile').select(`
+            user_id, first_name, last_name, username, profile_picture_url, university, bio, created_at, level, xp,
+            StudentSkill ( Skill ( id, name ) ),
+            StudentLanguage ( Language ( id, name ) )
+        `);
+
+        try {
+            if (studentSkills.length > 0) {
+                const { data: rpcData, error: rpcError } = await supabase.rpc('get_students_with_skills', { skill_ids: studentSkills, search_term: debouncedStudentSearch });
+                if (rpcError) throw rpcError;
+                const studentIds = rpcData?.map((s: { user_id: string }) => s.user_id) || [];
+                 if (studentIds.length === 0) { setStudents([]); setHasMoreStudents(false); setLoadingStudents(false); return; }
+                query = query.in('user_id', studentIds);
+            } else if (debouncedStudentSearch) {
+                query = query.or(`first_name.ilike.%${debouncedStudentSearch}%,last_name.ilike.%${debouncedStudentSearch}%,bio.ilike.%${debouncedStudentSearch}%`);
             }
-            query = query.in('user_id', studentIds);
-        } else if (debouncedStudentSearch) { 
-            query = query.or(`first_name.ilike.%${debouncedStudentSearch}%,last_name.ilike.%${debouncedStudentSearch}%,bio.ilike.%${debouncedStudentSearch}%`);
-        }
 
-        if (studentSortBy === 'newest') query = query.order('created_at', { ascending: false });
-        else if (studentSortBy === 'level') query = query.order('level_progress', { ascending: false, nullsFirst: false });
-        else query = query.order('last_name', { ascending: true });
-        
-        const { data } = await query.range(from, to);
-        if (data) {
-            const cleanedData = (data as RawStudentData[]).map(student => ({
-                ...student,
-                StudentSkill: (student.StudentSkill || []).flatMap(ss => ss.Skill).map(skill => ({ Skill: skill })),
-                StudentLanguage: (student.StudentLanguage || []).flatMap(sl => sl.Language).map(lang => ({ Language: lang })),
-            }));
-            setStudents(prev => (currentPage === 0 ? cleanedData : [...prev, ...cleanedData]));
-            setHasMoreStudents(data.length === ITEMS_PER_PAGE);
+            // Použití nullsFirst: false
+            if (studentSortBy === 'newest') query = query.order('created_at', { ascending: false });
+            else if (studentSortBy === 'level') query = query.order('level', { ascending: false, nullsFirst: false })
+                                                       .order('xp', { ascending: false, nullsFirst: false });
+            else query = query.order('last_name', { ascending: true });
+
+            const { data, error } = await query.range(from, to);
+             if (error) throw error;
+
+            if (data) {
+                const rawDataFromDB = data as RawStudentProfileFromDB[];
+                const cleanedData: Student[] = rawDataFromDB.map((student): Student => {
+
+                    const skills: { Skill: Skill }[] = (student.StudentSkill ?? [])
+                        .map(ss => {
+                            const skillData = ss ? (Array.isArray(ss.Skill) ? ss.Skill[0] : ss.Skill) : null;
+                            if (skillData && typeof skillData === 'object' && 'id' in skillData && 'name' in skillData) {
+                                return { Skill: skillData as Skill };
+                            }
+                            return null;
+                        })
+                        .filter((item): item is { Skill: Skill } => item !== null);
+
+                    const languages: { Language: Language }[] = (student.StudentLanguage ?? [])
+                        .map(sl => {
+                            const langData = sl ? (Array.isArray(sl.Language) ? sl.Language[0] : sl.Language) : null;
+                            if (langData && typeof langData === 'object' && 'id' in langData && 'name' in langData) {
+                                return { Language: langData as Language };
+                            }
+                            return null;
+                        })
+                        .filter((item): item is { Language: Language } => item !== null);
+
+                    // *** OPRAVA ZDE: level_progress nastaven na null ***
+                    return {
+                        user_id: student.user_id,
+                        first_name: student.first_name,
+                        last_name: student.last_name,
+                        username: student.username,
+                        profile_picture_url: student.profile_picture_url,
+                        university: student.university,
+                        bio: student.bio,
+                        created_at: student.created_at,
+                        level: student.level ?? null,
+                        xp: student.xp ?? null,
+                        StudentSkill: skills,
+                        StudentLanguage: languages,
+                    };
+                });
+
+                setStudents(prev => (currentPage === 0 ? cleanedData : [...prev, ...cleanedData]));
+                setHasMoreStudents(data.length === ITEMS_PER_PAGE);
+            } else {
+                if (currentPage === 0) setStudents([]); setHasMoreStudents(false);
+            }
+        } catch(error) {
+             console.error("Chyba při načítání studentů:", error instanceof Error ? error.message : JSON.stringify(error));
+             if (currentPage === 0) setStudents([]); setHasMoreStudents(false);
+        } finally {
+             setLoadingStudents(false);
         }
-        setLoadingStudents(false);
-    }, [debouncedStudentSearch, studentSkills, studentSortBy]); 
-    
+    }, [authLoading, debouncedStudentSearch, studentSkills, studentSortBy]);
+
+    // ... useEffecty a loadMore funkce zůstávají stejné ...
     useEffect(() => {
-        setStartupPage(0);
-        refetchStartups(0);
-    }, [debouncedStartupSearch, startupCategories, startupSortBy, refetchStartups]); 
+        if (!authLoading) {
+            setStartupPage(0);
+            refetchStartups(0);
+        }
+    }, [authLoading, debouncedStartupSearch, startupCategories, startupSortBy, refetchStartups]);
 
     useEffect(() => {
-        setStudentPage(0);
-        refetchStudents(0);
-    }, [debouncedStudentSearch, studentSkills, studentSortBy, refetchStudents]); 
+        if (!authLoading) {
+            setStudentPage(0);
+            refetchStudents(0);
+        }
+    }, [authLoading, debouncedStudentSearch, studentSkills, studentSortBy, refetchStudents]);
 
     useEffect(() => {
         const fetchFiltersData = async () => {
             if (allCategories.length > 0 && allSkills.length > 0) {
-                setLoadingFilters(false);
-                return;
+                 setLoadingFilters(false); return;
             }
+            if (authLoading) return;
             setLoadingFilters(true);
             try {
                 const [categoriesRes, skillsRes] = await Promise.all([
                     supabase.from('Category').select('id, name'),
                     supabase.from('Skill').select('id, name')
                 ]);
-
                 if (categoriesRes.data) setAllCategories(categoriesRes.data);
                 if (skillsRes.data) setAllSkills(skillsRes.data);
-
             } catch (error) {
                 console.error("Chyba při načítání dat pro filtry:", error);
             } finally {
@@ -204,26 +279,28 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
         };
         fetchFiltersData();
-    }, [allCategories.length, allSkills.length]);
+    }, [authLoading, allCategories.length, allSkills.length]);
 
     const loadMoreStartups = useCallback(() => {
+        if (loadingStartups || authLoading) return;
         const nextPage = startupPage + 1;
         setStartupPage(nextPage);
         refetchStartups(nextPage);
-    }, [startupPage, refetchStartups]);
-    
+    }, [startupPage, refetchStartups, loadingStartups, authLoading]);
+
     const loadMoreStudents = useCallback(() => {
+        if (loadingStudents || authLoading) return;
         const nextPage = studentPage + 1;
         setStudentPage(nextPage);
         refetchStudents(nextPage);
-    }, [studentPage, refetchStudents]);
+    }, [studentPage, refetchStudents, loadingStudents, authLoading]);
 
-    const value = useMemo(() => ({
+     const value = useMemo(() => ({
         startups, students, allCategories, allSkills,
         loadingStartups, loadingStudents, loadingFilters,
         hasMoreStartups, hasMoreStudents,
-        refetchStartups: () => refetchStartups(0),
-        refetchStudents: () => refetchStudents(0),
+        refetchStartups: () => { if (!authLoading) refetchStartups(0); },
+        refetchStudents: () => { if (!authLoading) refetchStudents(0); },
         loadMoreStartups, loadMoreStudents,
         startupFilters: {
             searchQuery: startupSearch, setSearchQuery: setStartupSearch,
@@ -235,7 +312,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
             selectedSkillIds: studentSkills, setSelectedSkillIds: setStudentSkills,
             sortBy: studentSortBy, setSortBy: setStudentSortBy,
         }
-    }), [startups, students, allCategories, allSkills, loadingStartups, loadingStudents, loadingFilters, hasMoreStartups, hasMoreStudents, startupSearch, startupCategories, startupSortBy, studentSearch, studentSkills, studentSortBy, loadMoreStartups, loadMoreStudents, refetchStartups, refetchStudents]);
+    }), [
+        startups, students, allCategories, allSkills,
+        loadingStartups, loadingStudents, loadingFilters,
+        hasMoreStartups, hasMoreStudents,
+        startupSearch, startupCategories, startupSortBy,
+        studentSearch, studentSkills, studentSortBy,
+        loadMoreStartups, loadMoreStudents,
+        refetchStartups, refetchStudents, authLoading
+    ]);
+
 
     return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }
