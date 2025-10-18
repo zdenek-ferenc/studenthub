@@ -10,41 +10,42 @@ import MainContent from '../components/MainContent';
 import './globals.css';
 import { Sora } from "next/font/google";
 import ToastContainer from '../components/ToastContainer';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { ReactNode } from 'react';
+import BottomNavBar from '@/components/BottomNavBar';
 
 const sora = Sora({
   subsets: ["latin"],
   variable: '--font-sora',
 });
 
-// Komponenta, která "obalí" zbytek aplikace a řeší načítání
-function AppShell({ children }: { children: ReactNode }) {
+function AppContent({ children }: { children: ReactNode }) {
   const { loading: authLoading } = useAuth();
 
-  return (
-    <div className="relative min-h-screen flex flex-col">
-      {/* Vždy renderujeme obsah, ale kondicionálně ho rozmažeme */}
-      <div className={`flex-1 flex flex-col ${authLoading ? 'loading-blur' : ''}`}>
-        <Header />
-        <MainContent>
-          {children}
-        </MainContent>
-        <Footer />
+  if (authLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner />
       </div>
+    );
+  }
 
-      {/* Overlay se spinnerem se zobrazí jen při načítání */}
-      {authLoading && (
-        <div className="loading-overlay">
-        </div>
-      )}
-    </div>
+  return (
+    <>
+      <Header />
+      <MainContent>
+        {children}
+      </MainContent>
+      <Footer />
+      <BottomNavBar />
+    </>
   );
 }
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode; // Zde byla oprava z React.React-Node na ReactNode
+  children: ReactNode;
 }) {
   return (
     <html lang="cs">
@@ -53,10 +54,7 @@ export default function RootLayout({
           <DashboardProvider>
             <ChallengesProvider>
               <DataProvider>
-                {/* Obalíme children do AppShell */}
-                <AppShell>
-                  {children}
-                </AppShell>
+                <AppContent>{children}</AppContent>
                 <ToastContainer />
               </DataProvider>
             </ChallengesProvider>
