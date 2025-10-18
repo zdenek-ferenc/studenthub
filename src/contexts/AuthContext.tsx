@@ -70,14 +70,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
 
-  useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-        if (session) {
-            setUser(session.user);
-            await fetchAndSetProfile(session.user);
-        }
-        setLoading(false);
-    });
+useEffect(() => {
+    // Nastavíme posluchače, který se spustí ihned při načtení
+    // a také při každé změně stavu přihlášení.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
@@ -86,22 +81,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const fetchedProfile = await fetchAndSetProfile(currentUser);
             if (fetchedProfile) {
                 const isRegistrationIncomplete = fetchedProfile.registration_step && fetchedProfile.registration_step < 6;
-                 if (isRegistrationIncomplete) {
+                if (isRegistrationIncomplete) {
                     const targetPath = `/register/${fetchedProfile.role}`;
-                    if (window.location.pathname !== targetPath) {
-                       router.push(targetPath);
+                    // Používáme pathname z usePathname() místo window.location.pathname pro lepší integraci s Next.js
+                    if (pathname !== targetPath) {
+                        router.push(targetPath);
                     }
                 }
             }
         } else {
+            // Pokud není uživatel, vyčistíme profil
             setProfile(null);
         }
+
+        // KLÍČOVÝ KROK: Ukončíme načítání AŽ POTÉ, co máme session a profil
+        setLoading(false);
     });
 
+    // Při odmontování komponenty zrušíme posluchače, abychom předešli memory leakům
     return () => {
-      subscription.unsubscribe();
+        subscription.unsubscribe();
     };
-  }, [fetchAndSetProfile, router]);
+}, [fetchAndSetProfile, router, pathname]);
 
 
   const refetchProfile = useCallback(async () => {
