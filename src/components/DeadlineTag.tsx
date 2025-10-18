@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-
 type DeadlineTagProps = {
   deadline: string | null;
   className?: string;
@@ -70,15 +68,7 @@ const getDeadlineInfo = (deadline: string | null): TagStyle | null => {
 
 
 export default function DeadlineTag({ deadline, className }: DeadlineTagProps) {
-  const [tagStyle, setTagStyle] = useState<TagStyle | null>(null);
-
-  useEffect(() => {
-    
-    const timer = setTimeout(() => {
-      setTagStyle(getDeadlineInfo(deadline));
-    }, 1);
-    return () => clearTimeout(timer);
-  }, [deadline]);
+  const tagStyle = getDeadlineInfo(deadline);
 
   if (!tagStyle) {
     return null;

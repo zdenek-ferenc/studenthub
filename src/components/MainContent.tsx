@@ -1,16 +1,20 @@
 "use client";
 
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function MainContent({ children }: { children: React.ReactNode }) {
-const pathname = usePathname();
-const isHomePage = pathname === '/';
+  const pathname = usePathname();
+  const [paddingTopClass, setPaddingTopClass] = useState('');
 
-const paddingTopClass = isHomePage ? 'pt-0' : '';
+  useEffect(() => {
+    const isHomePage = pathname === '/';
+    setPaddingTopClass(isHomePage ? 'pt-0' : '');
+  }, [pathname]); 
 
-return (
-  <main className={`main-content bg-[var(--barva-svetle-pozadi)] ${paddingTopClass}`}>
-    {children}
-  </main>
+  return (
+    <main className={`main-content bg-[var(--barva-svetle-pozadi)] ${paddingTopClass}`}>
+      {children}
+    </main>
   );
 }

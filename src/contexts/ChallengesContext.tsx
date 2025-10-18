@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { useAuth } from './AuthContext'; // <-- Přidáno
+import { useAuth } from './AuthContext';
 import { useDebounce } from '../hooks/useDebounce';
 
 type Skill = { id: string; name: string; };
@@ -40,27 +40,25 @@ type ChallengesContextType = {
 const ChallengesContext = createContext<ChallengesContextType | undefined>(undefined);
 
 export function ChallengesProvider({ children }: { children: ReactNode }) {
-  const { user, loading: authLoading } = useAuth(); // <-- Získání authLoading
+  const { user, loading: authLoading } = useAuth();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [studentSkills, setStudentSkills] = useState<Skill[]>([]);
-  const [loading, setLoading] = useState(true); // Začínáme jako true
+  const [loading, setLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('recommended');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-const refetchChallenges = useCallback(() => {
-    // Tuto funkci necháme prázdnou, ale existující pro kompatibilitu,
-    // pokud by ji nějaká komponenta volala přímo.
-    // Hlavní logiku přesuneme do useEffect.
+  const refetchChallenges = useCallback(() => {
+    // Tato funkce zůstává pro případné manuální obnovení,
+    // ale hlavní logika je v useEffect.
   }, []);
 
   useEffect(() => {
-    // Pokud stále probíhá autentizace, nic neděláme a počkáme.
     if (authLoading) {
-      setLoading(false);
+      // Pokud se stále ověřuje uživatel, nic neděláme.
       return;
     }
 
@@ -68,22 +66,19 @@ const refetchChallenges = useCallback(() => {
       setLoading(true);
 
       try {
-        // Načtení skillů studenta (pokud je přihlášen)
         if (user && studentSkills.length === 0) {
             const { data: studentSkillsData } = await supabase.from('StudentSkill').select('Skill(id, name)').eq('student_id', user.id);
             const skills = studentSkillsData?.flatMap(item => item.Skill || []) || [];
             setStudentSkills(skills);
         } else if (!user) {
-            setStudentSkills([]); // Reset skillů pokud není uživatel přihlášen
+            setStudentSkills([]);
         }
         
-        // Načtení všech dostupných skillů pro filtry
         if (allSkills.length === 0) {
           const { data: skillsData } = await supabase.from('Skill').select('id, name');
           setAllSkills(skillsData || []);
         }
 
-        // Sestavení a spuštění hlavního dotazu na výzvy
         let query = supabase.from('Challenge').select(`*, ChallengeSkill(Skill(*)), Submission(student_id), StartupProfile(*)`);
 
         if (selectedSkillIds.length > 0) {
@@ -131,14 +126,6 @@ const refetchChallenges = useCallback(() => {
     fetchAllData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, authLoading, debouncedSearchQuery, selectedSkillIds, sortBy]);
-
-  useEffect(() => {
-    // Spustíme načítání, až když je AuthContext hotový
-    if (!authLoading) {
-      refetchChallenges();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, user?.id, debouncedSearchQuery, selectedSkillIds, sortBy]);// Závislost na authLoading a refetchChallenges
 
   const value = useMemo(() => ({
     challenges,

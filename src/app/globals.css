@@ -206,3 +206,22 @@ body {
 .animate-slide-in-from-right {
   animation: slide-in-from-right 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
+
+
+.loading-blur {
+  filter: blur(4px);
+  transition: filter 0.3s ease-in-out;
+  pointer-events: none; /* Zabrání interakci s rozmazaným obsahem */
+  user-select: none;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0; /* (top: 0; right: 0; bottom: 0; left: 0;) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.3); /* Lehce bílý nádech */
+  backdrop-filter: blur(2px); /* Jemné rozmazání samotného overlaye pro lepší efekt */
+  z-index: 100;
+}

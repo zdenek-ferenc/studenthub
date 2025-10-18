@@ -33,7 +33,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Začínáme s načítáním
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const router = useRouter();
@@ -47,7 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
     if (error && error.code !== 'PGRST116') {
         console.error("AuthContext chyba při načítání profilu:", error);
-        setProfile(null);
         return null;
     }
 
@@ -65,44 +64,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(finalProfile);
         return finalProfile;
     }
-    setProfile(null);
     return null;
   }, []);
 
 
-useEffect(() => {
-    // Nastavíme posluchače, který se spustí ihned při načtení
-    // a také při každé změně stavu přihlášení.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser) {
+        await fetchAndSetProfile(currentUser);
+      }
+      
+      setLoading(false);
+    };
+
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
-
         if (currentUser) {
-            const fetchedProfile = await fetchAndSetProfile(currentUser);
-            if (fetchedProfile) {
-                const isRegistrationIncomplete = fetchedProfile.registration_step && fetchedProfile.registration_step < 6;
-                if (isRegistrationIncomplete) {
-                    const targetPath = `/register/${fetchedProfile.role}`;
-                    // Používáme pathname z usePathname() místo window.location.pathname pro lepší integraci s Next.js
-                    if (pathname !== targetPath) {
-                        router.push(targetPath);
-                    }
-                }
-            }
+            fetchAndSetProfile(currentUser);
         } else {
-            // Pokud není uživatel, vyčistíme profil
             setProfile(null);
         }
-
-        // KLÍČOVÝ KROK: Ukončíme načítání AŽ POTÉ, co máme session a profil
-        setLoading(false);
     });
 
-    // Při odmontování komponenty zrušíme posluchače, abychom předešli memory leakům
     return () => {
         subscription.unsubscribe();
     };
-}, [fetchAndSetProfile, router, pathname]);
+}, [fetchAndSetProfile]);
 
 
   const refetchProfile = useCallback(async () => {
@@ -110,6 +104,7 @@ useEffect(() => {
         await fetchAndSetProfile(user);
     }
   }, [user, fetchAndSetProfile]);
+
   const showToast = useCallback((message: string, type: 'success' | 'error') => {
     const newToast = { id: Date.now(), message, type };
     setToasts((prev) => [...prev, newToast]);

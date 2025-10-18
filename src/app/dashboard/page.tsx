@@ -32,10 +32,14 @@ function DashboardPage() {
   const { profile, loading: authLoading } = useAuth();
   const { studentProfile, loading: dashboardLoading } = useDashboard(); // <-- Použij data z kontextu
   const [activeTab, setActiveTab] = useState<TabId>('challenges');
-  
+  console.log(`Dashboard Stránka - Stavy načítání: authLoading: ${authLoading}, dashboardLoading: ${dashboardLoading}`);
   const displayName = studentProfile?.username ? studentProfile.username : "zpět";
 
-  if (authLoading || dashboardLoading) return <LoadingSpinner />;
+  if (authLoading || dashboardLoading) {
+    // A tento log
+    console.log('Dashboard Stránka: Zobrazuji LoadingSpinner.');
+    return <div className='md:pt-32'><LoadingSpinner /></div>;
+  }
   if (profile?.role !== 'student') return <p className="text-center py-20">Tato stránka je určena pouze pro studenty.</p>;
 
   return (

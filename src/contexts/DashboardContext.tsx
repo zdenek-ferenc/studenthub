@@ -154,19 +154,29 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
-        if (user && profile?.role === 'student' && !hasFetched && !authLoading) {
-            fetchData(user.id);
-        }
-        if (!user && !authLoading) {
-            setHasFetched(false);
-            setSubmissions([]);
-            setProgress(null);
-            setNotifications([]);
-            setStats(null);
-            setStudentProfile(null);
-            setLoading(false);
-        }
-    }, [user, profile, authLoading, hasFetched, fetchData]);
+    console.log(`DashboardContext: Kontroluji stav. Auth načítá: ${authLoading}`);
+    if (authLoading) {
+        console.log('DashboardContext: Čekám na dokončení AuthContextu.');
+        return;
+    }
+
+    if (user && profile?.role === 'student' && !hasFetched) {
+        console.log('DashboardContext: Začínám načítat data pro dashboard.');
+        fetchData(user.id);
+    } else if (!user) {
+        console.log('DashboardContext: Uživatel není přihlášen, resetuji stav.');
+        setHasFetched(false);
+        setSubmissions([]);
+        setProgress(null);
+        setNotifications([]);
+        setStats(null);
+        setStudentProfile(null);
+        setLoading(false);
+    } else {
+        console.log('DashboardContext: Není třeba nic dělat (uživatel není student nebo data už jsou načtena). Nastavuji loading na FALSE.');
+        setLoading(false);
+    }
+}, [user, profile, authLoading, hasFetched, fetchData]);
 
     const value = { loading, submissions, progress, notifications, stats, studentProfile };
 
