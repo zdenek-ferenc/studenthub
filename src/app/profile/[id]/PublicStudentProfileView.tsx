@@ -194,7 +194,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     }));
 
     return (
-        <div className="container mx-auto py-5 md:py-32 px-4">
+        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-32 px-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
                 <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:sticky lg:top-28">
                     <ProfileInfoCard profile={profile} isOwner={isOwner} />

@@ -34,11 +34,19 @@ type StartupProfile = {
     Challenge: Challenge[];
 };
 
+
+
 const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwner: boolean }) => {
     const { user, showToast } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [descriptionText, setDescriptionText] = useState(profile?.description || '');
     const [saving, setSaving] = useState(false);
+
+    const websiteUrl: string | undefined = profile.website 
+    ? (profile.website.startsWith('http') 
+    ? profile.website 
+    : `https://${profile.website}`) 
+    : undefined;
 
     const handleSaveDescription = async () => {
         if (!user) return;
@@ -54,21 +62,34 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
     };
 
     return (
-        <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
-            <div className="text-center">
-                <Image src={profile.logo_url || '/logo.svg'} alt={`${profile.company_name} logo`} width={96} height={96}
-                    className="w-24 h-24 rounded-2xl mx-auto mb-2 sm:mb-4 object-contain"
+        <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100">
+            <div className="flex items-start justify-start p-2 sm:p-4 gap-4">
+                <div>
+                    <Image src={profile.logo_url || '/logo.svg'} alt={`${profile.company_name} logo`} width={96} height={96}
+                    className="w-16 h-16 3xl:w-20 3xl:h-20 rounded-2xl mx-auto mb-2 sm:mb-4 object-contain"
                 />
-                <h1 className="text-2xl font-bold text-[var(--barva-tmava)]">{profile.company_name}</h1>
-                {profile.website && (
-                    <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-[var(--barva-primarni)] hover:underline break-all">{profile.website}</a>
+                </div>
+                
+                <div>
+                    <h1 className="text-2xl font-bold text-[var(--barva-tmava)]">{profile.company_name}</h1>
+                    {websiteUrl && (
+                    <a 
+                        href={websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--barva-primarni)] hover:underline break-all"
+                    >
+                        {profile.website}
+                    </a>
                 )}
+                </div>
+                
             </div>
-            <div className="p-2 sm:p-4 mt-3 sm:mt-6 pt-4 border-t border-gray-100">
+            <div className="px-2 sm:px-4">
                 {isEditing ? (
                     <div className="space-y-2">
                         <textarea value={descriptionText} onChange={(e) => setDescriptionText(e.target.value)} placeholder="Popište vaši firmu..."
-                            className="w-full min-h-[120px] text-sm rounded-lg border text-[var(--barva-tmava)] border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
+                            className="w-full min-h-[120px] text-[10px] 3xl:text-sm rounded-lg border text-[var(--barva-tmava)] border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
                         />
                         <div className="flex items-center gap-2">
                             <button onClick={handleSaveDescription} disabled={saving} className="text-sm font-semibold text-[var(--barva-primarni)] disabled:text-gray-400">{saving ? 'Ukládám...' : 'Uložit'}</button>
@@ -76,7 +97,7 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
                         </div>
                     </div>
                 ) : (
-                    <p className="text-gray-700 whitespace-pre-wrap text-sm">{descriptionText || (isOwner && "Zatím nemáte žádný popis. Kliknutím ho můžete přidat.")}</p>
+                    <p className="text-gray-700 whitespace-pre-wrap 3xl:text-base text-[13px]">{descriptionText || (isOwner && "Zatím nemáte žádný popis. Kliknutím ho můžete přidat.")}</p>
                 )}
                 {isOwner && !isEditing && (
                     <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[var(--barva-primarni)] transition-colors mt-3">
@@ -151,11 +172,11 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
     const showIdealCandidateSection = hasIdealCandidateInfo || isOwner;
 
     return (
-        <div className="container mx-auto py-5 md:py-32 px-4">
+        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-28 3xl:py-32 px-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
                 <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:top-28">
                     <StartupInfoCard profile={profile} isOwner={isOwner} />
-                    <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
+                    <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100">
                         <div className="flex justify-between items-center mb-3">
                             <h3 className="font-bold text-lg text-[var(--barva-tmava)]">Kategorie</h3>
                             {isOwner && (
@@ -191,8 +212,8 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                         </div>
                     )}
                     {activeChallenges.length > 0 && (
-                        <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
-                            <h2 className="text-lg sm:text-2xl font-bold text-[var(--barva-tmava)] mb-4">Aktivní výzvy</h2>
+                        <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100">
+                            <h2 className="text-lg 3xl:text-2xl font-bold text-[var(--barva-tmava)] mb-4">Aktivní výzvy</h2>
                             <div className="space-y-3">
                                 {activeChallenges.map(challenge => (
                                     <StartupProfileChallengeCard 

@@ -160,7 +160,7 @@ export default function StartupChallengesView() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-10 md:py-32">
+        <div className="flex md:mx-20 2xl:mx-28 3xl:mx-32 mx-auto px-4 py-4 md:py-30 4xl:py-32">
         {!loading && allChallenges.length === 0 ? (
             <div className="text-center max-w-lg mx-auto">
                 <Image
@@ -189,9 +189,9 @@ export default function StartupChallengesView() {
                             buttonsRef.current[index] = el;
                             }}
                             onClick={() => setActiveFilter(filter.id)}
-                            className="flex items-center justify-center gap-2 px-3 md:px-5 py-2 md:py-3 text-base md:text-md font-semibold z-10 transition-colors duration-200"
+                            className="flex items-center justify-center gap-2 px-3 md:px-5 py-2 md:py-3 text-xs 3xl:text-base font-semibold z-10 transition-colors duration-200"
                         >
-                            <span className={activeFilter === filter.id ? 'text-sm md:text-base text-[var(--barva-primarni)]' : 'text-gray-500 cursor-pointer hover:text-gray-800'}>
+                            <span className={activeFilter === filter.id ? 'text-sm md:text-xs 3xl:text-base text-[var(--barva-primarni)]' : 'text-gray-500 cursor-pointer hover:text-gray-800'}>
                                 {filter.label}
                             </span>
                             <span

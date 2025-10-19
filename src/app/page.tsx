@@ -14,8 +14,8 @@ export default function HomePage() {
                 <div className="absolute inset-0 z-0 opacity-20">
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[var(--barva-primarni)] via-[var(--barva-tmava)] to-black"></div>
                 </div>
-                <div className="container mx-auto text-center relative z-10 px-4 sm:px-6"> {/* Upraven padding */}
-                    <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-tight"> {/* Responzivní velikost textu */}
+                <div className="container mx-auto text-center relative z-10 px-4 sm:px-6">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl 3xl:text-8xl font-extrabold tracking-tighter leading-tight">
                         <div className="overflow-hidden">
                             <div className="animate-slide-in-reveal delay-100">
                                 Praxe, co má smysl.
@@ -28,7 +28,7 @@ export default function HomePage() {
                         </div>
                     </h1>
                     <div className="overflow-hidden mt-6">
-                        <p className="max-w-3xl mx-auto text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed"> 
+                        <p className="max-w-3xl mx-auto text-base sm:text-base 3xl:text-xl text-gray-300 leading-relaxed"> 
                             Propojujeme nejlepší studenty s inovativními startupy skrze reálné projekty. Přestaň snít o kariéře, začni ji budovat.
                         </p>
                     </div>
@@ -47,55 +47,55 @@ export default function HomePage() {
             </header>
 
             <main>
-                <section className="py-16 md:py-24 bg-[var(--barva-svetle-pozadi)]"> 
+                <section className="py-12 md:py-24 bg-[var(--barva-svetle-pozadi)] md:mx-20 2xl:mx-28 3xl:mx-32"> 
                     <div className="container mx-auto px-4 sm:px-6">
                         <ScrollAnimator>
-                            <div className="text-center mb-12 md:mb-16">
-                                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Vše, co potřebuješ k nastartování kariéry. Nebo firmy.</h2>
-                                <p className="mt-4 max-w-3xl mx-auto text-md sm:text-lg text-gray-600">Navrženo pro efektivitu, rychlost a reálné výsledky.</p>
+                            <div className="text-center mb-6 md:mb-16">
+                                <h2 className="text-xl md:text-3xl 3xl:text-4xl font-bold tracking-tight">Vše, co potřebuješ k nastartování kariéry, nebo firmy.</h2>
+                                <p className="mt-4 max-w-3xl mx-auto text-sm sm:text-lg text-gray-600">Navrženo pro efektivitu, rychlost a reálné výsledky.</p>
                             </div>
                         </ScrollAnimator>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <ScrollAnimator className="lg:col-span-2">
                                 <div className="p-6 md:p-10 bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col justify-between h-full">
                                     <div>
-                                        <h3 className="text-2xl md:text-4xl font-bold mb-4">Reálné výzvy, reálné výsledky</h3>
-                                        <p className="text-gray-600 text-base md:text-lg mb-6">Zapomeň na fiktivní úkoly. Pracuj na projektech, které mají skutečný dopad a řeší reálné problémy inovativních firem. Každá výzva je tvoje vstupenka do praxe.</p>
+                                        <h3 className="text-xl md:text-2xl 3xl:text-3xl font-bold mb-4">Reálné výzvy, reálné výsledky</h3>
+                                        <p className="text-gray-600 text-sm md:text-base 3xl:text-lg mb-6">Zapomeň na fiktivní úkoly. Pracuj na projektech, které mají skutečný dopad a řeší reálné problémy inovativních firem. Každá výzva je tvoje vstupenka do praxe.</p>
                                     </div>
                                     <div className="flex gap-4 sm:gap-6 items-center"> {/* Upraven gap */}
-                                        <Image src="/unknown-agency-logo.svg" alt="Startup" width={60} height={60} className="w-12 h-12 sm:w-16 sm:h-16 object-contain rounded-2xl" />
-                                        <Image src="/virtigodigital-logo.svg" alt="Startup" width={60} height={60} className="w-12 h-12 sm:w-16 sm:h-16 object-contain rounded-2xl" />
-                                        <Image src="/VUT_CZ.svg" alt="Startup" width={60} height={60} className="w-12 h-12 sm:w-16 sm:h-16 object-contain rounded-2xl" />
-                                        <p className='text-lg sm:text-xl font-semibold text-[var(--barva-tmava)]'>+42</p>
+                                        <Image src="/unknown-agency-logo.svg" alt="Startup" width={60} height={60} className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-xl" />
+                                        <Image src="/virtigodigital-logo.svg" alt="Startup" width={60} height={60} className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-xl" />
+                                        <Image src="/VUT_CZ.svg" alt="Startup" width={60} height={60} className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-xl" />
+                                        <p className='text-sm sm:text-xl font-semibold text-[var(--barva-tmava)]'>+42</p>
                                     </div>
                                 </div>
                             </ScrollAnimator>
                             <ScrollAnimator delay={200}>
-                                <div className="relative flex flex-col justify-center gap-2 p-6 md:p-8 bg-gradient-to-b from-[var(--barva-tmava)] to-[#002952] text-white rounded-3xl overflow-hidden h-full min-h-[250px]">
+                                <div className="relative flex flex-col justify-center gap-2 p-6 md:p-8 bg-gradient-to-b from-[var(--barva-tmava)] to-[#002952] text-white rounded-3xl overflow-hidden h-full md:min-h-[250px]">
                                     <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                                    <Users size={32} className="text-[var(--barva-primarni)] mb-4" />
-                                    <h3 className="text-xl md:text-2xl font-bold mb-2">Přístup k talentům</h3>
-                                    <p className="text-gray-300">Procházejte profily nejlepších studentů, filtrujte podle dovedností a najděte perfektní match pro váš tým.</p>
+                                    <Users size={32} className="w-10 sm:w-16 text-[var(--barva-primarni)] mb-4" />
+                                    <h3 className="text-base md:text-xl 3xl:text-2xl font-bold mb-2">Přístup k talentům</h3>
+                                    <p className="text-gray-300 text-sm md:text-base">Procházejte profily nejlepších studentů, filtrujte podle dovedností a najděte perfektní match pro váš tým.</p>
                                 </div>
                             </ScrollAnimator>
                             <ScrollAnimator>
-                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full min-h-[250px]">
+                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full md:min-h-[200px]">
                                     <TrendingUp size={32} className="text-[var(--barva-primarni)] mb-4" />
-                                    <h3 className="text-xl md:text-2xl font-bold mb-2">Buduj si portfolio</h3>
+                                    <h3 className="text-base md:text-xl 3xl:text-2xl font-bold mb-2">Buduj si portfolio</h3>
                                     <p className="text-gray-600">Každá dokončená výzva se stává referencí ve tvém veřejném profilu.</p>
                                 </div>
                             </ScrollAnimator>
                             <ScrollAnimator delay={200}>
-                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full min-h-[250px]">
+                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full md:min-h-[200px]">
                                     <Check size={32} className="text-[var(--barva-primarni)] mb-4" />
-                                    <h3 className="text-xl md:text-2xl font-bold mb-2">Férová zpětná vazba</h3>
+                                    <h3 className="text-xl md:text-xl 3xl:text-2xl font-bold mb-2">Férová zpětná vazba</h3>
                                     <p className="text-gray-600">Každé tvoje řešení je okomentováno a ohodnoceno profíky z oboru.</p>
                                 </div>
                             </ScrollAnimator>
                             <ScrollAnimator delay={400}>
-                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full min-h-[250px]">
+                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full md:min-h-[200px]">
                                     <DollarSign size={32} className="text-[var(--barva-primarni)] mb-4" />
-                                    <h3 className="text-xl md:text-2xl font-bold mb-2">Získej odměnu</h3>
+                                    <h3 className="text-xl md:text-xl 3xl:text-2xl font-bold mb-2">Získej odměnu</h3>
                                     <p className="text-gray-600">Za skvělou práci si zasloužíš finanční odměnu, stáž nebo nabídku práce.</p>
                                 </div>
                             </ScrollAnimator>
@@ -106,8 +106,8 @@ export default function HomePage() {
                 <section className="py-16 md:py-24">
                     <div className="container mx-auto px-4 sm:px-6">
                         <ScrollAnimator>
-                            <div className="text-center mb-12 md:mb-16">
-                                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Jednoduchý proces, maximální dopad</h2>
+                            <div className="text-center mb-8 md:mb-16">
+                                <h2 className="text-xl md:text-3xl 3xl:text-4xl font-bold tracking-tight">Jednoduchý proces, maximální dopad</h2>
                             </div>
                         </ScrollAnimator>
                         <div className="relative">
@@ -147,8 +147,8 @@ export default function HomePage() {
                 <section className="bg-white py-16 md:py-24">
                     <div className="container mx-auto text-center px-4 sm:px-6">
                         <ScrollAnimator>
-                            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[var(--barva-tmava)]">Připraven/a nastartovat budoucnost?</h2>
-                            <p className="mt-4 max-w-2xl mx-auto text-md sm:text-lg text-gray-600">
+                            <h2 className="text-xl md:text-3xl 3xl:text-4xl font-bold tracking-tight text-[var(--barva-tmava)]">Připraven/a nastartovat budoucnost?</h2>
+                            <p className="mt-4 max-w-2xl mx-auto text-md sm:text-base 3xl:text-lg  text-gray-600">
                                 Přidej se k rostoucí komunitě nejlepších studentů a inovativních firem v Česku. Registrace je zdarma.
                             </p>
                             <div className="mt-8">

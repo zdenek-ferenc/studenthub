@@ -61,20 +61,20 @@ const availableSkills = useMemo(() => {
 }, [allSkills, selectedSkillIds, skillSearch, showAll]);
 
 return (
-    <div className="p-6 bg-white h-full rounded-2xl">
+    <div className=" p-4 3xl:p-6 bg-white h-full rounded-2xl">
         <div className="mb-6">
             <label htmlFor="challenge-search" className="text-sm font-bold text-gray-700 block mb-2">
             Vyhledej výzvu
             </label>
             <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-3 top-1/2 w-3 3xl:w-4 -translate-y-1/2 text-gray-400" size={20} />
             <input
                 id="challenge-search"
                 type="text"
                 placeholder="Název, popis..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full leading-none pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition text-[var(--barva-tmava)]"
+                className="w-full leading-none pl-8 3xl:pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition text-[var(--barva-tmava)]"
             />
             </div>
         </div>
@@ -84,7 +84,7 @@ return (
             </label>
             <select 
                 id="sort-by"
-                className="w-full text-[var(--barva-tmava)] px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition bg-white"
+                className="w-full text-[var(--barva-tmava)] text-sm 3xl:text-base px-2 3xl:px-4 py-1.5 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition bg-white"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
             >
@@ -119,7 +119,7 @@ return (
                 placeholder="Hledej dovednost..."
                 value={skillSearch}
                 onChange={(e) => setSkillSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]"
+                className="w-full pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]"
             />
             </div>        
             <div className="flex justify-between items-center mb-2 mt-6">

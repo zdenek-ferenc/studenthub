@@ -5,8 +5,8 @@ import { Star, CheckCircle, Percent, Trophy, DollarSign } from 'lucide-react';
 
 const StatItem = ({ icon: Icon, value, label, colorClass }: { icon: React.ElementType, value: string, label: string, colorClass: string }) => (
     <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-lg ${colorClass} flex items-center shadow-md justify-center flex-shrink-0`}>
-            <Icon className="w-6 h-6 text-white " />
+        <div className={`3xl:w-12 w-10 h-10 3xl:h-12 rounded-lg ${colorClass} flex items-center shadow-md justify-center flex-shrink-0`}>
+            <Icon className="w-4 h-4 3xl:w-6 3xl:h-6 text-white " />
         </div>
         <div className="min-w-0">
             <p className="text-2xl font-bold text-[var(--barva-primarni)]">{value}</p>
@@ -19,12 +19,11 @@ export default function StatsWidget() {
     const { stats, loading } = useDashboard();
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
-            <h3 className="flex justify-center md:justify-start text-xl font-bold text-[var(--barva-tmava)] mb-4">Můj přehled</h3>
+        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
             {loading || !stats ? (
                 <p className="text-sm text-gray-500">Načítám přehled...</p>
             ) : (
-                <div className="space-y-5">
+                <div className="space-y-3 3xl:space-y-5">
                     <StatItem icon={CheckCircle} value={String(stats.completedCount)} label="Dokončené výzvy" colorClass="bg-gradient-to-t from-green-500 to-green-400" />
                     <StatItem icon={Star} value={`${stats.avgRating} / 10`} label="Prům. hodnocení" colorClass="bg-gradient-to-t from-blue-500 to-blue-400" />
                     <StatItem icon={Percent} value={`${stats.successRate}%`} label="Úspěšnost" colorClass="bg-gradient-to-t from-purple-500 to-purple-400" />

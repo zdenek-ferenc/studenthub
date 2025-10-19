@@ -98,27 +98,27 @@ const allSkillsSorted = (progress.StudentSkill || []).map(ss => ({ ...ss, Skill:
 const displayedSkills = showAllSkills ? allSkillsSorted : allSkillsSorted.slice(0, 5);
 
 return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
+    <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
     <div className="sm:my-3 md:my-6 text-center">
-        <p className="font-semibold text-gray-500">Celková Úroveň</p>
+        <p className="font-semibold text-sm 3xl:text-base text-gray-500">Celková Úroveň</p>
         <div className='relative w-full mx-auto h-20 flex items-center justify-center'>
             <div className="relative flex items-center justify-center">
-                <p className="text-6xl font-bold text-[var(--barva-primarni)] z-10">{progress.level}</p>
+                <p className="text-5xl 3xl:text-6xl font-bold text-[var(--barva-primarni)] z-10">{progress.level}</p>
                 <AnimatePresence>
                     {showLevelUpAnimation && (
-                        <motion.span initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0, transition: { delay: 0.4 } }} exit={{ opacity: 0, transition: { duration: 0.3 } }} className="absolute left-full top-1/2 -translate-y-1/2 ml-4 whitespace-nowrap text-2xl font-bold text-green-500">LEVEL UP!</motion.span>
+                        <motion.span initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0, transition: { delay: 0.4 } }} exit={{ opacity: 0, transition: { duration: 0.3 } }} className="absolute left-full top-1/2 -translate-y-1/2 ml-4 whitespace-nowrap text-xl 3xl:text-2xl font-bold text-green-500">LEVEL UP!</motion.span>
                     )}
                 </AnimatePresence>
             </div>
         </div>
-        <div className="max-w-xs mx-auto"><ProgressBar value={progress.xp} maxValue={xpForNextLevel} colorClass="bg-gradient-to-r from-[var(--barva-primarni)]/50 to-[var(--barva-primarni)]" /><p className="text-sm font-semibold text-gray-600 mt-1">{progress.xp} / {xpForNextLevel} XP</p></div>
+        <div className="max-w-xs mx-auto"><ProgressBar value={progress.xp} maxValue={xpForNextLevel} colorClass="bg-gradient-to-r from-[var(--barva-primarni)]/50 to-[var(--barva-primarni)]" /><p className="text-xs 3xl:text-sm font-semibold text-gray-600 mt-1">{progress.xp} / {xpForNextLevel} XP</p></div>
     </div>
     <hr className="my-4"/>
     <div>
         <div className="flex justify-between items-center mb-3">
-            <h4 className="font-bold text-gray-700">Dovednosti</h4>
+            <h4 className="text-sm 3xl:text-base font-bold text-gray-700">Dovednosti</h4>
             {allSkillsSorted.length > 5 && (
-                <button onClick={() => setShowAllSkills(!showAllSkills)} className="text-sm font-semibold text-[var(--barva-primarni)] flex items-center gap-1 cursor-pointer">
+                <button onClick={() => setShowAllSkills(!showAllSkills)} className="text-xs 3xl:text-sm font-semibold text-[var(--barva-primarni)] flex items-center gap-1 cursor-pointer">
                     {showAllSkills ? 'Zobrazit méně' : 'Zobrazit vše'}
                     <motion.div animate={{ rotate: showAllSkills ? 180 : 0 }}><ChevronDown size={16} /></motion.div>
                 </button>
@@ -142,15 +142,15 @@ return (
                         transition={{ duration: 0.3 }}
                     >
                         <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold text-gray-800">{skill.Skill.name}</span>
-                        <div className='flex items-center gap-2 relative'>
+                        <span className="text-sm 3xl:text-base font-semibold text-[var(--barva-primarni)]">{skill.Skill.name}</span>
+                        <div className='flex text-sm 3xl:text-base items-center gap-2 relative'>
                             {isNew && <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">NOVÝ!</span>}
                             {hasLeveledUp && <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">LEVEL UP!</span>}
-                            <span className="text-sm font-bold bg-[var(--barva-primarni2)] text-[var(--barva-primarni)] px-2 py-0.5 rounded-md w-20 text-center">Level {skill.level}</span>
+                            <span className="flex justify-center text-xs 3xl:text-sm font-bold bg-[var(--barva-primarni2)] text-[var(--barva-primarni)] px-2 py-0.5 rounded-md w-20 text-center">Level {skill.level}</span>
                         </div>
                         </div>
                         <ProgressBar value={skill.xp} maxValue={xpForNextSkillLevel} colorClass="bg-gradient-to-r from-amber-300 to-amber-500" />
-                        <p className="text-xs text-right text-gray-500 mt-0.5">{skill.xp} / {xpForNextSkillLevel} XP</p>
+                        <p className="text-[10px] 3xl:text-xs text-right text-gray-500 mt-0.5">{skill.xp} / {xpForNextSkillLevel} XP</p>
                     </motion.div>
                     );
                 })}

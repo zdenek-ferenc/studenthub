@@ -23,8 +23,8 @@ export default function NotificationsWidget() {
     const { notifications, loading } = useDashboard();
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col">
-            <h3 className="text-xl font-bold text-[var(--barva-tmava)] mb-4 flex justify-center md:justify-start">Nejnovější události</h3>
+        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col">
+            <h3 className="3xl:text-xl font-bold text-[var(--barva-tmava)] mb-4 flex justify-center md:justify-start">Notifikace</h3>
             {loading ? (
                 <p className="text-sm text-gray-500">Načítám...</p>
             ) : notifications.length > 0 ? (
@@ -44,7 +44,7 @@ export default function NotificationsWidget() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-6 flex-grow flex flex-col justify-center items-center">
+                <div className="text-center 3xl:py-6 flex-grow flex flex-col justify-center items-center">
                     <Bell className="w-10 h-10 mx-auto text-gray-300 mb-3" />
                     <p className="font-semibold text-gray-700">Žádné nové události</p>
                     <p className="text-sm text-gray-500 mt-1">Vše je v klidu.</p>

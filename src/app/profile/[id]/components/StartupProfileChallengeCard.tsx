@@ -55,7 +55,7 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
             )}
             <div className="p-2 sm:p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md hover:bg-blue-50 transition-all duration-300 flex items-center relative">
                 <div className="flex-grow min-w-0">
-                    <p className="text-[var(--barva-tmava)] truncate sm:text-lg pr-4">{challenge.title}</p>
+                    <p className="text-[var(--barva-tmava)] truncate text-sm 3xl:text-lg pr-4">{challenge.title}</p>
                     
                     <div className="flex items-end justify-between mt-2">
                         <div className="flex items-center gap-x-4 gap-y-1 flex-wrap">

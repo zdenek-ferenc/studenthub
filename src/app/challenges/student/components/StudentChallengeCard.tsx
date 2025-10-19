@@ -58,7 +58,12 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
         <div className="flex items-start justify-between gap-4 p-4 md:p-6 rounded-t-2xl">
           <div className="flex items-center gap-4">
             {challenge.StartupProfile?.logo_url ? (
-              <Image src={challenge.StartupProfile.logo_url} alt="logo firmy" width={56} height={56} className="rounded-lg" />
+              <Image src={challenge.StartupProfile.logo_url} alt="logo firmy" 
+                className='rounded-2xl'
+                priority={true}
+                height={50}
+                width={50}
+                style={{width:'56px', height: "56px" }}/>
             ) : (
               <div className="w-14 h-14 rounded-lg bg-gray-200 flex-shrink-0"></div>
             )}
@@ -112,7 +117,9 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
                 <RewardsDisplay challenge={challenge} />
             </div>
             <div className="col-span-2 flex items-center gap-2">
-                <Image src="/icons/calendar.svg" alt="" width={16} height={16} />
+                <Image src="/icons/calendar.svg" alt="" height={0}
+                width={0}
+                style={{width:'16px', height: "auto" }}/>
                 <span>{challenge.deadline ? new Date(challenge.deadline).toLocaleDateString('cs-CZ') : 'N/A'}</span>
             </div>
         </div>

@@ -78,7 +78,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             supabase.from('Submission').select(`id, completed_outputs, status, rating, position, Challenge:Challenge!Submission_challenge_id_fkey (id, title, status, expected_outputs, deadline, StartupProfile (company_name, logo_url), ChallengeSkill (Skill (name)))`).eq('student_id', userId),
             supabase.from('StudentProfile').select(`level, xp, StudentSkill (level, xp, Skill (id, name))`).eq('user_id', userId).single(),
             supabase.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(4),
-            supabase.from('Submission').select('rating, position').eq('student_id', userId).in('status', ['reviewed', 'winner', 'rejected']),
+            supabase.from('Submission').select('rating, position, Challenge!inner(status)').eq('student_id', userId).eq('Challenge.status', 'closed'),
             supabase.rpc('get_student_rewards', { p_student_id: userId }),
             supabase.from('StudentProfile').select('username').eq('user_id', userId).single(),
         ]);
@@ -149,17 +149,13 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
-    console.log(`DashboardContext: Kontroluji stav. Auth načítá: ${authLoading}`);
     if (authLoading) {
-        console.log('DashboardContext: Čekám na dokončení AuthContextu.');
         return;
     }
 
     if (user && profile?.role === 'student' && !hasFetched) {
-        console.log('DashboardContext: Začínám načítat data pro dashboard.');
         fetchData(user.id);
     } else if (!user) {
-        console.log('DashboardContext: Uživatel není přihlášen, resetuji stav.');
         setHasFetched(false);
         setSubmissions([]);
         setProgress(null);
@@ -168,7 +164,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         setStudentProfile(null);
         setLoading(false);
     } else {
-        console.log('DashboardContext: Není třeba nic dělat (uživatel není student nebo data už jsou načtena). Nastavuji loading na FALSE.');
         setLoading(false);
     }
 }, [user, profile, authLoading, hasFetched, fetchData]);

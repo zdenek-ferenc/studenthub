@@ -59,19 +59,19 @@ const FilterContent = ({
       <div className="mb-6">
         <label htmlFor="startup-search" className="text-sm font-bold text-[var(--barva-tmava)] block mb-2">Vyhledej startup</label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-1/2 w-3 3xl:w-4 -translate-y-1/2 text-gray-400" size={20} />
           <input 
             id="startup-search" 
             type="text" 
             placeholder="Název, popis..." 
             value={searchQuery} 
             onChange={(e) => setSearchQuery(e.target.value)} 
-            className="w-full leading-none pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition text-[var(--barva-tmava)]" />
+            className="w-full leading-none pl-8 3xl:pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition text-[var(--barva-tmava)]" />
         </div>
       </div>
       <div className="mb-6">
         <label htmlFor="sort-by" className="text-sm font-bold text-[var(--barva-tmava)] block mb-2">Seřadit podle</label>
-        <select id="sort-by" className="w-full text-[var(--barva-tmava)] px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition bg-white" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+        <select id="sort-by" className="w-full text-[var(--barva-tmava)] text-sm 3xl:text-base px-2 3xl:px-4 py-1.5 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition bg-white" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
           <option value="match">Největší shoda</option>
           <option value="newest">Nejnovější</option>
         </select>
@@ -89,8 +89,8 @@ const FilterContent = ({
           </div>
         )}
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input type="text" placeholder="Hledej kategorii..." value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]" />
+          <Search className="absolute left-3 top-1/2 w-3 3xl:w-4 -translate-y-1/2 text-gray-400" size={18} />
+          <input type="text" placeholder="Hledej kategorii..." value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} className="w-full pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]" />
         </div>
         <div className="flex justify-between items-center my-2 mt-6">
             <h4 className="text-xs font-semibold text-gray-500 uppercase">{categorySearch ? 'Výsledky hledání' : (showAll ? 'Všechny kategorie' : 'Populární kategorie')}</h4>
@@ -114,7 +114,7 @@ export default function StartupFilterSidebar(props: FilterSidebarProps) {
 
   return (
     <>
-      <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit sticky top-28 flex-shrink-0">
+      <aside className="hidden lg:block w-full lg:w-80 p-4 3xl:p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit sticky top-28 flex-shrink-0">
         <FilterContent {...props} />
       </aside>
 

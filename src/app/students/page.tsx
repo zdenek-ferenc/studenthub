@@ -24,9 +24,9 @@ function StudentCatalogPage() {
     }
 
     return (
-        <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-5 md:py-32">
+        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 md:py-22 lg:py-28 3xl:py-32 lg:flex-row items-start gap-8">
             {loadingFilters ? (
-                <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit sticky top-28 flex-shrink-0">
+                <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
                     <p className="text-gray-500">Načítám filtry...</p>
                 </aside>
             ) : (
@@ -42,14 +42,14 @@ function StudentCatalogPage() {
                     setMobileOpen={setIsFilterOpen}
                 />
             )}
-            <main className="flex-1 w-full">
-                <div className="mb-6 lg:hidden flex justify-end">
-                    <button 
-                        onClick={() => setIsFilterOpen(true)}
-                        className="p-3 rounded-full bg-white shadow-md border text-[var(--barva-primarni)]"
-                    >
+            <main className="flex-1 w-full ">
+                <div className="sticky md:relative top-0 z-30 pt-2 pb-2 lg:hidden flex justify-end">
+                        <button 
+                            onClick={() => setIsFilterOpen(true)}
+                            className="p-3 rounded-full bg-[var(--barva-tmava)] shadow-md border text-white"
+                        >
                         <SlidersHorizontal size={20} />
-                    </button>
+                        </button>
                 </div>
                 {loadingStudents && students.length === 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -59,7 +59,7 @@ function StudentCatalogPage() {
                 ) : (
                     <>
                         {students.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                                 {students.map(student => <StudentCard key={student.user_id} student={student} />)}
                             </div>
                         ) : (

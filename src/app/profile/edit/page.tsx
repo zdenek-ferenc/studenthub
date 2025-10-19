@@ -27,18 +27,22 @@ function EditProfilePage() {
   };
 
   return (
-    <div className="container mx-auto py-10 md:py-32 px-4">
+    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-26 3xl:py-32 px-4">
         <div className="mb-4 sm:mb-8">
-            <div className='flex flex-row items-center gap-1'>
-            <span className='text-[var(--barva-primarni)]'>
-              <ChevronLeft size={25}/>
+          <Link href="/profile" className="flex flex-row items-center gap-1 group w-fit">
+            <span className="text-[var(--barva-primarni)] transition-colors group-hover:text-[var(--barva-primarni)]">
+              <ChevronLeft size={25} />
             </span>
-            <Link href="/profile" className="text-gray-500 hover:text-[var(--barva-primarni)] transition-colors">Zpět na profil</Link>
+            <span className="text-gray-500 text-sm 3xl:text-base transition-colors group-hover:text-[var(--barva-primarni)]">
+              Zpět na profil
+            </span>
+          </Link>
+          <h1 className="text-2xl 3xl:text-3xl font-bold text-[var(--barva-tmava)] mt-2">
+            Upravit profil
+          </h1>
+          </div>
+              {renderForm()}
             </div>
-            <h1 className="text-4xl font-bold text-[var(--barva-tmava)] mt-2">Upravit profil</h1>
-        </div>
-        {renderForm()}
-    </div>
   );
 }
 

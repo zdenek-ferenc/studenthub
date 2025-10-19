@@ -9,7 +9,7 @@ import { Challenge } from '../StartupChallengesView';
 type ActionPriority = 'critical' | 'urgent' | 'default';
 
 const StatItem = ({ icon: Icon, text, colorClass }: { icon: React.ElementType, text: ReactNode, colorClass?: string }) => (
-    <div className={`flex items-center gap-2 text-sm font-medium ${colorClass || 'text-gray-500'}`}>
+    <div className={`flex items-center gap-2 text-xs 3xl:text-sm font-medium ${colorClass || 'text-gray-500'}`}>
         <Icon size={16} className="flex-shrink-0" />
         <span>{text}</span>
     </div>
@@ -106,26 +106,27 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
     };
 
     return (
-        <div className={`bg-white p-6 rounded-2xl flex flex-col h-full hover:shadow-md transition-all duration-300 ${borderClasses[action.priority]}`}>
-            
-            <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-xl text-[var(--barva-tmava)] pr-2 line-clamp-2">{challenge.title}</h3>
-                <div className="flex-shrink-0">
-                    {action.tag ? (
-                        <div className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ${tagColors[action.tag.color as keyof typeof tagColors]}`}>
-                            <action.tag.icon size={14} />
-                            <span>{action.tag.text}</span>
-                        </div>
-                    ) : (
-                        <DeadlineTag deadline={challenge.deadline} />
-                    )}
+        <div className={`relative bg-white p-6 rounded-2xl flex flex-col h-full hover:shadow-md transition-all duration-300 ${borderClasses[action.priority]}`}>
+            <div className="flex flex-col gap-3 justify-between items-start">
+                    {action.tag && (
+                    <div className={`absolute -top-3 -right-3 z-10 flex items-center justify-center gap-1.5 text-xs font-semibold leading-none px-3 py-1.5 rounded-full
+                ${tagColors[action.tag.color as keyof typeof tagColors]}`}>
+                <action.tag.icon size={14} />
+                <span>{action.tag.text}</span>
                 </div>
+            )}
+    <div className="flex flex-col gap-3 justify-between items-start">
+        <h3 className="font-bold 3xl:text-xl min-h-[45px] text-[var(--barva-tmava)] pr-2 line-clamp-2">{challenge.title}</h3>
+        <div className="flex-shrink-0">
+            {!action.tag && <DeadlineTag deadline={challenge.deadline} />}
+        </div>
+    </div>
             </div>
-            <p className="text-gray-500 text-base min-h-[40px] line-clamp-2 my-4 flex-grow">
+            <p className="text-gray-500 text-xs 3xl:text-base min-h-[52px] line-clamp-2 3xl:my-2">
                 {challenge.short_description || <span className="italic text-gray-400">Zatím bez popisu...</span>}
             </p>        
             <div className="space-y-3 mb-4">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center pt-4">
                     <StatItem icon={Users} text={`${applicantCount} / ${challenge.max_applicants || '∞'} přihlášeno`} />
                     {challenge.max_applicants && <span className="text-xs font-semibold text-gray-400">{Math.round(progress)}%</span>}
                 </div>                
@@ -136,19 +137,19 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
                     </div>
                 )}
             </div>
-            <div className="mt-auto border-t-2 border-[var(--barva-svetle-pozadi)] pt-4 flex justify-between items-center">
-                <div className="text-xs text-gray-400 space-y-1">
+            <div className="mt-auto border-[var(--barva-svetle-pozadi)] pt-4 flex justify-between items-center">
+                <div className="text-[11px] 3xl:text-[14px] text-gray-400 space-y-1">
                     <p>Vytvořeno: {new Date(challenge.created_at).toLocaleDateString('cs-CZ')}</p>
                     {challenge.deadline && (
-                        <p className={isPastDeadline && !isCompleted ? 'text-red-500 font-semibold' : ''}>
+                    <p className={isPastDeadline && !isCompleted ? 'text-red-500 font-semibold' : ''}>
                             Konec: {new Date(challenge.deadline).toLocaleDateString('cs-CZ')}
-                        </p>
+                    </p>
                     )}
 
                 </div>
                 <Link 
                     href={action.href} 
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2
+                    className={`px-4 py-2 rounded-full text-xs 3xl:text-sm font-semibold transition-all duration-300 flex items-center gap-2
                         ${action.priority !== 'default'
                             ? 'bg-[var(--barva-primarni)] text-white hover:opacity-90' 
                             : 'text-[var(--barva-primarni)]'

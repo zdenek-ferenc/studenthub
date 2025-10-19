@@ -42,61 +42,70 @@ export default function StartupCard({ startup }: StartupCardProps) {
   const activeChallenges = startup.Challenge?.filter(c => c.status === 'open').length ?? 0;
   const completedChallenges = startup.Challenge?.filter(c => c.status === 'closed').length ?? 0;
 
+  const websiteUrl = startup.website && (startup.website.startsWith('http') ? startup.website : `https://${startup.website}`);
+
+
   return (
-      <div className="bg-white rounded-2xl shadow-xs p-3 sm:p-6 border border-gray-100 hover:shadow-none transition-all duration-300 ease-in-out flex flex-col h-full cursor-pointer">       
-        <div className="flex items-center gap-4 mb-4">
-          {startup.logo_url ? (
-            <Image 
-              src={startup.logo_url} 
-              alt={startup.company_name}
-              width={56}
-              height={56}
-              className="w-14 h-14 rounded-full object-cover" 
-            />
-          ) : (
-            <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full text-xl font-bold text-indigo-600">
-              <span>{startup.company_name.charAt(0).toUpperCase()}</span>
+      <Link href={`/profile/${startup.user_id}`} className="block group h-full">
+        <div className="bg-white rounded-2xl shadow-xs p-3 sm:p-6 border border-gray-100 group-hover:shadow-lg group-hover:border-blue-200 transition-all duration-300 ease-in-out flex flex-col h-full">
+          <div className="flex-grow">
+            <div className="flex items-start gap-4 mb-4">
+              {startup.logo_url ? (
+                <Image 
+                  src={startup.logo_url} 
+                  alt={startup.company_name}
+                  width={56}
+                  height={56}
+                  className="h-10 w-10 3xl:w-14 3xl:h-14 rounded-full object-cover" 
+                />
+              ) : (
+                <div className="flex items-center justify-center h-10 w-10 3xl:w-14 3xl:h-14 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full text-xl font-bold text-indigo-600">
+                  <span>{startup.company_name.charAt(0).toUpperCase()}</span>
+                </div>
+              )}
+              <div>
+                <h3 className="3xl:text-lg font-bold text-gray-800">{startup.company_name}</h3>
+                {websiteUrl && (
+                  <span 
+                    onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(websiteUrl, '_blank');
+                    }}
+                    className="text-sm text-blue-500 hover:underline break-all relative z-10 cursor-pointer"
+                    >
+                    {startup.website}
+                  </span>
+                )}
+              </div>
             </div>
-          )}
-          <div>
-            <h3 className="text-lg font-bold text-gray-800">{startup.company_name}</h3>
-            {startup.website && <p className="text-sm text-blue-500 hover:underline">{startup.website}</p>}
+            <div className="flex items-center gap-2 sm:gap-4 mb-5 text-xs md:text-sm font-medium text-gray-500">
+              <div className='flex flex-col gap-4'>
+                <div className="flex items-center gap-1.5">
+                  <Briefcase className="text-blue-500" size={18} />
+                  <span>{formatChallengeText(activeChallenges, 'active')}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle className="text-green-500" size={18} />
+                  <span>{formatChallengeText(completedChallenges, 'completed')}</span>
+                </div>
+              </div>    
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {startup.StartupCategory?.slice(0, 3).map(({ Category }) => (
+                Category && (
+                  <span key={Category.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors">
+                    {Category.name}
+                  </span>
+                )
+              ))}
+              {startup.StartupCategory?.length > 3 && (
+                <span className="text-[var(--barva-primarni)] text-xs sm:text-sm">
+                  +{startup.StartupCategory.length - 3} další
+                </span>
+              )}
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4 mb-5 text-xs md:text-sm font-medium text-gray-500">
-          <div className='flex flex-col gap-4'>
-            <div className="flex items-center gap-1.5">
-              <Briefcase className="text-blue-500" size={18} />
-              <span>{formatChallengeText(activeChallenges, 'active')}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle className="text-green-500" size={18} />
-              <span>{formatChallengeText(completedChallenges, 'completed')}</span>
-            </div>
-          </div>    
-        </div>
-        <div className="flex flex-wrap items-center gap-2 mb-6">
-          {startup.StartupCategory?.slice(0, 3).map(({ Category }) => (
-            Category && (
-              <span key={Category.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors">
-                {Category.name}
-              </span>
-            )
-          ))}
-          {startup.StartupCategory?.length > 3 && (
-            <span className="text-[var(--barva-primarni)] text-xs sm:text-sm">
-              +{startup.StartupCategory.length - 3} další
-            </span>
-          )}
-        </div>
-        
-        <div className="mt-auto pt-3 sm:pt-4 border-t border-gray-100 flex justify-center">
-          <Link href={`/profile/${startup.user_id}`}>
-            <div className="flex justify-between items-center bg-[var(--barva-primarni)] text-white font-bold py-2 px-5 rounded-3xl hover:opacity-90 transition-opacity">
-              Profil startupu
-            </div>
-          </Link>          
-        </div>
-      </div>
+      </Link>
   );
 }

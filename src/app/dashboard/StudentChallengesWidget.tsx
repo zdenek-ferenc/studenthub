@@ -36,16 +36,16 @@ export default function StudentChallengesWidget() {
 
 
     const SwitchButton = ({ buttonView, label, count }: { buttonView: View, label: string, count: number }) => (
-        <button onClick={() => setView(buttonView)} className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors relative ${view === buttonView ? 'text-[var(--barva-primarni)]' : 'cursor-pointer text-gray-500 hover:text-[var(--barva-tmava)]'}`}>
+        <button onClick={() => setView(buttonView)} className={`px-4 py-2 rounded-lg text-xs sm:text-xs font-semibold transition-colors relative ${view === buttonView ? 'text-[var(--barva-primarni)]' : 'cursor-pointer text-gray-500 hover:text-[var(--barva-tmava)]'}`}>
             {label} <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-gray-100">{count}</span>
             {view === buttonView && <motion.div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--barva-primarni)]" layoutId="underline" />}
         </button>
     );
 
     return (
-        <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div className="flex flex-row items-center justify-start lg:justify-between mb-4">
-                <h3 className="hidden lg:block text-xl pb-2 md:pb-0 font-bold text-[var(--barva-tmava)]">Moje výzvy</h3>
+        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex flex-row items-start justify-between mb-4">
+                <h3 className="3xl:text-xl pb-2 md:pb-0 font-bold text-[var(--barva-tmava)]">Výzvy</h3>
                 <div className="flex items-center rounded-lg p-1">
                     <SwitchButton buttonView="active" label="Aktivní" count={activeChallenges.length} />
                     <SwitchButton buttonView="completed" label="Hotové" count={completedChallenges.length} />
@@ -64,9 +64,9 @@ export default function StudentChallengesWidget() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-8">
+                                    <div className="text-sm 3xl:text-base text-center py-5 3xl:py-8">
                                         <p className="text-gray-500">Momentálně nepracuješ na žádné výzvě.</p>
-                                        <Link href="/challenges" className="inline-block mt-4 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer text-sm">
+                                        <Link href="/challenges" className="inline-block mt-4 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer text-xs 3xl:text-sm hover:opacity-90 transition-all ease-in-out duration-200">
                                             Najít novou výzvu
                                         </Link>
                                     </div>

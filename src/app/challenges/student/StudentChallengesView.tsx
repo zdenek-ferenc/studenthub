@@ -49,7 +49,7 @@ export default function StudentChallengesView() {
   const studentSkillIdsForCard = useMemo(() => studentSkills.map(s => s.id), [studentSkills]);
 
   return (
-    <div className="container mx-auto flex flex-col lg:flex-row items-start gap-8 px-4 py-5 md:py-32">
+    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-8 md:py-32 lg:flex-row items-start gap-8">
       <ChallengeFilterSidebar
         allSkills={allSkills}
         selectedSkillIds={selectedSkillIds}

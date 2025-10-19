@@ -39,14 +39,14 @@ function DashboardPage() {
   if (profile?.role !== 'student') return <p className="text-center py-20">Tato stránka je určena pouze pro studenty.</p>;
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-32">
-      <h1 className="text-3xl md:text-4xl font-bold text-[var(--barva-tmava)] mb-2 md:mb-8">
+    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-8 md:py-28 3xl:py-32">
+      <h1 className="text-3xl 3xl:text-4xl font-bold text-[var(--barva-tmava)] mb-2 md:mb-4 3xl::mb-8">
         Vítej <span className='text-[var(--barva-primarni)]'>{displayName}</span>!
       </h1>
-      <div className="hidden lg:flex flex-col lg:flex-row items-start gap-6 md:gap-8">
-        <div className="w-full lg:w-2/3 space-y-6 md:space-y-8">
+      <div className="hidden lg:flex flex-col lg:flex-row items-start gap-6 3xl:gap-8">
+        <div className="w-full lg:w-2/3 space-y-6 3xl:space-y-8">
             <StudentChallengesWidget />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 3xl:md:gap-8">
                 <NotificationsWidget />
                 <StatsWidget />
             </div>

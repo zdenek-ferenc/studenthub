@@ -20,7 +20,7 @@ export type RecommendedChallenge = {
 };
 
 const InfoTag = ({ icon: Icon, text, colorClass, className }: { icon: React.ElementType, text: string | React.ReactNode, colorClass?: string, className?: string }) => (
-    <div className={`flex items-center gap-1.5 text-xs md:text-sm font-semibold ${colorClass || 'text-gray-600'} ${className}`}>
+    <div className={`flex items-center gap-1.5 text-xs 3xl:text-sm font-semibold ${colorClass || 'text-gray-600'} ${className}`}>
         <Icon size={14} className="flex-shrink-0" />
         <span>{text}</span>
     </div>
@@ -53,7 +53,7 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
     }
 
     return (
-        <Link href={`/challenges/${challenge.id}`} className="group block bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:bg-blue-50 transition-all duration-300 h-full">
+        <Link href={`/challenges/${challenge.id}`} className="group block bg-white lg:p-2 2xl:p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:bg-blue-50 transition-all duration-300 h-full">
             <div className="flex flex-col justify-between h-full">
                 <div className="flex items-start gap-4">
                     <Image 
@@ -61,22 +61,22 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
                         alt="logo" 
                         width={48} 
                         height={48} 
-                        className="rounded-lg w-12 h-12 object-cover flex-shrink-0" 
+                        className="rounded-lg w-10 h-10 3xl:w-12 3xl:h-12 object-cover flex-shrink-0" 
                     />
                     <div className="flex-grow min-w-0">
-                        <p className="text-sm font-semibold text-gray-500 truncate">{challenge.StartupProfile?.company_name}</p>
-                        <h5 className="text-sm md:text-lg font-bold text-gray-800 break-words">{challenge.title}</h5>
+                        <p className="text-xs 3xl:text-sm font-semibold text-gray-500 truncate">{challenge.StartupProfile?.company_name}</p>
+                        <h5 className="text-xs xl:text-sm 3xl:text-lg font-bold text-gray-800 break-words">{challenge.title}</h5>
                     </div>
                     <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-300 self-center">
                         <ChevronRight size={24} strokeWidth={2.5} className="text-blue-500" />
                     </div>
                 </div>
-                <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-6 gap-y-2 leading-none">
-                    <div className='bg-[var(--barva-primarni)]/90 px-4 py-2 rounded-3xl'>
+                <div className="mt-4 3xl:pt-3 border-gray-100 flex flex-wrap items-center gap-x-6 gap-y-2 leading-none">
+                    <div className='border-2 border-[var(--barva-primarni)]/90 px-3 py-1.5 3xl:px-4 3xl:py-2 rounded-3xl'>
                         <InfoTag 
                         icon={Sparkles} 
                         text={<>Shoda dovedností: <strong>{challenge.matchingSkills}/{challenge.requiredSkills}</strong></>}
-                        colorClass="text-white"
+                        colorClass="text-[var(--barva-primarni)]"
                         />
                     </div>
                     <InfoTag 

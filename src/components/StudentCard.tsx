@@ -84,7 +84,7 @@ export default function StudentCard({ student }: StudentCardProps) {
 
   return (
       <Link href={`/profile/${student.user_id}`} className="block group">
-        <div className="bg-white rounded-2xl shadow-xs p-6 border border-gray-100 group-hover:shadow-lg transition-all duration-300 ease-in-out flex flex-col h-full">
+        <div className="bg-white rounded-2xl shadow-xs p-4 3xl:p-6 border border-gray-100 group-hover:shadow-lg transition-all duration-300 ease-in-out flex flex-col h-full">
           <div className="flex items-center gap-4 mb-4">
             {student.profile_picture_url ? (
               <Image 
@@ -92,34 +92,34 @@ export default function StudentCard({ student }: StudentCardProps) {
                 alt={`${student.first_name} ${student.last_name}`}
                 width={56}
                 height={56}
-                className="w-14 h-14 rounded-full object-cover" 
+                className="w-10 h-10 3xl:w-14 3xl:h-14 rounded-full object-cover" 
               />
             ) : (
-              <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full text-xl font-bold text-[var(--barva-primarni)]">
+              <div className="flex items-center justify-center w-10 h-10 3xl:w-14 3xl:h-14 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full text-xs lg:text-[14px] 3xl:text-lg font-bold text-[var(--barva-primarni)]">
                 <span>{getInitials(student.first_name, student.last_name)}</span>
               </div>
             )}
             <div>
-              <h3 className="text-lg font-bold text-gray-800">{student.first_name} {student.last_name}</h3>
-              <p className="text-sm text-gray-500">@{student.username}</p>
+              <h3 className="text-sm 3xl:text-lg font-bold text-gray-800">{student.first_name} {student.last_name}</h3>
+              <p className="text-xs 3xl:text-sm text-gray-500">@{student.username}</p>
             </div>
           </div>
 
-          <div className="relative h-[60px] mb-5">
-              <p className="text-gray-600 text-sm line-clamp-3">
+          <div className="relative 2xl:h-[30px] 3xl:h-[60px] mb-5">
+              <p className="text-gray-600 text-xs 3xl:text-sm line-clamp-3">
                   {student.bio || 'Tento uživatel zatím nepřidal žádný popis.'}
               </p>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mb-5 text-sm font-medium text-gray-500">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mb-5 text-[12px] 3xl:text-sm font-medium text-gray-500">
             {stats ? (
-              <div className='flex flex-col gap-4'>
+              <div className='pt-2 flex flex-col gap-2 3xl:gap-4'>
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle className="text-green-500" size={18} />
+                  <CheckCircle className="text-green-500 w-3.5 3xl:w-6" size={18} />
                   <span>{formatChallengeText(stats.completed, 'completed')}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Trophy className="text-amber-500" size={18} />
+                  <Trophy className="text-amber-500 w-3.5 3xl:w-6" size={18} />
                   <span>{formatChallengeText(stats.won, 'won')}</span>
                 </div>
               </div>
@@ -128,17 +128,31 @@ export default function StudentCard({ student }: StudentCardProps) {
             )}
           </div>
           
-          <div className="flex flex-wrap items-start content-start gap-2 mb-6 h-auto overflow-hidden">
-            {sortedSkills.slice(0, 5).map(({ Skill }) => (
+          <div className="flex flex-wrap items-center content-start gap-2 h-auto overflow-hidden">
+            {(!sortedSkills || sortedSkills.length === 0) && (
+              <span className="bg-gray-100 text-gray-500 px-3 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm font-medium">
+                Uživatel nepřidal žádné dovednosti
+              </span>
+            )}
+            {sortedSkills.slice(0, 4).map(({ Skill }) => (
               Skill && (
-                <span key={Skill.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-sm font-semibold transition-colors">
+                <span key={Skill.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm 3xl:font-semibold transition-colors">
                   {Skill.name}
                 </span>
               )
             ))}
-            {sortedSkills.length > 5 && (
-              <span className="text-[var(--barva-primarni)] text-sm self-center pt-2">
-                +{sortedSkills.length - 5}
+            {sortedSkills.length > 4 && (
+              <span className="flex items-center gap-2 whitespace-nowrap self-center">
+                {sortedSkills[4]?.Skill && (
+                  <span key={sortedSkills[4].Skill.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm 3xl:font-semibold transition-colors">
+                    {sortedSkills[4].Skill.name}
+                  </span>
+                )}
+                {sortedSkills.length > 5 && (
+                  <span className="text-[var(--barva-primarni)] text-[11px] 3xl:text-sm self-center">
+                    +{sortedSkills.length - 5}
+                  </span>
+                )}
               </span>
             )}
           </div>
