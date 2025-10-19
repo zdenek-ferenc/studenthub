@@ -74,8 +74,8 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
     }, [challenge.ChallengeSkill, studentSkillIds]);
 
     return (
-        <div className="bg-white p-6 sm:p-8 md:p-12 rounded-2xl shadow-xs">
-            <div className="text-center mb-8">
+        <div className="bg-white p-6 sm:p-8 md:p-12 md:rounded-2xl shadow-xs">
+            <div className="text-center lg:mb-8">
                 <Image 
                     src={challenge.StartupProfile?.logo_url || '/logo.svg'} 
                     alt="logo firmy" 
@@ -83,8 +83,8 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                     height={80} 
                     className="mx-auto rounded-lg mb-4 w-16 h-16 sm:w-20 sm:h-20"
                 />
-                <p className="font-semibold text-gray-800">{challenge.StartupProfile?.company_name}</p>
-                <h1 className="text-3xl sm:text-4xl font-bold text-[var(--barva-tmava)]">{challenge.title}</h1>
+                <p className="font-semibold pb-2 lg:pb-4 text-gray-800">{challenge.StartupProfile?.company_name}</p>
+                <h1 className="text-xl lg:text-4xl font-bold text-[var(--barva-tmava)]">{challenge.title}</h1>
             </div>
             <div className="border-b border-gray-100 py-6">
                 <h2 className="text-lg sm:text-xl font-semibold text-[var(--barva-tmava)] mb-4">Potřebné dovednosti</h2>
@@ -94,7 +94,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                         return (
                             <span 
                                 key={Skill.id} 
-                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base font-semibold transition-colors ${
+                                className={`px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-base font-semibold transition-colors ${
                                     isMatch 
                                     ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)]' 
                                     : 'bg-white text-gray-600 border border-gray-300'
@@ -107,7 +107,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center text-[var(--barva-tmava)] py-4 text-base sm:text-lg font-semibold gap-4">
+            <div className="flex flex-row justify-between items-center text-[var(--barva-tmava)] py-4 text-base sm:text-lg font-semibold gap-4">
                 <span>Přihlášeno: <strong>{challenge.Submission.length} / {challenge.max_applicants}</strong></span>
                 <RewardsDisplay challenge={challenge} />
             </div>
@@ -145,11 +145,11 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                     </>
                 )}
                 
-                <p className='font-semibold text-lg sm:text-xl mt-6'>Termín odevzdání do: <strong className='ml-3 text-[var(--barva-primarni)]'>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></p>
+                <p className='font-semibold text-lg sm:text-xl mt-6'>Termín odevzdání: <strong className='ml-3 text-[var(--barva-primarni)]'>{new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</strong></p>
             </div>            
             {!isApplied && (
                 <div className="mt-10 text-center">
-                    <button onClick={onApply} disabled={isApplying || isChallengeFull} className="px-6 py-3 sm:px-7 sm:py-3 text-white bg-[var(--barva-primarni)] rounded-full font-normal text-xl sm:text-2xl outline-2 transition-colors duration-200 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    <button onClick={onApply} disabled={isApplying || isChallengeFull} className="px-6 py-3 sm:px-7 sm:py-3 text-white bg-[var(--barva-primarni)] rounded-full font-normal text-base md:text-2xl outline-2 transition-colors duration-200 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed">
                         {isApplying ? 'Přihlašuji...' : (isChallengeFull ? 'Kapacita naplněna' : 'Přihlásit se k výzvě')}
                     </button>
                 </div>

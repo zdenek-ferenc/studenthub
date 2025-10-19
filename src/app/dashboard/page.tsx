@@ -39,8 +39,8 @@ function DashboardPage() {
   if (profile?.role !== 'student') return <p className="text-center py-20">Tato stránka je určena pouze pro studenty.</p>;
 
   return (
-    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-8 md:py-28 3xl:py-32">
-      <h1 className="text-3xl 3xl:text-4xl font-bold text-[var(--barva-tmava)] mb-2 md:mb-4 3xl::mb-8">
+    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-4 sm:py-8 md:py-28 3xl:py-32">
+      <h1 className="hidden md:block text-3xl 3xl:text-4xl font-bold text-[var(--barva-tmava)] mb-2 md:mb-4 3xl::mb-8">
         Vítej <span className='text-[var(--barva-primarni)]'>{displayName}</span>!
       </h1>
       <div className="hidden lg:flex flex-col lg:flex-row items-start gap-6 3xl:gap-8">
@@ -62,6 +62,9 @@ function DashboardPage() {
           <PillButton id="growth" label="Růst" icon={TrendingUp} activeTab={activeTab} setActiveTab={setActiveTab} />
           <PillButton id="activities" label="Aktivity" icon={LayoutGrid} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
+        <h1 className="block md:hidden text-xl font-bold text-[var(--barva-tmava)] mb-2 md:mb-4 3xl::mb-8">
+        Vítej <span className='text-[var(--barva-primarni)]'>{displayName}</span>!
+      </h1>
         <AnimatePresence mode="wait">
           <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
             {activeTab === 'challenges' && ( <div className="space-y-3"><StudentChallengesWidget /><RecommendedChallengesWidget /></div> )}

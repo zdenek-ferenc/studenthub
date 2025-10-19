@@ -59,7 +59,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
           <div className="flex items-center gap-4">
             {challenge.StartupProfile?.logo_url ? (
               <Image src={challenge.StartupProfile.logo_url} alt="logo firmy" 
-                className='rounded-2xl'
+                className='rounded-2xl hidden xl:block'
                 priority={true}
                 height={50}
                 width={50}
@@ -69,7 +69,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
             )}
             <div className='flex flex-col gap-1'>
               <p className="font-semibold text-gray-700">{challenge.StartupProfile?.company_name}</p>
-              <h3 className="xl:text-xl font-bold text-[var(--barva-tmava)] -mt-1 line-clamp-1 flex-grow">{challenge.title}</h3>
+              <h3 className="xl:text-[18px] font-bold text-[var(--barva-tmava)] -mt-1 line-clamp-2 flex-grow">{challenge.title}</h3>
             </div>
           </div>
         </div>
