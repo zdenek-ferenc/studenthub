@@ -4,8 +4,8 @@ import { ChallengeFormData } from "../CreateChallengeWizard";
 
 const FormField = ({ label, description, children }: { label: string, description: string, children: React.ReactNode }) => (
     <div>
-        <label className="block text-xl font-semibold md:font-bold text-[var(--barva-primarni)]">{label}</label>
-        <p className="text-sm md:text-base text-gray-500 mt-1 mb-4">{description}</p>
+        <label className="block md:text-xl 3xl:text-2xl font-semibold md:font-bold text-[var(--barva-primarni)]">{label}</label>
+        <p className="text-xs 3xl:text-sm text-gray-500 mt-1 mb-4">{description}</p>
         {children}
     </div>
 );
@@ -17,10 +17,10 @@ export default function Step1_Basics() {
     const currentLength = shortDescriptionValue?.length || 0;
 
     return (
-        <div className="space-y-4 md:space-y-10">
+        <div className="space-y-4 md:space-y-8">
             <div>
-                <h2 className="text-2xl md:text-4xl font-bold md:font-extrabold text-[var(--barva-tmava)]">Základy výzvy</h2>
-                <p className="md:text-lg text-gray-600 mt-2">Začněme tím nejdůležitějším. Jak se bude vaše výzva jmenovat a o co v ní ve zkratce půjde?</p>
+                <h2 className="text-2xl 3xl:text-3xl font-bold md:font-extrabold text-[var(--barva-tmava)]">Základy výzvy</h2>
+                <p className="text-sm 3xl:text-base text-gray-600 mt-2">Začněme tím nejdůležitějším. Jak se bude vaše výzva jmenovat a o co v ní ve zkratce půjde?</p>
             </div>            
             <FormField
                 label="Název výzvy"
@@ -30,8 +30,9 @@ export default function Step1_Basics() {
                     id="title" 
                     {...register('title', { required: 'Název je povinný' })} 
                     className="input !font-normal" 
+                    placeholder="..."
                 />
-                {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+                {errors.title && <p className="text-red-500 text-sm mt-2">{errors.title.message}</p>}
             </FormField>
             <FormField
                 label={`Krátký popis (max. ${maxLength} znaků)`}
@@ -44,12 +45,15 @@ export default function Step1_Basics() {
                         maxLength: { value: maxLength, message: `Popis nesmí být delší než ${maxLength} znaků` } 
                     })} 
                     rows={2} 
+                    placeholder="..."
                     className="input !font-normal" 
                 />
+                <div className="w-full flex justify-between">
+                {errors.short_description && <p className="text-red-500 text-sm mt-1">{errors.short_description.message}</p>}    
                 <div className={`text-right text-sm mt-1 ${currentLength > maxLength ? 'text-red-500' : 'text-gray-500'}`}>
                     {currentLength}/{maxLength}
+                </div>                
                 </div>
-                {errors.short_description && <p className="text-red-500 text-sm mt-1">{errors.short_description.message}</p>}
             </FormField>
         </div>
     );

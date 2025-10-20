@@ -1,28 +1,30 @@
 "use client";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { ChallengeFormData } from "../CreateChallengeWizard";
 import { PlusCircle, XCircle } from "lucide-react";
+import AttachmentUploader from "../../../../components/AttachmentUploader";
 
 const FormField = ({ label, description, children }: { label: string, description: string, children: React.ReactNode }) => (
     <div>
-        <label className="block text-xl font-semibold md:font-bold text-[var(--barva-primarni)]">{label}</label>
-        <p className="text-sm md:text-base text-gray-500 mt-1 mb-4">{description}</p>
+        <label className="block md:text-xl 3xl:text-2xl font-semibold md:font-bold text-[var(--barva-primarni)]">{label}</label>
+        <p className="text-xs 3xl:text-sm text-gray-500 mt-1 mb-4">{description}</p>
         {children}
     </div>
 );
 
 export default function Step2_Details() {
-    const { register, control, formState: { errors } } = useFormContext<ChallengeFormData>();
+    const { register, control, watch, formState: { errors } } = useFormContext<ChallengeFormData>();
+    const challengeId = watch('id');
     const { fields, append, remove } = useFieldArray({
         control,
-        name: "expected_outputs", 
+        name: "expected_outputs",
     });
 
     return (
-        <div className="space-y-4 md:space-y-10">
+        <div className="space-y-4 md:space-y-8">
             <div>
-                <h2 className="text-2xl md:text-4xl font-bold md:font-extrabold text-[var(--barva-tmava)]">Detailní zadání</h2>
-                <p className="md:text-lg text-gray-600 mt-2">Nyní je čas jít do hloubky. Popište studentům kontext a přesně specifikujte, co od nich očekáváte.</p>
+                <h2 className="text-2xl 3xl:text-3xl font-bold md:font-extrabold text-[var(--barva-tmava)]">Detailní zadání</h2>
+                <p className="text-sm 3xl:text-base text-gray-600 mt-2">Nyní je čas jít do hloubky. Popište studentům kontext a přesně specifikujte, co od nich očekáváte.</p>
             </div>
             
             <FormField
@@ -32,7 +34,8 @@ export default function Step2_Details() {
                 <textarea 
                     id="description" 
                     {...register('description', { required: 'Podrobný popis je povinný' })} 
-                    rows={5} 
+                    rows={5}
+                    placeholder="..."
                     className="input" 
                 />
                 {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
@@ -46,10 +49,29 @@ export default function Step2_Details() {
                     id="goals" 
                     {...register('goals', { required: 'Cíle jsou povinné' })} 
                     rows={3} 
+                    placeholder="..."
                     className="input" 
                 />
                 {errors.goals && <p className="text-red-500 text-sm mt-1">{errors.goals.message}</p>}
             </FormField>
+
+            <FormField
+                label="Podklady pro studenty (volitelné)"
+                description="Nahrajte soubory, které studentům pomohou s řešením (např. loga, brandbook, designové podklady). Vše prosím sbalte do jednoho ZIP souboru."
+            >
+                <Controller
+                    name="attachments_urls"
+                    control={control}
+                    render={({ field }) => (
+                        <AttachmentUploader
+                            challengeId={challengeId || null}
+                            initialFiles={field.value || []}
+                            onUploadComplete={field.onChange}
+                        />
+                    )}
+                />
+            </FormField>
+
 
             <FormField
                 label="Očekávané výstupy"

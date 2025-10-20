@@ -80,7 +80,7 @@ const DesktopFilterContent = ({
                     placeholder="Hledej výzvu, dovednost..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--barva-primarni)] transition text-[var(--barva-tmava)] bg-gray-50 md:bg-transparent"
+                    className="w-full pl-12 pr-4 py-3 border-none rounded-lg focus:outline-none focus:ring-0 focus:ring-[var(--barva-primarni)] transition text-[var(--barva-tmava)] bg-gray-50 md:bg-transparent"
                 />
             </div>
             <div className="w-full md:w-auto md:border-l border-gray-100 md:pl-2">
@@ -116,8 +116,8 @@ const DesktopFilterContent = ({
                             <ChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} size={16} />
                         </Popover.Button>
                         <Transition as={Fragment} enter="transition ease-out duration-200" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-150" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
-                            <Popover.Panel className="absolute z-10 mt-2 w-72 bg-white shadow-lg rounded-lg p-4 border border-gray-100">
-                                <input type="text" placeholder="Hledej..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full px-3 py-2 mb-3 border border-gray-300 rounded-lg text-sm" />
+                            <Popover.Panel className="absolute z-30 mt-2 w-72 bg-white shadow-lg rounded-lg p-4 border border-gray-100">
+                                <input type="text" placeholder="Hledej..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full px-3 py-2 mb-3 border text-gray-600 border-gray-300 rounded-lg text-sm" />
                                 <div className="max-h-48 overflow-y-auto flex flex-wrap gap-2">
                                     {availableSkillsInPopover.map(skill => (
                                         <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200">{skill.name}</button>
@@ -187,12 +187,12 @@ const MobileFilterContent = (props: Omit<ChallengeFilterProps, 'isMobileOpen' | 
                 <label htmlFor="challenge-search-mobile" className="text-sm font-bold text-gray-700 block mb-2">Vyhledej výzvu</label>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                    <input id="challenge-search-mobile" type="text" placeholder="Název, popis..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"/>
+                    <input id="challenge-search-mobile" type="text" placeholder="Název, popis..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 border text-gray-600 border-gray-300 rounded-lg"/>
                 </div>
             </div>
             <div>
                 <label htmlFor="sort-by-mobile" className="text-sm font-bold text-gray-700 block mb-2">Seřadit podle</label>
-                <select id="sort-by-mobile" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full py-2 px-4 border border-gray-300 rounded-lg bg-white">
+                <select id="sort-by-mobile" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full py-2 px-4 border text-gray-600 border-gray-300 rounded-lg bg-white">
                     <option value="recommended">Doporučené</option>
                     <option value="newest">Nejnovější</option>
                     <option value="ending_soon">Brzy končí</option>
@@ -210,7 +210,7 @@ const MobileFilterContent = (props: Omit<ChallengeFilterProps, 'isMobileOpen' | 
                         ))}
                     </div>
                 )}
-                <input type="text" placeholder="Hledej dovednost..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full px-4 py-2 mb-2 border border-gray-300 rounded-lg"/>
+                <input type="text" placeholder="Hledej dovednost..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full px-4 py-2 mb-2 border text-gray-600 border-gray-300 rounded-lg"/>
                 <div className="max-h-48 overflow-y-auto flex flex-wrap gap-2 p-2 bg-gray-100 rounded-lg">
                     {availableSkills.map(skill => (
                         <button key={`mobile-available-${skill.id}`} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1 bg-white text-gray-800 rounded-full text-sm border hover:bg-gray-200">
@@ -232,9 +232,9 @@ export default function ChallengeFilter(props: ChallengeFilterProps) {
                 <DesktopFilterContent {...props} />
             </div>
             <Transition appear show={isMobileOpen} as={Fragment}>
-                <Dialog as="div" className="relative z-50 lg:hidden" onClose={() => setMobileOpen(false)}>
+                <Dialog as="div" className="relative z-40 lg:hidden" onClose={() => setMobileOpen(false)}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                        <div className="fixed inset-0 bg-black bg-opacity-25" />
+                        <div className="fixed inset-0 bg-black/70 bg-opacity-25" />
                     </Transition.Child>
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center p-4 text-center">

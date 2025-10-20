@@ -85,7 +85,7 @@ const getSkillsTitle = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Hledej dovednost (např. React)"
-        className="w-full text-[var(--barva-primarni)] border-2 border-[var(--barva-primarni2)] rounded-2xl focus:outline-none p-3"
+        className="input text-[var(--barva-primarni)] border-2 border-[var(--barva-primarni2)] rounded-2xl focus:outline-none p-3"
       />
       
       <div className="min-h-[6rem]">
@@ -98,7 +98,7 @@ const getSkillsTitle = () => {
                 key={`selected-${skill.id}`}
                 type="button"
                 onClick={() => handleToggleSkill(skill.id)}
-                className="px-4 py-1 text-[var(--barva-primarni)] bg-[#F1F8FF] font-semibold rounded-full text-md outline-2 transition-colors duration-200 cursor-pointer"
+                className="px-4 py-1 text-[var(--barva-primarni)] bg-[#F1F8FF] font-semibold rounded-full text-sm 3xl:text-base outline-2 transition-colors duration-200 cursor-pointer"
               >
                 {skill.name}
                 <span className='ml-2 font-semibold'>&times;</span>
@@ -117,13 +117,13 @@ const getSkillsTitle = () => {
                 </button>
             )}
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2 3xl:gap-3">
           {displayedSkills.filter(skill => !selectedIds.includes(skill.id)).map(skill => (
             <button
               key={skill.id}
               type="button"
               onClick={() => handleToggleSkill(skill.id)}
-              className="px-4 py-1 text-[var(--barva-primarni)] rounded-full font-normal text-md outline-2 transition-colors duration-200 cursor-pointer"
+              className="px-4 py-1 text-[var(--barva-primarni)] rounded-full font-normal text-sm 3xl:text-base outline-2 transition-colors duration-200 cursor-pointer"
             >
               {skill.name}
             </button>

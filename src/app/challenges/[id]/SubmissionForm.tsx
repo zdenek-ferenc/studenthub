@@ -145,7 +145,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
       return;
     }
     const { data: { publicUrl } } = supabase.storage.from('submission-files').getPublicUrl(storageData.path);
-    const { error: dbError } = await supabase.from('Submission').update({ file_url: publicUrl, file_name_original: file.name }).eq('id', submissionId); 
+    const { error: dbError } = await supabase.from('Submission').update({ file_url: publicUrl}).eq('id', submissionId); 
     if (dbError) {
         showToast("Soubor se nahrál, ale nepodařilo se ho uložit k odevzdání.", "error");
     } else {
@@ -253,7 +253,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
               <div className="flex items-center justify-between bg-gray-100 p-2 rounded-md text-sm">
                 <span className="font-medium text-gray-700 truncate pr-2">{uploadedFile.name}</span>
                 {!isSubmitted && (
-                  <button type="button" onClick={handleFileDelete} className="text-red-500 hover:text-red-700 p-1 rounded-full">
+                  <button type="button" onClick={handleFileDelete} className="text-red-500 hover:text-red-700 p-1 rounded-full cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 )}

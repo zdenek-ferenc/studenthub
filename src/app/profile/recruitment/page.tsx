@@ -25,7 +25,7 @@ function RecruitmentHubPage() {
     ];
 
     return (
-        <div className="container mx-auto py-8 md:py-32 px-4">
+        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 md:py-22 lg:py-28 3xl:py-32 py-8 ">
             <div className="mb-8">
                 <Link href={`/profile/${profile.id}`} className="text-gray-500 hover:text-[var(--barva-primarni)] transition-colors text-sm">
                     &larr; Zpět na profil

@@ -191,9 +191,22 @@ export default function CreateChallengeWizard() {
     };
 
     const handlePublish = async () => {
-        await handleSaveAndContinue();
-        if (!challengeId || !methods.formState.isValid) {
+        const isValid = await methods.trigger();
+        if (!isValid) {
             showToast('Před zveřejněním prosím doplňte všechny povinné údaje.', 'error');
+            const errors = methods.formState.errors;
+            if (errors.title || errors.short_description) {
+                setStep(1);
+            } else if (errors.description || errors.goals || errors.expected_outputs) {
+                setStep(2);
+            } else if (errors.deadline || errors.skills || errors.reward_first_place) {
+                setStep(3);
+            }
+            return;
+        }
+        await handleSaveAndContinue(); 
+        if (!challengeId) {
+            showToast('Před zveřejněním se výzvu nepodařilo uložit.', 'error');
             return;
         }
 

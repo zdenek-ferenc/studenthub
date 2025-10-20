@@ -4,7 +4,7 @@ import { useMemo, useEffect, useState } from 'react';
 import { useChallenges } from '../../../contexts/ChallengesContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import StudentChallengeCard from './components/StudentChallengeCard';
-import ChallengeFilter from './components/ChallengeFilter '; // Import nového filtru
+import ChallengeFilter from './components/ChallengeFilter '; 
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { SlidersHorizontal } from 'lucide-react'; 
 
