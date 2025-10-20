@@ -91,7 +91,7 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
     const isActive = pathname === `/profile/${user?.id}`;
     return (
         <div className="relative bg-white rounded-full" ref={dropdownRef}>
-            <button onClick={() => setIsOpen(!isOpen)} className={`w-10 h-10 3xl:w-12 3xl:h-12 rounded-full bg-gradient-to-b from-[#86C5FF]/30 to-[#86C5FF]/55 text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer 3xl:text-lg hover:shadow-md transition-all ease-in duration-300 ${isActive ? 'ring-2 3xl:ring-3 ring-[var(--barva-primarni)] leading-none' : ''}`}>{initials}</button>
+            <button onClick={() => setIsOpen(!isOpen)} className={`w-10 h-10 3xl:w-12 3xl:h-12 rounded-full bg-gradient-to-b from-[#86C5FF]/30 to-[#86C5FF]/55 text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer 3xl:text-lg hover:shadow-md transition-all ease-in duration-300 ${isActive ? 'ring-2 ring-[var(--barva-primarni)] leading-none' : ''}`}>{initials}</button>
             <div className={`absolute right-0 pt-2 transition-opacity duration-200 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                 <div className="w-36 3xl:w-48 bg-white rounded-xl shadow-lg z-10">
                     <Link href={`/profile/${user?.id}`} className="block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm text-gray-700 rounded-tr-xl rounded-tl-xl hover:bg-sky-50 transition-all ease-in-out duration-100" onClick={() => setIsOpen(false)}>Můj profil</Link>

@@ -78,6 +78,7 @@ export default function StudentChallengesView() {
         <ChallengeFilter
             allSkills={allSkills}
             selectedSkillIds={selectedSkillIds}
+            studentSkills={studentSkills}
             setSelectedSkillIds={setSelectedSkillIds}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
