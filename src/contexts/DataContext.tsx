@@ -163,7 +163,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         try {
             if (studentSkills.length > 0) {
-                const { data: rpcData, error: rpcError } = await supabase.rpc('get_students_with_skills', { skill_ids: studentSkills, search_term: debouncedStudentSearch });
+                const { data: rpcData, error: rpcError } = await supabase.rpc('get_students_with_all_skills', { 
+                    p_skill_ids: studentSkills, 
+                    p_search_term: debouncedStudentSearch 
+                });
                 if (rpcError) throw rpcError;
                 const studentIds = rpcData?.map((s: { user_id: string }) => s.user_id) || [];
                 if (studentIds.length === 0) { setStudents([]); setHasMoreStudents(false); setLoadingStudents(false); return; }

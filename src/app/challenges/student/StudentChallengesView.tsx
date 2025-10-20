@@ -35,6 +35,12 @@ export default function StudentChallengesView() {
         challenge.deadline ? new Date(challenge.deadline) >= new Date() : false
     );
 
+    if (user) {
+        filtered = filtered.filter(challenge => 
+            !challenge.Submission.some(sub => sub.student_id === user.id)
+        );
+    }
+
     if (searchQuery && selectedSkillIds.length === 0) {
         const lowerCaseQuery = searchQuery.toLowerCase();
         filtered = filtered.filter(challenge => 
@@ -54,17 +60,16 @@ export default function StudentChallengesView() {
     }
 
     return filtered;
-  }, [challenges, studentSkills, sortBy, searchQuery, selectedSkillIds]);
+  }, [challenges, studentSkills, sortBy, searchQuery, selectedSkillIds, user]);
 
   const studentSkillIdsForCard = useMemo(() => studentSkills.map(s => s.id), [studentSkills]);
 
   return (
-    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-8 md:py-28 3xl:py-32 items-start gap-3 xl:gap-8">
+    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-8 md:py-28 3xl:py-32 items-start gap-2 xl:gap-3">
       <div className="w-full">
         <div className="xl:mb-6 flex justify-between items-center">
           <div>
               <h1 className="text-2xl 3xl:text-3xl font-bold text-[var(--barva-tmava)]">Objev nové výzvy</h1>
-              <p className="text-sm md:text-lg text-gray-500 mt-1">Nalezeno <span className='text-[var(--barva-primarni)] font-bold'>{displayedChallenges.length}</span> výzev na základě tvých filtrů.</p>
           </div>
           <div className="lg:hidden">
               <button 
@@ -76,19 +81,20 @@ export default function StudentChallengesView() {
           </div>
         </div>
         <ChallengeFilter
-            allSkills={allSkills}
-            selectedSkillIds={selectedSkillIds}
-            studentSkills={studentSkills}
-            setSelectedSkillIds={setSelectedSkillIds}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            isMobileOpen={isFilterOpen}
-            setMobileOpen={setIsFilterOpen}
+          allSkills={allSkills}
+          selectedSkillIds={selectedSkillIds}
+          studentSkills={studentSkills}
+          setSelectedSkillIds={setSelectedSkillIds}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          isMobileOpen={isFilterOpen}
+          setMobileOpen={setIsFilterOpen}
         />
+        <p className="text-base pt-3 p-2 text-gray-500 mt-1">Nalezeno <span className='text-[var(--barva-primarni)] font-bold'>{displayedChallenges.length}</span> výzev na základě tvých filtrů.</p>
       </div>
-      <main className="flex-1 w-full mt-4">
+      <main className="flex-1 w-full">
         {loading ? (
           <LoadingSpinner />
         ) : (
@@ -102,7 +108,7 @@ export default function StudentChallengesView() {
                       key={challenge.id}
                       challenge={challenge}
                       studentSkillIds={studentSkillIdsForCard}
-                      isApplied={isApplied}
+                      isApplied={isApplied} 
                     />
                   );
                 })}
@@ -110,7 +116,7 @@ export default function StudentChallengesView() {
             ) : (
               <div className="text-center bg-white p-12 rounded-2xl col-span-full">
                   <h2 className="text-xl font-bold text-[var(--barva-tmava)]">Žádné výzvy nenalezeny</h2>
-                  <p className="text-gray-500 mt-2">Zkus upravit filtry nebo se podívej později.</p>
+                  <p className="text-gray-500 mt-2">Vypadá to, že jsi se přihlásil do všech dostupných výzev, nebo zkus upravit filtry.</p>
               </div>
             )}
           </>

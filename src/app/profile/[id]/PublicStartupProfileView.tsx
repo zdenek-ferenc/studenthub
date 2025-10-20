@@ -187,7 +187,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {profile.StartupCategory.map((cat, i) => (
-                                <span key={i} className="px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
+                                <span key={i} className="px-3 py-1.5 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)] rounded-lg text-sm font-medium">
                                     {cat.Category.name}
                                 </span>
                             ))}

@@ -53,7 +53,7 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
     }
 
     return (
-        <Link href={`/challenges/${challenge.id}`} className="group block bg-white p-1 lg:p-2 2xl:p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:bg-blue-50 transition-all duration-300 h-full">
+        <Link href={`/challenges/${challenge.id}`} className="group block bg-white p-1 lg:p-2 2xl:p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:bg-blue-50/50 transition-all duration-300 h-full">
             <div className="flex flex-col justify-between h-full">
                 <div className="flex items-start gap-4">
                     <Image 
@@ -71,8 +71,8 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
                         <ChevronRight size={24} strokeWidth={2.5} className="text-blue-500" />
                     </div>
                 </div>
-                <div className="mt-4 3xl:pt-3 border-gray-100 flex flex-wrap items-center gap-x-6 gap-y-2 leading-none">
-                    <div className='border-2 border-[var(--barva-primarni)]/90 px-3 py-1.5 3xl:px-4 3xl:py-2 rounded-3xl'>
+                <div className="mt-1 3xl:mt-3 border-gray-100 flex flex-wrap items-center gap-x-6 gap-y-2 leading-none">
+                    <div className='px-1 py-1.5 3xl:px-3 3xl:py-1 rounded-3xl'>
                         <InfoTag 
                         icon={Sparkles} 
                         text={<>Shoda dovedností: <strong>{challenge.matchingSkills}/{challenge.requiredSkills}</strong></>}

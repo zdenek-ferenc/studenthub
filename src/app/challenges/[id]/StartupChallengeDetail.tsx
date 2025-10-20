@@ -206,7 +206,7 @@ const handleFinalizeChallenge = async () => {
 if (loading) return <p className="text-center py-20">Načítám přihlášky...</p>;
 
 return (
-    <div className="container mx-auto space-y-8 py-10 md:py-32">
+    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 space-y-8 py-10 md:py-32">
     <ChallengeDetailBox challenge={challenge} />
 
     {challenge.status === 'closed' ? (

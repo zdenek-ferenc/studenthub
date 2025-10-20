@@ -55,8 +55,12 @@ function RecruitmentHubPage() {
                     ))}
                 </nav>
                 <main>
-                    {activeTab === 'candidate' && <IdealCandidateForm />}
-                    {activeTab === 'qna' && <QnaManagement />}
+                    <div className={activeTab === 'candidate' ? '' : 'hidden'}>
+                        <IdealCandidateForm />
+                    </div>
+                    <div className={activeTab === 'qna' ? '' : 'hidden'}>
+                        <QnaManagement />
+                    </div>
                 </main>
             </div>
         </div>

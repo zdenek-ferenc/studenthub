@@ -71,7 +71,7 @@ const DesktopFilterContent = ({
 
   return (
     <div className="space-y-3">
-        <div className="bg-white p-2.5 rounded-xl border border-gray-100 shadow-sm w-full flex flex-col md:flex-row items-center gap-2">
+        <div className="bg-white px-1 3xl:p-2 rounded-xl border border-gray-100 shadow-sm w-full flex flex-col md:flex-row items-center gap-2">
             <div className="relative w-full flex-grow">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
@@ -80,13 +80,13 @@ const DesktopFilterContent = ({
                     placeholder="Hledej výzvu, dovednost..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border-none rounded-lg focus:outline-none focus:ring-0 focus:ring-[var(--barva-primarni)] transition text-[var(--barva-tmava)] bg-gray-50 md:bg-transparent"
+                    className="w-full pl-12 pr-4 py-2 border-none rounded-lg focus:outline-none focus:ring-0 focus:ring-[var(--barva-primarni)] text-sm 3xl:text-base transition text-[var(--barva-tmava)] bg-gray-50 md:bg-transparent"
                 />
             </div>
             <div className="w-full md:w-auto md:border-l border-gray-100 md:pl-2">
                 <select 
                     id="sort-by"
-                    className="w-full text-[var(--barva-tmava)] py-3 px-4 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--barva-primarni)] transition bg-gray-50 md:bg-transparent cursor-pointer appearance-none"
+                    className="w-full text-sm 3xl:text-base text-[var(--barva-tmava)] py-3 px-4 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--barva-primarni)] transition bg-gray-50 md:bg-transparent cursor-pointer appearance-none"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                 >
@@ -97,13 +97,13 @@ const DesktopFilterContent = ({
                 </select>
             </div>
         </div>
-        <div className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm w-full space-y-3">
+        <div className="bg-white p-1.5 3xl:p-3 px-5 rounded-xl border border-gray-100 shadow-sm w-full space-y-3">
             <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-semibold text-gray-500 mr-2">Tvoje dovednosti:</span>
                 {quickSelectSkills.map(skill => {
                     if (selectedSkillIds.includes(skill.id)) return null;
                     return (
-                        <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer">
+                        <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs 3xl:text-sm font-medium hover:bg-[var(--barva-svetle-pozadi)] border border-white hover:text-[var(--barva-primarni)] hover:border-[var(--barva-primarni)] transition-all ease-in-out duration-200 cursor-pointer">
                             {skill.name}
                         </button>
                     );
@@ -111,16 +111,16 @@ const DesktopFilterContent = ({
                 <Popover className="relative">
                     {({ open }) => (
                         <>
-                        <Popover.Button className="flex items-center gap-2 text-sm font-medium py-1.5 px-3 rounded-full border-2 border-dashed border-gray-300 text-gray-500 hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition">
+                        <Popover.Button className="flex items-center gap-2 text-xs 3xl:text-sm cursor-pointer font-medium py-1.5 px-3 rounded-full border-2 border-dashed border-gray-300 text-gray-500 hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition">
                             <span>Další</span>
                             <ChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} size={16} />
                         </Popover.Button>
                         <Transition as={Fragment} enter="transition ease-out duration-200" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-150" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
                             <Popover.Panel className="absolute z-30 mt-2 w-72 bg-white shadow-lg rounded-lg p-4 border border-gray-100">
-                                <input type="text" placeholder="Hledej..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full px-3 py-2 mb-3 border text-gray-600 border-gray-300 rounded-lg text-sm" />
+                                <input type="text" placeholder="Hledej..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full px-3 py-2 mb-3 border text-gray-600 border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-0" />
                                 <div className="max-h-48 overflow-y-auto flex flex-wrap gap-2">
                                     {availableSkillsInPopover.map(skill => (
-                                        <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200">{skill.name}</button>
+                                        <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm cursor-pointer hover:bg-[var(--barva-svetle-pozadi)] border border-white hover:text-[var(--barva-primarni)] hover:border-[var(--barva-primarni)] transition-all ease-in-out duration-200">{skill.name}</button>
                                     ))}
                                 </div>
                             </Popover.Panel>

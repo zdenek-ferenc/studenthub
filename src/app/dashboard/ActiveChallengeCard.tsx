@@ -71,14 +71,14 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
   const completedCount = submission.completed_outputs?.length || 0;
   
     const borderClass = submission.status === 'applied'
-    ? 'border-2 border-blue-400'
+    ? 'border-2 border-blue-400/50'
     : (submission.status === 'submitted' || submission.status === 'reviewed')
-    ? 'border-2 border-amber-400'
+    ? 'border-2 border-amber-400/50'
     : 'border-gray-100';
 
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
-      <div className={`bg-white p-4 rounded-2xl hover:bg-blue-50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4 ${borderClass}`}>
+      <div className={`bg-white p-4 rounded-2xl hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4 ${borderClass}`}>
         <div className="flex items-center gap-4 flex-grow w-full">
             <div className="flex-shrink-0">
                 <Image 
@@ -90,7 +90,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 />
             </div>
             <div className="flex flex-col flex-grow min-w-0">
-                <h4 className="text-md sm:text-lg font-bold text-gray-800 truncate max-w-2xs sm:max-w-xs lg:max-w-xs">{Challenge.title}</h4>
+                <h4 className="text-sm 3xl:text-lg font-bold text-[var(--barva-tmava)] truncate max-w-2xs sm:max-w-xs lg:max-w-lg">{Challenge.title}</h4>
                 <div className="mt-2">
                     <div className="hidden md:flex xl:hidden flex-wrap gap-1.5">
                         {Challenge.ChallengeSkill.slice(0, 2).map(({ Skill }, index) => (

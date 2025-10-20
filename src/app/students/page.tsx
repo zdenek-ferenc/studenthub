@@ -6,7 +6,6 @@ import FilterSidebar from '../../components/FilterSidebar';
 import { useAuth } from '../../contexts/AuthContext';
 import withAuth from '../../components/withAuth';
 import { useData } from '../../contexts/DataContext';
-import StudentCardSkeleton from '../../components/skeletons/StudentCardSkeleton';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { SlidersHorizontal } from 'lucide-react';
 
@@ -53,8 +52,6 @@ function StudentCatalogPage() {
                 </div>
                 {loadingStudents && students.length === 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        <StudentCardSkeleton /><StudentCardSkeleton /><StudentCardSkeleton />
-                        <StudentCardSkeleton /><StudentCardSkeleton /><StudentCardSkeleton />
                     </div>
                 ) : (
                     <>

@@ -39,7 +39,7 @@ function TestNotificationsPage() {
     };
 
     return (
-        <div className="container mx-auto py-20 px-4">
+        <div className="container mx-auto py-32 px-4">
             <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-lg border">
                 <h1 className="text-2xl font-bold text-center text-[var(--barva-tmava)] mb-2">
                     Panel pro testování notifikací

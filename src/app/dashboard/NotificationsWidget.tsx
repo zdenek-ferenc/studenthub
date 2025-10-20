@@ -15,7 +15,7 @@ const NotificationIcon = ({ type }: { type: Notification['type'] }) => {
         case 'submission_winner':
             return <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-amber-100 to-amber-200 flex items-center justify-center"><Trophy className="w-5 h-5 text-amber-500" /></div>;
         default:
-            return <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-gray-100 to-gray-200 flex items-center justify-center"><Bell className="w-5 h-5 text-gray-400" /></div>;
+            return <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center"><Bell className="w-5 h-5 text-blue-950" /></div>;
     }
 };
 
@@ -30,12 +30,12 @@ export default function NotificationsWidget() {
             ) : notifications.length > 0 ? (
                 <div className="space-y-3 flex-grow">
                     {notifications.map(notification => (
-                        <Link href={notification.link_url} key={notification.id} className="block p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div className="flex items-start gap-3">
+                        <Link href={notification.link_url} key={notification.id} className="block p-2 rounded-lg bg-[var(--barva-svetle-pozadi)] transition-colors">
+                            <div className="flex items-center gap-3">
                                 <NotificationIcon type={notification.type} />
                                 <div className="min-w-0 flex-1">
                                     <p className="text-sm text-gray-800 leading-snug line-clamp-2">{notification.message}</p>
-                                    <p className="text-xs text-gray-400 mt-1">
+                                    <p className="text-xs text-gray-600">
                                         {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: cs })}
                                     </p>
                                 </div>
