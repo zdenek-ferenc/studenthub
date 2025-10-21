@@ -53,7 +53,7 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
     }
 
     return (
-        <Link href={`/challenges/${challenge.id}`} className="group block bg-white p-1 lg:p-2 2xl:p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:bg-blue-50/50 transition-all duration-300 h-full">
+        <Link href={`/challenges/${challenge.id}`} className="group block bg-white p-1 lg:p-2 2xl:p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[var(--barva-primarni)] hover:bg-blue-50/50 transition-all duration-300 h-full">
             <div className="flex flex-col justify-between h-full">
                 <div className="flex items-start gap-4">
                     <Image 

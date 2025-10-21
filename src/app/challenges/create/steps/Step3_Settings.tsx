@@ -31,12 +31,11 @@ const FormSwitch = ({ name, options }: { name: "type" | "has_financial_reward", 
     );
 };
 
-// Konstanta přesunuta mimo komponentu, aby se nevytvářela při každém renderu
 const deadlinePresets = [
     { label: '3 dny', days: 3 },
-    { label: '7 dní', days: 7, recommended: true },
-    { label: '14 dní', days: 14 },
-    { label: '1 měsíc', days: 30 },
+    { label: '7 dní', days: 7 },
+    { label: '14 dní', days: 14 , recommended: true  },
+    { label: '30 dní', days: 30 },
 ];
 
 export default function Step3_Settings() {

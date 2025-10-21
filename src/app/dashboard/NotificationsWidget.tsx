@@ -30,7 +30,7 @@ export default function NotificationsWidget() {
             ) : notifications.length > 0 ? (
                 <div className="space-y-3 flex-grow">
                     {notifications.map(notification => (
-                        <Link href={notification.link_url} key={notification.id} className="block p-2 rounded-lg bg-[var(--barva-svetle-pozadi)] transition-colors">
+                        <Link href={notification.link_url} key={notification.id} className="block p-2 rounded-lg bg-[var(--barva-svetle-pozadi)] hover:bg-[var(--barva-svetle-pozadi)]/50 border border-white hover:border-[var(--barva-primarni)]/50 transition-all ease-in-out duration-200">
                             <div className="flex items-center gap-3">
                                 <NotificationIcon type={notification.type} />
                                 <div className="min-w-0 flex-1">
@@ -51,7 +51,7 @@ export default function NotificationsWidget() {
                 </div>
             )}
             <div className="mt-auto pt-4 text-center">
-                <Link href="/notifications" className="text-sm font-semibold text-[var(--barva-primarni)]">
+                <Link href="/notifications" className="text-sm font-semibold text-[var(--barva-primarni)] hover:text-[var(--barva-tmava)] transition-all ease-in-out duration-200">
                     Zobrazit všechny notifikace
                 </Link>
             </div>

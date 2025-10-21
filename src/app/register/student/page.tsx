@@ -18,7 +18,7 @@ import { ArrowLeft } from 'lucide-react';
 type Skill = { id: string; name: string; };
 type Language = { id: string; name: string; };
 
-const IS_DEVELOPMENT_MODE = false;
+const IS_DEVELOPMENT_MODE = true;
 const DEV_START_STEP = 2;
 const TOTAL_STEPS = 4; 
 

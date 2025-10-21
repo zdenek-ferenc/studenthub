@@ -26,8 +26,8 @@ return (
         
         <ScrollAnimator>
         <div className="text-center mb-6 md:mb-16">
-            <ShieldCheck className="w-16 h-16 mx-auto text-[var(--barva-primarni)] mb-4" />
-            <h1 className="text-2xl md:text-5xl font-bold text-[var(--barva-tmava)]">Zásady Ochrany Osobních Údajů</h1>
+            <ShieldCheck className="hidden sm:block w-14 h-14 mx-auto text-[var(--barva-primarni)] mb-4" />
+            <h1 className="text-2xl md:text-4xl font-bold text-[var(--barva-tmava)]">Zásady Ochrany Osobních Údajů</h1>
             <p className="text-gray-500 mt-2">Platnost od: 19. října 2025</p>
         </div>
         </ScrollAnimator>

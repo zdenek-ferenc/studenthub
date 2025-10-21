@@ -71,7 +71,7 @@ const DesktopFilterContent = ({
 
   return (
     <div className="space-y-3">
-        <div className="bg-white px-1 3xl:p-2 rounded-xl border border-gray-100 shadow-sm w-full flex flex-col md:flex-row items-center gap-2">
+        <div className="bg-white p-1 3xl:p-2 rounded-xl border border-gray-100 shadow-sm w-full flex flex-col md:flex-row items-center gap-2">
             <div className="relative w-full flex-grow">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
@@ -83,17 +83,17 @@ const DesktopFilterContent = ({
                     className="w-full pl-12 pr-4 py-2 border-none rounded-lg focus:outline-none focus:ring-0 focus:ring-[var(--barva-primarni)] text-sm 3xl:text-base transition text-[var(--barva-tmava)] bg-gray-50 md:bg-transparent"
                 />
             </div>
-            <div className="w-full md:w-auto md:border-l border-gray-100 md:pl-2">
+            <div className="w-full md:w-1/5 xl:w-1/8 bg-gray-100 rounded-xl md:border-l border-gray-100 md:px-2">
                 <select 
                     id="sort-by"
-                    className="w-full text-sm 3xl:text-base text-[var(--barva-tmava)] py-3 px-4 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--barva-primarni)] transition bg-gray-50 md:bg-transparent cursor-pointer appearance-none"
+                    className="w-full text-sm 3xl:text-base text-[var(--barva-tmava)] py-2 px-3 xl:p-3 xl:px-2 border-none rounded-lg focus:outline-none transition bg-gray-50 md:bg-transparent focus:ring-0 cursor-pointer"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                 >
                     <option value="recommended">Doporučené</option>
                     <option value="newest">Nejnovější</option>
                     <option value="ending_soon">Brzy končí</option>
-                    <option value="highest_reward">Nejvyšší odměna</option>
+                    <option value="highest_reward">Odměna</option>
                 </select>
             </div>
         </div>
