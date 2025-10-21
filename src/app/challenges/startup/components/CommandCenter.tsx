@@ -53,7 +53,7 @@ return (
                 <>
                 <Popover.Button 
                     disabled={stats.unreviewedSubmissionsCount === 0}
-                    className={`w-full text-left bg-white p-2 md:p-5 3xl:p-6 rounded-2xl shadow-sm transition-all hover:shadow-md disabled:opacity-70 disabled:shadow-none ${open ? 'border-blue-500 ring-2 ring-blue-50 focus:outline-none' : 'border-gray-100 hover:border-gray-300 focus:outline-none'}`}
+                    className={`w-full text-left bg-white p-2 md:p-5 3xl:p-6 rounded-2xl shadow-sm transition-all disabled:opacity-70 disabled:shadow-none ${open ? 'border-blue-500 ring-2 ring-blue-50 focus:outline-none' : 'border-gray-100 hover:border-gray-300 focus:outline-none'}`}
                 >
                     <div className="flex items-center justify-between">
                         <h3 className="text-xs md:text-base 3xl:text-lg font-semibold text-[var(--barva-tmava)]">Nová řešení</h3>
@@ -74,11 +74,11 @@ return (
                     enter="transition ease-out duration-200" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0"
                     leave="transition ease-in duration-150" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1"
                 >
-                    <Popover.Panel className="absolute -left-3 z-10 mt-3 w-screen max-w-sm transform px-4 sm:px-0">
+                    <Popover.Panel className="absolute -left-0 z-10 mt-3 w-screen max-w-md transform px-4 sm:px-0">
                     <div className="overflow-hidden rounded-2xl shadow-lg">
                         <div className="relative bg-white p-1 md:p-4 space-y-1">
                             {stats.recentSubmissions.map((sub) => (
-                                <Link key={sub.challengeId + sub.anonymousId} href={`/challenges/${sub.challengeId}`} className="flex items-start rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50">
+                                <Link key={sub.challengeId + sub.anonymousId} href={`/challenges/${sub.challengeId}`} className="flex items-start rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-100">
                                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--barva-primarni2)] text-[var(--barva-primarni)]">
                                         <Star size={20} />
                                     </div>

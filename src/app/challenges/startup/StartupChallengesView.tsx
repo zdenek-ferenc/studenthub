@@ -160,7 +160,7 @@ export default function StartupChallengesView() {
     }
 
     return (
-        <div className="flex md:mx-20 2xl:mx-28 3xl:mx-32 mx-auto px-4 py-4 md:py-30 4xl:py-32">
+        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 mx-auto px-4 py-4 md:py-30 4xl:py-32">
         {!loading && allChallenges.length === 0 ? (
             <div className="text-center max-w-lg mx-auto">
                 <Image

@@ -101,7 +101,7 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
     
     const tagColors = {
         red: 'bg-red-100 text-red-700',
-        yellow: 'bg-yellow-100 text-yellow-800',
+        yellow: 'bg-yellow-100 text-yellow-800 ',
         green: 'bg-green-100 text-green-700'
     };
 
