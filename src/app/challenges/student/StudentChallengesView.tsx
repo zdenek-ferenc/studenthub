@@ -67,9 +67,9 @@ export default function StudentChallengesView() {
   return (
     <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-8 md:py-28 3xl:py-32 items-start gap-2 xl:gap-3">
       <div className="w-full">
-        <div className="xl:mb-6 flex justify-between items-center">
+        <div className="xl:mb-4 flex justify-between items-center">
           <div>
-              <h1 className="text-2xl 3xl:text-3xl font-bold text-[var(--barva-tmava)]">Objev nové výzvy</h1>
+              <h1 className="text-2xl 3xl:text-3xl font-semibold text-[var(--barva-tmava)]">Objev nové výzvy</h1>
           </div>
           <div className="lg:hidden">
               <button 

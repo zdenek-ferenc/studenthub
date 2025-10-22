@@ -1,5 +1,7 @@
 "use client";
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import GDPRModal from '../../../../components/GDPRModal';
 
 type FormData = {
   company_name: string;
@@ -25,9 +27,11 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
           phone_number: initialData.phone_number || '',
           contact_email: initialData.contact_email || '',
           address: initialData.address || '',
-          gdpr_consent: false, 
+          gdpr_consent: initialData.gdpr_consent || false,
       }
   });
+
+  const [isGdprModalOpen, setIsGdprModalOpen] = useState(false);
 
   return (
     <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
@@ -109,7 +113,13 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
                   Souhlasím se zpracováním osobních údajů
                 </label>
                 <p className="text-gray-500 text-xs">
-                  Pro více informací o tom, jak nakládáme s vašimi daty, si přečtěte naše <a href="/zasady-ochrany-udaju" target="_blank" className="underline hover:text-indigo-600">Zásady ochrany osobních údajů</a>.
+                  Pro více informací o tom, jak nakládáme s vašimi daty, si přečtěte naše{' '}
+                  <button
+                    type="button"
+                    onClick={() => setIsGdprModalOpen(true)}
+                    className="underline hover:text-[var(--barva-primarni)] cursor-pointer focus:outline-none">
+                    Zásady ochrany osobních údajů
+                  </button>.
                 </p>
               </div>
             </div>
@@ -119,6 +129,7 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
           <button type="submit" className="px-6 py-3 md:px-8 md:py-4 rounded-3xl bg-[var(--barva-primarni)] md:text-xl text-white font-semibold shadow-sm hover:opacity-90 transition-all duration-300 ease-in-out">Pokračovat</button>
         </div>
       </form>
+      <GDPRModal isOpen={isGdprModalOpen} onClose={() => setIsGdprModalOpen(false)} />
     </div>
   );
 }

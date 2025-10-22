@@ -148,8 +148,8 @@ export default function StudentRegistrationPage() {
 
         try {
             if (currentStep === 2) {
-                const { first_name, last_name, username, phone_number } = data;
-                const { error } = await supabase.from('StudentProfile').update({ first_name, last_name, username, phone_number }).eq('user_id', user.id);
+                const { first_name, last_name, username, phone_number, gdpr_consent } = data;
+                const { error } = await supabase.from('StudentProfile').update({ first_name, last_name, username, phone_number, gdpr_consent }).eq('user_id', user.id);
                 if (error) throw error;
             }
             if (currentStep === 3) {

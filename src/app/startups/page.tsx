@@ -42,9 +42,9 @@ function StartupCatalogPage() {
                 />
             )}
             <main className="flex-1 w-full">
-                <div className='mb-3 3xl:mb-6 flex justify-between items-center'>
+                <div className='mb-3 3xl:mb-4 flex justify-between items-center'>
                     <div>
-                    <h1 className="text-xl 3xl:text-3xl font-bold text-[var(--barva-tmava)]">Objev inovativní startupy</h1>
+                    <h1 className="text-xl 3xl:text-3xl font-semibold text-[var(--barva-tmava)]">Objev inovativní startupy</h1>
                 </div>
                 <div className="lg:hidden flex justify-between items-center">
                     <button 

@@ -90,11 +90,11 @@ const FilterContent = ({
         )}
         <div className="relative mb-3">
           <Search className="absolute left-3 top-1/2 w-3 3xl:w-4 -translate-y-1/2 text-gray-400" size={18} />
-          <input type="text" placeholder="Hledej kategorii..." value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} className="w-full pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]" />
+          <input type="text" placeholder="Hledej kategorii..." value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} className="w-full leading-none pl-8 3xl:pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition text-[var(--barva-tmava)]" />
         </div>
         <div className="flex justify-between items-center my-2 mt-6">
             <h4 className="text-xs font-semibold text-gray-500 uppercase">{categorySearch ? 'Výsledky hledání' : (showAll ? 'Všechny kategorie' : 'Populární kategorie')}</h4>
-            {!categorySearch && <button onClick={() => setShowAll(!showAll)} className="text-xs font-bold text-[var(--barva-primarni)] hover:underline">{showAll ? 'Zobrazit méně' : 'Zobrazit vše'}</button>}
+            {!categorySearch && <button onClick={() => setShowAll(!showAll)} className="text-xs font-bold text-[var(--barva-primarni)] cursor-pointer hover:underline">{showAll ? 'Zobrazit méně' : 'Zobrazit vše'}</button>}
         </div>
         <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
           {availableCategories.map(cat => (
@@ -127,15 +127,15 @@ export default function StartupFilterSidebar(props: FilterSidebarProps) {
             <div className="flex min-h-full items-center justify-center p-4 text-center">
               <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all p-6">
-                  <div className="flex justify-between items-center p-4 border-b">
+                  <div className="flex justify-between items-center pb-4">
                     <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-gray-900 flex items-center gap-2"><SlidersHorizontal size={20} /> Filtry</Dialog.Title>
                     <button onClick={() => setMobileOpen(false)} className="p-1 rounded-full hover:bg-gray-100"><X size={20} /></button>
                   </div>
                   <div className="max-h-[80vh] overflow-y-auto">
                     <FilterContent {...props} />
                   </div>
-                  <div className="p-4 border-t">
-                    <button onClick={() => setMobileOpen(false)} className="w-full px-6 py-2.5 rounded-full bg-[var(--barva-primarni)] text-white font-semibold">Zobrazit výsledky</button>
+                  <div className="pt-6 flex justify-center">
+                    <button onClick={() => setMobileOpen(false)} className="px-6 py-2.5 text-sm rounded-full bg-[var(--barva-primarni)] text-white font-semibold">Zobrazit výsledky</button>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

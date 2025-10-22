@@ -70,15 +70,10 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
   const totalOutputs = Challenge.expected_outputs.split('\n').filter(line => line.trim() !== '').length;
   const completedCount = submission.completed_outputs?.length || 0;
   
-    const borderClass = submission.status === 'applied'
-    ? 'border-2 border-blue-400/50'
-    : (submission.status === 'submitted' || submission.status === 'reviewed')
-    ? 'border-2 border-amber-400/50'
-    : 'border-gray-100';
 
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
-      <div className={`bg-white p-4 rounded-2xl hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4 ${borderClass}`}>
+      <div className={`bg-white p-4 rounded-2xl shadow-sm border border-gray-300 hover:border-[var(--barva-primarni)] hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
         <div className="flex items-center gap-4 flex-grow w-full">
             <div className="flex-shrink-0">
                 <Image 

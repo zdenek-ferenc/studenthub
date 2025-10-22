@@ -44,7 +44,6 @@ export default function StartupCard({ startup }: StartupCardProps) {
 
   const websiteUrl = startup.website && (startup.website.startsWith('http') ? startup.website : `https://${startup.website}`);
 
-
   return (
       <Link href={`/profile/${startup.user_id}`} className="block group h-full">
         <div className="bg-white rounded-2xl shadow-xs p-3 sm:p-6 border border-gray-100 group-hover:shadow-lg group-hover:border-blue-200 transition-all duration-300 ease-in-out flex flex-col h-full">
@@ -79,7 +78,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 mb-5 text-xs md:text-sm font-medium text-gray-500">
-              <div className='flex flex-col gap-4'>
+              <div className='flex flex-col gap-2'>
                 <div className="flex items-center gap-1.5">
                   <Briefcase className="text-blue-500" size={18} />
                   <span>{formatChallengeText(activeChallenges, 'active')}</span>

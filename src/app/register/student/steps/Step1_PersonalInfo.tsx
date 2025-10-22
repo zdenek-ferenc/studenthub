@@ -4,6 +4,7 @@ import { supabase } from '../../../../lib/supabaseClient';
 import { useState, useEffect, useCallback } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
+import GDPRModal from '../../../../components/GDPRModal';
 
 type FormData = {
   first_name: string;
@@ -27,12 +28,13 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
           last_name: initialData.last_name || '',
           username: initialData.username || '',
           phone_number: initialData.phone_number || '',
-          gdpr_consent: false,
+          gdpr_consent: initialData.gdpr_consent || false,
       }
   });
 
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [displayError, setDisplayError] = useState<string | null>(null);
+  const [isGdprModalOpen, setIsGdprModalOpen] = useState(false);
 
   const usernameValue = watch('username');
   const debouncedUsername = useDebounce(usernameValue, 500);
@@ -136,9 +138,15 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
             id="phone_number" 
             type="tel" 
             placeholder="Telefonní číslo"
-            {...register('phone_number')} 
-            className="input" 
-          />
+          {...register('phone_number', {
+            required: 'Telefonní číslo je povinné',
+            pattern: {
+            value: /^[0-9]{9,15}$/, 
+            message: 'Zadej platné telefonní číslo',
+    },
+  })} 
+  className="input" 
+/>
         </div>
 
       <div className="pt-4">
@@ -156,7 +164,13 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
             Souhlasím se zpracováním osobních údajů
           </label>
           <p className="text-gray-500 text-xs">
-            Pro více informací o tom, jak nakládáme s vašimi daty, si přečtěte naše <a href="/zasady-ochrany-udaju" target="_blank" className="underline hover:text-indigo-600">Zásady ochrany osobních údajů</a>.
+            Pro více informací o tom, jak nakládáme s vašimi daty, si přečtěte naše{' '}
+            <button
+              type="button"
+              onClick={() => setIsGdprModalOpen(true)}
+              className="underline hover:text-[var(--barva-primarni)] focus:outline-none cursor-pointer">
+              Zásady ochrany osobních údajů
+            </button>.
           </p>
         </div>
       </div>
@@ -171,6 +185,7 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
           </button>
         </div>
       </form>
+      <GDPRModal isOpen={isGdprModalOpen} onClose={() => setIsGdprModalOpen(false)} />
     </div>
   );
 }

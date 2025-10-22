@@ -145,8 +145,8 @@ export default function StartupRegistrationPage() {
 
         try {
             if (currentStep === 2) {
-                const { company_name, ico, website, phone_number, contact_email, address } = data;
-                const { error } = await supabase.from('StartupProfile').update({ company_name, ico, website, phone_number, contact_email, address }).eq('user_id', user.id);
+                const { company_name, ico, website, phone_number, contact_email, address, gdpr_consent } = data;
+                const { error } = await supabase.from('StartupProfile').update({ company_name, ico, website, phone_number, contact_email, address, gdpr_consent }).eq('user_id', user.id);
                 if (error) throw error;
             }
             if (currentStep === 3) {
@@ -269,9 +269,9 @@ const renderStep = () => {
     }
 
     return (
-        <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4 py-10 md:py-32">
+        <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4">
             {IS_DEVELOPMENT_MODE || session ? (
-                <div className="w-full">
+                <div className="w-full py-6 md:py-12">
                     {step >= 2 && step <= 5 && (
                         <RegistrationHeader
                             currentStep={step}
