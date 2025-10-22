@@ -91,7 +91,7 @@ function XpGainedSummary({ events }: { events: XpEventWithSkill[] }) {
                 )}
                 {skillEvents.length > 0 && (
                     <div>
-                        <h4 className="font-semibold text-gray-600 mb-2 ml-1">Vylepšené dovednosti:</h4>
+                        <h4 className="font-semibold text-white mb-2 ml-1">Vylepšené dovednosti:</h4>
                         <div className="space-y-2">
                             {skillEvents.map((event, i) => (
                                 <XpRow
@@ -107,12 +107,12 @@ function XpGainedSummary({ events }: { events: XpEventWithSkill[] }) {
                 )}
                 {newSkillEvents.length > 0 && (
                     <div>
-                        <h4 className="font-semibold text-green-700 mb-2 ml-1">Nové dovednosti odemčeny!</h4>
+                        <h4 className="font-semibold text-white mb-2 ml-1">Nové dovednosti odemčeny!</h4>
                         <div className="space-y-2">
                             {newSkillEvents.map((event, i) => (
                                 <XpRow
                                     key={`new-skill-${i}`}
-                                    icon={<Sparkles className="w-6 h-6 text-green-600" />}
+                                    icon={<Sparkles className="w-6 h-6 text-green-500" />}
                                     label={event.Skill?.name || 'Nová dovednost'}
                                     xp={event.xp_gained}
                                     newLevel={event.new_level}
