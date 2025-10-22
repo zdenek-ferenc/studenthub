@@ -84,7 +84,7 @@ export default function StudentCard({ student }: StudentCardProps) {
 
   return (
       <Link href={`/profile/${student.user_id}`} className="block group">
-        <div className="bg-white rounded-2xl shadow-xs p-4 3xl:p-6 border border-gray-100 group-hover:shadow-lg transition-all duration-300 ease-in-out flex flex-col h-full">
+        <div className="bg-white rounded-2xl shadow-xs p-4 3xl:p-6 border border-gray-100 group-hover:shadow-md transition-all duration-300 ease-in-out flex flex-col h-full">
           <div className="flex items-center gap-4 mb-4">
             {student.profile_picture_url ? (
               <Image 

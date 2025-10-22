@@ -81,7 +81,7 @@ function ChallengeDetailPage() {
   }, [challengeId]);
 
   if (authLoading || loading) {
-    return <LoadingSpinner />
+    return <div className='pt-12 lg:pt-28 3xl:pt-34'><LoadingSpinner /></div>
   }
 
   if (!challenge) {

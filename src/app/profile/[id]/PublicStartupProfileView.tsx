@@ -62,8 +62,8 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
     };
 
     return (
-        <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100">
-            <div className="flex items-start justify-start p-2 sm:p-4 gap-4">
+        <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100 flex flex-col gap-2">
+            <div className="flex items-start justify-start gap-4">
                 <div>
                     <Image src={profile.logo_url || '/logo.svg'} alt={`${profile.company_name} logo`} width={96} height={96}
                     className="w-16 h-16 3xl:w-20 3xl:h-20 rounded-2xl mx-auto mb-2 sm:mb-4 object-contain"
@@ -71,7 +71,7 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
                 </div>
                 
                 <div>
-                    <h1 className="text-2xl font-bold text-[var(--barva-tmava)]">{profile.company_name}</h1>
+                    <h1 className="text-xl 3xl:text-2xl font-bold text-[var(--barva-tmava)]">{profile.company_name}</h1>
                     {websiteUrl && (
                     <a 
                         href={websiteUrl}
@@ -85,7 +85,7 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
                 </div>
                 
             </div>
-            <div className="px-2 sm:px-4">
+            <div className="">
                 {isEditing ? (
                     <div className="space-y-2">
                         <textarea value={descriptionText} onChange={(e) => setDescriptionText(e.target.value)} placeholder="Popište vaši firmu..."
@@ -97,10 +97,10 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
                         </div>
                     </div>
                 ) : (
-                    <p className="text-gray-700 whitespace-pre-wrap 3xl:text-base text-[13px]">{descriptionText || (isOwner && "Zatím nemáte žádný popis. Kliknutím ho můžete přidat.")}</p>
+                    <p className="text-gray-800 whitespace-pre-wrap 3xl:text-base text-[13px]">{descriptionText || (isOwner && "Zatím nemáte žádný popis. Kliknutím ho můžete přidat.")}</p>
                 )}
                 {isOwner && !isEditing && (
-                    <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[var(--barva-primarni)] transition-colors mt-3">
+                    <button onClick={() => setIsEditing(true)} className="flex items-center cursor-pointer gap-1.5 text-xs 3xl:text-sm font-semibold text-gray-400 hover:text-[var(--barva-primarni)] transition-colors mt-3">
                         <Edit size={12} /> Upravit popis
                     </button>
                 )}
@@ -173,8 +173,8 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
 
     return (
         <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-28 3xl:py-32 px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
-                <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:top-28">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 3xl:gap-6 items-start">
+                <aside className="lg:col-span-1 space-y-3 space-y-5 3xl:space-y-6 lg:top-28">
                     <StartupInfoCard profile={profile} isOwner={isOwner} />
                     <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100">
                         <div className="flex justify-between items-center mb-3">
@@ -187,7 +187,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {profile.StartupCategory.map((cat, i) => (
-                                <span key={i} className="px-3 py-1.5 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)] rounded-lg text-sm font-medium">
+                                <span key={i} className="3xl:px-3 px-2 py-1 3xl:py-1.5 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)] rounded-lg text-xs 3xl:text-sm font-medium">
                                     {cat.Category.name}
                                 </span>
                             ))}
@@ -195,7 +195,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                     </div>
                 </aside>
 
-                <main className="lg:col-span-2 space-y-3 sm:space-y-8">
+                <main className="lg:col-span-2 space-y-3 space-y-5 3xl:space-y-6">
                     {showIdealCandidateSection && (
                         <div className="relative">
                             {isOwner && hasIdealCandidateInfo && (

@@ -32,15 +32,14 @@ const StatWidget = ({ value, label, icon: Icon }: { value: number, label: string
 
 export default function CommandCenter({ stats }: { stats: CommandCenterStats }) {
 return (
-    <div className="mb-4">
+    <div className="mb-2 3xl:mb-4">
         <div className="hidden md:flex flex-col md:flex-row justify-between items-center mb-4 3xl:mb-8 gap-4">
-            <h1 className=" 2xl:text-2xl 3xl:text-3xl font-bold text-[var(--barva-tmava)]">Přehled výzev</h1>
             <div className=" flex items-center gap-3">
-                <Link href="/challenges/create" className="px-5 py-2 3xl:py-2.5 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:opacity-90 transition-all duration-200 flex items-center gap-2 text-xs md:text-sm">
+                <Link href="/challenges/create" className="px-5 py-2 3xl:py-2.5 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:opacity-90 transition-all duration-200 flex items-center gap-2 text-xs 3xl:text-sm">
                     <Plus size={18} />
                     <span>Vytvořit výzvu</span>
                 </Link>
-                <Link href="/profile/recruitment" className="px-5 py-2 3xl:py-2.5  rounded-full bg-white border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-colors flex items-center gap-2 text-xs md:text-sm">
+                <Link href="/profile/recruitment" className="px-5 py-2 3xl:py-2.5  rounded-full bg-white border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-colors flex items-center gap-2 text-xs 3xl:text-sm">
                     <Settings size={16} />
                     <span>Centrum pro nábor</span>
                 </Link>

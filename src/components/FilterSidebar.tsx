@@ -108,19 +108,19 @@ const FilterContent = ({
         
         <div className="relative mb-3">
           <Search className="absolute left-3 w-3 3xl:w-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input type="text" placeholder="Hledej dovednost..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]" />
+          <input type="text" placeholder="Hledej dovednost..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full pl-8 3xl:pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]" />
         </div>
         
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center mb-2 xl:mb-4">
             <h4 className="text-xs font-semibold text-gray-500 uppercase">
                 {skillSearch ? 'Výsledky hledání' : (showAll ? 'Všechny dovednosti' : 'Populární dovednosti')}
             </h4>
-            {!skillSearch && <button onClick={() => setShowAll(!showAll)} className="text-xs font-bold text-[var(--barva-primarni)] hover:underline">{showAll ? 'Zobrazit méně' : 'Zobrazit vše'}</button>}
+            {!skillSearch && <button onClick={() => setShowAll(!showAll)} className="text-xs font-bold text-[var(--barva-primarni)] cursor-pointer hover:underline">{showAll ? 'Zobrazit méně' : 'Zobrazit vše'}</button>}
         </div>
         
         <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
           {availableSkills.map(skill => (
-            <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="cursor-pointer px-3 py-1.5 rounded-full text-xs 3xl:text-sm text-[var(--barva-primarni)] font-normal border bg-white border-[var(--barva-primarni)] hover:bg-[var(--barva-svetle-pozadi)] transition-colors">
+            <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="flex items-center justify-center cursor-pointer gap-1.5 hover:bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm 3xl:font-semibold transition-colors">
               {skill.name}
             </button>
           ))}
@@ -136,14 +136,14 @@ export default function FilterSidebar(props: FilterSidebarProps) {
 
   return (
     <>
-        <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
+        <aside className="hidden lg:block w-full lg:w-74 p-4 xl:p-5 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
             <FilterContent {...props} />
         </aside>
 
         <Transition appear show={isMobileOpen} as={Fragment}>
             <Dialog as="div" className="relative z-50 lg:hidden" onClose={() => setMobileOpen(false)}>
                 <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                    <div className="fixed inset-0 bg-black bg-opacity-25" />
+                    <div className="fixed inset-0 bg-black/80 bg-opacity-25" />
                 </Transition.Child>
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center p-4 text-center">

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import SubmissionCard, { type Submission } from './SubmissionCard';
-import ChallengeDetailBox from './ChallengeDetailBox';
 import FinalSelection from './FinalSelection';
 import { useRouter } from 'next/navigation';
 import ConfirmationModal from '../../../components/ConfirmationModal';
@@ -11,11 +10,14 @@ import ChallengeRecapView from './ChallengeRecapView';
 import { useAuth } from '../../../contexts/AuthContext';
 import { AlertCircle, CheckCircle, Lock, Clock, Users,} from 'lucide-react';
 import { differenceInDays, format } from 'date-fns';
+import StartupChallengeHeader from './StartupChallengeHeader';
 
 type Challenge = {
 id: string; status: 'draft' | 'open' | 'closed' | 'archived'; title: string;
 description: string; goals: string; expected_outputs: string;
 reward_first_place: number | null; reward_second_place: number | null; reward_third_place: number | null;
+reward_description: string | null; // Přidáno pro nefinanční odměnu
+attachments_urls: string[] | null;
 number_of_winners: number | null; 
 max_applicants: number | null; deadline: string;
 Submission: { id: string, student_id: string }[];
@@ -48,12 +50,12 @@ const EvaluationStatusPanel = ({
     const capacityProgress = maxApplicants ? (applicants / maxApplicants) * 100 : 0;
     if (!canFinalize) {
         return (
-            <div className="py-8 rounded-2xl">
+            <div className="lg:py-4 rounded-2xl">
                 <div className="max-w-3xl mx-auto">
-                    <h3 className="text-2xl font-bold text-center text-[var(--barva-tmava)] mb-2">
+                    <h3 className="xl:text-2xl text-xl font-bold text-center text-[var(--barva-tmava)] mb-2">
                         {daysRemaining < 0 ? "Výzva je po termínu, čeká se na odevzdání" : "Výzva je v plném proudu"}
                     </h3>
-                    <p className="text-center text-gray-500 mb-8">Zde je přehled aktuálního stavu a dalších kroků.</p>
+                    <p className="lg:text-base text-sm text-center text-gray-500 mb-8">Zde je přehled aktuálního stavu a dalších kroků.</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                         <div>
                             <div className="flex justify-between items-center mb-1 font-semibold text-sm">
@@ -206,12 +208,11 @@ const handleFinalizeChallenge = async () => {
 if (loading) return <p className="text-center py-20">Načítám přihlášky...</p>;
 
 return (
-    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 space-y-8 py-10 md:py-32">
-    <ChallengeDetailBox challenge={challenge} />
-
-    {challenge.status === 'closed' ? (
+    <div className='lg:max-w-5xl 3xl:max-w-6xl mx-4 sm:mx-auto py-4 md:py-24 xl:py-32 md:px-4 space-y-4 sm:space-y-6 xl:space-y-7'>
+    <StartupChallengeHeader challenge={challenge} />
+    {challenge.status === 'closed' || challenge.status === 'archived' ? (
         <ChallengeRecapView submissions={submissions} />
-    ) : (
+        ) : (
         <>
             {view === 'evaluating' && (
                 <>

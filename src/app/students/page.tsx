@@ -45,7 +45,7 @@ function StudentCatalogPage() {
                 <div className="sticky md:relative top-0 z-30 pt-2 pb-2 lg:hidden flex justify-end">
                         <button 
                             onClick={() => setIsFilterOpen(true)}
-                            className="p-3 rounded-full bg-[var(--barva-tmava)] shadow-md border text-white"
+                            className="p-3 rounded-full bg-[var(--barva-tmava)] cursor-pointer shadow-md border text-white"
                         >
                         <SlidersHorizontal size={20} />
                         </button>
@@ -56,7 +56,7 @@ function StudentCatalogPage() {
                 ) : (
                     <>
                         {students.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5 2xl:gap-6">
                                 {students.map(student => <StudentCard key={student.user_id} student={student} />)}
                             </div>
                         ) : (
@@ -65,10 +65,9 @@ function StudentCatalogPage() {
                                 <p className="text-gray-500 mt-2">Zkuste upravit filtry pro lepší výsledky.</p>
                             </div>
                         )}
-
                         <div className="text-center mt-12">
                             {hasMoreStudents && (
-                                <button onClick={loadMoreStudents} disabled={loadingStudents} className="px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                <button onClick={loadMoreStudents} disabled={loadingStudents} className="px-8 py-3 rounded-full bg-[var(--barva-primarni)] cursor-pointer text-white font-semibold shadow-md hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                     {loadingStudents ? 'Načítám...' : 'Načíst další'}
                                 </button>
                             )}

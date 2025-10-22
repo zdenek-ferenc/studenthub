@@ -106,7 +106,7 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
     };
 
     return (
-        <div className={`relative bg-white p-6 rounded-2xl flex flex-col h-full hover:shadow-md transition-all duration-300 ${borderClasses[action.priority]}`}>
+    <div className={`relative bg-white p-5 3xl:p-6 rounded-2xl flex flex-col h-full hover:shadow-md transition-all duration-300 ${borderClasses[action.priority]}`}>
             <div className="flex flex-col gap-3 justify-between items-start">
                     {action.tag && (
                     <div className={`absolute -top-3 -right-3 z-10 flex items-center justify-center gap-1.5 text-xs font-semibold leading-none px-3 py-1.5 rounded-full
@@ -137,7 +137,7 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
                     </div>
                 )}
             </div>
-            <div className="mt-auto border-[var(--barva-svetle-pozadi)] pt-4 flex justify-between items-center">
+            <div className="mt-auto border-[var(--barva-svetle-pozadi)] pt-2 3xl:pt-4 flex justify-between items-center">
                 <div className="text-[11px] 3xl:text-[14px] text-gray-400 space-y-1">
                     <p>Vytvořeno: {new Date(challenge.created_at).toLocaleDateString('cs-CZ')}</p>
                     {challenge.deadline && (

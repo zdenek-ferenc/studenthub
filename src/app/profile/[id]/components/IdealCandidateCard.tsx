@@ -48,7 +48,7 @@ export default function IdealCandidateCard({ description, technologies, isOwner,
                     <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
                         <UserPlus size={24} className="text-[var(--barva-primarni)]" />
                     </div>
-                    <h3 className="text-lg font-bold text-[var(--barva-tmava)]">Přilákejte ty správné talenty</h3>
+                    <h3 className="3xl:text-lg font-bold text-[var(--barva-tmava)]">Přilákejte ty správné talenty</h3>
                     <p className="text-xs 3xl:text-sm text-gray-500 mt-1 mb-4 max-w-xs">Definujte, koho hledáte, a zvyšte tak relevanci přihlášených studentů.</p>
                     <Link href="/profile/recruitment" className="3xl:px-5 px-3 py-1.5 3xl:py-2 rounded-full 3xl:font-semibold text-white bg-[var(--barva-primarni)] text-xs 3xl:text-sm cursor-pointer hover:opacity-90 transition-all ease-in-out duration-200">
                         Definovat kandidáta

@@ -55,7 +55,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
         </div>
       )}
       <div className="flex-grow">
-        <div className="flex items-start justify-between gap-4 p-4 md:p-6 rounded-t-2xl">
+        <div className="flex items-start justify-between gap-4 p-4 md:p-5 3xl:p-6 rounded-t-2xl">
           <div className="flex items-center gap-4">
             {challenge.StartupProfile?.logo_url ? (
               <Image src={challenge.StartupProfile.logo_url} alt="logo firmy" 
@@ -73,7 +73,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
             </div>
           </div>
         </div>
-        <p className="text-gray-600 mb-3 px-4 text-[13px] 3xl:text-base md:px-6 line-clamp-3 flex-grow min-h-[3em]">{challenge.short_description}</p>
+        <p className="text-gray-600 mb-3 px-4 md:px-5 3xl:px-6 text-[13px] 3xl:text-base line-clamp-3 flex-grow min-h-[3em]">{challenge.short_description}</p>
         <div className="flex flex-wrap px-4 md:px-5 py-2 gap-2">
           {(
             [
@@ -124,7 +124,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
             </div>
         </div>
         <Link href={`/challenges/${challenge.id}`} className="absolute right-3 bottom-3 leading-none">
-          <div className="hidden xl:flex items-center justify-center 3xl:px-3 px-3 py-2 3xl:py-2.5 text-sm 3xl:text-base rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
+          <div className="hidden xl:flex items-center justify-center 3xl:px-4 px-3 py-2 3xl:py-2.5 text-sm 3xl:text-base rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
             Detail výzvy
           </div>
           <div className="flex xl:hidden items-center justify-center w-8 h-8 md:w-10 md:h-10 ring-2 ring-[var(--barva-primarni)] bg-[var(--barva-primarni)]  text-white rounded-full transition-colors">
