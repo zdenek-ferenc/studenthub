@@ -1,5 +1,7 @@
+// src/app/profile/[id]/components/StartupProfileChallengeCard.tsx
 "use client";
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { differenceInCalendarDays } from 'date-fns';
@@ -43,11 +45,24 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
         deadlineText = `Zbývá ${daysRemaining} dní`;
     }
 
+    const sortedSkills = useMemo(() => {
+        if (!isStudentViewer) {
+            return challenge.ChallengeSkill;
+        }
+        return [...challenge.ChallengeSkill].sort((a, b) => {
+            const aIsMatch = studentSkillIds.includes(a.Skill.id);
+            const bIsMatch = studentSkillIds.includes(b.Skill.id);
+            if (aIsMatch && !bIsMatch) return -1; 
+            if (!aIsMatch && bIsMatch) return 1;  
+            return 0; 
+        });
+    }, [challenge.ChallengeSkill, studentSkillIds, isStudentViewer]);
+
     return (
         <Link href={`/challenges/${challenge.id}`} className="block group relative">
             {isApplied && (
                 <div className={`absolute top-2 -right-2 sm:top-4 sm:-right-3 flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-1 sm:px-2 py-1 rounded-full z-10 shadow-sm
-                                transition-all duration-300 ease-in-out 
+                                transition-all duration-300 ease-in-out
                                 group-hover:opacity-0 group-hover:scale-75 group-hover:-translate-y-2`}>
                     <CheckCircle size={14} />
                     <span className='hidden sm:block'>Přihlášeno</span>
@@ -56,7 +71,7 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
             <div className="p-2 sm:p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md hover:bg-blue-50 transition-all duration-300 flex items-center relative">
                 <div className="flex-grow min-w-0">
                     <p className="text-[var(--barva-tmava)] truncate text-sm 3xl:text-lg pr-4">{challenge.title}</p>
-                    
+
                     <div className="flex items-end justify-between mt-2">
                         <div className="flex items-center gap-x-4 gap-y-1 flex-wrap">
                             {isStudentViewer && (
@@ -66,11 +81,21 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
                                 </div>
                             )}
                             <div className="hidden md:flex items-center gap-1.5 flex-wrap">
-                                {challenge.ChallengeSkill.slice(0, 2).map(cs => (
-                                    <span key={cs.Skill.id} className="text-xs font-medium border-1 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] px-3 py-1 rounded-xl">
-                                        {cs.Skill.name}
-                                    </span>
-                                ))}
+                                {sortedSkills.slice(0, 2).map(cs => {
+                                    const isMatch = isStudentViewer && studentSkillIds.includes(cs.Skill.id);
+                                    return (
+                                        <span
+                                            key={cs.Skill.id}
+                                            className={`text-xs font-medium border px-3 py-1 rounded-xl transition-colors ${
+                                                isMatch
+                                                    ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border-[var(--barva-primarni)]' 
+                                                    : 'bg-gray-100 text-gray-600 border-gray-200' 
+                                            }`}
+                                        >
+                                            {cs.Skill.name}
+                                        </span>
+                                    );
+                                })}
                                 {challenge.ChallengeSkill.length > 2 && (
                                     <span className="text-xs font-bold text-[var(--barva-primarni)]">+{challenge.ChallengeSkill.length - 2}</span>
                                 )}
