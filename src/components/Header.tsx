@@ -153,7 +153,7 @@ export default function Header() {
       <header className={`hidden md:block fixed w-full top-0 z-50`}>
         <div className={`absolute inset-0 bg-white/0 backdrop-blur-md transition-opacity duration-300 ${showBackground ? 'opacity-100' : 'opacity-0'}`}></div>
         
-        <div className="relative mx-auto container px-17 2xl:px-32 3xl:px-36 flex justify-between items-center h-24 3xl:h-30">
+        <div className="relative max-w-5/6 mx-auto flex justify-between items-center h-24 3xl:h-30">
           <div className="flex-1 flex justify-start">
             {isRegistrationFlow ? (
               <div className="cursor-default">

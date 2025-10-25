@@ -65,7 +65,7 @@ export default function StudentChallengesView() {
   const studentSkillIdsForCard = useMemo(() => studentSkills.map(s => s.id), [studentSkills]);
 
   return (
-    <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-8 md:py-28 3xl:py-32 items-start gap-2 xl:gap-3">
+    <div className="flex flex-col max-w-5/6 mx-auto py-8 md:py-28 3xl:py-32 items-start gap-2 xl:gap-3">
       <div className="w-full">
         <div className="xl:mb-4 flex justify-between items-center">
           <div>

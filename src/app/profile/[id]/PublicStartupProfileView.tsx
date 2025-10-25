@@ -9,7 +9,8 @@ import StartupQnA from './components/StartupQnA';
 import StartupProfileChallengeCard from './components/StartupProfileChallengeCard';
 import Image from 'next/image';
 import Link from 'next/link';
-import { PlusCircle, Edit } from 'lucide-react';
+import { PlusCircle, Edit, ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Skill = { id: string; name: string; };
 type Technology = { name: string; };
@@ -111,6 +112,7 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
 
 export default function PublicStartupProfileView({ profileId }: { profileId: string }) {
     const { user, profile: viewerProfile } = useAuth();
+    const router = useRouter();
     const [profile, setProfile] = useState<StartupProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [studentSkillIds, setStudentSkillIds] = useState<string[]>([]);
@@ -173,8 +175,17 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
 
     return (
         <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-28 3xl:py-32 px-4">
+            {!isOwner && (
+                <button
+                    onClick={() => router.back()}
+                    className="flex items-center cursor-pointer gap-1 text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-4"
+                >
+                    <ChevronLeft size={16} />
+                    Zpět na přehled
+                </button>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 3xl:gap-6 items-start">
-                <aside className="lg:col-span-1 space-y-3 space-y-5 3xl:space-y-6 lg:top-28">
+                <aside className="lg:col-span-1 space-y-3 sm:space-y-5 3xl:space-y-6 lg:top-28">
                     <StartupInfoCard profile={profile} isOwner={isOwner} />
                     <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100">
                         <div className="flex justify-between items-center mb-3">
@@ -195,7 +206,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                     </div>
                 </aside>
 
-                <main className="lg:col-span-2 space-y-3 space-y-5 3xl:space-y-6">
+                <main className="lg:col-span-2 space-y-3 sm:space-y-5 3xl:space-y-6">
                     {showIdealCandidateSection && (
                         <div className="relative">
                             {isOwner && hasIdealCandidateInfo && (

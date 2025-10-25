@@ -26,7 +26,7 @@ export default function ProfileSkillsSection({ skills, languages, isOwner }: { s
                     <h3 className="font-semibold text-gray-500 uppercase text-xs mb-3">Dovednosti</h3>
                     <div className="flex flex-wrap gap-2">
                         {skills.map((s, i) => (
-                            <span key={i} className="px-3 py-1.5 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] rounded-full text-sm font-medium">
+                            <span key={i} className="px-3 py-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-sm font-medium">
                                 {s.Skill.name}
                             </span>
                         ))}

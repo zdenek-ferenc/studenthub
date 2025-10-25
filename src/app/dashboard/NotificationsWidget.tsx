@@ -23,14 +23,14 @@ export default function NotificationsWidget() {
     const { notifications, loading } = useDashboard();
 
     return (
-        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col">
+        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-200 h-full flex flex-col">
             <h3 className="3xl:text-xl font-bold text-[var(--barva-tmava)] mb-4 flex justify-center md:justify-start">Notifikace</h3>
             {loading ? (
                 <p className="text-sm text-gray-500">Načítám...</p>
             ) : notifications.length > 0 ? (
                 <div className="space-y-3 flex-grow">
                     {notifications.map(notification => (
-                        <Link href={notification.link_url} key={notification.id} className="block p-2 rounded-lg bg-[var(--barva-svetle-pozadi)] hover:bg-[var(--barva-svetle-pozadi)]/50 border border-white hover:border-[var(--barva-primarni)]/50 transition-all ease-in-out duration-200">
+                        <Link href={notification.link_url} key={notification.id} className="block p-2 rounded-lg hover:bg-[var(--barva-svetle-pozadi)]/50 border shadow-xs border-gray-200 bg-gray-100/30 hover:border-[var(--barva-primarni)]/50 transition-all ease-in-out duration-200">
                             <div className="flex items-center gap-3">
                                 <NotificationIcon type={notification.type} />
                                 <div className="min-w-0 flex-1">

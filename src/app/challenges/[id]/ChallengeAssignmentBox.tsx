@@ -45,7 +45,7 @@ const StatItem = ({ icon: Icon, label, value }: { icon: React.ElementType, label
             <Icon size={16} />
             <span className="text-xs md:text-sm">{label}</span>
         </div>
-        <span className="font-bold text-lg text-[var(--barva-tmava)] mt-1">{value}</span>
+        <span className="font-bold sm:text-lg text-[var(--barva-tmava)] mt-1">{value}</span>
     </div>
 );
 
@@ -81,25 +81,25 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                     className="rounded-full p-1 w-16 h-16 sm:w-20 sm:h-20 object-fill flex-shrink-0"
                 />
                 <div className='space-y-1'>
-                    <h3 className="font-bold text-base text-gray-800/70">{challenge.StartupProfile?.company_name}</h3>
-                    <h1 className="text-2xl sm:text-2xl font-bold text-[var(--barva-tmava)] -mt-1">{challenge.title}</h1>
+                    <h3 className="font-bold text-xs sm:text-base text-gray-800/70">{challenge.StartupProfile?.company_name}</h3>
+                    <h1 className="text-base sm:text-2xl font-bold text-[var(--barva-tmava)] -mt-1">{challenge.title}</h1>
                 </div>
             </header>
-            <section className="flex justify-between md:grid grid-cols-3 gap-4 py-4 border-y border-gray-100 mb-8">
+            <section className="flex justify-between md:grid grid-cols-3 gap-4 py-4 border-y border-gray-100 mb-4 sm:mb-5">
                 <StatItem icon={Award} label="Hlavní odměna" value={topReward} />
                 <StatItem icon={Users} label="Kapacita" value={`${challenge.Submission.length} / ${challenge.max_applicants || '∞'}`} />
                 <StatItem icon={Calendar} label="Termín" value={daysRemaining >= 0 ? `${daysRemaining} dní` : 'Ukončeno'} />
             </section>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <main className="md:col-span-2 prose max-w-none text-gray-800 prose-h3:font-bold prose-h3:text-xl prose-h3:text-[var(--barva-tmava)] prose-h3:mb-2 prose-ul:list-disc prose-ul:pl-5">
-                    <h3 className='text-lg text-[var(--barva-primarni)] font-semibold'>Popis výzvy</h3>
-                    <p className='p-2'>{challenge.description}</p>
+                    <h3 className='sm:text-lg text-[var(--barva-primarni)] font-semibold'>Popis výzvy</h3>
+                    <p className='text-sm sm:text-base p-2'>{challenge.description}</p>
 
-                    <h3 className='text-lg text-[var(--barva-primarni)] font-semibold'>Cíle</h3>
-                    <p className='p-2'>{challenge.goals}</p>
+                    <h3 className='sm:text-lg text-[var(--barva-primarni)] font-semibold'>Cíle</h3>
+                    <p className='text-sm sm:text-base p-2'>{challenge.goals}</p>
 
-                    <h3 className='text-lg text-[var(--barva-primarni)] font-semibold'>Očekávané výstupy</h3>
-                    <ul className='list-disc pl-5 p-2 space-y-2'>
+                    <h3 className='sm:text-lg text-[var(--barva-primarni)] font-semibold'>Očekávané výstupy</h3>
+                    <ul className='text-sm sm:text-base list-disc pl-5 p-2 space-y-2'>
                         {expectedOutputsArray.map((output, index) => <li key={index}>{output}</li>)}
                     </ul>
 
@@ -129,7 +129,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                 </main>
                 <aside className="md:col-span-1 space-y-6">
                     <div>
-                        <h3 className="text-xl font-bold text-[var(--barva-tmava)] mb-3">Potřebné dovednosti</h3>
+                        <h3 className="sm:text-lg font-bold text-[var(--barva-tmava)] mb-3">Potřebné dovednosti</h3>
                         <div className="flex flex-wrap gap-2">
                             {sortedSkills.map(({ Skill }) => {
                                 const isMatch = studentSkillIds.has(Skill.id);

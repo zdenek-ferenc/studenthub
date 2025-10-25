@@ -5,7 +5,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '../../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import type { Submission } from './SubmissionCard';
-import { Clock } from 'lucide-react';
+import { Clock, ChevronLeft } from 'lucide-react';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
 import StudentChallengeRecap from './StudentChallengeRecap';
@@ -108,8 +108,14 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   };
 
   return (
-    <div className="max-w-4xl mx-auto md:py-24 xl:py-32 md:px-4 space-y-8">
-      
+    <div className="p-4 lg:max-w-1/2 mx-auto md:py-24 xl:py-32 md:px-4 space-y-8">
+      <button
+        onClick={() => router.back()} 
+        className="flex items-center gap-1 cursor-pointer text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-2"
+      >
+        <ChevronLeft size={16} />
+        Zpět
+      </button>
       {showResults && userSubmission && (
         <StudentChallengeRecap 
             submission={userSubmission} 

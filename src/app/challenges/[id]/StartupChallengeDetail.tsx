@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import ChallengeRecapView from './ChallengeRecapView';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AlertCircle, CheckCircle, Lock, Clock, Users,} from 'lucide-react';
+import { AlertCircle, CheckCircle, Lock, Clock, Users, ChevronLeft} from 'lucide-react';
 import { differenceInDays, format } from 'date-fns';
 import StartupChallengeHeader from './StartupChallengeHeader';
 
@@ -95,7 +95,7 @@ const EvaluationStatusPanel = ({
         );
     }
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
+        <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-200 text-center">
             <div className="max-w-2xl mx-auto">
                 {allRated ? (
                     <>
@@ -209,6 +209,13 @@ if (loading) return <p className="text-center py-20">Načítám přihlášky...<
 
 return (
     <div className='lg:max-w-5xl 3xl:max-w-6xl mx-4 sm:mx-auto py-4 md:py-24 xl:py-32 md:px-4 space-y-4 sm:space-y-6 xl:space-y-7'>
+    <button
+          onClick={() => router.back()} // Použití router.back()
+          className="flex items-center gap-1 text-sm cursor-pointer font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-2"
+        >
+          <ChevronLeft size={16} />
+          Zpět na přehled
+        </button>
     <StartupChallengeHeader challenge={challenge} />
     {challenge.status === 'closed' || challenge.status === 'archived' ? (
         <ChallengeRecapView submissions={submissions} />

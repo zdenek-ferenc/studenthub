@@ -282,7 +282,7 @@ const renderStep = () => {
                     {renderStep()}
                 </div>
             ) : (
-                <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-md overflow-hidden">
+                <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-md overflow-hidden 3xl:mt-32">
                     <div className="p-8 sm:p-12 flex flex-col justify-center">
                         <div>
                             <div className="text-center">

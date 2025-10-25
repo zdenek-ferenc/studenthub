@@ -31,9 +31,9 @@ export default function SkillRadarChart({ skills }: SkillRadarChartProps) {
     }
 
     return (
-        <div style={{ width: '100%', height: 250 }}> 
-            <ResponsiveContainer>
-                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={topSkills}>
+        <div className="skill-radar-chart-container focus:outline-none" style={{ width: '100%', height: 250 }}>
+            <ResponsiveContainer className="focus:ring-0">
+                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={topSkills} className="focus:ring-0">
                     <PolarGrid stroke="var(--barva-podtext)" strokeOpacity={0.2} />
                     <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--barva-tmava)', fontSize: 12 }} />
                     <Radar name="Level" dataKey="level" stroke="var(--barva-primarni)" fill="var(--barva-primarni)" fillOpacity={0.6} />

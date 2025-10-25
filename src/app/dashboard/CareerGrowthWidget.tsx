@@ -98,7 +98,7 @@ const allSkillsSorted = (progress.StudentSkill || []).map(ss => ({ ...ss, Skill:
 const displayedSkills = showAllSkills ? allSkillsSorted : allSkillsSorted.slice(0, 5);
 
 return (
-    <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
+    <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-200 h-full">
     <div className="sm:my-3 md:my-6 text-center">
         <p className="font-semibold text-sm 3xl:text-base text-gray-500">Celková Úroveň</p>
         <div className='relative w-full mx-auto h-20 flex items-center justify-center'>

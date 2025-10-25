@@ -53,7 +53,7 @@ const StatusInfo = ({ status }: { status: string }) => {
     }
 
     return (
-        <div className={`flex items-center gap-2 text-sm font-semibold leading-none ${colorClass}`}>
+        <div className={`flex items-center gap-2 text-sm leading-none ${colorClass}`}>
             {icon}
             <span>{text}</span>
         </div>
@@ -73,7 +73,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
 
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
-      <div className={`bg-white p-4 rounded-2xl shadow-sm border border-gray-300 hover:border-[var(--barva-primarni)] hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
+      <div className={`bg-white p-4 rounded-2xl shadow-xs border border-gray-200 hover:border-[var(--barva-primarni)] hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
         <div className="flex items-center gap-4 flex-grow w-full">
             <div className="flex-shrink-0">
                 <Image 
@@ -85,19 +85,19 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 />
             </div>
             <div className="flex flex-col flex-grow min-w-0">
-                <h4 className="text-sm 3xl:text-lg font-bold text-[var(--barva-tmava)] truncate max-w-2xs sm:max-w-xs lg:max-w-lg">{Challenge.title}</h4>
+                <h4 className="text-sm 3xl:text-lg font-semibold text-[var(--barva-tmava)] truncate max-w-2xs sm:max-w-xs lg:max-w-lg">{Challenge.title}</h4>
                 <div className="mt-2">
                     <div className="hidden md:flex xl:hidden flex-wrap gap-1.5">
                         {Challenge.ChallengeSkill.slice(0, 2).map(({ Skill }, index) => (
-                            <span key={index} className="text-xs font-bold border-1 text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
+                            <span key={index} className="text-xs border-1 text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
                         ))}
-                        {Challenge.ChallengeSkill.length > 2 && <span className="text-xs font-bold  self-center text-[var(--barva-primarni)] px-2 py-1 rounded-xl">+{Challenge.ChallengeSkill.length - 2}</span>}
+                        {Challenge.ChallengeSkill.length > 2 && <span className="text-xs self-center text-[var(--barva-primarni)] px-2 py-1 rounded-xl">+{Challenge.ChallengeSkill.length - 2}</span>}
                     </div>
                     <div className="hidden xl:flex flex-wrap gap-1.5">
                         {Challenge.ChallengeSkill.slice(0, 4).map(({ Skill }, index) => (
-                            <span key={index} className="text-xs font-bold border-1  text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
+                            <span key={index} className="text-xs border-1  text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
                         ))}
-                        {Challenge.ChallengeSkill.length > 4 && <span className="text-xs font-bold text-blue-500 self-center  px-2 py-1">+{Challenge.ChallengeSkill.length - 4}</span>}
+                        {Challenge.ChallengeSkill.length > 4 && <span className="text-xs text-blue-500 self-center  px-2 py-1">+{Challenge.ChallengeSkill.length - 4}</span>}
                     </div>
                 </div>
             </div>
@@ -114,7 +114,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 <div className="transition-opacity duration-200">
                     <StatusInfo status={submission.status} />
                 </div>
-                <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-2 -translate-x-0 transition-all duration-400 text-sm font-bold text-[var(--barva-primarni)]">
+                <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-2 -translate-x-0 transition-all duration-400 text-sm text-[var(--barva-primarni)]">
                     <ChevronRight size={18} strokeWidth={2.5}/>
                 </div>
             </div>  

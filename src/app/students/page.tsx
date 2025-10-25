@@ -23,7 +23,7 @@ function StudentCatalogPage() {
     }
 
     return (
-        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 md:py-22 lg:py-28 3xl:py-32 lg:flex-row items-start gap-8">
+        <div className="flex flex-col max-w-5/6 mx-auto px-4 md:py-22 lg:py-28 3xl:py-32 lg:flex-row items-start gap-8">
             {loadingFilters ? (
                 <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
                     <p className="text-gray-500">Načítám filtry...</p>

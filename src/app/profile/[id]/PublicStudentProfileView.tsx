@@ -7,8 +7,9 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import SkillRadarChart from './components/SkillRadarChart';
 import ProfilePortfolioSection from './components/ProfilePortfolioSection';
 import ProfileSkillsSection from './components/ProfileSkillsSection';
-import { Github, Linkedin, Dribbble, Link as LinkIcon, Briefcase, GraduationCap, Edit, PlusCircle } from 'lucide-react';
+import { Github, Linkedin, Dribbble, Link as LinkIcon, Briefcase, GraduationCap, Edit, PlusCircle,ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type Skill = {
     name: string;
@@ -145,6 +146,7 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
 export default function PublicStudentProfileView({ profileId }: { profileId: string }) {
     const { user } = useAuth();
     const [profile, setProfile] = useState<StudentProfile | null>(null);
+    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [hasFetched, setHasFetched] = useState(false);
 
@@ -195,6 +197,15 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
 
     return (
         <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-32 px-4">
+            {!isOwner && (
+                <button
+                    onClick={() => router.back()} // Použití router.back()
+                    className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-4"
+                >
+                    <ChevronLeft size={16} />
+                    Zpět na přehled
+                </button>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
                 <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:sticky lg:top-28">
                     <ProfileInfoCard profile={profile} isOwner={isOwner} />

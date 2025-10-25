@@ -59,7 +59,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
           <div className="flex items-center gap-4">
             {challenge.StartupProfile?.logo_url ? (
               <Image src={challenge.StartupProfile.logo_url} alt="logo firmy" 
-                className='rounded-lg hidden xl:block'
+                className='rounded-lg'
                 priority={true}
                 height={50}
                 width={50}
