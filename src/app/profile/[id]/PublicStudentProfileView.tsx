@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { supabase } from '../../../lib/supabaseClient';
 import { useAuth } from '../../../contexts/AuthContext';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import SkillRadarChart from './components/SkillRadarChart';
 import ProfilePortfolioSection from './components/ProfilePortfolioSection';
 import ProfileSkillsSection from './components/ProfileSkillsSection';
-import { Github, Linkedin, Dribbble, Link as LinkIcon, Briefcase, GraduationCap, Edit, PlusCircle,ChevronLeft } from 'lucide-react';
+import { Github, Linkedin, Dribbble, Link as LinkIcon, Briefcase, GraduationCap, Edit, PlusCircle,ChevronLeft,Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -52,7 +53,7 @@ type StudentLanguage = {
 };
 
 type StudentProfile = {
-    first_name: string; last_name: string; username: string; bio: string | null;
+    first_name: string; last_name: string; username: string; bio: string | null; profile_picture_url: string | null;
     university: string | null; field_of_study: string | null; level: number; xp: number;
     github_url: string | null; linkedin_url: string | null;
     dribbble_url: string | null; personal_website_url: string | null;
@@ -91,13 +92,37 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
     };
 
     const initials = `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`;
+    const hasAnyLink = !!(profile.linkedin_url || profile.github_url || profile.dribbble_url || profile.personal_website_url);
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
+        <div className="relative bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
+            {isOwner && (
+                <Link
+                    href="/profile/edit"
+                    title="Upravit profil"
+                    className="absolute top-3 right-3 p-1.5 bg-gray-100 rounded-full text-gray-400 hover:bg-[var(--barva-primarni2)] hover:text-[var(--barva-primarni)] transition-colors z-10"
+                >
+                    <Settings size={16} />
+                </Link>
+            )}
+
             <div className="text-center">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-4xl font-bold mx-auto mb-4">
-                    {initials}
-                </div>
+                <div className="w-24 h-24 rounded-full mx-auto mb-4 relative">
+          {profile.profile_picture_url ? (
+            <Image
+              src={profile.profile_picture_url}
+              alt={`Profilový obrázek ${profile.first_name} ${profile.last_name}`}
+              width={200}
+              height={200}
+              className="w-24 h-24 rounded-full object-cover border-2 border-gray-100"
+              key={profile.profile_picture_url}
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-4xl font-bold">
+              {initials}
+            </div>
+          )}
+        </div>
                 <h1 className="text-2xl font-bold text-[var(--barva-tmava)]">{profile.first_name} {profile.last_name}</h1>
                 <p className="text-gray-500">@{profile.username}</p>
                 <div className="flex justify-center items-center gap-4 mt-4">
@@ -106,20 +131,25 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
                     <SocialLink href={profile.dribbble_url} Icon={Dribbble} label="Dribbble" />
                     <SocialLink href={profile.personal_website_url} Icon={LinkIcon} label="Osobní web" />
                     {isOwner && (
-                        <Link href="/profile/edit?tab=links" title="Upravit odkazy" className="text-gray-400 hover:text-[var(--barva-primarni)] transition-colors">
+                        <Link
+                            href="/profile/edit?tab=links"
+                            title="Upravit odkazy"
+                            className="flex items-center gap-1 text-gray-400 hover:text-[var(--barva-primarni)] transition-colors"
+                        >
                             <PlusCircle size={20} />
+                            {!hasAnyLink && <span className="text-xs">(Přidat odkazy)</span>}
                         </Link>
                     )}
                 </div>
             </div>
             <div className="text-sm space-y-4 mt-6 pt-4 border-t border-gray-100">
-                <div className="text-gray-700">
+                 <div className="text-gray-700">
                     {isEditing ? (
                         <div className="space-y-2">
                             <textarea
                                 value={bioText}
                                 onChange={(e) => setBioText(e.target.value)}
-                                placeholder="Řekni něco o sobě..."
+                                placeholder="Řekni něco o sobě, co tě zajímá, na čem pracuješ..."
                                 className="w-full min-h-[100px] text-sm rounded-lg border border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
                             />
                             <div className="flex items-center gap-2">
@@ -128,12 +158,29 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
                             </div>
                         </div>
                     ) : (
-                        <p className="whitespace-pre-wrap">{bioText || (isOwner && "Zatím nemáš žádné bio. Kliknutím ho můžeš přidat.")}</p>
-                    )}
-                    {isOwner && !isEditing && (
-                        <button onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[var(--barva-primarni)] transition-colors mt-3">
-                            <Edit size={12} /> Upravit bio
-                        </button>
+                        <>
+                            <p className={`whitespace-pre-wrap ${!bioText ? 'text-gray-500' : ''}`}>
+                                {bioText
+                                    ? bioText 
+                                    : isOwner
+                                        ? "Přidej krátký popisek o sobě, aby startupy věděly, co tě zajímá a na čem pracuješ."
+                                        : "Student o sobě zatím nic nenapsal." 
+                                }
+                            </p>
+                            {isOwner && (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className={`flex items-center gap-1.5 text-sm cursor-pointer font-semibold transition-colors mt-3 ${
+                                        bioText
+                                            ? 'text-gray-400 hover:text-[var(--barva-tmava)]' 
+                                            : 'text-[var(--barva-primarni)] hover:opacity-80' 
+                                    }`}
+                                >
+                                    <Edit size={12} />
+                                    {bioText ? 'Upravit bio' : 'Přidat bio'}
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
                 {profile.university && <div className="flex items-center gap-3 text-gray-600 pt-4 border-t border-gray-100"><GraduationCap size={20} className="flex-shrink-0" /> <span>{profile.university}</span></div>}
@@ -198,9 +245,9 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     return (
         <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-32 px-4">
             {!isOwner && (
-                <button
-                    onClick={() => router.back()} // Použití router.back()
-                    className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-4"
+                 <button
+                    onClick={() => router.back()}
+                    className="flex items-center cursor-pointer gap-1 text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-4"
                 >
                     <ChevronLeft size={16} />
                     Zpět na přehled
@@ -210,8 +257,8 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
                 <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:sticky lg:top-28">
                     <ProfileInfoCard profile={profile} isOwner={isOwner} />
                     <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
-                        <h3 className="font-bold text-lg text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
-                        <SkillRadarChart skills={skillsForChart} />
+                        <h3 className="font-bold text-xl text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
+                        <SkillRadarChart skills={skillsForChart} isOwner={isOwner} />
                     </div>
                 </aside>
                 <main className="lg:col-span-2 space-y-3 sm:space-y-8">

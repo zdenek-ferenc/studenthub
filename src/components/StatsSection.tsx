@@ -27,7 +27,7 @@ export default function StatsSection() {
             suffix="+"
           />
         </p>
-        <p className="text-2xl sm:text-3xl">partnerských startupů</p>
+        <p className="text-2xl sm:text-3xl">Partnerských startupů</p>
       </div>
 
     </section>

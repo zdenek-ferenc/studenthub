@@ -49,36 +49,42 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
     const { user } = useAuth();
     const [initials, setInitials] = useState('??');
     const [isOpen, setIsOpen] = useState(false);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (user && profile) {
-            const fetchInitials = async () => {
+            const fetchProfileData = async () => {
+                let fetchedInitials = '??';
+                let fetchedImageUrl: string | null = null;
+
                 if (profile.role === 'student') {
                     const { data } = await supabase
                         .from('StudentProfile')
-                        .select('first_name, last_name')
+                        .select('first_name, last_name, profile_picture_url')
                         .eq('user_id', user.id)
                         .single();
                     if (data) {
-                        const newInitials = `${data.first_name?.charAt(0) ?? ''}${data.last_name?.charAt(0) ?? ''}`.toUpperCase();
-                        setInitials(newInitials || '??');
+                        fetchedInitials = `${data.first_name?.charAt(0) ?? ''}${data.last_name?.charAt(0) ?? ''}`.toUpperCase() || '??';
+                        fetchedImageUrl = data.profile_picture_url; 
                     }
                 } else if (profile.role === 'startup') {
                     const { data } = await supabase
                         .from('StartupProfile')
-                        .select('company_name')
+                        .select('company_name, logo_url')
                         .eq('user_id', user.id)
                         .single();
                     if (data) {
-                        const newInitials = data.company_name?.substring(0, 2).toUpperCase() || '??';
-                        setInitials(newInitials);
+                        fetchedInitials = data.company_name?.substring(0, 2).toUpperCase() || '??';
+                        fetchedImageUrl = data.logo_url; 
                     }
                 } else {
-                    setInitials(profile.email?.substring(0, 2).toUpperCase() || '??');
+                    fetchedInitials = profile.email?.substring(0, 2).toUpperCase() || '??';
                 }
+                setInitials(fetchedInitials);
+                setImageUrl(fetchedImageUrl);
             };
-            fetchInitials();
+            fetchProfileData();
         }
     }, [user, profile]);
 
@@ -91,9 +97,25 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
     const isActive = pathname === `/profile/${user?.id}`;
     return (
         <div className="relative bg-white rounded-full" ref={dropdownRef}>
-            <button onClick={() => setIsOpen(!isOpen)} className={`w-10 h-10 3xl:w-12 3xl:h-12 rounded-full bg-gradient-to-b from-[#86C5FF]/30 to-[#86C5FF]/55 text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer 3xl:text-lg transition-all ease-in duration-100 ${isActive ? 'ring-2 ring-[var(--barva-primarni)] leading-none' : ''}`}>{initials}</button>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`w-10 h-10 3xl:w-12 3xl:h-12 rounded-full bg-gradient-to-b from-[#86C5FF]/30 to-[#86C5FF]/55 text-[var(--barva-primarni)] flex items-center justify-center font-bold cursor-pointer 3xl:text-lg transition-all ease-in duration-100 overflow-hidden ${isActive ? 'ring-3 ring-[var(--barva-primarni)]' : ''}`}
+            >
+                {imageUrl ? (
+                    <Image
+                        src={imageUrl}
+                        alt="Profilový obrázek"
+                        width={150} 
+                        height={150}
+                        className="w-full h-full object-cover" 
+                        key={imageUrl} 
+                    />
+                ) : (
+                    initials
+                )}
+            </button>
             <div className={`absolute right-0 pt-2 transition-opacity duration-200 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                <div className="w-36 3xl:w-48 bg-white rounded-xl shadow-lg z-10">
+                 <div className="w-36 3xl:w-48 bg-white rounded-xl shadow-lg z-10">
                     <Link href={`/profile/${user?.id}`} className="block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm text-gray-700 rounded-tr-xl rounded-tl-xl hover:bg-sky-50 transition-all ease-in-out duration-100" onClick={() => setIsOpen(false)}>Můj profil</Link>
                     <Link href="/profile/edit" className="block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm text-gray-700 hover:bg-sky-50 transition-all ease-in-out duration-100" onClick={() => setIsOpen(false)}>Upravit profil</Link>
                     <button onClick={handleLogout} className="w-full cursor-pointer text-left block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm rounded-br-xl rounded-bl-xl text-gray-700 hover:bg-sky-50 transition-all ease-in-out duration-100">Odhlásit se</button>

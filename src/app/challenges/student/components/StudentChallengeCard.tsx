@@ -48,12 +48,6 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
 
   return (
     <div className="relative bg-white rounded-2xl shadow-xs hover:shadow-none transition-all duration-300 ease-in-out border border-gray-100 flex flex-col h-full">
-        {isApplied && (
-        <div className="absolute -top-2 -right-2 z-10 flex-shrink-0 flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold 3xl:px-3 px-2 py-1 3xl:py-1.5 rounded-full shadow-md border-2 border-white">
-          <CheckCircle size={14} />
-          <span>Přihlášeno</span>
-        </div>
-      )}
       <div className="flex-grow">
         <div className="flex items-start justify-between gap-4 p-4 md:p-5 3xl:p-6 rounded-t-2xl">
           <div className="flex items-center gap-4">
@@ -68,8 +62,8 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
               <div className="w-14 h-14 rounded-full bg-gray-200 flex-shrink-0"></div>
             )}
             <div className='flex flex-col gap-1'>
-              <p className="text-sm 3xl:text-base font-semibold text-gray-700">{challenge.StartupProfile?.company_name}</p>
-              <h3 className="text-[16px] 3xl:text-[18px] font-bold text-[var(--barva-tmava)] -mt-1 line-clamp-2 flex-grow">{challenge.title}</h3>
+              <p className="text-sm 3xl:text-base font-semibold text-gray-600">{challenge.StartupProfile?.company_name}</p>
+              <h3 className="text-[16px] 3xl:text-[18px] font-semibold text-[var(--barva-tmava)] -mt-1 line-clamp-2 flex-grow">{challenge.title}</h3>
             </div>
           </div>
         </div>

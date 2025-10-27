@@ -45,24 +45,19 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [studentSkills, setStudentSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasFetchedInitial, setHasFetchedInitial] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('recommended');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const refetchChallenges = useCallback(() => {
-  }, []);
-
-  useEffect(() => {
-    if (authLoading) {
-      return;
+  const fetchAllData = useCallback(async () => {
+    if (authLoading || !hasFetchedInitial) {
+        setLoading(true);
     }
 
-    const fetchAllData = async () => {
-      setLoading(true);
-
-      try {
+    try {
         if (user && studentSkills.length === 0) {
             const { data: studentSkillsData } = await supabase.from('StudentSkill').select('Skill(id, name)').eq('student_id', user.id);
             const skills = studentSkillsData?.flatMap(item => item.Skill || []) || [];
@@ -70,7 +65,7 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
         } else if (!user) {
             setStudentSkills([]);
         }
-        
+
         if (allSkills.length === 0) {
           const { data: skillsData } = await supabase.from('Skill').select('id, name');
           setAllSkills(skillsData || []);
@@ -103,11 +98,14 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
             case 'newest': query = query.order('created_at', { ascending: false }); break;
             case 'ending_soon': query = query.order('deadline', { ascending: true }); break;
             case 'highest_reward': query = query.order('reward_first_place', { ascending: false, nullsFirst: false }); break;
-            default: break;
+            default:
+                 if (sortBy !== 'recommended') {
+                      query = query.order('created_at', { ascending: false });
+                 }
+                 break;
         }
 
         const { data: challengesData, error: challengesError } = await query;
-
         if (challengesError) throw challengesError;
 
         setChallenges((challengesData as Challenge[]) ?? []);
@@ -117,12 +115,22 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
           setChallenges([]);
       } finally {
           setLoading(false);
+          if (!hasFetchedInitial) setHasFetchedInitial(true);
       }
-    };
-
-    fetchAllData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, authLoading, debouncedSearchQuery, selectedSkillIds, sortBy]);
+  }, [user?.id, authLoading, debouncedSearchQuery, selectedSkillIds, sortBy, allSkills.length, studentSkills.length, hasFetchedInitial]);
+
+
+  const refetchChallenges = useCallback(() => {
+      fetchAllData();
+  }, [fetchAllData]);
+
+  useEffect(() => {
+      if (!authLoading) {
+          fetchAllData();
+      }
+  }, [authLoading, fetchAllData]);
+
 
   const value = useMemo(() => ({
     challenges,

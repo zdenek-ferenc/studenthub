@@ -6,6 +6,7 @@
   --barva-primarni: #006ACC;
   --barva-primarni2: #CEE8FF;
   --barva-tmava: #003566;
+  --barva-tmava-tmavsi: #092947;
   --barva-svetle-pozadi: #EFF8FF;
   --barva-podtext: #00356675;
 }
@@ -42,7 +43,7 @@ body {
 }
 
 .input {
-  @apply w-full text-left border border-gray-300 rounded-xl 3xl:rounded-2xl px-4 text-black py-1.5 text-sm 3xl:text-base 3xl:py-2.5;
+  @apply w-full text-left border border-gray-300 rounded-xl 3xl:rounded-xl px-4 text-black py-1.5 text-sm 3xl:text-base 3xl:py-2.5;
   @apply focus:outline-none focus:ring-1 focus:ring-[var(--barva-primarni)] focus:border-transparent;
   @apply transition-all;
 }
@@ -235,4 +236,27 @@ body {
 
 .skill-radar-chart-container svg:focus-visible {
    outline: none !important;
+}
+
+@keyframes subtleShimmer {
+  0% { background-position: 0% 0%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+
+.smooth-shimmer-bg {
+
+  background-image: radial-gradient(
+    circle at center,
+    var(--barva-tmava-tmavsi) 0%,
+    var(--barva-tmava) 70% 
+  );
+
+
+  background-size: 200% 200%;
+
+  animation: subtleShimmer 15s linear infinite;
 }

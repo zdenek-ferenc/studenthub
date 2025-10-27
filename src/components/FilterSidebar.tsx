@@ -120,7 +120,7 @@ const FilterContent = ({
         
         <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
           {availableSkills.map(skill => (
-            <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="flex items-center justify-center cursor-pointer gap-1.5 hover:bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm 3xl:font-semibold transition-colors">
+            <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="flex items-center justify-center cursor-pointer gap-1.5 hover:bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm transition-colors">
               {skill.name}
             </button>
           ))}

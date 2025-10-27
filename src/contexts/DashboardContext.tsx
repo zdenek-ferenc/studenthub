@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 
@@ -35,7 +35,7 @@ export type ProfileProgress = {
 };
 
 export type Notification = {
-    id: string; message: string; link_url: string; created_at: string; type: 'new_submission' | 'submission_reviewed' | 'submission_winner' | null;
+    id: string; message: string; link_url: string; created_at: string; type: 'new_submission' | 'submission_reviewed' | 'submission_winner' | null; is_read: boolean;
 };
 
 export type StudentStats = {
@@ -49,6 +49,7 @@ type DashboardContextType = {
     notifications: Notification[];
     stats: StudentStats | null;
     studentProfile: { username: string; } | null;
+    refetchDashboardData: () => void;
 };
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -64,7 +65,17 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     const [stats, setStats] = useState<StudentStats | null>(null);
     const [studentProfile, setStudentProfile] = useState<{ username: string } | null>(null);
 
-    const fetchData = useCallback(async (userId: string) => {
+    const fetchDashboardData = useCallback(async (userId: string | undefined) => {
+        if (!userId) {
+             setLoading(false);
+             setHasFetched(false);
+             setSubmissions([]);
+             setProgress(null);
+             setNotifications([]);
+             setStats(null);
+             setStudentProfile(null);
+             return;
+         }
         setLoading(true);
 
         const [
@@ -75,21 +86,21 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             statsRewardsRes,
             profileRes
         ] = await Promise.all([
-            supabase.from('Submission').select(`id, completed_outputs, status, rating, position, Challenge:Challenge!Submission_challenge_id_fkey (id, title, status, expected_outputs, deadline, StartupProfile (company_name, logo_url), ChallengeSkill (Skill (name)))`).eq('student_id', userId),
-            supabase.from('StudentProfile').select(`level, xp, StudentSkill (level, xp, Skill (id, name))`).eq('user_id', userId).single(),
-            supabase.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(4),
-            supabase.from('Submission').select('rating, position, Challenge!inner(status)').eq('student_id', userId).eq('Challenge.status', 'closed'),
-            supabase.rpc('get_student_rewards', { p_student_id: userId }),
-            supabase.from('StudentProfile').select('username').eq('user_id', userId).single(),
-        ]);
-        
+             supabase.from('Submission').select(`id, completed_outputs, status, rating, position, Challenge:Challenge!Submission_challenge_id_fkey (id, title, status, expected_outputs, deadline, StartupProfile (company_name, logo_url), ChallengeSkill (Skill (name)))`).eq('student_id', userId),
+             supabase.from('StudentProfile').select(`level, xp, StudentSkill (level, xp, Skill (id, name))`).eq('user_id', userId).single(),
+             supabase.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(4),
+             supabase.from('Submission').select('rating, position, Challenge!inner(status)').eq('student_id', userId).eq('Challenge.status', 'closed'),
+             supabase.rpc('get_student_rewards', { p_student_id: userId }),
+             supabase.from('StudentProfile').select('username').eq('user_id', userId).single(),
+         ]);
+
         if (submissionsRes.data) {
             const cleanedSubmissions = submissionsRes.data.map(sub => {
                 const challengeData = sub.Challenge ? (Array.isArray(sub.Challenge) ? sub.Challenge[0] : sub.Challenge) : null;
                 if (!challengeData) return { ...sub, Challenge: null };
 
                 const cleanedStartupProfile = challengeData.StartupProfile ? (Array.isArray(challengeData.StartupProfile) ? challengeData.StartupProfile[0] : challengeData.StartupProfile) : null;
-                
+
                 const cleanedChallengeSkills = (challengeData.ChallengeSkill || []).map(cs => ({
                     ...cs,
                     Skill: cs.Skill ? (Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill) : null,
@@ -123,9 +134,9 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         } else {
             setProgress(null);
         }
-        
+
         setNotifications(notificationsRes.data as Notification[] || []);
-        
+
         let performanceStats = { avgRating: 0, completedCount: 0, successRate: 0 };
         if (!statsPerformanceRes.error && statsPerformanceRes.data) {
             const ratedSubmissions = statsPerformanceRes.data.filter(s => s.rating !== null);
@@ -148,27 +159,31 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         setHasFetched(true);
     }, []);
 
+    const refetchDashboardData = useCallback(() => {
+        if (user?.id) {
+            setHasFetched(false);
+            fetchDashboardData(user.id);
+        }
+    }, [user?.id, fetchDashboardData]);
+
+
     useEffect(() => {
-    if (authLoading) {
-        return;
-    }
+        if (authLoading) {
+            return;
+        }
 
-    if (user && profile?.role === 'student' && !hasFetched) {
-        fetchData(user.id);
-    } else if (!user) {
-        setHasFetched(false);
-        setSubmissions([]);
-        setProgress(null);
-        setNotifications([]);
-        setStats(null);
-        setStudentProfile(null);
-        setLoading(false);
-    } else {
-        setLoading(false);
-    }
-}, [user, profile, authLoading, hasFetched, fetchData]);
+        if (user && profile?.role === 'student' && !hasFetched) {
+            fetchDashboardData(user.id);
+        } else if (!user && hasFetched) {
+             fetchDashboardData(undefined);
+         } else if (!user && !authLoading) {
+             setLoading(false);
+         }
+    }, [user, profile, authLoading, hasFetched, fetchDashboardData]);
 
-    const value = { loading, submissions, progress, notifications, stats, studentProfile };
+    const value = useMemo(() => ({
+        loading, submissions, progress, notifications, stats, studentProfile, refetchDashboardData
+    }), [loading, submissions, progress, notifications, stats, studentProfile, refetchDashboardData]);
 
     return (
         <DashboardContext.Provider value={value}>

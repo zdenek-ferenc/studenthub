@@ -20,7 +20,7 @@ export type RecommendedChallenge = {
 };
 
 const InfoTag = ({ icon: Icon, text, colorClass, className }: { icon: React.ElementType, text: string | React.ReactNode, colorClass?: string, className?: string }) => (
-    <div className={`flex items-center gap-1.5 text-xs 3xl:text-sm font-semibold ${colorClass || 'text-gray-600'} ${className}`}>
+    <div className={`flex items-center gap-1.5 text-xs 3xl:text-sm ${colorClass || 'text-gray-600'} ${className}`}>
         <Icon size={14} className="flex-shrink-0" />
         <span>{text}</span>
     </div>
@@ -71,7 +71,7 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
                         <ChevronRight size={24} strokeWidth={2.5} className="text-blue-500" />
                     </div>
                 </div>
-                <div className="mt-1 3xl:mt-3 border-gray-100 flex flex-wrap items-center gap-x-6 gap-y-2 leading-none">
+                <div className="mt-1 3xl:mt-3 border-gray-100 flex flex-wrap items-center gap-x-4 gap-y-2 leading-none">
                     <div className='px-1 py-1.5 3xl:px-3 3xl:py-1 rounded-3xl'>
                         <InfoTag 
                         icon={Sparkles} 
@@ -84,7 +84,7 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
                         text={<>{challenge.applicantCount} / {challenge.max_applicants || '∞'}</>}
                         className="hidden sm:flex"
                     />
-                    {deadlineText && <InfoTag icon={daysRemaining !== null && daysRemaining < 0 ? AlertTriangle : Clock} text={deadlineText} colorClass={deadlineColor} />}
+                    {deadlineText && <InfoTag className='font-semibold' icon={daysRemaining !== null && daysRemaining < 0 ? AlertTriangle : Clock} text={deadlineText} colorClass={deadlineColor} />}
                 </div>
             </div>
         </Link>

@@ -11,6 +11,8 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import StudentChallengeRecap from './StudentChallengeRecap';
 import SubmissionForm from './SubmissionForm';
 import ChallengeAssignmentBox from './ChallengeAssignmentBox';
+import { useChallenges } from '../../../contexts/ChallengesContext';
+import { useDashboard } from '../../../contexts/DashboardContext';
 
 type Challenge = {
   id: string;
@@ -45,9 +47,11 @@ const WaitingForResults = () => (
 
 
 export default function StudentChallengeDetail({ challenge }: { challenge: Challenge }) {
-  const { user, loading: authLoading, refetchProfile, showToast } = useAuth();
+  const { user, loading: authLoading, showToast } = useAuth();
   const router = useRouter();
-  
+  const { refetchChallenges } = useChallenges();
+  const { refetchDashboardData } = useDashboard();
+
   const [isApplying, setIsApplying] = useState(false);
   const [userSubmission, setUserSubmission] = useState<Submission | undefined>(undefined);
   const [studentSkillIds, setStudentSkillIds] = useState<Set<string>>(new Set());
@@ -72,9 +76,9 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   if (authLoading) {
     return <LoadingSpinner />;
   }
-  
+
   const isApplied = !!userSubmission;
-  const isChallengeFull = challenge.Submission.length >= challenge.max_applicants;
+  const isChallengeFull = challenge.max_applicants ? challenge.Submission.length >= challenge.max_applicants : false;
   const showResults = challenge.status === 'closed' || challenge.status === 'archived';
   const isReviewedByStartup = userSubmission && ['reviewed', 'winner', 'rejected'].includes(userSubmission.status);
 
@@ -92,14 +96,17 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
     } else {
       showToast("Úspěšně jste se přihlásili do výzvy!", 'success');
       setUserSubmission(newSubmission as Submission);
-      refetchProfile();
+      refetchChallenges();
+      refetchDashboardData();
     }
     setIsApplying(false);
   };
-  
+
   const handleSubmissionUpdate = (updatedSubmission: Submission) => {
     setUserSubmission(updatedSubmission);
-    router.refresh();
+    refetchChallenges();
+    refetchDashboardData();
+    router.refresh(); 
   };
 
   const assignmentBoxProps = {
@@ -110,25 +117,25 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   return (
     <div className="p-4 lg:max-w-1/2 mx-auto md:py-24 xl:py-32 md:px-4 space-y-8">
       <button
-        onClick={() => router.back()} 
+        onClick={() => router.back()}
         className="flex items-center gap-1 cursor-pointer text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-2"
       >
         <ChevronLeft size={16} />
         Zpět
       </button>
       {showResults && userSubmission && (
-        <StudentChallengeRecap 
-            submission={userSubmission} 
-            challengeStatus={challenge.status} 
+        <StudentChallengeRecap
+            submission={userSubmission}
+            challengeStatus={challenge.status}
         />
       )}
       <ChallengeAssignmentBox {...assignmentBoxProps} />
       {!showResults && isApplied && (
         <>
           {!isReviewedByStartup && userSubmission ? (
-            <SubmissionForm 
-              challengeId={challenge.id} 
-              submissionId={userSubmission.id} 
+            <SubmissionForm
+              challengeId={challenge.id}
+              submissionId={userSubmission.id}
               initialSubmission={userSubmission}
               expectedOutputs={expectedOutputsArray}
               onSuccess={handleSubmissionUpdate}

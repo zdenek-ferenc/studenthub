@@ -85,7 +85,7 @@ export default function LanguageSelectorEdit({ onSelectionChange, initialSelecte
                 key={lang.id}
                 type="button"
                 onClick={() => handleToggleLanguage(lang.id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--barva-primarni2)] text-[var(--barva-primarni)] rounded-full text-sm font-semibold hover:opacity-70 transition-all ease-in-out duration-300 cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-sm font-semibold hover:opacity-70 transition-all ease-in-out duration-300 cursor-pointer"
               >
                 {lang.name}
                 <X size={14} />
@@ -111,7 +111,7 @@ export default function LanguageSelectorEdit({ onSelectionChange, initialSelecte
               key={lang.id}
               type="button"
               onClick={() => handleToggleLanguage(lang.id)}
-              className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-full text-sm hover:bg-[var(--barva-svetle-pozadi)] hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-colors"
+              className="px-3 py-1.5 bg-white border border-gray-400 cursor-pointer text-gray-700 rounded-full text-sm hover:bg-[var(--barva-svetle-pozadi)] hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-colors"
             >
               + {lang.name}
             </button>

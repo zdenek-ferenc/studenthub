@@ -20,7 +20,7 @@ type Submission = {
 export default function ProfilePortfolioSection({ submissions }: { submissions: Submission[] }) {
     return (
         <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
-            <h2 className="text-2xl font-bold text-[var(--barva-tmava)] mb-4">Portfolio úspěchů</h2>
+            <h2 className="text-xl font-bold text-[var(--barva-tmava)] mb-4">Portfolio úspěchů</h2>
             {submissions && submissions.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {submissions.map((sub, index) => (

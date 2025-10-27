@@ -11,8 +11,8 @@ export default function HomePage() {
     <>
         <div className="w-full overflow-x-hidden text-[var(--barva-tmava)] !pt-0">
             <header className="relative h-screen min-h-[700px] flex items-center justify-center text-white bg-[var(--barva-tmava)] overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-20">
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[var(--barva-primarni)] via-[var(--barva-tmava)] to-black"></div>
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 smooth-shimmer-bg opacity-40"></div>
                 </div>
                 <div className="container mx-auto text-center relative z-10 px-4 sm:px-6">
                     <h1 className="text-4xl sm:text-5xl md:text-6xl 3xl:text-8xl font-extrabold tracking-tighter leading-tight">

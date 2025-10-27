@@ -33,13 +33,10 @@ function EditProfilePage() {
             <span className="text-[var(--barva-primarni)] transition-colors group-hover:text-[var(--barva-primarni)]">
               <ChevronLeft size={25} />
             </span>
-            <span className="text-gray-500 text-sm 3xl:text-base transition-colors group-hover:text-[var(--barva-primarni)]">
+            <span className="text-gray-500 text-sm 3xl:text-base leading-none transition-colors group-hover:text-[var(--barva-primarni)]">
               Zpět na profil
             </span>
           </Link>
-          <h1 className="text-2xl 3xl:text-3xl font-bold text-[var(--barva-tmava)] mt-2">
-            Upravit profil
-          </h1>
           </div>
               {renderForm()}
             </div>
