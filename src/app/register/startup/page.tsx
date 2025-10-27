@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '../../../lib/supabaseClient';
-import { Session, User, Provider, PostgrestError } from '@supabase/supabase-js';
+import { Session, User, Provider } from '@supabase/supabase-js';
 
 import Step1_CompanyInfo from './steps/Step1_CompanyInfo';
 import Step2_ContactPerson from './steps/Step2_ContactPerson';
@@ -19,7 +19,7 @@ type Category = { id: string; name: string; };
 
 const IS_DEVELOPMENT_MODE = false;
 const DEV_START_STEP = 2;
-const TOTAL_STEPS = 4; 
+const TOTAL_STEPS = 4;
 
 type StartupRegistrationData = {
     company_name: string; ico: string; website: string; phone_number: string; contact_email: string; address: string;
@@ -68,7 +68,7 @@ const RegistrationHeader = ({ currentStep, onBack, isLoading }: { currentStep: n
 };
 
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
-    
+
     const handleLogin = async () => {
         const redirectPath = '/register/startup';
         const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
@@ -112,8 +112,8 @@ export default function StartupRegistrationPage() {
     const [authInitialized, setAuthInitialized] = useState(IS_DEVELOPMENT_MODE);
     const [localProfileLoaded, setLocalProfileLoaded] = useState(IS_DEVELOPMENT_MODE);
 
-    
-    
+
+
     const loadInitialProfileData = useCallback(async (userId: string): Promise<number | null> => {
         setIsSaving(true);
         setError(null);
@@ -127,8 +127,8 @@ export default function StartupRegistrationPage() {
 
             if (selectError) {
                 console.error("Chyba při načítání profilu (loadInitialProfileData):", selectError);
-                if (selectError.message.includes("multiple (or no) rows returned") || selectError.code === 'PGRST116') { 
-                     
+                if (selectError.message.includes("multiple (or no) rows returned") || selectError.code === 'PGRST116') {
+
                      if(selectError.code !== 'PGRST116') {
                         setError("Chyba databáze: Nalezeno více profilů pro jednoho uživatele.");
                      } else {
@@ -137,7 +137,7 @@ export default function StartupRegistrationPage() {
                 } else {
                     setError(`Nepodařilo se načíst data profilu: ${selectError.message}`);
                 }
-                
+
                 return null;
             }
 
@@ -150,44 +150,47 @@ export default function StartupRegistrationPage() {
                 }));
                 const currentDBStep = data.registration_step || 2;
                 console.log(`loadInitialProfileData: Profil načten, DB krok je ${currentDBStep}.`);
-                
+
                 return currentDBStep;
             }
 
-            
+
              console.log("Profil startupu nenalezen (loadInitialProfileData - konec).");
              return null;
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Neočekávaná chyba v catch bloku loadInitialProfileData:", err);
-            setError(`Nepodařilo se načíst data profilu: ${err.message || 'Neznámá chyba'}`);
-            
+            if (err instanceof Error) {
+                setError(`Nepodařilo se načíst data profilu: ${err.message || 'Neznámá chyba'}`);
+            } else {
+                 setError(`Nepodařilo se načíst data profilu: Neznámá chyba`);
+            }
             return null;
         } finally {
             setIsSaving(false);
              console.log("loadInitialProfileData: Dokončeno.");
         }
-    
-    }, [setError]);
 
-    
+    }, [setError, step, isSaving]);
+
+
     const handleUserSignedIn = useCallback(async (session: Session) => {
         if (!session?.user) {
              setError("Nepodařilo se získat informace o uživateli.");
-             if (loading) setLoading(false); 
+             if (loading) setLoading(false);
              return;
          }
         const userId = session.user.id;
         console.log(`handleUserSignedIn (startup) voláno pro userId: ${userId}`);
 
-        
+
         if (isSaving) {
             console.log("handleUserSignedIn: Přeskakuji, protože isSaving je true.");
             return;
         }
 
         try {
-             setIsSaving(true); 
+             setIsSaving(true);
 
             const { data: existingUser, error: selectUserError } = await supabase
                 .from('User')
@@ -197,7 +200,7 @@ export default function StartupRegistrationPage() {
 
             if (selectUserError) {
                 console.error("Chyba RLS (406?) při kontrole User:", selectUserError);
-                
+
             }
 
             if (existingUser && existingUser.role !== 'startup') {
@@ -206,11 +209,11 @@ export default function StartupRegistrationPage() {
                 setUser(null); setSession(null);
                 setAuthInitialized(false); setLocalProfileLoaded(false);
                 setLoading(false);
-                setIsSaving(false); 
+                setIsSaving(false);
                 return;
             }
 
-            
+
             let loadedDBStep: number | null = null;
 
             if (existingUser) {
@@ -218,19 +221,18 @@ export default function StartupRegistrationPage() {
                 if (!localProfileLoaded) {
                      console.log("Profil startupu ještě nebyl načten, volám loadInitialProfileData...");
                      loadedDBStep = await loadInitialProfileData(userId);
-                     if (loadedDBStep !== null) { 
+                     if (loadedDBStep !== null) {
                          setLocalProfileLoaded(true);
                          console.log("Profil startupu úspěšně načten, localProfileLoaded=true");
                      } else {
                          console.log("Načítání profilu selhalo nebo profil nenalezen.");
-                         
-                         
-                         
-                         
+
+
+
                      }
                 } else {
                      console.log("Profil startupu již byl načten (localProfileLoaded=true).");
-                     
+
                 }
             } else {
                  console.log(`Uživatel (startup) ${userId} nenalezen (nebo RLS selhal), vytvářím nové záznamy...`);
@@ -244,17 +246,17 @@ export default function StartupRegistrationPage() {
                      .insert({ user_id: userId, registration_step: 2, contact_email: session.user.email });
                  if (profileInsertError && !profileInsertError.message.includes('duplicate key') && !profileInsertError.message.includes('startup_profile_user_id_key')) { throw profileInsertError; }
 
-                
+
                  loadedDBStep = 2;
                  setFormDataCache(prev => ({ ...prev, contact_email: session.user.email || '' }));
-                 setLocalProfileLoaded(true); 
+                 setLocalProfileLoaded(true);
                  console.log("Nový uživatel a profil startupu vytvořen, krok=2, localProfileLoaded=true");
             }
 
-             
-             const targetStep = loadedDBStep ?? step; 
 
-             
+             const targetStep = loadedDBStep ?? step;
+
+
              if (step !== targetStep) {
                  console.log(`Nastavuji krok UI na ${targetStep}`);
                  setStep(targetStep);
@@ -263,7 +265,7 @@ export default function StartupRegistrationPage() {
              }
 
 
-            
+
              if (targetStep >= 6) {
                  console.log(`Registrace startupu dokončena (krok ${targetStep}), přesměrovávám na /challenges`);
                  if (typeof window !== 'undefined') {
@@ -274,24 +276,28 @@ export default function StartupRegistrationPage() {
                  console.log(`Pokračuji v registraci startupu na kroku ${targetStep}`);
              }
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Chyba v handleUserSignedIn (startup):", err);
-            setError(`Nastala chyba při zpracování přihlášení: ${err.message || 'Neznámá chyba'}. Zkuste to prosím znovu.`);
-            
+            if (err instanceof Error) {
+                 setError(`Nastala chyba při zpracování přihlášení: ${err.message}. Zkuste to prosím znovu.`);
+            } else {
+                setError(`Nastala chyba při zpracování přihlášení: Neznámá chyba. Zkuste to prosím znovu.`);
+            }
+
         } finally {
-             setIsSaving(false); 
+             setIsSaving(false);
              if (loading) {
                  console.log("handleUserSignedIn (startup) dokončil hlavní loading.");
                  setLoading(false);
             }
         }
-    
-    
-    }, [router, loadInitialProfileData, localProfileLoaded, loading, setError]); 
 
-    
+
+    }, [router, loadInitialProfileData, localProfileLoaded, loading, setError, isSaving, step]);
+
+
     const saveStepData = useCallback(async (currentStep: number, data: StartupRegistrationData) => {
-        
+
         if (!user || isSaving) return;
          setIsSaving(true);
          console.log(`Ukládám (startup) krok ${currentStep} pro uživatele ${user.id}`);
@@ -359,25 +365,25 @@ export default function StartupRegistrationPage() {
                   console.error("Neznámá chyba při ukládání (startup) na pozadí:", error);
                   setError("Uložení selhalo z neznámého důvodu.");
               }
-              
+
               throw error;
 
          } finally {
              setIsSaving(false);
              console.log(`Ukládání (startup) kroku ${currentStep} dokončeno.`);
          }
-    
+
     }, [user, isSaving, setError]);
 
-    
+
     const handleNextStep = async (formData: FormDataStep) => {
-        
+
         setError(null);
         const newCache = { ...formDataCache, ...formData };
         setFormDataCache(newCache);
 
         try {
-            await saveStepData(step, newCache); 
+            await saveStepData(step, newCache);
             const nextStep = step + 1;
 
             if (nextStep > 5) {
@@ -392,14 +398,14 @@ export default function StartupRegistrationPage() {
 
         } catch (error) {
             console.log("Ukládání selhalo, zůstávám na kroku:", step);
-            
+
         }
     };
 
 
-    
+
     useEffect(() => {
-        
+
          const fetchStaticData = async () => {
              if (staticDataLoaded) return;
              try {
@@ -421,12 +427,12 @@ export default function StartupRegistrationPage() {
          }
     }, [staticDataLoaded, loading, authInitialized]);
 
-    
+
     useEffect(() => {
          console.log(`Auth useEffect (startup) spuštěn: authInit=${authInitialized}, loading=${loading}, user=${!!user}, profileLoaded=${localProfileLoaded}`);
 
         if (authInitialized || IS_DEVELOPMENT_MODE) {
-            
+
              if (IS_DEVELOPMENT_MODE && !user) {
                   setUser({ id: 'dev-user-startup' } as User);
                   setSession({} as Session);
@@ -443,30 +449,30 @@ export default function StartupRegistrationPage() {
         supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
             console.log("getSession (startup) výsledek:", !!currentSession);
             initialCheckDone = true;
-            if (!isSubscribed || authInitialized) { 
+            if (!isSubscribed || authInitialized) {
                  console.log("getSession: Přeskakuji zpracování (unsubscribed nebo už inicializováno).");
                  return;
             }
 
-            
+
             setAuthInitialized(true);
             console.log("Auth inicializace nastavena na true v getSession.");
 
             if (currentSession) {
                 const currentUserForGetSession = currentSession.user;
                 console.log("Nalezena session (startup), nastavuji uživatele...");
-                setUser(currentUserForGetSession); 
+                setUser(currentUserForGetSession);
                 setSession(currentSession);
 
-                
-                
+
+
                 if (!localProfileLoaded) {
                      console.log("getSession: Profil ještě nebyl načten (localProfileLoaded=false), volám handleUserSignedIn...");
                      await handleUserSignedIn(currentSession);
                 } else {
                      console.log("getSession: Profil už byl načten (localProfileLoaded=true), přeskočeno volání handleUserSignedIn.");
-                     
-                     const currentDBStep = formDataCache.registration_step || 2; 
+
+                     const currentDBStep = formDataCache.registration_step || 2;
                      if (currentDBStep >= 6) {
                         console.log("getSession: Registrace vypadá dokončená, přesměrovávám.");
                         if (typeof window !== 'undefined') { sessionStorage.setItem('justFinishedRegistration', 'true');}
@@ -475,17 +481,17 @@ export default function StartupRegistrationPage() {
                 }
             } else {
                 console.log("Session (startup) nenalezena.");
-                setLoading(false); 
+                setLoading(false);
             }
 
-            
+
 
         }).catch(err => {
              console.error("Chyba v getSession (startup):", err);
              if (isSubscribed) {
                  setError("Chyba při ověřování session.");
                  setLoading(false);
-                 setAuthInitialized(true); 
+                 setAuthInitialized(true);
              }
         });
 
@@ -494,31 +500,31 @@ export default function StartupRegistrationPage() {
             if (!isSubscribed) return;
 
             const currentUser = newSession?.user ?? null;
-            const previousUserId = user?.id; 
+            const previousUserId = user?.id;
 
-             
+
              setSession(newSession);
              setUser(currentUser);
 
 
             if (currentUser?.id !== previousUserId) {
                 console.log("onAuthStateChange: Uživatel se změnil, resetuji localProfileLoaded.");
-                setLocalProfileLoaded(false); 
-                 setAuthInitialized(false); 
-                 setLoading(true); 
-                 return; 
+                setLocalProfileLoaded(false);
+                 setAuthInitialized(false);
+                 setLoading(true);
+                 return;
             }
 
-            
+
             if (!initialCheckDone && !loading) {
                  console.log("onAuthStateChange dokončil loading (před getSession?).");
                  setLoading(false);
-                 
+
              }
 
             if (_event === 'SIGNED_IN' && newSession) {
-                 
-                 
+
+
                  if (!localProfileLoaded) {
                      console.log("onAuthStateChange: SIGNED_IN, profil nebyl načten, volám handleUserSignedIn...");
                      await handleUserSignedIn(newSession);
@@ -530,8 +536,8 @@ export default function StartupRegistrationPage() {
                 setStep(1);
                 setFormDataCache(initialStartupFormData);
                 setLocalProfileLoaded(false);
-                setAuthInitialized(false); 
-                setLoading(false); 
+                setAuthInitialized(false);
+                setLoading(false);
             }
         });
 
@@ -540,13 +546,12 @@ export default function StartupRegistrationPage() {
             isSubscribed = false;
             subscription?.unsubscribe();
         };
-    
-    }, [authInitialized, handleUserSignedIn, loadInitialProfileData, user, localProfileLoaded, loading, router, formDataCache.registration_step]); 
+
+    }, [authInitialized, handleUserSignedIn, loadInitialProfileData, user, localProfileLoaded, loading, router, formDataCache.registration_step]);
 
 
-    
     const handleEmailRegister = async (e: React.FormEvent) => {
-        
+
          e.preventDefault();
          setError(null);
          setLoading(true);
@@ -569,21 +574,25 @@ export default function StartupRegistrationPage() {
              } else {
                  setIsModalOpen(true);
              }
-         } catch(err: any) {
-              setError(`Nastala neočekávaná chyba: ${err.message}`);
+         } catch(err: unknown) {
+              if (err instanceof Error) {
+                  setError(`Nastala neočekávaná chyba: ${err.message}`);
+              } else {
+                   setError(`Nastala neočekávaná chyba.`);
+              }
          } finally {
              setLoading(false);
          }
     };
 
-    
+
     const renderStep = () => {
-        
+
           if (!user && !IS_DEVELOPMENT_MODE) {
               if (step === 1) return null;
-              
+
               if(loading || step !== 1) return <div className="py-10"><LoadingSpinner/></div>;
-              return null; 
+              return null;
           }
           if (!staticDataLoaded && step === 4) {
                return <div className="py-10"><LoadingSpinner /></div>;
@@ -592,7 +601,7 @@ export default function StartupRegistrationPage() {
                return <div className="py-10"><LoadingSpinner /></div>;
           }
           if (!user && !IS_DEVELOPMENT_MODE && step > 1) {
-              
+
               return <div className="py-10"><LoadingSpinner/></div>;
           }
           const currentUserId = user ? user.id : 'dev-user-startup';
@@ -602,17 +611,17 @@ export default function StartupRegistrationPage() {
              case 3: return <Step2_ContactPerson onNext={handleNextStep} initialData={formDataCache} />;
              case 4: return <Step3_Categories onNext={handleNextStep} allCategories={allCategories} isLoading={!staticDataLoaded} initialSelectedIds={formDataCache.categories} />;
              case 5: return <Step4_LogoUpload onNext={handleNextStep} userId={currentUserId} />;
-             default: return null; 
+             default: return null;
          }
     };
 
-    
-    
+
+
     if (loading && !authInitialized) {
         return <div className="w-full min-h-screen flex items-center justify-center bg-[var(--barva-svetle-pozadi)]"><LoadingSpinner /></div>;
     }
 
-    
+
     return (
         <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4">
             {session ? (
@@ -628,7 +637,7 @@ export default function StartupRegistrationPage() {
                     {renderStep()}
                 </div>
             ) : (
-                 
+                
                  <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-md overflow-hidden my-6 md:my-32">
                      <div className="p-8 sm:p-12 flex flex-col justify-center">
                          <div>

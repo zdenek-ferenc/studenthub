@@ -41,9 +41,7 @@ const initialStudentFormData: StudentRegistrationData = {
 
 
 const RegistrationHeader = ({ currentStep, onBack, isLoading }: { currentStep: number, onBack: () => void, isLoading: boolean }) => {
-    
     const stepIndex = Math.max(0, currentStep - 2); 
-    
     const progressPercentage = (stepIndex / TOTAL_STEPS) * 100;
 
     return (
@@ -51,7 +49,6 @@ const RegistrationHeader = ({ currentStep, onBack, isLoading }: { currentStep: n
             <div className="flex items-center justify-between mb-2">
                 <button
                     onClick={onBack}
-                    
                     disabled={currentStep <= 2 || isLoading}
                     className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
@@ -75,7 +72,6 @@ const RegistrationHeader = ({ currentStep, onBack, isLoading }: { currentStep: n
 
 
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
-    
     const handleLogin = async () => {
         const redirectPath = '/register/student';
         const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
@@ -119,8 +115,8 @@ export default function StudentRegistrationPage() {
     const [authInitialized, setAuthInitialized] = useState(IS_DEVELOPMENT_MODE);
     const [localProfileLoaded, setLocalProfileLoaded] = useState(IS_DEVELOPMENT_MODE);
 
-    
-    const loadInitialProfileData = useCallback(async (userId: string) => {
+
+    const loadInitialProfileData = useCallback(async (userId: string): Promise<number> => {
         setIsSaving(true);
         try {
             const { data } = await supabase
@@ -137,13 +133,13 @@ export default function StudentRegistrationPage() {
                     languages: data.StudentLanguage?.map((l: { language_id: string }) => l.language_id) || [],
                 }));
                 const currentDBStep = data.registration_step || 2;
-                
+
                 setStep(prevStep => Math.max(prevStep, currentDBStep));
                 console.log(`Profil načten, krok nastaven/ponechán na ${Math.max(step, currentDBStep)}`);
                 return currentDBStep;
             }
              console.log("Profil nenalezen, nový uživatel nebo chyba.");
-             setStep(prevStep => Math.max(prevStep, 2)); 
+             setStep(prevStep => Math.max(prevStep, 2));
              return 2;
         } catch (err) {
             console.error("Chyba při načítání profilu studenta:", err);
@@ -153,11 +149,11 @@ export default function StudentRegistrationPage() {
         } finally {
             setIsSaving(false);
         }
-    }, [step, setError]); 
+    }, [step, setError, isSaving]);
 
-    
+
     const handleUserSignedIn = useCallback(async (session: Session) => {
-        
+
          if (!session?.user) {
              setError("Nepodařilo se získat informace o uživateli.");
              setLoading(false);
@@ -167,7 +163,7 @@ export default function StudentRegistrationPage() {
          console.log(`handleUserSignedIn voláno pro userId: ${userId}`);
 
          try {
-             
+
              const { data: existingUser } = await supabase
                  .from('User')
                  .select('id, role')
@@ -179,7 +175,7 @@ export default function StudentRegistrationPage() {
                  await supabase.auth.signOut();
                  setUser(null);
                  setSession(null);
-                 setAuthInitialized(false); 
+                 setAuthInitialized(false);
                  setLocalProfileLoaded(false);
                  setLoading(false);
                  return;
@@ -188,18 +184,18 @@ export default function StudentRegistrationPage() {
              let currentRegistrationStep = 1;
              if (existingUser) {
                  console.log(`Uživatel ${userId} nalezen v User tabulce.`);
-                 
+
                  if (!localProfileLoaded) {
                       console.log("Profil ještě nebyl načten, volám loadInitialProfileData...");
                       currentRegistrationStep = await loadInitialProfileData(userId);
                       setLocalProfileLoaded(true);
                  } else {
                       console.log("Profil již byl načten, používám krok ze stavu:", step);
-                      currentRegistrationStep = step; 
+                      currentRegistrationStep = step;
                  }
 
              } else {
-                 
+
                  console.log(`Uživatel ${userId} nenalezen, vytvářím nové záznamy...`);
                  const { error: userInsertError } = await supabase
                      .from('User')
@@ -208,7 +204,7 @@ export default function StudentRegistrationPage() {
 
                  const { error: profileInsertError } = await supabase
                      .from('StudentProfile')
-                     .insert({ user_id: userId, registration_step: 2, level: 1, xp: 0 }); 
+                     .insert({ user_id: userId, registration_step: 2, level: 1, xp: 0 });
                  if (profileInsertError) throw profileInsertError;
 
                  currentRegistrationStep = 2;
@@ -217,42 +213,46 @@ export default function StudentRegistrationPage() {
                  console.log("Nový uživatel a profil vytvořen, krok nastaven na 2.");
              }
 
-             
+
               if (currentRegistrationStep >= 6) {
                   console.log(`Registrace dokončena (krok ${currentRegistrationStep}), přesměrovávám na /dashboard`);
                   router.push('/dashboard');
              } else {
                   console.log(`Pokračuji v registraci na kroku ${currentRegistrationStep}`);
-                  
+
                   if (step !== currentRegistrationStep) {
                       setStep(currentRegistrationStep);
                   }
              }
 
-         } catch (err: any) {
+         } catch (err: unknown) {
              console.error("Chyba v handleUserSignedIn:", err);
-             setError(`Nastala chyba při zpracování přihlášení: ${err.message || 'Neznámá chyba'}. Zkuste to prosím znovu.`);
+            if (err instanceof Error) {
+                setError(`Nastala chyba při zpracování přihlášení: ${err.message || 'Neznámá chyba'}. Zkuste to prosím znovu.`);
+            } else {
+                 setError(`Nastala chyba při zpracování přihlášení: Neznámá chyba. Zkuste to prosím znovu.`);
+            }
              await supabase.auth.signOut().catch(e => console.error("Chyba při odhlášení po chybě:", e));
              setUser(null);
              setSession(null);
              setAuthInitialized(false);
              setLocalProfileLoaded(false);
          } finally {
-              
+
               if (loading) {
                   console.log("handleUserSignedIn dokončil hlavní loading.");
                   setLoading(false);
              }
          }
-    }, [router, loadInitialProfileData, localProfileLoaded, step, loading, setError]); 
+    }, [router, loadInitialProfileData, localProfileLoaded, step, loading, setError]);
 
-    
+
     const saveStepData = useCallback(async (currentStep: number, data: StudentRegistrationData) => {
-        
+
          if (!user || isSaving) return;
          setIsSaving(true);
          console.log(`Ukládám krok ${currentStep} pro uživatele ${user.id}`);
-         setError(null); 
+         setError(null);
 
          try {
              let updateData: Partial<StudentRegistrationData> = {};
@@ -281,7 +281,7 @@ export default function StudentRegistrationPage() {
                      break;
              }
 
-             
+
              if (Object.keys(updateData).length > 0) {
                  const { error: profileUpdateError } = await supabase
                      .from('StudentProfile')
@@ -291,14 +291,14 @@ export default function StudentRegistrationPage() {
                  console.log(`Profil aktualizován pro krok ${currentStep}`);
              }
 
-              
+
               if (relatedTableData) {
                   if (relatedTableData.deleteCondition) {
                       const { error: deleteError } = await supabase
                           .from(relatedTableData.table)
                           .delete()
                           .match(relatedTableData.deleteCondition);
-                      
+
                       if (deleteError && deleteError.code !== 'PGRST204') throw deleteError;
                       console.log(`Staré záznamy smazány (nebo neexistovaly) z ${relatedTableData.table}`);
                   }
@@ -311,8 +311,8 @@ export default function StudentRegistrationPage() {
                   }
               }
 
-             
-             const nextStepInDB = Math.min(currentStep + 1, 6); 
+
+             const nextStepInDB = Math.min(currentStep + 1, 6);
              const { error: stepUpdateError } = await supabase
                  .from('StudentProfile')
                  .update({ registration_step: nextStepInDB })
@@ -324,57 +324,57 @@ export default function StudentRegistrationPage() {
              console.error("Detailní chyba při ukládání na pozadí:", error);
               if (error instanceof Error) {
                   console.error("Chyba při ukládání na pozadí (message):", error.message);
-                  setError(`Uložení selhalo: ${error.message}`); 
+                  setError(`Uložení selhalo: ${error.message}`);
               } else {
                   console.error("Neznámá chyba při ukládání na pozadí:", error);
                   setError("Uložení selhalo z neznámého důvodu.");
               }
-              
-              setStep(currentStep); 
-              throw error; 
+
+              setStep(currentStep);
+              throw error;
 
          } finally {
              setIsSaving(false);
              console.log(`Ukládání kroku ${currentStep} dokončeno.`);
          }
-    }, [user, isSaving, setStep, setError]); 
+    }, [user, isSaving, setStep, setError]);
 
-    
+
     const handleNextStep = async (formData: FormDataStep) => {
-        setError(null); 
+        setError(null);
         const newCache = { ...formDataCache, ...formData };
         setFormDataCache(newCache);
 
         try {
-            
+
             await saveStepData(step, newCache);
 
             const nextStep = step + 1;
 
-            
-            if (nextStep > 5) { 
+
+            if (nextStep > 5) {
                 console.log("Poslední krok uložen, nastavuji flag a přesměrovávám...");
-                
+
                 if (typeof window !== 'undefined') {
                     sessionStorage.setItem('justFinishedRegistration', 'true');
                 }
                 router.push('/dashboard');
             } else {
-                setStep(nextStep); 
+                setStep(nextStep);
             }
         } catch (error) {
             console.log("Ukládání selhalo, zůstávám na kroku:", step);
-            
+
         }
     };
 
 
-    
+
     useEffect(() => {
-        
+
          const fetchStaticData = async () => {
              if (staticDataLoaded) return;
-             
+
              try {
                  const [skillsRes, languagesRes] = await Promise.all([
                      supabase.from('Skill').select('id, name').order('name'),
@@ -388,22 +388,22 @@ export default function StudentRegistrationPage() {
                  console.error("Chyba při načítání skills/languages:", err);
                  setError("Nepodařilo se načíst potřebná data pro formulář.");
              } finally {
-                  
+
                   if (loading && authInitialized) {
                      setLoading(false);
                   }
              }
          };
-         
-         
+
+
          if (!staticDataLoaded) {
               fetchStaticData();
          }
     }, [staticDataLoaded, loading, authInitialized]);
 
-    
+
     useEffect(() => {
-        
+
         if (authInitialized || IS_DEVELOPMENT_MODE) {
             if (IS_DEVELOPMENT_MODE && !user) {
                  setUser({ id: 'dev-user-student' } as User);
@@ -426,16 +426,16 @@ export default function StudentRegistrationPage() {
                 if (currentSession) {
                      const currentUserForGetSession = currentSession.user;
                      console.log("Nalezena session, nastavuji uživatele...");
-                     setUser(currentUserForGetSession); 
+                     setUser(currentUserForGetSession);
                      setSession(currentSession);
-                    
-                    if (!user) { 
+
+                    if (!user) {
                         console.log("Volám handleUserSignedIn z getSession...");
                         await handleUserSignedIn(currentSession);
                     } else {
                          console.log("Přeskakuji handleUserSignedIn v getSession (user už byl nastaven).");
-                         
-                         
+
+
                          if (!localProfileLoaded) {
                              console.log("Profil ještě nebyl načten v getSession, volám loadInitialProfileData...");
                              await loadInitialProfileData(currentUserForGetSession.id);
@@ -465,7 +465,7 @@ export default function StudentRegistrationPage() {
             const currentUser = newSession?.user ?? null;
             const previousUserId = user?.id;
 
-              
+
               setUser(currentUser);
               setSession(newSession);
 
@@ -491,9 +491,9 @@ export default function StudentRegistrationPage() {
             } else if (_event === 'SIGNED_OUT') {
                 console.log("Uživatel odhlášen, resetuji stav.");
                 setStep(1);
-                setFormDataCache(initialStudentFormData); 
+                setFormDataCache(initialStudentFormData);
                 setLocalProfileLoaded(false);
-                setAuthInitialized(false); 
+                setAuthInitialized(false);
             }
         });
 
@@ -504,12 +504,12 @@ export default function StudentRegistrationPage() {
         };
     }, [authInitialized, handleUserSignedIn, loadInitialProfileData, user, localProfileLoaded, loading]);
 
-    
+
     const handleEmailRegister = async (e: React.FormEvent) => {
-        
+
           e.preventDefault();
           setError(null);
-          setLoading(true); 
+          setLoading(true);
           try {
               const { data: existingUser } = await supabase.from('User').select('email').eq('email', email).single();
               if (existingUser) {
@@ -527,27 +527,31 @@ export default function StudentRegistrationPage() {
               if (signUpError) {
                   setError(`Registrace se nezdařila: ${signUpError.message}`);
               } else {
-                  setIsModalOpen(true); 
+                  setIsModalOpen(true);
               }
-          } catch (err: any) {
-               setError(`Nastala neočekávaná chyba: ${err.message}`);
+          } catch (err: unknown) {
+               if (err instanceof Error) {
+                  setError(`Nastala neočekávaná chyba: ${err.message}`);
+               } else {
+                   setError(`Nastala neočekávaná chyba.`);
+               }
           } finally {
-              setLoading(false); 
+              setLoading(false);
           }
     };
 
-    
+
     const renderStep = () => {
-        
+
           if (!user && !IS_DEVELOPMENT_MODE) {
               if (step === 1) return null;
-              return <div className="py-10"><LoadingSpinner/></div>; 
+              return <div className="py-10"><LoadingSpinner/></div>;
           }
           if (!staticDataLoaded && (step === 4 || step === 5)) {
                return <div className="py-10"><LoadingSpinner /></div>;
           }
-          
-          const currentUserId = user ? user.id : 'dev-user-student'; 
+
+          const currentUserId = user ? user.id : 'dev-user-student';
 
           switch (step) {
               case 2: return <Step1_PersonalInfo onNext={handleNextStep} initialData={formDataCache} />;
@@ -558,12 +562,12 @@ export default function StudentRegistrationPage() {
           }
     };
 
-    
+
     if (loading) {
         return <div className="w-full min-h-screen flex items-center justify-center bg-[var(--barva-svetle-pozadi)]"><LoadingSpinner /></div>;
     }
 
-    
+
     return (
         <div className="w-full min-h-screen flex items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4">
             {session ? (
