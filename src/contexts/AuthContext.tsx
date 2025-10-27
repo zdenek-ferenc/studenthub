@@ -63,36 +63,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
+        const { data: { session } } = await supabase.auth.getSession();
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
 
-      if (currentUser) {
-        const fetchedProfile = await fetchAndSetProfile(currentUser);
-        if (fetchedProfile) {
-          const isRegistrationIncomplete = fetchedProfile.registration_step && fetchedProfile.registration_step < 6;
-          const onRegistrationPage = pathname.startsWith('/register/');
-          if (isRegistrationIncomplete && !onRegistrationPage) {
-            router.push(`/register/${fetchedProfile.role}`);
-          }
+        if (currentUser) {
+            const fetchedProfile = await fetchAndSetProfile(currentUser);
+            if (fetchedProfile) {
+                const isRegistrationIncomplete = fetchedProfile.registration_step && fetchedProfile.registration_step < 6;
+                const onRegistrationPage = pathname.startsWith('/register/');
+                const justFinishedRegistration = typeof window !== 'undefined' ? sessionStorage.getItem('justFinishedRegistration') : null;
+
+                if (justFinishedRegistration && pathname !== `/register/${fetchedProfile.role}`) {
+                     if (typeof window !== 'undefined') {
+                        sessionStorage.removeItem('justFinishedRegistration');
+                     }
+                     console.log("AuthContext: Detekováno dokončení registrace, přeskočena kontrola přesměrování.");
+                } else if (isRegistrationIncomplete && !onRegistrationPage) {
+                    console.log(`AuthContext: Nedokončená registrace (krok ${fetchedProfile.registration_step}), přesměrovávám na /register/${fetchedProfile.role}`);
+                    router.push(`/register/${fetchedProfile.role}`);
+                } else if (!isRegistrationIncomplete && onRegistrationPage) {
+                     console.log("AuthContext: Registrace dokončena, ale stále na registrační stránce. Přesměrovávám pryč.");
+                     router.push(fetchedProfile.role === 'student' ? '/dashboard' : '/challenges');
+                }
+            }
         }
-      }
-      setLoading(false);
+        setLoading(false);
     };
 
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      fetchAndSetProfile(session?.user ?? null);
+        const currentUser = session?.user ?? null;
+         if (currentUser?.id !== user?.id && typeof window !== 'undefined') {
+             sessionStorage.removeItem('justFinishedRegistration');
+         }
+        setUser(currentUser);
+        fetchAndSetProfile(currentUser);
     });
 
+
     return () => {
-      subscription.unsubscribe();
+        subscription.unsubscribe();
     };
-  }, [fetchAndSetProfile, pathname, router]);
+}, [fetchAndSetProfile, pathname, router, user?.id]);
 
 
   const refetchProfile = useCallback(async () => {
