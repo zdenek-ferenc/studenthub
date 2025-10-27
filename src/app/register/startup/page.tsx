@@ -314,7 +314,7 @@ export default function StartupRegistrationPage() {
          let relatedTableData: {
              table: string;
              data: RelatedTableInsertData[]; 
-             deleteCondition?: Record<string, any>;
+             deleteCondition?: Record<string, string>;
          } | null = null;
          // ------------------------------
 

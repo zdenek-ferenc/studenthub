@@ -272,7 +272,7 @@ export default function StudentRegistrationPage() {
              let relatedTableData: {
                  table: string;
                  data: RelatedTableInsertData[]; 
-                 deleteCondition?: Record<string, any>;
+                 deleteCondition?: Record<string, string>;
              } | null = null;
 
              switch (currentStep) {
