@@ -107,7 +107,7 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
                         alt="Profilový obrázek"
                         width={150} 
                         height={150}
-                        className="w-full h-full object-cover" 
+                        className="w-full h-full object-cover rounded-full border border-white" 
                         key={imageUrl} 
                     />
                 ) : (
