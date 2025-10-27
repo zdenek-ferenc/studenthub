@@ -39,7 +39,7 @@ return (
                     <Plus size={18} />
                     <span>Vytvořit výzvu</span>
                 </Link>
-                <Link href="/profile/recruitment" className="px-5 py-2 3xl:py-2.5  rounded-full bg-white border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-colors flex items-center gap-2 text-xs 3xl:text-sm">
+                <Link href="/profile/recruitment" className="px-5 py-2 3xl:py-2.5  rounded-full bg-white hover:bg-blue-100/50 border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-all ease-in-out duration-200 flex items-center gap-2 text-xs 3xl:text-sm">
                     <Settings size={16} />
                     <span>Centrum pro nábor</span>
                 </Link>
@@ -61,7 +61,7 @@ return (
                     <div className='flex justify-between gap-8'>
                         <p className="text-3xl 3xl:text-5xl font-bold text-[var(--barva-primarni)] md:mt-4">{stats.unreviewedSubmissionsCount}</p>
                         {stats.unreviewedSubmissionsCount > 0 && (
-                        <div className="mt-4 text-xs md:text-sm font-semibold text-gray-500 flex items-center cursor-pointer">
+                        <div className="mt-4 text-xs md:text-sm font-semibold text-gray-500 hover:text-gray-600 transition-all ease-in-out duration-200 flex items-center cursor-pointer">
                             <p>Zobrazit</p>&nbsp;<span className="hidden md:block">přehled</span>  <ChevronDown className={`ml-1 transition-transform ${open ? 'rotate-180' : ''}`} size={16} />
                         </div>
                         )}
@@ -115,7 +115,7 @@ return (
                     <Plus size={18} />
                     <span>Vytvořit výzvu</span>
                 </Link>
-                <Link href="/profile/recruitment" className="px-5 py-1.5 3xl:py-2.5  rounded-full bg-white border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-colors flex items-center gap-2 text-xs md:text-sm">
+                <Link href="/profile/recruitment" className="px-5 py-1.5 3xl:py-2.5 rounded-full bg-white hover:bg-sky-200 border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-all flex items-center gap-2 text-xs md:text-sm">
                     <Settings size={16} />
                     <span>Centrum pro nábor</span>
                 </Link>

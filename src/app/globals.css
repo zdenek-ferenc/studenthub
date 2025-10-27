@@ -49,7 +49,7 @@ body {
 }
 
 .input2 {
-  @apply w-full text-left border border-gray-300 rounded-2xl px-12 py-3 font-semibold text-black;
+  @apply w-full text-left border border-gray-300 rounded-xl px-12 py-3 font-semibold text-black;
   @apply focus:outline-none focus:ring-1 focus:ring-[var(--barva-primarni)] focus:border-transparent;
   @apply transition-all;
 }

@@ -43,7 +43,7 @@ export default function StudentChallengesWidget() {
     );
 
     return (
-        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-200">
+        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border-2 border-gray-100">
             <div className="flex flex-row justify-between mb-4">
                 <h3 className="3xl:text-xl pb-2 md:pb-0 font-semibold text-[var(--barva-tmava)]">Výzvy</h3>
                 <div className="flex items-center rounded-lg p-1">

@@ -29,11 +29,11 @@ export default function StatsWidget() {
     const { stats, loading } = useDashboard();
 
     return (
-        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-200 h-full">
+        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border-2 border-gray-100 h-full">
             {loading || !stats ? (
-                 <div className="flex justify-center items-center h-full">
-                   <LoadingSpinner />
-                 </div>
+                <div className="flex justify-center items-center h-full">
+                <LoadingSpinner />
+                </div>
             ) : (
                 <div className="space-y-3 3xl:space-y-5">
                     <StatItem

@@ -23,7 +23,7 @@ export default function NotificationsWidget() {
     const { notifications, loading } = useDashboard();
 
     return (
-        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-200 h-full flex flex-col">
+        <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border-2 border-gray-100 h-full flex flex-col">
             <h3 className="3xl:text-xl font-semibold text-[var(--barva-tmava)] mb-4 flex justify-center md:justify-start">Notifikace</h3>
             {loading ? (
                 <p className="text-sm text-gray-500">Načítám...</p>

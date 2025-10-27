@@ -79,7 +79,7 @@ export default function LoginPage() {
 
   return (
     <div className="w-full min-h-screen py-10 md:py-32 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
-      <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-8 sm:p-12 flex flex-col justify-center">
           <div>
             <h1 className="text-3xl font-bold text-[var(--barva-tmava)]">Vítej zpět!</h1>
@@ -100,7 +100,7 @@ export default function LoginPage() {
               <input type="password" placeholder="Heslo" value={password} onChange={(e) => setPassword(e.target.value)} required className="input2 w-full pl-10" />
             </div>
             <div className='flex justify-center'>
-              <button type="submit" disabled={loading} className="px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer hover:bg-[#0069ccde] transition-all duration-300 ease-in-out">
+              <button type="submit" disabled={loading} className="px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white cursor-pointer hover:bg-[#0069ccde] transition-all duration-300 ease-in-out">
               {loading ? 'Přihlašuji...' : 'Přihlásit se'}
               </button>
             </div>

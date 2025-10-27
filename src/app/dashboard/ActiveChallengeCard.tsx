@@ -53,7 +53,7 @@ const StatusInfo = ({ status }: { status: string }) => {
     }
 
     return (
-        <div className={`flex items-center gap-2 text-sm leading-none ${colorClass}`}>
+        <div className={`flex items-center gap-2 font-semibold text-sm leading-none ${colorClass}`}>
             {icon}
             <span>{text}</span>
         </div>
@@ -73,7 +73,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
 
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
-      <div className={`bg-white p-4 rounded-2xl shadow-xs border border-gray-200 hover:border-[var(--barva-primarni)] hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
+      <div className={`bg-white p-4 rounded-2xl shadow-xs border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
         <div className="flex items-center gap-4 flex-grow w-full">
             <div className="flex-shrink-0">
                 <Image 
@@ -89,15 +89,15 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 <div className="mt-2">
                     <div className="hidden md:flex xl:hidden flex-wrap gap-1.5">
                         {Challenge.ChallengeSkill.slice(0, 2).map(({ Skill }, index) => (
-                            <span key={index} className="text-xs border-1 text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
+                            <span key={index} className="text-xs border-1 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
                         ))}
                         {Challenge.ChallengeSkill.length > 2 && <span className="text-xs self-center text-[var(--barva-primarni)] px-2 py-1 rounded-xl">+{Challenge.ChallengeSkill.length - 2}</span>}
                     </div>
                     <div className="hidden xl:flex flex-wrap gap-1.5">
                         {Challenge.ChallengeSkill.slice(0, 4).map(({ Skill }, index) => (
-                            <span key={index} className="text-xs border-1  text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
+                            <span key={index} className="text-xs border-1 bg-[var(--barva-svetle-pozadi)]  text-[var(--barva-primarni)] px-2 py-1 rounded-xl">{Skill.name}</span>
                         ))}
-                        {Challenge.ChallengeSkill.length > 4 && <span className="text-xs text-blue-500 self-center  px-2 py-1">+{Challenge.ChallengeSkill.length - 4}</span>}
+                        {Challenge.ChallengeSkill.length > 4 && <span className="text-xs text-blue-500 self-center px-1 py-1">+{Challenge.ChallengeSkill.length - 4}</span>}
                     </div>
                 </div>
             </div>

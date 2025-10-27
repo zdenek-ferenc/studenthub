@@ -99,7 +99,7 @@ const DesktopFilterContent = ({
         </div>
         <div className="bg-white p-1.5 3xl:p-3 px-5 rounded-xl border border-gray-100 shadow-sm w-full space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-semibold text-gray-500 mr-2">Tvoje dovednosti:</span>
+                <span className="text-sm font-semibold text-gray-500 mx-2">Tvoje dovednosti:</span>
                 {quickSelectSkills.map(skill => {
                     if (selectedSkillIds.includes(skill.id)) return null;
                     return (

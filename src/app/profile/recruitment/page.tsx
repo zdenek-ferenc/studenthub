@@ -4,7 +4,7 @@ import { useState } from 'react';
 import withAuth from '../../../components/withAuth';
 import { useAuth } from '../../../contexts/AuthContext';
 import Link from 'next/link';
-import { Target, MessageSquare } from 'lucide-react';
+import { Target, MessageSquare, ChevronLeft } from 'lucide-react';
 import IdealCandidateForm from './IdealCandidateForm';
 import QnaManagement from './QnaManagement';
 import { motion } from 'framer-motion';
@@ -25,10 +25,10 @@ function RecruitmentHubPage() {
     ];
 
     return (
-        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 md:py-22 lg:py-28 3xl:py-32 py-8 ">
+        <div className="flex flex-col max-w-5/6 mx-auto  py-4 sm:py-8 md:py-28 3xl:py-32">
             <div className="mb-8">
-                <Link href={`/profile/${profile.id}`} className="text-gray-500 hover:text-[var(--barva-primarni)] transition-colors text-sm">
-                    &larr; Zpět na profil
+                <Link href={`/profile/${profile.id}`} className="text-gray-500 flex flex-row items-center hover:text-[var(--barva-primarni)] transition-colors text-sm">
+                    <ChevronLeft/> Zpět na profil
                 </Link>
                 <h1 className="text-4xl font-bold text-[var(--barva-tmava)] mt-2">Centrum pro nábor</h1>
                 <p className="text-gray-600 mt-2 max-w-2xl">Spravujte, jak se vaše firma prezentuje talentům. Upravte popis ideálního kandidáta a odpovídejte na dotazy studentů.</p>

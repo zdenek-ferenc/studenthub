@@ -111,7 +111,7 @@ export default function IdealCandidateForm() {
                 <div className="bg-white p-6 rounded-2xl shadow-xs border space-y-6">
                     <div>
                         <label htmlFor="ideal_candidate_description" className="block text-lg font-bold text-[var(--barva-tmava)] mb-2">Popis ideálního kandidáta</label>
-                        <p className="text-sm text-gray-500 mb-3">Popište, jaký typ studenta hledáte a jaké vlastnosti jsou pro vás klíčové.</p>
+                        <p className="text-sm text-gray-500 mb-3">Popište, jaký typ talentu hledáte a jaké vlastnosti jsou pro vás klíčové.</p>
                         <textarea
                             id="ideal_candidate_description"
                             {...register('ideal_candidate_description')}
@@ -132,12 +132,12 @@ export default function IdealCandidateForm() {
                         {errors.technologies && <p className="text-red-500 text-sm">{errors.technologies.message}</p>}
                     </div>
                     <div className="flex items-center gap-4 pt-4 border-t">
-                        <button type="submit" disabled={isSubmitting || !Object.keys(dirtyFields).length} className="flex-grow px-5 py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <button type="submit" disabled={isSubmitting || !Object.keys(dirtyFields).length} className="flex-grow px-5 py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 transition-all ease-in-out duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
                             {isSubmitting ? 'Ukládám...' : 'Uložit změny'}
                         </button>
                         {hasExistingData && (
                             <button type="button" onClick={() => setIsDeleteModalOpen(true)} title="Smazat a skrýt z profilu"
-                                className="p-3 rounded-full font-semibold text-red-500 bg-red-50 hover:bg-red-100 transition-colors">
+                                className="p-3 rounded-full font-semibold cursor-pointer text-red-500 bg-red-50 hover:bg-red-100 transition-colors">
                                 <Trash2 size={20} />
                             </button>
                         )}

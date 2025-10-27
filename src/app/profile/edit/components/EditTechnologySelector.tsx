@@ -72,7 +72,7 @@ export default function TechnologySelectorEdit({ onSelectionChange, initialSelec
         <div className="p-3 bg-gray-50 rounded-lg min-h-[4rem] flex flex-wrap gap-2 border">
           {selectedTechnologiesObjects.map(tech => (
             <button key={tech.id} type="button" onClick={() => handleToggleTechnology(tech.id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold hover:opacity-70 transition-all">
+              className="flex items-center gap-1.5 px-4 cursor-pointer py-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-sm font-semibold hover:opacity-80 transition-all">
               {tech.name} <X size={14} />
             </button>
           ))}
@@ -86,7 +86,7 @@ export default function TechnologySelectorEdit({ onSelectionChange, initialSelec
         <div className="p-3 bg-white rounded-lg max-h-60 overflow-y-auto flex flex-wrap gap-2 border">
           {availableTechnologies.map(tech => (
             <button key={tech.id} type="button" onClick={() => handleToggleTechnology(tech.id)}
-              className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-full text-sm hover:bg-gray-100 transition-colors">
+              className="px-3 py-1.5 bg-white cursor-pointer border border-gray-300 text-gray-700 rounded-full text-sm hover:bg-gray-100 transition-colors">
               + {tech.name}
             </button>
           ))}

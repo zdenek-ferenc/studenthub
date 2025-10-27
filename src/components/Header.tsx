@@ -33,11 +33,11 @@ function PillSwitch({ role, pathname }: { role: 'student' | 'startup', pathname:
   ];
   const startupLinks = [
     { id: 'vyzvy', label: 'Výzvy', href: '/challenges' },
-    { id: 'studenti', label: 'Studenti', href: '/students' },
+    { id: 'studenti', label: 'Talenty', href: '/students' },
   ];
   const links = role === 'student' ? studentLinks : startupLinks;
   return (
-    <div className="p-1 md:p-1.5 gap-2 bg-white rounded-full shadow-md flex items-center">
+    <div className="p-1 md:p-1.5 gap-2 bg-white rounded-full shadow-sm flex items-center">
       {links.map(link => (
         <Link key={link.id} href={link.href} className={`px-4 py-2 md:px-5 3xl:px-8 3xl:py-3 rounded-full text-[14px] 3xl:text-lg font-semibold transition-all duration-300 ease-in-out ${pathname.startsWith(link.href) ? 'bg-[var(--barva-primarni)] text-white ' : 'text-[var(--barva-tmava)] hover:inset-shadow-sm hover:bg-gray-50'}`}>{link.label}</Link>
       ))}
@@ -115,10 +115,10 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
                 )}
             </button>
             <div className={`absolute right-0 pt-2 transition-opacity duration-200 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                 <div className="w-36 3xl:w-48 bg-white rounded-xl shadow-lg z-10">
-                    <Link href={`/profile/${user?.id}`} className="block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm text-gray-700 rounded-tr-xl rounded-tl-xl hover:bg-sky-50 transition-all ease-in-out duration-100" onClick={() => setIsOpen(false)}>Můj profil</Link>
-                    <Link href="/profile/edit" className="block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm text-gray-700 hover:bg-sky-50 transition-all ease-in-out duration-100" onClick={() => setIsOpen(false)}>Upravit profil</Link>
-                    <button onClick={handleLogout} className="w-full cursor-pointer text-left block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm rounded-br-xl rounded-bl-xl text-gray-700 hover:bg-sky-50 transition-all ease-in-out duration-100">Odhlásit se</button>
+                <div className="w-36 3xl:w-48 bg-white border-2 border-[var(--barva-primarni)] rounded-xl shadow-lg z-10">
+                    <Link href={`/profile/${user?.id}`} className="block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm text-gray-800 rounded-tr-lg rounded-tl-lg hover:bg-[var(--barva-primarni)] hover:text-white transition-all ease-in-out duration-200" onClick={() => setIsOpen(false)}>Můj profil</Link>
+                    <Link href="/profile/edit" className="block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm text-gray-800  hover:bg-[var(--barva-primarni)] hover:text-white transition-all ease-in-out duration-200" onClick={() => setIsOpen(false)}>Upravit profil</Link>
+                    <button onClick={handleLogout} className="w-full cursor-pointer text-left block px-2 3xl:px-4 py-1.5 3xl:py-2 md:text-xs 3xl:text-sm rounded-br-lg rounded-bl-lg text-gray-800 hover:bg-[var(--barva-primarni)] hover:text-white transition-all ease-in-out duration-200">Odhlásit se</button>
                 </div>
             </div>
         </div>
@@ -139,7 +139,7 @@ function NotificationBell() {
     return (
         <div className="relative" ref={notificationRef}>
             <button onClick={onBellClick} className="relative bg-[var(--barva-svetle-pozadi)] p-2 rounded-full cursor-pointer transition-colors"><Bell className="w-5 h-5 3xl:w-5 3xl:h-5 text-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-all ease-in duration-100" />{unreadCount > 0 && (<span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>)}</button>
-            {isOpen && (<div className="absolute right-0 mt-2 w-80 rounded-xl shadow-lg z-20 bg-white border border-gray-100"><div className="py-2 px-4 rounded-t-xl font-semibold text-white text-sm 3xl:text-base bg-[var(--barva-primarni)] border-b border-[var(--barva-primarni2)]">Notifikace</div><div className="flex flex-col">{isLoading ? (<p className="p-4 text-sm text-gray-500">Načítám...</p>) : notifications.length > 0 ? (notifications.map(notif => (<Link key={notif.id} href={notif.link_url} onClick={() => setIsOpen(false)} className="p-3 3xl:p-4 text-xs 3xl:text-sm text-gray-700 hover:bg-[var(--barva-primarni)]/5 border-b border-[var(--barva-primarni2)] last:border-b-0">{notif.message}</Link>))) : (<p className="p-4 text-sm text-gray-500">Zatím žádné novinky.</p>)}</div><div className="p-2 bg-gray-50 flex justify-center items-center rounded-b-xl leading-none"><Link href="/notifications" onClick={() => setIsOpen(false)} className="text-sm font-semibold text-[var(--barva-primarni)]">Zobrazit všechny</Link></div></div>)}
+            {isOpen && (<div className="absolute right-0 mt-2 w-80 rounded-2xl shadow-lg z-20 bg-white border-2 border-[var(--barva-primarni)]"><div className="py-2 px-4 rounded-t-xl font-semibold text-white text-sm 3xl:text-base bg-[var(--barva-primarni)] border-b border-[var(--barva-primarni2)]">Notifikace</div><div className="flex flex-col">{isLoading ? (<p className="p-4 text-sm text-gray-500">Načítám...</p>) : notifications.length > 0 ? (notifications.map(notif => (<Link key={notif.id} href={notif.link_url} onClick={() => setIsOpen(false)} className="p-3 3xl:p-4 text-xs 3xl:text-sm text-gray-700 hover:bg-[var(--barva-primarni)]/5 border-b border-[var(--barva-primarni2)] last:border-b-0">{notif.message}</Link>))) : (<p className="p-4 text-sm text-gray-500">Zatím žádné novinky.</p>)}</div><div className="p-2 bg-gray-50 flex justify-center items-center rounded-b-2xl leading-none"><Link href="/notifications" onClick={() => setIsOpen(false)} className="text-sm font-semibold text-[var(--barva-primarni)]">Zobrazit všechny</Link></div></div>)}
         </div>
     );
 }

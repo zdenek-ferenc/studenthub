@@ -79,7 +79,7 @@ export default function RecommendedChallengesWidget() {
     }, [user]);
 
     return (
-    <div className="lg:col-span-2 bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-200">
+    <div className="lg:col-span-2 bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border-2 border-gray-100">
         <h3 className="flex justify-start 3xl:text-xl font-semibold text-[var(--barva-tmava)] mb-4">Doporučené výzvy</h3>
         {loading ? (
             <p className="text-sm text-gray-500">Hledám nejlepší výzvy...</p>

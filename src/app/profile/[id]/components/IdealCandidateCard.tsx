@@ -32,7 +32,7 @@ export default function IdealCandidateCard({ description, technologies, isOwner,
                     <h4 className="font-semibold text-sm text-blue-200 mb-2">Klíčové technologie:</h4>
                     <div className="flex flex-wrap gap-2 min-h-[26px]">
                         {technologies.length > 0 ? technologies.map((tech, index) => (
-                            <span key={index} className="px-2.5 py-1 bg-blue-900/50 text-blue-200 rounded-md text-xs font-medium">
+                            <span key={index} className="px-2.5 py-1 ring-1 ring-blue-200 bg-blue-900/50 text-blue-200 rounded-md text-xs font-medium">
                                 {tech.Technology.name}
                             </span>
                         )) : (<span className="px-2.5 py-1 bg-blue-900/50 text-blue-300/50 rounded-md text-xs italic">Zde budou vaše technologie...</span>)}

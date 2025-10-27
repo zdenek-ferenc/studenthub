@@ -47,7 +47,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
   });
 
   return (
-    <div className="relative bg-white rounded-2xl shadow-xs hover:shadow-none transition-all duration-300 ease-in-out border border-gray-100 flex flex-col h-full">
+    <div className="relative bg-white rounded-2xl shadow-xs hover:shadow-none transition-all duration-300 ease-in-out border-2 border-gray-100 flex flex-col h-full">
       <div className="flex-grow">
         <div className="flex items-start justify-between gap-4 p-4 md:p-5 3xl:p-6 rounded-t-2xl">
           <div className="flex items-center gap-4">
@@ -86,7 +86,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
                 className={`flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-xs 3xl:text-sm font-semibold transition-colors ${
                   isMatch
                     ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border-[var(--barva-primarni)] font-semibold'
-                    : 'bg-white text-gray-600 border-gray-300'
+                    : 'bg-gray-100 text-gray-600 border-gray-400'
                 }`}
               >
                 {Skill.name}
@@ -118,7 +118,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
             </div>
         </div>
         <Link href={`/challenges/${challenge.id}`} className="absolute right-3 bottom-3 leading-none">
-          <div className="hidden xl:flex items-center justify-center 3xl:px-4 px-3 py-2 3xl:py-2.5 text-sm 3xl:text-base rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity">
+          <div className="hidden xl:flex items-center justify-center 3xl:px-5 px-4 py-1.5 3xl:py-2 text-sm 3xl:text-base rounded-full bg-[var(--barva-primarni)] text-white hover:opacity-90 transition-opacity ease-in-out duration-200">
             Detail výzvy
           </div>
           <div className="flex xl:hidden items-center justify-center w-8 h-8 md:w-10 md:h-10 ring-2 ring-[var(--barva-primarni)] bg-[var(--barva-primarni)]  text-white rounded-full transition-colors">
