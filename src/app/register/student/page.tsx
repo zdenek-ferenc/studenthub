@@ -246,6 +246,19 @@ export default function StudentRegistrationPage() {
          }
     }, [router, loadInitialProfileData, localProfileLoaded, step, loading, setError]);
 
+    type StudentSkillInsert = {
+    student_id: string;
+    skill_id: string;
+    level: number;
+    xp: number;
+    };
+
+    type StudentLanguageInsert = {
+        student_id: string;
+        language_id: string;
+    };
+
+    type RelatedTableInsertData = StudentSkillInsert | StudentLanguageInsert;
 
     const saveStepData = useCallback(async (currentStep: number, data: StudentRegistrationData) => {
 
@@ -256,7 +269,11 @@ export default function StudentRegistrationPage() {
 
          try {
              let updateData: Partial<StudentRegistrationData> = {};
-             let relatedTableData: { table: string, data: any[], deleteCondition?: any } | null = null;
+             let relatedTableData: {
+                 table: string;
+                 data: RelatedTableInsertData[]; 
+                 deleteCondition?: Record<string, any>;
+             } | null = null;
 
              switch (currentStep) {
                  case 2:

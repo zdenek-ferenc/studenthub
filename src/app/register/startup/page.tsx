@@ -295,85 +295,100 @@ export default function StartupRegistrationPage() {
 
     }, [router, loadInitialProfileData, localProfileLoaded, loading, setError, isSaving, step]);
 
+    type StartupCategoryInsert = {
+    startup_id: string;
+    category_id: string;
+    };
+
+    type RelatedTableInsertData = StartupCategoryInsert;
 
     const saveStepData = useCallback(async (currentStep: number, data: StartupRegistrationData) => {
 
-        if (!user || isSaving) return;
-         setIsSaving(true);
-         console.log(`Ukládám (startup) krok ${currentStep} pro uživatele ${user.id}`);
-         setError(null);
+    if (!user || isSaving) return;
+     setIsSaving(true);
+     console.log(`Ukládám (startup) krok ${currentStep} pro uživatele ${user.id}`);
+     setError(null);
 
-         try {
-             let updateData: Partial<StartupRegistrationData> = {};
-             let relatedTableData: { table: string, data: any[], deleteCondition?: any } | null = null;
+     try {
+         let updateData: Partial<StartupRegistrationData> = {};
+         let relatedTableData: {
+             table: string;
+             data: RelatedTableInsertData[]; 
+             deleteCondition?: Record<string, any>;
+         } | null = null;
+         // ------------------------------
 
-             switch (currentStep) {
-                 case 2:
-                     updateData = { company_name: data.company_name, ico: data.ico, website: data.website, phone_number: data.phone_number, contact_email: data.contact_email, address: data.address, gdpr_consent: data.gdpr_consent };
-                     break;
-                 case 3:
-                     updateData = { contact_first_name: data.contact_first_name, contact_last_name: data.contact_last_name, contact_position: data.contact_position };
-                     break;
-                 case 4:
-                     relatedTableData = { table: 'StartupCategory', data: data.categories.map(id => ({ startup_id: user.id, category_id: id })), deleteCondition: { startup_id: user.id } };
-                     break;
-                 case 5:
-                     updateData = { logo_url: data.logo_url };
-                     break;
-             }
-
-             if (Object.keys(updateData).length > 0) {
-                 console.log("Aktualizuji StartupProfile s daty:", updateData);
-                 const { error: profileUpdateError } = await supabase
-                     .from('StartupProfile')
-                     .update(updateData)
-                     .eq('user_id', user.id);
-                 if (profileUpdateError) {
-                     console.error("Supabase profile update error object:", profileUpdateError);
-                     throw new Error(`Chyba při aktualizaci profilu: ${profileUpdateError.message} (Kód: ${profileUpdateError.code})`);
-                 }
-                 console.log(`Startup profil úspěšně aktualizován pro krok ${currentStep}`);
-             }
-
-             if (relatedTableData) {
-                 if (relatedTableData.deleteCondition) {
-                     const { error: deleteError } = await supabase.from(relatedTableData.table).delete().match(relatedTableData.deleteCondition);
-                     if (deleteError && deleteError.code !== 'PGRST204') throw deleteError;
-                     console.log(`Staré záznamy smazány (nebo neexistovaly) z ${relatedTableData.table}`);
-                 }
-                 if (relatedTableData.data.length > 0) {
-                     const { error: insertError } = await supabase.from(relatedTableData.table).insert(relatedTableData.data);
-                     if (insertError) throw insertError;
-                      console.log(`Nové záznamy vloženy do ${relatedTableData.table}`);
-                 }
-             }
-
-             const nextStepInDB = Math.min(currentStep + 1, 6);
-             const { error: stepUpdateError } = await supabase.from('StartupProfile').update({ registration_step: nextStepInDB }).eq('user_id', user.id);
-             if (stepUpdateError) {
-                 console.error("Supabase step update error object:", stepUpdateError);
-                 throw new Error(`Chyba při aktualizaci kroku registrace: ${stepUpdateError.message} (Kód: ${stepUpdateError.code})`);
-             }
-              console.log(`Startup registration step aktualizován na ${nextStepInDB}`);
-
-         } catch (error: unknown) {
-              console.error("Detailní chyba při ukládání (startup) na pozadí:", error);
-              if (error instanceof Error) {
-                  console.error("Chyba při ukládání (startup) na pozadí (message):", error.message);
-                  setError(`Uložení selhalo: ${error.message}`);
-              } else {
-                  console.error("Neznámá chyba při ukládání (startup) na pozadí:", error);
-                  setError("Uložení selhalo z neznámého důvodu.");
-              }
-
-              throw error;
-
-         } finally {
-             setIsSaving(false);
-             console.log(`Ukládání (startup) kroku ${currentStep} dokončeno.`);
+         switch (currentStep) {
+             case 2:
+                 updateData = { company_name: data.company_name, ico: data.ico, website: data.website, phone_number: data.phone_number, contact_email: data.contact_email, address: data.address, gdpr_consent: data.gdpr_consent };
+                 break;
+             case 3:
+                 updateData = { contact_first_name: data.contact_first_name, contact_last_name: data.contact_last_name, contact_position: data.contact_position };
+                 break;
+             case 4:
+                 relatedTableData = {
+                     table: 'StartupCategory',
+                     data: data.categories.map(id => ({ startup_id: user.id, category_id: id })), // <-- Data odpovídají StartupCategoryInsert
+                     deleteCondition: { startup_id: user.id }
+                 };
+                 break;
+             case 5:
+                 updateData = { logo_url: data.logo_url };
+                 break;
          }
 
-    }, [user, isSaving, setError]);
+         if (Object.keys(updateData).length > 0) {
+             console.log("Aktualizuji StartupProfile s daty:", updateData);
+             const { error: profileUpdateError } = await supabase
+                 .from('StartupProfile')
+                 .update(updateData)
+                 .eq('user_id', user.id);
+             if (profileUpdateError) {
+                 console.error("Supabase profile update error object:", profileUpdateError);
+                 throw new Error(`Chyba při aktualizaci profilu: ${profileUpdateError.message} (Kód: ${profileUpdateError.code})`);
+             }
+             console.log(`Startup profil úspěšně aktualizován pro krok ${currentStep}`);
+         }
+
+         if (relatedTableData) {
+             if (relatedTableData.deleteCondition) {
+                 const { error: deleteError } = await supabase.from(relatedTableData.table).delete().match(relatedTableData.deleteCondition);
+                 if (deleteError && deleteError.code !== 'PGRST204') throw deleteError;
+                 console.log(`Staré záznamy smazány (nebo neexistovaly) z ${relatedTableData.table}`);
+             }
+             if (relatedTableData.data.length > 0) {
+                 const { error: insertError } = await supabase.from(relatedTableData.table).insert(relatedTableData.data);
+                 if (insertError) throw insertError;
+                  console.log(`Nové záznamy vloženy do ${relatedTableData.table}`);
+             }
+         }
+
+         const nextStepInDB = Math.min(currentStep + 1, 6);
+         const { error: stepUpdateError } = await supabase.from('StartupProfile').update({ registration_step: nextStepInDB }).eq('user_id', user.id);
+         if (stepUpdateError) {
+             console.error("Supabase step update error object:", stepUpdateError);
+             throw new Error(`Chyba při aktualizaci kroku registrace: ${stepUpdateError.message} (Kód: ${stepUpdateError.code})`);
+         }
+          console.log(`Startup registration step aktualizován na ${nextStepInDB}`);
+
+     } catch (error: unknown) {
+          console.error("Detailní chyba při ukládání (startup) na pozadí:", error);
+          if (error instanceof Error) {
+              console.error("Chyba při ukládání (startup) na pozadí (message):", error.message);
+              setError(`Uložení selhalo: ${error.message}`);
+          } else {
+              console.error("Neznámá chyba při ukládání (startup) na pozadí:", error);
+              setError("Uložení selhalo z neznámého důvodu.");
+          }
+
+          throw error;
+
+     } finally {
+         setIsSaving(false);
+         console.log(`Ukládání (startup) kroku ${currentStep} dokončeno.`);
+     }
+
+}, [user, isSaving, setError]);
 
 
     const handleNextStep = async (formData: FormDataStep) => {
@@ -637,7 +652,7 @@ export default function StartupRegistrationPage() {
                     {renderStep()}
                 </div>
             ) : (
-                
+
                  <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-md overflow-hidden my-6 md:my-32">
                      <div className="p-8 sm:p-12 flex flex-col justify-center">
                          <div>
