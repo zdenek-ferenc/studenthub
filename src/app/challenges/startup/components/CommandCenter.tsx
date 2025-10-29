@@ -25,7 +25,7 @@ const StatWidget = ({ value, label, icon: Icon }: { value: number, label: string
             <h3 className="text-xs md:text-base 3xl:text-lg font-semibold text-[var(--barva-tmava)]">{label}</h3>
             <Icon className="hidden md:block w-6 h-6 text-gray-400" />
         </div>
-        <p className="text-3xl 3xl:text-5xl font-bold text-[var(--barva-primarni)] md:mt-4">{value}</p>
+        <p className="text-3xl 3xl:text-4xl font-bold text-[var(--barva-primarni)] md:mt-4">{value}</p>
     </div>
 );
 
@@ -39,7 +39,7 @@ return (
                     <Plus size={18} />
                     <span>Vytvořit výzvu</span>
                 </Link>
-                <Link href="/profile/recruitment" className="px-5 py-2 3xl:py-2.5  rounded-full bg-white hover:bg-blue-100/50 border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-all ease-in-out duration-200 flex items-center gap-2 text-xs 3xl:text-sm">
+                <Link href="/profile/recruitment" className="px-5 py-2 3xl:py-2.5  rounded-full bg-white hover:bg-gray-100 border text-[var(--barva-primarni)] font-semibold shadow-sm hover:border-[var(--barva-primarni)] transition-all ease-in-out duration-200 flex items-center gap-2 text-xs 3xl:text-sm">
                     <Settings size={16} />
                     <span>Centrum pro nábor</span>
                 </Link>
@@ -59,7 +59,7 @@ return (
                         <Star className="hidden md:block w-6 h-6 text-gray-400" />
                     </div>
                     <div className='flex justify-between'>
-                        <p className="text-3xl 3xl:text-5xl font-bold text-[var(--barva-primarni)] md:mt-4">{stats.unreviewedSubmissionsCount}</p>
+                        <p className="text-3xl 3xl:text-4xl font-bold text-[var(--barva-primarni)] md:mt-4">{stats.unreviewedSubmissionsCount}</p>
                         {stats.unreviewedSubmissionsCount > 0 && (
                         <div className="mt-4 text-[10px] sm:text-xs lg:text-sm font-semibold text-gray-500 hover:text-gray-600 transition-all ease-in-out duration-200 flex items-center cursor-pointer">
                             <p>Zobrazit</p>&nbsp;<span className="hidden md:block">přehled</span>  <ChevronDown className={`ml-1 transition-transform ${open ? 'rotate-180' : ''}`} size={16} />
