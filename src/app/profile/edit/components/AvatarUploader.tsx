@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface AvatarUploaderProps {
   userId: string;
-  currentAvatarUrl: string | null; // URL předaná z formuláře
+  currentAvatarUrl: string | null; 
   onUploadSuccess: (newUrl: string) => void;
   onDeleteSuccess: () => void;
 }
@@ -17,13 +17,12 @@ const BUCKET_NAME = 'profile-pictures';
 
 export default function AvatarUploader({
   userId,
-  currentAvatarUrl, // Použijeme přímo tento prop pro zobrazení
+  currentAvatarUrl, 
   onUploadSuccess,
   onDeleteSuccess,
 }: AvatarUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Odebrali jsme interní stav avatarUrl a useEffect pro synchronizaci
   const { showToast } = useAuth();
 
   const deleteOldAvatar = async (oldUrl: string | null) => {
@@ -31,9 +30,7 @@ export default function AvatarUploader({
     try {
       const oldFileName = oldUrl.split('/').pop();
       if (oldFileName) {
-        // Zkusíme smazat, i když nevíme jistě, jestli existuje
         const { error: removeError } = await supabase.storage.from(BUCKET_NAME).remove([oldFileName]);
-        // Ignorujeme chybu, pokud soubor neexistoval
         if (removeError && !removeError.message.includes('Not Found')) {
             console.warn("Nepodařilo se smazat starý avatar (ale pokračujeme):", removeError);
         }
@@ -47,7 +44,7 @@ export default function AvatarUploader({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+    if (file.size > 2 * 1024 * 1024) { 
       setError("Soubor je příliš velký (max 2MB).");
       showToast("Soubor je příliš velký (max 2MB).", "error");
       return;
@@ -61,24 +58,20 @@ export default function AvatarUploader({
     const filePath = `${fileName}`;
 
     try {
-      // 1. Smažeme starý obrázek (použijeme prop currentAvatarUrl)
       await deleteOldAvatar(currentAvatarUrl);
 
-      // 2. Nahrání nového souboru
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(BUCKET_NAME)
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      // 3. Získání veřejné URL
       const { data: publicUrlData } = supabase.storage
         .from(BUCKET_NAME)
         .getPublicUrl(filePath);
 
       const newUrl = publicUrlData.publicUrl;
 
-      // 4. Aktualizace URL v databázi (StudentProfile)
       const { error: dbError } = await supabase
         .from('StudentProfile')
         .update({ profile_picture_url: newUrl })
@@ -86,7 +79,6 @@ export default function AvatarUploader({
 
       if (dbError) throw dbError;
 
-      // 5. Zavolání callbacku - TÍM SE AKTUALIZUJE FORMULÁŘ A PROP currentAvatarUrl!
       onUploadSuccess(newUrl);
       showToast('Profilovka úspěšně nahrána!', 'success');
 
@@ -101,16 +93,14 @@ export default function AvatarUploader({
   };
 
   const handleDelete = async () => {
-     // Použijeme přímo prop
-     if (!currentAvatarUrl) return;
-     if (!confirm("Opravdu chcete smazat profilový obrázek?")) return;
+    if (!currentAvatarUrl) return;
+    if (!confirm("Opravdu chcete smazat profilový obrázek?")) return;
 
-     setUploading(true);
-     try {
-        // 1. Smazání z Storage
+    setUploading(true);
+    try {
+
         await deleteOldAvatar(currentAvatarUrl);
 
-        // 2. Smazání z DB
         const { error: dbError } = await supabase
             .from('StudentProfile')
             .update({ profile_picture_url: null })
@@ -118,32 +108,31 @@ export default function AvatarUploader({
 
         if (dbError) throw dbError;
 
-        // 3. Zavolání callbacku pro aktualizaci formuláře
         onDeleteSuccess();
         showToast('Profilovka smazána.', 'success');
 
-     } catch (err: unknown) {
-         console.error("Chyba při mazání avataru:", err);
-         showToast("Mazání selhalo.", "error");
-     } finally {
-         setUploading(false);
-     }
+    } catch (err: unknown) {
+        console.error("Chyba při mazání avataru:", err);
+        showToast("Mazání selhalo.", "error");
+    } finally {
+        setUploading(false);
+    }
   };
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative w-32 h-32 rounded-full group">
-        {currentAvatarUrl ? ( // Používáme přímo prop
+      <div className="relative w-21 h-21 md:w-32 md:h-32 rounded-full group">
+        {currentAvatarUrl ? ( 
           <Image
-            src={currentAvatarUrl} // Používáme přímo prop
+            src={currentAvatarUrl} 
             alt="Profilový obrázek"
             width={1000}
             height={1000}
-            className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
-            key={currentAvatarUrl} // Používáme přímo prop
+            className="w-21 h-21 md:w-32 md:h-32 rounded-full object-cover border-2 border-gray-200"
+            key={currentAvatarUrl}
           />
         ) : (
-          <div className="w-32 h-32 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center border-2 border-dashed border-gray-300">
+          <div className="w-21 h-21 md:w-32 md:h-32 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center border-2 border-dashed border-gray-300">
             <UserIcon size={48} />
           </div>
         )}
@@ -171,7 +160,6 @@ export default function AvatarUploader({
          <label htmlFor="avatar-upload" className="text-sm font-semibold text-[var(--barva-primarni)] cursor-pointer hover:underline">
             {uploading ? "Nahrávám..." : "Změnit obrázek"}
          </label>
-         {/* Kontrolujeme přímo prop */}
          {currentAvatarUrl && (
             <button
                 type="button"

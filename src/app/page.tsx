@@ -7,15 +7,19 @@ import ScrollAnimator from '../components/ScrollAnimator';
 import StatsSection from '../components/StatsSection';
 
 export default function HomePage() {
-  return (
+return (
     <>
         <div className="w-full overflow-x-hidden text-[var(--barva-tmava)] !pt-0">
-            <header className="relative h-screen min-h-[700px] flex items-center justify-center text-white bg-[var(--barva-tmava)] overflow-hidden">
+            <header className="relative sm:h-screen flex pt-10 sm:pt-0 sm:items-center justify-center text-white bg-[var(--barva-tmava)] overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 smooth-shimmer-bg opacity-40"></div>
                 </div>
                 <div className="container mx-auto text-center relative z-10 px-4 sm:px-6">
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl 3xl:text-8xl font-extrabold tracking-tighter leading-tight">
+                    <div className='block !md:hidden'>
+                        <Image src="/logo3.svg" alt="logo" width={200} height={80} className="logo-reveal-container w-[160px] md:hidden mx-auto pb-12" />
+                    </div>
+                    
+                    <h1 className="text-4xl sm:text-5xl md:text-7xl 3xl:text-8xl font-extrabold tracking-tighter leading-tight">
                         <div className="overflow-hidden">
                             <div className="animate-slide-in-reveal delay-100">
                                 Praxe, co má smysl.
@@ -28,16 +32,16 @@ export default function HomePage() {
                         </div>
                     </h1>
                     <div className="overflow-hidden mt-6">
-                        <p className="max-w-3xl mx-auto text-base sm:text-base 3xl:text-xl text-gray-300 leading-relaxed"> 
+                        <p className="max-w-3xl mx-auto text-xs sm:text-base 3xl:text-xl text-gray-300 leading-relaxed"> 
                             Propojujeme nejlepší studenty s inovativními startupy skrze reálné projekty. Přestaň snít o kariéře, začni ji budovat.
                         </p>
                     </div>
                     <div className="overflow-hidden mt-10">
-                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 flex-wrap">
-                            <Link href="/register/student" className="w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center">
+                        <div className="flex flex-row justify-center items-center gap-4 sm:gap-8 flex-wrap">
+                            <Link href="/register/student" className="w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full bg-[var(--barva-primarni)] text-base sm:text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center">
                                 Chci výzvu
                             </Link>
-                            <Link href="/register/startup" className="w-full sm:w-auto px-8 py-4 rounded-full border-2 border-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#00284d] hover:shadow-none transition-all duration-500 flex justify-center items-center">
+                            <Link href="/register/startup" className="w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full border-2 border-[var(--barva-primarni)] text-base sm:text-lg text-white font-semibold shadow-lg hover:bg-[#00284d] hover:shadow-none transition-all duration-500 flex justify-center items-center">
                                 Hledám talent
                             </Link>
                         </div>
@@ -57,7 +61,7 @@ export default function HomePage() {
                         </ScrollAnimator>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <ScrollAnimator className="lg:col-span-2">
-                                <div className="p-6 md:p-10 bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col justify-between h-full">
+                                <div className="p-6 md:p-10 bg-white rounded-3xl lg:shadow-xl border border-gray-100 flex flex-col justify-between h-full">
                                     <div>
                                         <h3 className="text-xl md:text-2xl 3xl:text-3xl font-bold mb-4">Reálné výzvy, reálné výsledky</h3>
                                         <p className="text-gray-600 text-sm md:text-base 3xl:text-lg mb-6">Zapomeň na fiktivní úkoly. Pracuj na projektech, které mají skutečný dopad a řeší reálné problémy inovativních firem. Každá výzva je tvoje vstupenka do praxe.</p>
@@ -79,21 +83,21 @@ export default function HomePage() {
                                 </div>
                             </ScrollAnimator>
                             <ScrollAnimator>
-                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full md:min-h-[200px]">
+                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl lg:shadow-xl border border-gray-100 h-full md:min-h-[200px]">
                                     <TrendingUp size={32} className="text-[var(--barva-primarni)] mb-4" />
                                     <h3 className="text-base md:text-xl 3xl:text-2xl font-bold mb-2">Buduj si portfolio</h3>
                                     <p className="text-gray-600">Každá dokončená výzva se stává referencí ve tvém veřejném profilu.</p>
                                 </div>
                             </ScrollAnimator>
                             <ScrollAnimator delay={200}>
-                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full md:min-h-[200px]">
+                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl lg:shadow-xl border border-gray-100 h-full md:min-h-[200px]">
                                     <Check size={32} className="text-[var(--barva-primarni)] mb-4" />
                                     <h3 className="text-xl md:text-xl 3xl:text-2xl font-bold mb-2">Férová zpětná vazba</h3>
                                     <p className="text-gray-600">Každé tvoje řešení je okomentováno a ohodnoceno profíky z oboru.</p>
                                 </div>
                             </ScrollAnimator>
                             <ScrollAnimator delay={400}>
-                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl shadow-xl border border-gray-100 h-full md:min-h-[200px]">
+                                <div className="p-6 md:p-8 flex flex-col justify-center gap-2 bg-white rounded-3xl lg:shadow-xl border border-gray-100 h-full md:min-h-[200px]">
                                     <DollarSign size={32} className="text-[var(--barva-primarni)] mb-4" />
                                     <h3 className="text-xl md:text-xl 3xl:text-2xl font-bold mb-2">Získej odměnu</h3>
                                     <p className="text-gray-600">Za skvělou práci si zasloužíš finanční odměnu, stáž nebo nabídku práce.</p>

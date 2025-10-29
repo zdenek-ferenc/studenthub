@@ -42,7 +42,7 @@ export default function Step3_Categories({ onNext, allCategories, isLoading, ini
           <button 
             onClick={handleContinue} 
             disabled={isLoading}
-            className="px-6 py-3 md:px-8 md:py-4 rounded-3xl bg-[var(--barva-primarni)] md:text-xl text-white font-semibold shadow-sm hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400"
+            className="px-4 py-2 md:px-6 md:py-3 rounded-3xl bg-[var(--barva-primarni)] text-sm cursor-pointer md:text-base text-white font-semibold shadow-sm hover:opacity-90 transition-all duration-300 ease-in-out"
           >
             Pokračovat
           </button>

@@ -64,7 +64,7 @@ export default function StudentChallengesView() {
   const studentSkillIdsForCard = useMemo(() => studentSkills.map(s => s.id), [studentSkills]);
 
   return (
-    <div className="flex flex-col max-w-5/6 mx-auto py-8 md:py-28 3xl:py-32 items-start gap-2 xl:gap-3">
+    <div className="flex flex-col sm:max-w-5/6 mx-auto py-4 px-4 md:py-28 3xl:py-32 items-start gap-2 xl:gap-3">
       <div className="w-full">
         <div className="xl:mb-4 flex justify-between items-center">
           <div>
@@ -91,7 +91,7 @@ export default function StudentChallengesView() {
           isMobileOpen={isFilterOpen}
           setMobileOpen={setIsFilterOpen}
         />
-        <p className="text-base pt-3 p-2 text-gray-500 mt-1">
+        <p className="text-sm sm:text-base pt-2 p-2 text-gray-500 mt-1">
             Nalezeno <span className='text-[var(--barva-primarni)] font-bold'>{challenges.length}</span> výzev na základě tvých filtrů.
         </p>
         <ChallengeViewSwitch

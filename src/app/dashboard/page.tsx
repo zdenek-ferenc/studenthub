@@ -18,7 +18,7 @@ type TabId = 'challenges' | 'growth' | 'activities';
 const PillButton = ({ id, label, icon: Icon, activeTab, setActiveTab }: { id: TabId, label: string, icon: React.ElementType, activeTab: TabId, setActiveTab: (id: TabId) => void }) => {
   const isActive = activeTab === id;
   return (
-    <button onClick={() => setActiveTab(id)} className="relative flex-1 flex items-center justify-center gap-2 p-2 m-1 text-sm font-semibold transition-colors z-10">
+    <button onClick={() => setActiveTab(id)} className="relative flex-1 flex items-center justify-center gap-2 p-2 m-1 text-xs sm:text-sm font-semibold transition-colors z-10">
       {isActive && ( <motion.div className="absolute inset-0 bg-[var(--barva-primarni)] rounded-full shadow-md" layoutId="activePill" /> )}
       <div className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}><Icon size={20} /></div>
       <span className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}>{label}</span>
@@ -39,7 +39,7 @@ function DashboardPage() {
   if (profile?.role !== 'student') return <p className="text-center py-20">Tato stránka je určena pouze pro studenty.</p>;
 
   return (
-    <div className="flex flex-col max-w-5/6 mx-auto  py-4 sm:py-8 md:py-28 3xl:py-32">
+    <div className="h-screen sm:h-full flex flex-col sm:max-w-5/6 mx-auto px-4 py-4 sm:py-8 md:py-28 3xl:py-32">
       <div className="hidden lg:flex flex-col item-center lg:flex-row items-start gap-6 3xl:gap-5">
         <div className="w-full mx-auto space-y-6 3xl:space-y-5">
             <StudentChallengesWidget />
@@ -59,9 +59,6 @@ function DashboardPage() {
           <PillButton id="growth" label="Růst" icon={TrendingUp} activeTab={activeTab} setActiveTab={setActiveTab} />
           <PillButton id="activities" label="Aktivity" icon={LayoutGrid} activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
-        <h1 className="block md:hidden text-xl font-bold text-[var(--barva-tmava)] mb-2 md:mb-4 3xl::mb-8">
-        Vítej <span className='text-[var(--barva-primarni)]'>{displayName}</span>!
-      </h1>
         <AnimatePresence mode="wait">
           <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
             {activeTab === 'challenges' && ( <div className="space-y-3"><StudentChallengesWidget /><RecommendedChallengesWidget /></div> )}

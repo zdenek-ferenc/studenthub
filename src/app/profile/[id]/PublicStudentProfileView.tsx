@@ -95,7 +95,7 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
     const hasAnyLink = !!(profile.linkedin_url || profile.github_url || profile.dribbble_url || profile.personal_website_url);
 
     return (
-        <div className="relative bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
+        <div className="relative bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
             {isOwner && (
                 <Link
                     href="/profile/edit"
@@ -107,25 +107,25 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
             )}
 
             <div className="text-center">
-                <div className="w-24 h-24 rounded-full mx-auto mb-4 relative">
-          {profile.profile_picture_url ? (
+                <div className="h-16 w-16 sm:w-24 sm:h-24 rounded-full mx-auto mb-4 relative">
+        {profile.profile_picture_url ? (
             <Image
-              src={profile.profile_picture_url}
-              alt={`Profilový obrázek ${profile.first_name} ${profile.last_name}`}
-              width={200}
-              height={200}
-              className="w-24 h-24 rounded-full object-cover border-2 border-gray-100"
-              key={profile.profile_picture_url}
+            src={profile.profile_picture_url}
+            alt={`Profilový obrázek ${profile.first_name} ${profile.last_name}`}
+            width={200}
+            height={200}
+            className="h-16 w-16 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-gray-100"
+            key={profile.profile_picture_url}
             />
-          ) : (
-            <div className="w-24 h-24 rounded-full bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-4xl font-bold">
-              {initials}
+        ) : (
+            <div className="h-16 w-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-xl sm:text-4xl font-bold">
+            {initials}
             </div>
-          )}
+        )}
         </div>
-                <h1 className="text-2xl font-bold text-[var(--barva-tmava)]">{profile.first_name} {profile.last_name}</h1>
-                <p className="text-gray-500">@{profile.username}</p>
-                <div className="flex justify-center items-center gap-4 mt-4">
+                <h1 className="text-xl sm:text-2xl font-bold text-[var(--barva-tmava)]">{profile.first_name} {profile.last_name}</h1>
+                <p className="text-gray-500 text-sm sm:text-base">@{profile.username}</p>
+                <div className="flex justify-center items-center gap-4 mt-2 sm:mt-4">
                     <SocialLink href={profile.linkedin_url} Icon={Linkedin} label="LinkedIn" />
                     <SocialLink href={profile.github_url} Icon={Github} label="GitHub" />
                     <SocialLink href={profile.dribbble_url} Icon={Dribbble} label="Dribbble" />
@@ -142,15 +142,15 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
                     )}
                 </div>
             </div>
-            <div className="text-sm space-y-4 mt-6 pt-4 border-t border-gray-100">
-                 <div className="text-gray-700">
+            <div className="text-sm space-y-4 mt-2 sm:mt-6 pt-4 border-t border-gray-100">
+                <div className="text-gray-700">
                     {isEditing ? (
                         <div className="space-y-2">
                             <textarea
                                 value={bioText}
                                 onChange={(e) => setBioText(e.target.value)}
                                 placeholder="Řekni něco o sobě, co tě zajímá, na čem pracuješ..."
-                                className="w-full min-h-[100px] text-sm rounded-lg border border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
+                                className="w-full min-h-[100px] text-xs sm:text-sm rounded-lg border border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
                             />
                             <div className="flex items-center gap-2">
                                 <button onClick={handleSaveBio} disabled={saving} className="text-sm font-semibold text-[var(--barva-primarni)] disabled:text-gray-400">{saving ? 'Ukládám...' : 'Uložit'}</button>
@@ -159,7 +159,7 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
                         </div>
                     ) : (
                         <>
-                            <p className={`whitespace-pre-wrap ${!bioText ? 'text-gray-500' : ''}`}>
+                            <p className={`text-xs sm:text-sm whitespace-pre-wrap ${!bioText ? 'text-gray-500' : ''}`}>
                                 {bioText
                                     ? bioText 
                                     : isOwner
@@ -170,7 +170,7 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
                             {isOwner && (
                                 <button
                                     onClick={() => setIsEditing(true)}
-                                    className={`flex items-center gap-1.5 text-sm cursor-pointer font-semibold transition-colors mt-3 ${
+                                    className={`flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer font-semibold transition-colors mt-3 ${
                                         bioText
                                             ? 'text-gray-400 hover:text-[var(--barva-tmava)]' 
                                             : 'text-[var(--barva-primarni)] hover:opacity-80' 
@@ -183,8 +183,8 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
                         </>
                     )}
                 </div>
-                {profile.university && <div className="flex items-center gap-3 text-gray-600 pt-4 border-t border-gray-100"><GraduationCap size={20} className="flex-shrink-0" /> <span>{profile.university}</span></div>}
-                {profile.field_of_study && <div className="flex items-center gap-3 text-gray-600"><Briefcase size={20} className="flex-shrink-0" /> <span>{profile.field_of_study}</span></div>}
+                {profile.university && <div className="flex text-xs sm:text-sm items-center gap-3 text-gray-600 pt-4 border-t border-gray-100"><GraduationCap size={20} className="flex-shrink-0" /> <span>{profile.university}</span></div>}
+                {profile.field_of_study && <div className="flex text-xs sm:text-sm items-center gap-3 text-gray-600"><Briefcase size={20} className="flex-shrink-0" /> <span>{profile.field_of_study}</span></div>}
             </div>
         </div>
     );
@@ -243,7 +243,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     }));
 
     return (
-        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-32 px-4">
+        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-4 md:py-32 px-4">
             {!isOwner && (
                  <button
                     onClick={() => router.back()}
@@ -256,13 +256,13 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
                 <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:sticky lg:top-28">
                     <ProfileInfoCard profile={profile} isOwner={isOwner} />
-                    <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
-                        <h3 className="font-bold text-xl text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
+                    <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
+                        <h3 className="font-bold text-lg sm:text-xl text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
                         <SkillRadarChart skills={skillsForChart} isOwner={isOwner} />
                     </div>
                 </aside>
                 <main className="lg:col-span-2 space-y-3 sm:space-y-8">
-                    <ProfilePortfolioSection submissions={profile.Submission} />
+                    <ProfilePortfolioSection isOwner={isOwner} submissions={profile.Submission} />
                     <ProfileSkillsSection skills={profile.StudentSkill} languages={profile.StudentLanguage} isOwner={isOwner} />
                 </main>
             </div>

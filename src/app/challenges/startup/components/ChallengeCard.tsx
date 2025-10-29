@@ -122,7 +122,7 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
         </div>
     </div>
             </div>
-            <p className="text-gray-500 text-xs 3xl:text-base min-h-[52px] line-clamp-2 3xl:my-2">
+            <p className="text-gray-500 text-xs 3xl:text-base sm:min-h-[52px] xl:line-clamp-2 3xl:my-2">
                 {challenge.short_description || <span className="italic text-gray-400">Zatím bez popisu...</span>}
             </p>        
             <div className="space-y-3 mb-4">

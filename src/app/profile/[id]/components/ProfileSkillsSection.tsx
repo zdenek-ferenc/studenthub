@@ -16,7 +16,7 @@ export default function ProfileSkillsSection({ skills, languages, isOwner }: { s
     const validLanguages = languages.filter(l => l.Language);
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
             <div className="space-y-6">
                 <div>
                     <h3 className="font-semibold text-gray-500 uppercase text-xs mb-3">Dovednosti</h3>

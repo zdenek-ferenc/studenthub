@@ -81,7 +81,7 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
         <div className="pt-6 flex justify-center">
           <button 
             onClick={() => onNext({ logo_url: null })}
-            className="text-gray-500 hover:text-gray-800 hover:underline"
+            className="text-gray-500 hover:text-gray-800 hover:underline cursor-pointer"
           >
             Přeskočit a dokončit registraci
           </button>

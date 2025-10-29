@@ -35,10 +35,14 @@ export default function SavedChallengeCard({ savedChallenge }: { savedChallenge:
             if (error) throw error;
             showToast('Výzva odebrána z uložených.', 'success');
             refetchDashboardData();
-        } catch (error: any) {
-            showToast(`Odebrání se nezdařilo: ${error.message}`, 'error');
-            setIsRemoving(false);
+        } catch (error: unknown) {
+            let errorMessage = "Odebrání se nezdařilo: Neznámá chyba.";
+            if (error instanceof Error) { 
+            errorMessage = `Odebrání se nezdařilo: ${error.message}`; 
         }
+    showToast(errorMessage, 'error');
+    setIsRemoving(false);
+}
     };
 
     const skills = Challenge.ChallengeSkill.map(cs => cs.Skill?.name).filter(Boolean);

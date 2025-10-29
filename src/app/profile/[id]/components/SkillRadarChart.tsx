@@ -28,11 +28,11 @@ export default function SkillRadarChart({ skills, isOwner }: SkillRadarChartProp
     if (topSkills.length < 3) {
         if (isOwner) {
             return (
-                <div className="text-center text-gray-500 text-sm py-8 h-[250px] flex flex-col items-center justify-center gap-3">
+                <div className="text-center text-gray-500 text-xs sm:text-sm py-4 sm:py-8 sm:h-[250px] flex flex-col items-center justify-center gap-3">
                     <p>Pro zobrazení grafu potřebuješ alespoň 3 dovednosti.</p>
                     <Link
                         href="/profile/edit?tab=skills"
-                        className="flex items-center gap-2 my-4 px-4 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold text-xs hover:opacity-90 transition-opacity"
+                        className="flex items-center gap-2 my-2 sm:my-4 px-4 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold text-sm hover:opacity-90 transition-opacity"
                     >
                         <PlusCircle size={16} />
                         Přidat dovednosti
@@ -49,7 +49,7 @@ export default function SkillRadarChart({ skills, isOwner }: SkillRadarChartProp
     }
 
     return (
-        <div className="skill-radar-chart-container focus:outline-none" style={{ width: '100%', height: 250 }}>
+        <div className="skill-radar-chart-container h-[50px] sm:h-[250px] xs:h-[180px] focus:outline-none">
             <ResponsiveContainer className="focus:ring-0">
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={topSkills} className="focus:ring-0">
                     <PolarGrid stroke="var(--barva-podtext)" strokeOpacity={0.2} />

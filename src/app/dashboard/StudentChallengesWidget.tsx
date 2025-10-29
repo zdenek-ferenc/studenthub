@@ -36,24 +36,22 @@ export default function StudentChallengesWidget() {
         return { activeChallenges: active, completedChallenges: completed };
     }, [allSubmissions]);
 
-    const SwitchButton = ({ buttonView, label, count, icon: Icon }: { buttonView: View, label: string, count: number, icon?: React.ElementType }) => (
+    const SwitchButton = ({ buttonView, label, icon: Icon }: { buttonView: View, label: string, count: number, icon?: React.ElementType }) => (
         <button
             onClick={() => setView(buttonView)}
-            className={`px-3 sm:px-4 pb-2 rounded-lg text-xs sm:text-xs font-semibold transition-colors relative flex items-center gap-1.5 ${view === buttonView ? 'text-[var(--barva-primarni)]' : 'cursor-pointer text-gray-500 hover:text-[var(--barva-tmava)]'}`}
+            className={`px-1 sm:px-4 sm:py-1 text-[10px] sm:text-xs font-semibold transition-colors border border-[var(--barva-primarni)] rounded-xl relative flex items-center justify-center gap-1.5 ${view === buttonView ? 'text-[var(--barva-primarni)]' : 'border-white hover:border-[var(--barva-primarni)] cursor-pointer transition-all ease-in-out duration-200 text-gray-500 hover:text-[var(--barva-primarni)]'}`}
         >
             {Icon && <Icon size={14} className="hidden sm:inline-block" />} {/* Volitelná ikona */}
             {label}
-            <span className="ml-1 p-1 text-xs">{count}</span>
-            {view === buttonView && <motion.div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--barva-primarni)]" layoutId="underline" />}
         </button>
     );
 
     return (
         <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border-2 border-gray-100">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+            <div className="flex justify-between items-start sm:items-center mb-4">
                 <h3 className="3xl:text-xl pb-2 md:pb-0 font-semibold text-[var(--barva-tmava)]">Výzvy</h3>
                 {/* Přidáme nové tlačítko do přepínače */}
-                <div className="flex items-center rounded-lg p-1 space-x-1 sm:space-x-2">
+                <div className="flex items-center rounded-lg space-x-1 sm:space-x-2">
                     <SwitchButton buttonView="active" label="Aktivní" count={activeChallenges.length} />
                     <SwitchButton buttonView="completed" label="Hotové" count={completedChallenges.length} />
                     <SwitchButton buttonView="saved" label="Uložené" count={savedChallenges.length} />

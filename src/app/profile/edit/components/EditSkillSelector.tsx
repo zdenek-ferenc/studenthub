@@ -78,14 +78,14 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
     <div className='w-full space-y-6'>
       <div>
         <h4 className="text-md font-semibold text-[var(--barva-tmava)] mb-2">Tvoje dovednosti</h4>
-        <div className="p-3 bg-gray-50/50 rounded-lg min-h-[4rem] flex flex-wrap gap-2 border">
+        <div className="p-3 bg-gray-50/50 rounded-lg flex flex-wrap gap-2 border">
           {selectedSkillsObjects.length > 0 ? (
             selectedSkillsObjects.map(skill => (
               <button
                 key={skill.id}
                 type="button"
                 onClick={() => handleToggleSkill(skill.id)}
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-sm font-semibold hover:opacity-70 transition-all ease-in-out duration-300 cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-1.5 sm:px-4 sm:py-2 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-xs sm:text-sm font-semibold hover:opacity-70 transition-all ease-in-out duration-300 cursor-pointer"
               >
                 {skill.name}
                 <X size={14} />
@@ -111,7 +111,7 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
               key={skill.id}
               type="button"
               onClick={() => handleToggleSkill(skill.id)}
-              className="px-3 py-1.5 bg-white border border-gray-400 cursor-pointer text-gray-700 rounded-full text-sm hover:bg-[var(--barva-svetle-pozadi)] hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-colors"
+              className="px-4 py-1.5 sm:px-4 sm:py-2 bg-white border border-gray-400 cursor-pointer text-gray-700 rounded-full text-xs sm:text-sm hover:bg-[var(--barva-svetle-pozadi)] hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-colors"
             >
               + {skill.name}
             </button>

@@ -46,12 +46,11 @@ export default function NotificationsWidget() {
             ) : (
                 <div className="text-center 3xl:py-6 flex-grow flex flex-col justify-center items-center">
                     <Bell className="w-10 h-10 mx-auto text-gray-300 mb-3" />
-                    <p className="font-semibold text-gray-700">Žádné nové události</p>
-                    <p className="text-sm text-gray-500 mt-1">Vše je v klidu.</p>
+                    <p className="text-sm md:font-base font-semibold text-gray-700">Žádné nové události</p>
                 </div>
             )}
             <div className="mt-auto pt-4 text-center">
-                <Link href="/notifications" className="text-sm font-semibold text-[var(--barva-primarni)] hover:text-[var(--barva-tmava)] transition-all ease-in-out duration-200">
+                <Link href="/notifications" className="text-xs md:text-sm font-semibold text-[var(--barva-primarni)] hover:text-[var(--barva-tmava)] transition-all ease-in-out duration-200">
                     Zobrazit všechny notifikace
                 </Link>
             </div>

@@ -81,13 +81,13 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
         className="px-3 py-1.5 sm:px-5 sm:py-2 text-[var(--barva-primarni)] rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-text focus:outline-2 outline-[var(--barva-primarni)]"
       />
       {selectedSkillsObjects.length > 0 && (
-        <div className="w-full max-w-4xl sm:px-8 flex flex-wrap gap-3 md:gap-4 md:mb-6 pt-4">
+        <div className="w-full max-w-4xl sm:px-8 flex flex-wrap gap-3 md:gap-4 py-4">
             {selectedSkillsObjects.map(skill => (
                 <button
                     key={`selected-${skill.id}`}
                     type="button"
                     onClick={() => handleToggleSkill(skill.id)}
-                    className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] bg-sky-100 rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] bg-[var(--barva-svetle-pozadi)] rounded-full text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer"
                 >
                     {skill.name}
                     <X size={20} className='w-4 h-4' />
@@ -96,7 +96,7 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
         </div>
       )}
 
-      <div className="w-full max-w-4xl md:px-4 sm:px-8 flex justify-between items-center mb-8">
+      <div className="w-full max-w-4xl px-2 md:px-4 sm:px-8 flex justify-between items-center mb-2 xl:mb-4 3xl:mb-8">
             <h4 className="text-xs sm:text-lg font-semibold opacity-70 text-[var(--barva-primarni)]">{getSkillsTitle()}</h4>
             {!searchTerm && (
                 <button type="button" onClick={() => setShowAll(!showAll)} className="text-xs sm:text-lg font-semibold text-[var(--barva-primarni)] flex items-center gap-1">
@@ -112,7 +112,7 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
             key={skill.id}
             type="button"
             onClick={() => handleToggleSkill(skill.id)}
-            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full font-semibold sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer
               ${selectedIds.includes(skill.id)
                 ? 'bg-[var(--barva-primarni2)]'
                 : 'bg-white hover:bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni2)]'

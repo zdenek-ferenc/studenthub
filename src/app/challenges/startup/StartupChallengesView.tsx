@@ -160,28 +160,34 @@ export default function StartupChallengesView() {
     }
 
     return (
-        <div className="flex flex-col max-w-5/6 mx-auto px-4 py-4 md:py-30 4xl:py-32">
+        <div className="flex flex-col h-full sm:max-w-5/6 mx-auto px-4 py-4 md:py-30 4xl:py-32">
         {!loading && allChallenges.length === 0 ? (
             <div className="text-center max-w-lg mx-auto">
                 <Image
                     src="/frownbig.svg"
                     alt="Smutný smajlík"
-                    width={50}
-                    height={50}
-                    className="w-xs mx-auto my-4 rounded-lg"
+                    width={150}
+                    height={150}
+                    className="mx-auto my-4 rounded-lg"
                 />
-            <div className='flex flex-col gap-4 my-8'>
-                <h2 className="text-3xl text-[var(--barva-primarni)]">Zatím žádná výzva</h2>
-                <p className="text-gray-500 mt-2 mb-6">Vytvořte svou první výzvu a objevte talentované studenty.</p>
+                    <div className="flex flex-col gap-4 my-8">
+                        <h2 className="text-3xl text-[var(--barva-primarni)] font-semibold">
+                        Zatím tu žádná výzva není
+                        </h2>
+                        <p className="text-gray-600 text-lg">Udělejte první krok a vytvořte výzvu, která zaujme talenty.</p>
+                    </div>
+                <Link
+                    href="/challenges/create"
+                    className="mt-6 inline-block px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-xl text-white hover:bg-[var(--barva-primarni-tmava)] transition"
+                >
+                Vytvořit první výzvu
+                </Link>
             </div>
-            <Link href="/challenges/create" className="mt-6 px-6 py-3 rounded-full bg-[var(--barva-primarni)] text-xl text-white font-semibold">
-                Vytvořit výzvu
-            </Link>
-            </div>
+
         ) : (
             <div>
                 <CommandCenter stats={dashboardStats} />
-                <div className="relative flex flex-row justify-between sm:justify-start items-center md:border-b border-gray-200 mb-8">
+                <div className="relative flex flex-row justify-between sm:justify-start items-center mb-4 md:mb-8">
                     {filters.map((filter, index) => (
                         <button
                             key={filter.id}
@@ -210,7 +216,7 @@ export default function StartupChallengesView() {
                 </div>
 
                 {displayedChallenges.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-4 3xl:gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 3xl:gap-6 mb-4">
                         {displayedChallenges.map(challenge => (
                         <ChallengeCard key={challenge.id} challenge={challenge} /> 
                         ))}
