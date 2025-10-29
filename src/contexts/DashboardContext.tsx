@@ -4,25 +4,66 @@ import { createContext, useContext, useState, ReactNode, useEffect, useCallback,
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 
+
+type SkillFromDB = { id: string; name: string };
+type StartupProfileFromDB = { company_name: string; logo_url: string | null };
+
+
+type ChallengeSkillFromDB = {
+    Skill: SkillFromDB | SkillFromDB[] | null;
+};
+
+
+type ChallengeFromDB = {
+    id: string;
+    title: string;
+    status: 'open' | 'closed' | 'archived';
+    expected_outputs: string;
+    deadline: string | null;
+    StartupProfile: StartupProfileFromDB | StartupProfileFromDB[] | null;
+    ChallengeSkill: ChallengeSkillFromDB[] | null; 
+};
+
+
+
+
+type CleanChallengeSkill = {
+    Skill: SkillFromDB | null;
+};
+
+
+type CleanChallenge = {
+    id: string;
+    title: string;
+    status: 'open' | 'closed' | 'archived';
+    expected_outputs: string;
+    deadline: string | null;
+    StartupProfile: StartupProfileFromDB | null;
+    ChallengeSkill: CleanChallengeSkill[]; 
+};
+
+
 export type CleanSubmission = {
     id: string;
     completed_outputs: string[];
     status: string;
     rating: number | null;
     position: number | null;
-    Challenge: {
-        id: string;
-        title: string;
-        status: 'open' | 'closed' | 'archived';
-        expected_outputs: string;
-        deadline: string | null;
-        StartupProfile: {
-            company_name: string;
-            logo_url: string | null;
-        } | null;
-        ChallengeSkill: { Skill: { name: string } | null }[];
-    } | null;
+    Challenge: CleanChallenge | null; 
 };
+
+
+export type SavedChallenge = {
+    Challenge: CleanChallenge; 
+    saved_at: string;
+};
+
+
+type SavedChallengeResponse = {
+    saved_at: string;
+    Challenge: ChallengeFromDB | ChallengeFromDB[] | null; 
+};
+
 
 export type ProfileProgress = {
     level: number;
@@ -33,27 +74,13 @@ export type ProfileProgress = {
         Skill: { id: string; name: string; } | null;
     }[];
 };
-
 export type Notification = {
     id: string; message: string; link_url: string; created_at: string; type: 'new_submission' | 'submission_reviewed' | 'submission_winner' | null; is_read: boolean;
 };
-
 export type StudentStats = {
     avgRating: number; completedCount: number; successRate: number; totalEarnings: number; totalWins: number;
 };
 
-export type SavedChallenge = {
-    Challenge: {
-        id: string;
-        title: string;
-        StartupProfile: {
-            company_name: string;
-            logo_url: string | null;
-        } | null;
-        ChallengeSkill: { Skill: { name: string } | null }[]; 
-    } | null;
-    saved_at: string; 
-};
 
 
 type DashboardContextType = {
@@ -63,7 +90,7 @@ type DashboardContextType = {
     notifications: Notification[];
     stats: StudentStats | null;
     studentProfile: { username: string; } | null;
-    savedChallenges: SavedChallenge[]; 
+    savedChallenges: SavedChallenge[];
     refetchDashboardData: () => void;
 };
 
@@ -79,32 +106,22 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [stats, setStats] = useState<StudentStats | null>(null);
     const [studentProfile, setStudentProfile] = useState<{ username: string } | null>(null);
-    const [savedChallenges, setSavedChallenges] = useState<SavedChallenge[]>([]); 
+    const [savedChallenges, setSavedChallenges] = useState<SavedChallenge[]>([]);
 
     const fetchDashboardData = useCallback(async (userId: string | undefined) => {
         if (!userId) {
-             setLoading(false);
-             setHasFetched(false);
-             setSubmissions([]);
-             setProgress(null);
-             setNotifications([]);
-             setStats(null);
-             setStudentProfile(null);
-             setSavedChallenges([]); 
+             setLoading(false); setHasFetched(false); setSubmissions([]); setProgress(null);
+             setNotifications([]); setStats(null); setStudentProfile(null); setSavedChallenges([]);
              return;
          }
         setLoading(true);
 
         const [
-            submissionsRes,
-            progressRes,
-            notificationsRes,
-            statsPerformanceRes,
-            statsRewardsRes,
-            profileRes,
-            savedChallengesRes 
+            submissionsRes, progressRes, notificationsRes, statsPerformanceRes,
+            statsRewardsRes, profileRes, savedChallengesRes
         ] = await Promise.all([
-             supabase.from('Submission').select(`id, completed_outputs, status, rating, position, Challenge:Challenge!Submission_challenge_id_fkey (id, title, status, expected_outputs, deadline, StartupProfile (company_name, logo_url), ChallengeSkill (Skill (name)))`).eq('student_id', userId),
+             
+             supabase.from('Submission').select(`id, completed_outputs, status, rating, position, Challenge:Challenge!Submission_challenge_id_fkey (id, title, status, expected_outputs, deadline, StartupProfile (company_name, logo_url), ChallengeSkill (Skill (id, name)))`).eq('student_id', userId),
              supabase.from('StudentProfile').select(`level, xp, StudentSkill (level, xp, Skill (id, name))`).eq('user_id', userId).single(),
              supabase.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(4),
              supabase.from('Submission').select('rating, position, Challenge!inner(status)').eq('student_id', userId).eq('Challenge.status', 'closed'),
@@ -114,43 +131,41 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
                 .from('SavedChallenge')
                 .select(`
                     saved_at:created_at,
-                    Challenge (
-                        id,
-                        title,
-                        StartupProfile (company_name, logo_url),
-                        ChallengeSkill (Skill (name))
-                    )
+                    Challenge (id, title, StartupProfile (company_name, logo_url), ChallengeSkill (Skill (id, name)))
                 `)
                 .eq('student_id', userId)
                 .order('created_at', { ascending: false })
          ]);
 
+        
         if (submissionsRes.data) {
             const cleanedSubmissions = submissionsRes.data.map(sub => {
-                const challengeData = sub.Challenge ? (Array.isArray(sub.Challenge) ? sub.Challenge[0] : sub.Challenge) : null;
+                
+                const challengeData = sub.Challenge ? (Array.isArray(sub.Challenge) ? sub.Challenge[0] : sub.Challenge) as ChallengeFromDB : null;
                 if (!challengeData) return { ...sub, Challenge: null };
+
                 const cleanedStartupProfile = challengeData.StartupProfile ? (Array.isArray(challengeData.StartupProfile) ? challengeData.StartupProfile[0] : challengeData.StartupProfile) : null;
-                const cleanedChallengeSkills = (challengeData.ChallengeSkill || []).map(cs => ({
-                    ...cs,
+                
+                const cleanedChallengeSkills: CleanChallengeSkill[] = (challengeData.ChallengeSkill || []).map((cs: ChallengeSkillFromDB) => ({
                     Skill: cs.Skill ? (Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill) : null,
                 }));
-                return {
-                    ...sub,
-                    Challenge: {
-                        ...challengeData,
-                        StartupProfile: cleanedStartupProfile,
-                        ChallengeSkill: cleanedChallengeSkills,
-                    }
+                
+                const cleanChallenge: CleanChallenge = {
+                    ...challengeData,
+                    StartupProfile: cleanedStartupProfile,
+                    ChallengeSkill: cleanedChallengeSkills,
                 };
+
+                return { ...sub, Challenge: cleanChallenge };
             });
             setSubmissions(cleanedSubmissions as CleanSubmission[]);
         } else {
             setSubmissions([]);
         }
-
-        if (progressRes.data) {
+        
+         if (progressRes.data) {
             const rawProgress = progressRes.data;
-            const cleanedSkills = (rawProgress.StudentSkill || []).map(ss => ({
+            const cleanedSkills = (rawProgress.StudentSkill || []).map((ss: { Skill: SkillFromDB | SkillFromDB[] | null, level: number, xp: number }) => ({
                 ...ss,
                 Skill: ss.Skill ? (Array.isArray(ss.Skill) ? ss.Skill[0] : ss.Skill) : null,
             }));
@@ -164,7 +179,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         }
 
         setNotifications(notificationsRes.data as Notification[] || []);
-
+        
         let performanceStats = { avgRating: 0, completedCount: 0, successRate: 0 };
         if (!statsPerformanceRes.error && statsPerformanceRes.data) {
             const ratedSubmissions = statsPerformanceRes.data.filter(s => s.rating !== null);
@@ -173,44 +188,49 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             const avgRating = ratedSubmissions.length > 0 ? ratedSubmissions.reduce((acc, s) => acc + s.rating!, 0) / ratedSubmissions.length : 0;
             const successRate = totalCompleted > 0 ? (totalWinners / totalCompleted) * 100 : 0;
             performanceStats = { avgRating: parseFloat(avgRating.toFixed(1)), completedCount: totalCompleted, successRate: Math.round(successRate) };
-        }
+         }
         let rewardStats = { totalEarnings: 0, totalWins: 0 };
         if (!statsRewardsRes.error && statsRewardsRes.data && statsRewardsRes.data.length > 0) {
-            const result = statsRewardsRes.data[0];
+             const result = statsRewardsRes.data[0];
             rewardStats = { totalEarnings: result.total_earnings || 0, totalWins: result.total_wins || 0 };
         }
         setStats({ ...performanceStats, ...rewardStats });
 
         setStudentProfile(profileRes.data as { username: string } | null);
 
+        
         if (savedChallengesRes.data) {
-            const cleanedSavedChallenges = (savedChallengesRes.data as any[])
-                .filter(item => item.Challenge)
-                .map(item => {
-                    const challenge = Array.isArray(item.Challenge) ? item.Challenge[0] : item.Challenge;
-                    if (!challenge) return null;
+            const cleanedSavedChallenges = (savedChallengesRes.data as SavedChallengeResponse[])
+                
+                .filter(item => item.Challenge && !Array.isArray(item.Challenge))
+                .map((item: SavedChallengeResponse) => {
+                    
+                    const challenge = item.Challenge as ChallengeFromDB;
 
                     const cleanedStartupProfile = challenge.StartupProfile
                         ? (Array.isArray(challenge.StartupProfile) ? challenge.StartupProfile[0] : challenge.StartupProfile)
                         : null;
 
-                    const cleanedChallengeSkills = (challenge.ChallengeSkill || []).map((cs: any) => ({
-                        ...cs,
+                    
+                    const cleanedChallengeSkills: CleanChallengeSkill[] = (challenge.ChallengeSkill || []).map((cs: ChallengeSkillFromDB) => ({
                         Skill: cs.Skill ? (Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill) : null,
                     }));
 
+                    
+                    const cleanChallenge: CleanChallenge = {
+                         ...challenge,
+                         StartupProfile: cleanedStartupProfile,
+                         ChallengeSkill: cleanedChallengeSkills,
+                    };
+
+                    
                     return {
                         saved_at: item.saved_at,
-                        Challenge: {
-                            ...challenge,
-                            StartupProfile: cleanedStartupProfile,
-                            ChallengeSkill: cleanedChallengeSkills,
-                        },
-                    } as SavedChallenge;
-                })
-                .filter(Boolean) as SavedChallenge[];
+                        Challenge: cleanChallenge
+                    };
+                }); 
 
-            setSavedChallenges(cleanedSavedChallenges);
+            setSavedChallenges(cleanedSavedChallenges); 
         } else {
             setSavedChallenges([]);
         }
@@ -219,7 +239,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         setHasFetched(true);
     }, []);
 
-     const refetchDashboardData = useCallback(() => {
+    const refetchDashboardData = useCallback(() => {
         if (user?.id) {
             setHasFetched(false);
             fetchDashboardData(user.id);
@@ -228,10 +248,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
 
     useEffect(() => {
-        if (authLoading) {
-            return;
-        }
-
+        if (authLoading) return;
         if (user && profile?.role === 'student' && !hasFetched) {
             fetchDashboardData(user.id);
         } else if (!user && hasFetched) {
@@ -242,8 +259,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     }, [user, profile, authLoading, hasFetched, fetchDashboardData]);
 
     const value = useMemo(() => ({
-        loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData // <-- Přidáno savedChallenges
-    }), [loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData]); // <-- Přidáno savedChallenges
+        loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData
+    }), [loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData]);
 
     return (
         <DashboardContext.Provider value={value}>
