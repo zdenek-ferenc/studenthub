@@ -211,9 +211,12 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
                 </div>
               </Link>
               
-              <div className="flex xl:hidden items-center justify-center w-8 h-8 md:w-10 md:h-10 ring-2 ring-[var(--barva-primarni)] bg-[var(--barva-primarni)]  text-white rounded-full transition-colors">
-                <ChevronRight size={22} strokeWidth={3} />
-              </div>
+              <Link href={`/challenges/${challenge.id}`} className="h-full flex flex-col">
+                <div className="flex xl:hidden items-center justify-center w-8 h-8 md:w-10 md:h-10 ring-2 ring-[var(--barva-primarni)] bg-[var(--barva-primarni)]  text-white rounded-full transition-colors">
+                  <ChevronRight size={22} strokeWidth={3} />
+                </div>
+              </Link>
+              
             </div>
           </div>
       </div>
