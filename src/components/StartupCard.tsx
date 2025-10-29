@@ -46,7 +46,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
 
   return (
       <Link href={`/profile/${startup.user_id}`} className="block group h-full">
-        <div className="bg-white rounded-2xl shadow-xs p-3 sm:p-6 border border-gray-100 group-hover:shadow-lg group-hover:border-blue-200 transition-all duration-300 ease-in-out flex flex-col h-full">
+        <div className="bg-white rounded-2xl shadow-xs p-3 sm:p-6 border border-gray-100 group-hover:shadow-sm group-hover:border-blue-200 transition-all duration-300 ease-in-out flex flex-col h-full">
           <div className="flex-grow">
             <div className="flex items-start gap-4 mb-4">
               {startup.logo_url ? (

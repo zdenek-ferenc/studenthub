@@ -79,11 +79,11 @@ export default function LoginPage() {
 
   return (
     <div className="w-full min-h-screen py-10 md:py-32 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
-      <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="p-8 sm:p-12 flex flex-col justify-center">
           <div>
             <h1 className="text-3xl font-bold text-[var(--barva-tmava)]">Vítej zpět!</h1>
-            <p className="text-gray-500 mt-4 text-sm">Zadej své přihlašovací údaje</p>
+            <p className="text-gray-500 mt-4 texxt-sm">Zadej své přihlašovací údaje</p>
           </div>
 
           <form onSubmit={handleEmailLogin} className="mt-8 space-y-5">

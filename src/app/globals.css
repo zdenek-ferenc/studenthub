@@ -6,7 +6,7 @@
   --barva-primarni: #006ACC;
   --barva-primarni2: #CEE8FF;
   --barva-tmava: #003566;
-  --barva-tmava-tmavsi: #092947;
+  --barva-tmava-tmavsi: #001b35;
   --barva-svetle-pozadi: #EFF8FF;
   --barva-podtext: #00356675;
 }
@@ -43,13 +43,13 @@ body {
 }
 
 .input {
-  @apply w-full text-left border border-gray-300 rounded-xl 3xl:rounded-xl px-4 text-black py-1.5 text-sm 3xl:text-base 3xl:py-2.5;
+  @apply w-full text-left border border-gray-300 rounded-xl px-4 text-black py-1.5 text-sm 3xl:text-base 3xl:py-2.5;
   @apply focus:outline-none focus:ring-1 focus:ring-[var(--barva-primarni)] focus:border-transparent;
   @apply transition-all;
 }
 
 .input2 {
-  @apply w-full text-left border border-gray-300 rounded-2xl px-12 py-3 font-semibold text-black;
+  @apply w-full text-left border border-gray-300 rounded-xl px-12 py-3 text-black;
   @apply focus:outline-none focus:ring-1 focus:ring-[var(--barva-primarni)] focus:border-transparent;
   @apply transition-all;
 }
@@ -259,4 +259,38 @@ body {
   background-size: 200% 200%;
 
   animation: subtleShimmer 15s linear infinite;
+}
+
+@import 'react-phone-number-input/style.css';
+
+
+.PhoneInputInput {
+   
+    width: 100% !important;
+    border-width: 1px !important;
+    border-color: #fff !important;
+    border-radius: 0.5rem !important;
+    padding-left: 0.75rem !important;
+    font-weight: 400 !important;
+    font-size: 0.875rem !important;
+}
+
+
+.PhoneInputInput:focus {
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+    border-color: #fff;
+    box-shadow: 0 0 0 2px var(--barva-primarni-light) !important;
+}
+
+
+.glasseffect {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+
+  backdrop-filter: blur(6px);
+  filter: url(#glass-distortion);
+  overflow: hidden;
+  isolation: isolate;
 }

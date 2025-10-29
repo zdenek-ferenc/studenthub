@@ -70,7 +70,7 @@ export default function CompletedChallengeCard({ submission }: { submission: Com
             className="rounded-xl w-14 h-14 object-cover flex-shrink-0" 
         />
         <div className="flex-grow min-w-0">
-            <h4 className="text-md sm:text-lg font-bold text-gray-800 truncate">{Challenge.title}</h4>
+            <h4 className="text-md sm:text-lg font-bold text-[var(--barva-tmava)] truncate">{Challenge.title}</h4>
             <p className="text-sm font-semibold text-gray-500 truncate">{Challenge.StartupProfile?.company_name}</p>
         </div>
         <div className="flex-shrink-0 flex items-center gap-4">

@@ -5,6 +5,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 import GDPRModal from '../../../../components/GDPRModal';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css'; 
+import { Controller } from 'react-hook-form';
 
 type FormData = {
   first_name: string;
@@ -20,7 +23,7 @@ type StepProps = {
 };
 
 export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
-  const { register, handleSubmit, formState: { errors, isSubmitting, isValidating }, watch } = useForm<FormData>({
+  const { register, control, handleSubmit, formState: { errors, isSubmitting, isValidating }, watch } = useForm<FormData>({
       mode: 'onChange',
       reValidateMode: 'onChange',
       defaultValues: {
@@ -134,19 +137,25 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
         </div>
 
         <div>
-          <input 
-            id="phone_number" 
-            type="tel" 
-            placeholder="Telefonní číslo"
-          {...register('phone_number', {
-            required: 'Telefonní číslo je povinné',
-            pattern: {
-            value: /^[0-9]{9,15}$/, 
-            message: 'Zadej platné telefonní číslo',
-    },
-  })} 
-  className="input" 
-/>
+          <Controller
+            name="phone_number"
+            control={control}
+            rules={{
+              required: 'Telefonní číslo je povinné',
+              validate: (value) => isValidPhoneNumber(value || '') || 'Zadejte platné telefonní číslo'
+            }}
+            render={({ field }) => (
+              <PhoneInput
+          {...field}
+          placeholder="Telefonní číslo *"
+          className="input"
+          defaultCountry="CZ" 
+          international
+          countryCallingCodeEditable={false}
+              />
+            )}
+          />
+          {errors.phone_number && <p className="error pt-2 text-red-500 text-center">{errors.phone_number.message}</p>}
         </div>
 
       <div className="pt-4">

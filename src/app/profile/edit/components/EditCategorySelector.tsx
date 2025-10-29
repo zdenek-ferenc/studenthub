@@ -110,7 +110,7 @@ export default function CategorySelectorEdit({ onSelectionChange, initialSelecte
               key={cat.id}
               type="button"
               onClick={() => handleToggleCategory(cat.id)}
-              className="cursor-pointer px-3 py-1.5 bg-white text-gray-700 border border-gray-700 rounded-lg text-sm hover:bg-[var(--barva-svetle-pozadi)] hover:text-[var(--barva-primarni)] hover:border-[var(--barva-primarni)]  transition-all ease-in-out duration-200"
+              className="cursor-pointer px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-700 rounded-lg text-sm hover:bg-[var(--barva-svetle-pozadi)] hover:text-[var(--barva-primarni)] hover:border-[var(--barva-primarni)]  transition-all ease-in-out duration-200"
             >
               + {cat.name}
             </button>

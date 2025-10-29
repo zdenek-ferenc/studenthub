@@ -42,6 +42,20 @@ export type StudentStats = {
     avgRating: number; completedCount: number; successRate: number; totalEarnings: number; totalWins: number;
 };
 
+export type SavedChallenge = {
+    Challenge: {
+        id: string;
+        title: string;
+        StartupProfile: {
+            company_name: string;
+            logo_url: string | null;
+        } | null;
+        ChallengeSkill: { Skill: { name: string } | null }[]; 
+    } | null;
+    saved_at: string; 
+};
+
+
 type DashboardContextType = {
     loading: boolean;
     submissions: CleanSubmission[];
@@ -49,6 +63,7 @@ type DashboardContextType = {
     notifications: Notification[];
     stats: StudentStats | null;
     studentProfile: { username: string; } | null;
+    savedChallenges: SavedChallenge[]; 
     refetchDashboardData: () => void;
 };
 
@@ -64,6 +79,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [stats, setStats] = useState<StudentStats | null>(null);
     const [studentProfile, setStudentProfile] = useState<{ username: string } | null>(null);
+    const [savedChallenges, setSavedChallenges] = useState<SavedChallenge[]>([]); 
 
     const fetchDashboardData = useCallback(async (userId: string | undefined) => {
         if (!userId) {
@@ -74,6 +90,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
              setNotifications([]);
              setStats(null);
              setStudentProfile(null);
+             setSavedChallenges([]); 
              return;
          }
         setLoading(true);
@@ -84,7 +101,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             notificationsRes,
             statsPerformanceRes,
             statsRewardsRes,
-            profileRes
+            profileRes,
+            savedChallengesRes 
         ] = await Promise.all([
              supabase.from('Submission').select(`id, completed_outputs, status, rating, position, Challenge:Challenge!Submission_challenge_id_fkey (id, title, status, expected_outputs, deadline, StartupProfile (company_name, logo_url), ChallengeSkill (Skill (name)))`).eq('student_id', userId),
              supabase.from('StudentProfile').select(`level, xp, StudentSkill (level, xp, Skill (id, name))`).eq('user_id', userId).single(),
@@ -92,20 +110,30 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
              supabase.from('Submission').select('rating, position, Challenge!inner(status)').eq('student_id', userId).eq('Challenge.status', 'closed'),
              supabase.rpc('get_student_rewards', { p_student_id: userId }),
              supabase.from('StudentProfile').select('username').eq('user_id', userId).single(),
+             supabase
+                .from('SavedChallenge')
+                .select(`
+                    saved_at:created_at,
+                    Challenge (
+                        id,
+                        title,
+                        StartupProfile (company_name, logo_url),
+                        ChallengeSkill (Skill (name))
+                    )
+                `)
+                .eq('student_id', userId)
+                .order('created_at', { ascending: false })
          ]);
 
         if (submissionsRes.data) {
             const cleanedSubmissions = submissionsRes.data.map(sub => {
                 const challengeData = sub.Challenge ? (Array.isArray(sub.Challenge) ? sub.Challenge[0] : sub.Challenge) : null;
                 if (!challengeData) return { ...sub, Challenge: null };
-
                 const cleanedStartupProfile = challengeData.StartupProfile ? (Array.isArray(challengeData.StartupProfile) ? challengeData.StartupProfile[0] : challengeData.StartupProfile) : null;
-
                 const cleanedChallengeSkills = (challengeData.ChallengeSkill || []).map(cs => ({
                     ...cs,
                     Skill: cs.Skill ? (Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill) : null,
                 }));
-
                 return {
                     ...sub,
                     Challenge: {
@@ -155,11 +183,43 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
         setStudentProfile(profileRes.data as { username: string } | null);
 
+        if (savedChallengesRes.data) {
+            const cleanedSavedChallenges = (savedChallengesRes.data as any[])
+                .filter(item => item.Challenge)
+                .map(item => {
+                    const challenge = Array.isArray(item.Challenge) ? item.Challenge[0] : item.Challenge;
+                    if (!challenge) return null;
+
+                    const cleanedStartupProfile = challenge.StartupProfile
+                        ? (Array.isArray(challenge.StartupProfile) ? challenge.StartupProfile[0] : challenge.StartupProfile)
+                        : null;
+
+                    const cleanedChallengeSkills = (challenge.ChallengeSkill || []).map((cs: any) => ({
+                        ...cs,
+                        Skill: cs.Skill ? (Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill) : null,
+                    }));
+
+                    return {
+                        saved_at: item.saved_at,
+                        Challenge: {
+                            ...challenge,
+                            StartupProfile: cleanedStartupProfile,
+                            ChallengeSkill: cleanedChallengeSkills,
+                        },
+                    } as SavedChallenge;
+                })
+                .filter(Boolean) as SavedChallenge[];
+
+            setSavedChallenges(cleanedSavedChallenges);
+        } else {
+            setSavedChallenges([]);
+        }
+
         setLoading(false);
         setHasFetched(true);
     }, []);
 
-    const refetchDashboardData = useCallback(() => {
+     const refetchDashboardData = useCallback(() => {
         if (user?.id) {
             setHasFetched(false);
             fetchDashboardData(user.id);
@@ -182,8 +242,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     }, [user, profile, authLoading, hasFetched, fetchDashboardData]);
 
     const value = useMemo(() => ({
-        loading, submissions, progress, notifications, stats, studentProfile, refetchDashboardData
-    }), [loading, submissions, progress, notifications, stats, studentProfile, refetchDashboardData]);
+        loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData // <-- Přidáno savedChallenges
+    }), [loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData]); // <-- Přidáno savedChallenges
 
     return (
         <DashboardContext.Provider value={value}>
