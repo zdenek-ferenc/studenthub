@@ -54,8 +54,8 @@ export default function StatsWidget() {
                         icon={Percent}
                         value={`${stats.successRate}%`}
                         label="Úspěšnost"
-                        colorClass="text-purple-500"
-                        borderColorClass="border-purple-500"
+                        colorClass="text-fuchsia-400"
+                        borderColorClass="border-fuchsia-400"
                     />
                      <StatItem
                         icon={Trophy}

@@ -2,6 +2,9 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import GDPRModal from '../../../../components/GDPRModal';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { Controller } from 'react-hook-form';
 
 type FormData = {
   company_name: string;
@@ -19,7 +22,7 @@ type StepProps = {
 };
 
 export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { register, control, handleSubmit, formState: { errors } } = useForm<FormData>({
       defaultValues: {
           company_name: initialData.company_name || '',
           ico: initialData.ico || '',
@@ -61,14 +64,25 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
         </div>
 
         <div>
-          <input 
-            id="phone_number" 
-            type="tel" 
-            placeholder="Telefonní číslo *"
-            {...register('phone_number', { required: 'Telefonní číslo je povinné' })} 
-            className="input" 
+          <Controller
+            name="phone_number"
+            control={control}
+            rules={{
+              required: 'Telefonní číslo je povinné',
+              validate: (value) => isValidPhoneNumber(value || '') || 'Zadejte platné telefonní číslo'
+            }}
+            render={({ field }) => (
+              <PhoneInput
+          {...field}
+          placeholder="Telefonní číslo *"
+          className="input"
+          defaultCountry="CZ" 
+          international
+          countryCallingCodeEditable={false}
+              />
+            )}
           />
-          {errors.phone_number && <p className="error pt-2 text-blue-400 text-center">{errors.phone_number.message}</p>}
+          {errors.phone_number && <p className="error pt-2 text-red-500 text-center">{errors.phone_number.message}</p>}
         </div>
 
         <div>

@@ -7,17 +7,27 @@ import { useAuth, Profile } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Bell, LogIn} from 'lucide-react';
+import { Bell, LogIn, UserPlus} from 'lucide-react';
 import BottomNavBar from './BottomNavBar';
 
 
 function LoggedOutBottomNavBar() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-40 md:hidden">
-      <div className="w-full h-full max-w-md mx-auto flex items-center justify-around gap-4 px-4">
-        <Link href="/welcome" className="flex-1 flex items-center justify-center gap-3 text-center group py-3 px-6 bg-[var(--barva-primarni)] hover:opacity-90 rounded-xl transition-opacity">
-            <LogIn size={22} className="text-white" />
-            <span className="text-base font-semibold text-white">Přihlásit se / Registrovat</span>
+      <div className="w-full h-full max-w-md mx-auto flex items-center justify-around gap-2 px-2"> 
+        <Link
+          href="/register"
+          className="flex-1 flex items-center justify-center gap-2 text-center group py-3 px-4 bg-[var(--barva-primarni)] hover:opacity-90 rounded-xl transition-opacity"
+        >
+          <UserPlus size={20} className="text-white" />
+          <span className="text-sm font-semibold text-white">Vytvořit účet</span>
+        </Link>
+        <Link
+          href="/login"
+          className="flex-1 flex items-center justify-center gap-2 text-center group py-3 px-4 border-2 border-[var(--barva-primarni)] bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+        >
+          <LogIn size={20} className="text-[var(--barva-primarni)]" />
+          <span className="text-sm font-semibold text-[var(--barva-primarni)]">Přihlásit se</span>
         </Link>
       </div>
     </nav>
@@ -173,8 +183,8 @@ export default function Header() {
   return (
     <>
       <header className={`hidden md:block fixed w-full top-0 z-50`}>
-        <div className={`absolute inset-0 bg-white/0 backdrop-blur-md transition-opacity duration-300 ${showBackground ? 'opacity-100' : 'opacity-0'}`}></div>
-        
+        <div className={`isolate absolute inset-0 glasseffect card transition-opacity duration-300 ${showBackground ? 'opacity-100' : 'opacity-0'}`}></div>
+
         <div className="relative max-w-5/6 mx-auto flex justify-between items-center h-24 3xl:h-30">
           <div className="flex-1 flex justify-start">
             {isRegistrationFlow ? (
