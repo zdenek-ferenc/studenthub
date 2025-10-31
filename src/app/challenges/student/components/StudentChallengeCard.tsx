@@ -125,15 +125,29 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
   return (
     
     <div className="relative bg-white rounded-2xl shadow-xs hover:shadow-none transition-all duration-300 ease-in-out border-2 border-gray-100 flex flex-col h-full pr-5 sm:pr-6">
-      <button
-        onClick={handleSaveToggle}
-        disabled={isSaving}
-        className={`absolute top-3 right-3 z-10 p-1.5 cursor-pointer rounded-full transition-colors duration-200 ${isSaving ? 'text-gray-300' : isSaved ? 'text-yellow-500 bg-yellow-100 hover:bg-yellow-200' : 'text-gray-400 hover:bg-yellow-50 hover:text-yellow-400 tranistion-all ease-in-out duration-200'}`}
-        aria-label={isSaved ? "Odebrat z uložených" : "Uložit výzvu"}
-      >
-        <Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
-      </button>
-
+      {isApplied ? (
+    <div
+      className={`absolute top-2  sm:top-4 sm:right-3 flex items-center w-4 h-4 bg-green-400 border border-green-300 inset-shadow-sm inset-shadow-white/50 font-bold rounded-full z-10 shadow-sm
+                  transition-all duration-300 ease-in-out
+                  group-hover:opacity-0 group-hover:scale-75 group-hover:-translate-y-2`}
+    >
+    </div>
+  ) : (
+    <button
+      onClick={handleSaveToggle}
+      disabled={isSaving}
+      className={`absolute top-3 right-3 z-10 p-1.5 cursor-pointer rounded-full transition-colors duration-200 ${
+        isSaving
+          ? 'text-gray-300'
+          : isSaved
+          ? 'text-yellow-500 bg-yellow-100 hover:bg-yellow-200'
+          : 'text-gray-400 hover:bg-yellow-50 hover:text-yellow-400 tranistion-all ease-in-out duration-200'
+      }`}
+      aria-label={isSaved ? 'Odebrat z uložených' : 'Uložit výzvu'}
+    >
+      <Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
+    </button>
+  )}
       <div className="h-full flex flex-col">
           <div className="flex-grow">
             <div className="flex items-start justify-between gap-4 px-4 pt-4 pb-2 sm:pb-0 md:p-5 3xl:px-6 rounded-t-2xl">

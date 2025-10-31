@@ -24,7 +24,7 @@ function LoggedOutBottomNavBar() {
         </Link>
         <Link
           href="/login"
-          className="flex-1 flex items-center justify-center gap-2 text-center group py-3 px-4 border-2 border-[var(--barva-primarni)] bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 text-center group py-3 px-4 border-2 border-[var(--barva-primarni)] bg-white rounded-xl transition-colors"
         >
           <LogIn size={20} className="text-[var(--barva-primarni)]" />
           <span className="text-sm font-semibold text-[var(--barva-primarni)]">Přihlásit se</span>
@@ -212,7 +212,7 @@ export default function Header() {
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
-                  <Link href="/login" className="px-5 py-2.5 rounded-full text-xs lg:text-base font-medium text-[var(--barva-tmava)] bg-gray-100 hover:bg-gray-200">Přihlásit se</Link>
+                  <Link href="/login" className="px-5 py-2.5 rounded-full flex gap-1 text-xs lg:text-base font-medium text-[var(--barva-primarni)] bg-white border border-[var(--barva-primarni)] hover:bg-gray-50">Přihlásit <span className='hidden md:block'>se</span></Link>
                   <Link href="/register" className="px-5 py-2.5 rounded-full text-xs lg:text-base font-medium bg-[var(--barva-primarni)] text-white hover:opacity-90">Registrovat</Link>
                 </div>
               )

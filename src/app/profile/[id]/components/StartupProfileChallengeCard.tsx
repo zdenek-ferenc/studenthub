@@ -68,7 +68,7 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
                     <span className='hidden sm:block'>Přihlášeno</span>
                 </div>
             )}
-            <div className="p-2 sm:p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md hover:bg-blue-50 transition-all duration-300 flex items-center relative">
+            <div className="p-2 sm:p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex items-center relative">
                 <div className="flex-grow min-w-0">
                     <p className="text-[var(--barva-tmava)] truncate text-sm 3xl:text-lg pr-4">{challenge.title}</p>
 
@@ -89,7 +89,7 @@ export default function StartupProfileChallengeCard({ challenge, studentSkillIds
                                             className={`text-xs font-medium border px-3 py-1 rounded-xl transition-colors ${
                                                 isMatch
                                                     ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border-[var(--barva-primarni)]' 
-                                                    : 'bg-gray-100 text-gray-600 border-gray-200' 
+                                                    : 'bg-gray-50 text-gray-600 border-gray-200' 
                                             }`}
                                         >
                                             {cs.Skill.name}

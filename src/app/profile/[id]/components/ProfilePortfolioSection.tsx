@@ -39,7 +39,7 @@ export default function ProfilePortfolioSection({ submissions, isOwner }: Props)
                     {isOwner ? (
                         <>
                             <p className='text-sm sm:text-base'>Zatím jsi nezveřejnil/a žádné úspěchy.</p>
-                            <p className="mt-2 text-xs sm:text-sm">Získej reference dokončením výzev!</p>
+                            <p className="mt-3 text-xs font-light text-gray-400 sm:text-sm">Získej reference dokončením výzev!</p>
                             <Link href="/challenges" className="inline-block mt-4 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer text-sm hover:opacity-90 transition-opacity">
                                 Prohlédnout výzvy
                             </Link>

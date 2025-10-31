@@ -78,11 +78,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full min-h-screen py-10 md:py-32 flex items-start justify-center bg-[var(--barva-svetle-pozadi)] p-4">
-      <div className="w-full max-w-4xl grid lg:grid-cols-2 bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="w-full min-h-screen py-10 md:py-32 flex items-start justify-center bg-white sm:bg-[var(--barva-svetle-pozadi)] p-4">
+      <div className="w-full max-w-4xl grid lg:grid-cols-2 sm:bg-white rounded-2xl sm:shadow-sm md:border-2 md:border-gray-100 overflow-hidden">
         <div className="p-8 sm:p-12 flex flex-col justify-center">
           <div>
-            <h1 className="text-3xl font-bold text-[var(--barva-tmava)]">Vítej zpět!</h1>
+            <h1 className="text-3xl font-bold text-[var(--barva-primarni)] sm:text-[var(--barva-tmava)]">Vítej zpět!</h1>
             <p className="text-gray-500 mt-4 texxt-sm">Zadej své přihlašovací údaje</p>
           </div>
 
@@ -128,7 +128,7 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-        <div className="hidden lg:block bg-[var(--barva-primarni)] relative">
+        <div className=" bg-[var(--barva-primarni)] relative">
             <ImageSlideshow />
         </div>
       </div>
