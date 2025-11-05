@@ -10,6 +10,7 @@ type Submission = {
     Challenge: {
         id: string;
         title: string;
+        startup_id: string;
         ChallengeSkill: { Skill: { name: string } }[];
         StartupProfile: {
             company_name: string;
