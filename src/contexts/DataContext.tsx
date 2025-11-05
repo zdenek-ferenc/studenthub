@@ -291,8 +291,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         startups, students, allCategories, allSkills,
         loadingStartups, loadingStudents, loadingFilters,
         hasMoreStartups, hasMoreStudents,
-        refetchStartups: () => { if (!authLoading) refetchStartups(0); },
-        refetchStudents: () => { if (!authLoading) refetchStudents(0); },
+        refetchStartups: refetchStartups,
+        refetchStudents: refetchStudents,
         loadMoreStartups, loadMoreStudents,
         startupFilters: {
             searchQuery: startupSearch, setSearchQuery: setStartupSearch,
@@ -311,7 +311,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         startupSearch, startupCategories, startupSortBy,
         studentSearch, studentSkills, studentSortBy,
         loadMoreStartups, loadMoreStudents,
-        refetchStartups, refetchStudents, authLoading
+        refetchStartups, refetchStudents
     ]);
 
 

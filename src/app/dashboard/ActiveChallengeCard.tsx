@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckSquare, Clock, Edit3, ChevronRight } from 'lucide-react';
+import { CheckSquare, Clock, Edit3, ChevronRight, AlertTriangle } from 'lucide-react';
+import { differenceInCalendarDays } from 'date-fns';
 
 export type ActiveChallengeData = {
   id: string;
@@ -12,6 +13,7 @@ export type ActiveChallengeData = {
     id: string;
     title: string;
     expected_outputs: string;
+    deadline: string | null; 
     StartupProfile: {
       company_name: string;
       logo_url: string | null;
@@ -53,7 +55,7 @@ const StatusInfo = ({ status }: { status: string }) => {
     }
 
     return (
-        <div className={`flex items-center gap-2 font-semibold text-sm leading-none ${colorClass}`}>
+        <div className={`flex items-center gap-2 font-semibold text-xs ${colorClass}`}>
             {icon}
             <span>{text}</span>
         </div>
@@ -70,10 +72,40 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
   const totalOutputs = Challenge.expected_outputs.split('\n').filter(line => line.trim() !== '').length;
   const completedCount = submission.completed_outputs?.length || 0;
   
+  const daysRemaining = Challenge.deadline ? differenceInCalendarDays(new Date(Challenge.deadline), new Date()) : null;
+  let deadlineText: string | null = null;
+  let deadlineColor = 'text-gray-500';
+  let DeadlineIcon = Clock;
+
+  if (daysRemaining !== null) {
+      if (daysRemaining < 0) {
+          deadlineText = 'Po termínu';
+          deadlineColor = 'text-red-500 font-semibold';
+          DeadlineIcon = AlertTriangle;
+      } else if (daysRemaining === 0) {
+          deadlineText = 'Končí dnes!';
+          deadlineColor = 'text-red-500 font-bold';
+      } else if (daysRemaining === 1) {
+          deadlineText = 'Zbývá 1 den';
+          deadlineColor = 'text-orange-500 font-semibold';
+      } else if (daysRemaining <= 4) {
+          deadlineText = `Zbývají ${daysRemaining} dny`;
+          deadlineColor = 'text-orange-500';
+      } else {
+          deadlineText = `Zbývá ${daysRemaining} dní`;
+          if (daysRemaining <= 7) {
+              // 5, 6, 7 dní
+              deadlineColor = 'text-orange-500'; 
+          } else {
+              // 8+ dní
+              deadlineColor = 'text-gray-500';
+          }
+      }
+  }
 
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
-      <div className={`bg-white p-4 rounded-2xl shadow-xs border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
+      <div className={`bg-white p-4 rounded-2xl shadow-xs border-1 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
         <div className="flex items-center gap-4 flex-grow w-full">
             <div className="flex-shrink-0">
                 <Image 
@@ -110,14 +142,23 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 </div>
                 <ProgressBar value={completedCount} maxValue={totalOutputs} />
             </div>
-            <div className="w-full flex justify-end md:justify-start items-end mt-3 h-5">
-                <div className="transition-opacity duration-200">
-                    <StatusInfo status={submission.status} />
+            <div className="w-full flex justify-between items-center mt-3 h-auto">
+                <div className="flex flex-col gap-1.5"> {/* Kontejner pro řazení pod sebe */}
+                    {deadlineText && (
+                        <div className={`flex items-center gap-1.5 text-xs font-medium ${deadlineColor}`}>
+                            <DeadlineIcon size={14} />
+                            <span>{deadlineText}</span>
+                        </div>
+                    )}
+                    <div className="transition-opacity duration-200">
+                        <StatusInfo status={submission.status} />
+                    </div>
                 </div>
-                <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-2 -translate-x-0 transition-all duration-400 text-sm text-[var(--barva-primarni)]">
+                
+                <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-2 -translate-x-0 transition-all duration-400 text-sm text-[var(--barva-primarni)] self-center">
                     <ChevronRight size={18} strokeWidth={2.5}/>
                 </div>
-            </div>  
+            </div>
         </div>
       </div>
     </Link>

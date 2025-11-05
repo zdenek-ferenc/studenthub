@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StudentCard from '../../components/StudentCard';
 import FilterSidebar from '../../components/FilterSidebar';
 import { useAuth } from '../../contexts/AuthContext';
@@ -9,10 +9,17 @@ import { useData } from '../../contexts/DataContext';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { SlidersHorizontal } from 'lucide-react';
 
+
 function StudentCatalogPage() {
     const { profile, loading: authLoading } = useAuth();
-    const { students, allSkills, studentFilters, loadingStudents, loadMoreStudents, hasMoreStudents, loadingFilters } = useData();
+    const { students, allSkills, studentFilters, loadingStudents, loadMoreStudents, hasMoreStudents, loadingFilters, refetchStudents } = useData();
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    useEffect(() => {
+        if (profile?.role === 'startup') {
+            refetchStudents();
+        }
+    }, [profile?.role, refetchStudents]);
 
     if (authLoading) {
         return <LoadingSpinner />;

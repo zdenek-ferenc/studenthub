@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Bookmark, CheckCircle, ChevronRight } from 'lucide-react';
+import { Bookmark, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../../lib/supabaseClient'; 
 import { useAuth } from '../../../../contexts/AuthContext'; 

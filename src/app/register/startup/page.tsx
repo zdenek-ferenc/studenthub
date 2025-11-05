@@ -39,8 +39,7 @@ const initialStartupFormData: StartupRegistrationData = {
 
 
 const RegistrationHeader = ({ currentStep, onBack, isLoading }: { currentStep: number, onBack: () => void, isLoading: boolean }) => {
-    const stepIndex = Math.max(0, currentStep - 2);
-    const progressPercentage = (stepIndex / TOTAL_STEPS) * 100;
+    const activeStepIndex = Math.max(0, currentStep - 2);
 
     return (
         <div className="w-full max-w-lg mx-auto mb-4">
@@ -57,11 +56,15 @@ const RegistrationHeader = ({ currentStep, onBack, isLoading }: { currentStep: n
                     Krok {currentStep - 1} / {TOTAL_STEPS}
                 </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                <div
-                    className="bg-[var(--barva-primarni)] h-1.5 rounded-full transition-all duration-300 ease-out"
-                    style={{ width: `${progressPercentage}%` }}
-                />
+            <div className="flex items-center gap-2 w-full">
+                {Array.from({ length: TOTAL_STEPS }).map((_, index) => (
+                    <div
+                        key={index}
+                        className={`h-1.5 flex-1 rounded-full transition-colors inset-shadow-sm inset-shadow-white/40 duration-300 ease-out ${
+                            index <= activeStepIndex ? 'bg-[var(--barva-primarni)]' : 'bg-gray-200'
+                        }`}
+                    />
+                ))}
             </div>
         </div>
     );

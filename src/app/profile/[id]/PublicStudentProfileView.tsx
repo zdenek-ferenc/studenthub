@@ -29,9 +29,11 @@ type StartupProfileInfo = {
     logo_url: string | null;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ChallengeInfo = {
     id: string;
     title: string;
+    startup_id: string;
     ChallengeSkill: ChallengeSkill[];
     StartupProfile: StartupProfileInfo | null;
 };
@@ -39,7 +41,16 @@ type ChallengeInfo = {
 type Submission = {
     rating: number | null;
     position: number | null;
-    Challenge: ChallengeInfo | null;
+    Challenge: {
+        id: string;
+        title: string;
+        startup_id: string; // <-- PŘIDEJ TENTO ŘÁDEK
+        ChallengeSkill: { Skill: { name: string } }[];
+        StartupProfile: {
+            company_name: string;
+            logo_url: string | null;
+        } | null;
+    } | null;
 };
 
 type StudentSkill = {

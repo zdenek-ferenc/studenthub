@@ -92,7 +92,7 @@ export default function StudentChallengesView() {
           setMobileOpen={setIsFilterOpen}
         />
         <p className="text-base pt-3 p-2 text-gray-500 mt-1">
-            Nalezeno <span className='text-[var(--barva-primarni)] font-bold'>{challenges.length}</span> výzev na základě tvých filtrů.
+            Nalezeno <span className='text-[var(--barva-primarni)] font-bold'>{availableChallenges.length}</span> výzev na základě tvých filtrů.
         </p>
         <ChallengeViewSwitch
             currentView={currentView}

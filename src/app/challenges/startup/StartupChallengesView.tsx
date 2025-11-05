@@ -155,10 +155,8 @@ export default function StartupChallengesView() {
         return <div className='py-10 md:py-32'>
                     <LoadingSpinner />;
                 </div>
-
         
     }
-
     return (
         <div className="flex flex-col h-full sm:max-w-5/6 mx-auto px-4 py-4 md:py-30 4xl:py-32">
         {!loading && allChallenges.length === 0 ? (
@@ -178,7 +176,7 @@ export default function StartupChallengesView() {
                     </div>
                 <Link
                     href="/challenges/create"
-                    className="mt-6 inline-block px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-xl text-white hover:bg-[var(--barva-primarni-tmava)] transition"
+                    className="mt-6 inline-block px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-xl text-white hover:bg-[var(--barva-primarni)]/80 transition"
                 >
                 Vytvořit první výzvu
                 </Link>

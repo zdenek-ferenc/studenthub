@@ -23,6 +23,7 @@ type Student = {
 
 type StudentCardProps = {
   student: Student;
+  demoStats?: { completed: number; won: number };
 };
 
 const getInitials = (firstName: string, lastName:string) => {
@@ -43,7 +44,7 @@ const formatChallengeText = (count: number, type: 'completed' | 'won') => {
 };
 
 
-export default function StudentCard({ student }: StudentCardProps) {
+export default function StudentCard({ student, demoStats }: StudentCardProps) {
   const [stats, setStats] = useState<{ completed: number; won: number } | null>(null);
 
   const sortedSkills = useMemo(() => {
@@ -53,6 +54,11 @@ export default function StudentCard({ student }: StudentCardProps) {
   
 
   useEffect(() => {
+    if (demoStats) {
+      setStats(demoStats);
+      return;
+    }
+
     const fetchChallengeStats = async () => {
         if (!student.user_id) return;
 
@@ -75,7 +81,7 @@ export default function StudentCard({ student }: StudentCardProps) {
     };
 
     fetchChallengeStats();
-  }, [student.user_id]);
+  }, [student.user_id, demoStats]);
 
 
   if (!student) {
