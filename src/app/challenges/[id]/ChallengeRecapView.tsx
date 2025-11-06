@@ -2,7 +2,9 @@
 
 import { useMemo } from 'react';
 import type { Submission } from './SubmissionCard';
-import { Download, MessageSquareText } from 'lucide-react';
+import { Download, MessageSquareText, User } from 'lucide-react';
+import Link from 'next/link';
+
 
 const SingleWinnerCard = ({ submission }: { submission: Submission }) => {
     const student = submission.StudentProfile;
@@ -13,7 +15,7 @@ const SingleWinnerCard = ({ submission }: { submission: Submission }) => {
                 {student?.first_name?.[0]}{student?.last_name?.[0]}
             </div>
             <p className="text-2xl font-bold text-gray-800">{student?.first_name} {student?.last_name}</p>
-            <p className="text-md text-gray-500 mb-6">@{student?.username}</p>          
+            <p className="text-md text-gray-500 mb-6">@{student?.username}</p>
             {submission.feedback_comment && (
                 <div className="text-left mb-6">
                     <h5 className="font-semibold text-gray-700 flex items-center gap-2 mb-2">
@@ -25,16 +27,24 @@ const SingleWinnerCard = ({ submission }: { submission: Submission }) => {
                     </p>
                 </div>
             )}
-
-            <a 
-                href={submission.file_url || submission.link || '#'} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[var(--barva-primarni)] font-semibold"
-            >
-                <Download className="w-5 h-5" />
-                Stáhnout vítězné řešení
-            </a>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+                <a 
+                    href={submission.file_url || submission.link || '#'} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 ease-in-out duration-200 transition-opacity w-full sm:w-auto"
+                >
+                    <Download className="w-5 h-5" />
+                    Stáhnout řešení
+                </a>
+                <Link 
+                    href={`/profile/${submission.student_id}`}
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white text-[var(--barva-primarni)] border-2 border-[var(--barva-primarni)] ease-in-out duration-200 font-semibold hover:bg-blue-50 transition-colors w-full sm:w-auto"
+                >
+                    <User className="w-5 h-5" />
+                    Zobrazit profil
+                </Link>
+            </div>
         </div>
     );
 };
@@ -44,27 +54,39 @@ const WinnerListItem = ({ submission }: { submission: Submission }) => {
     const placeText: { [key: number]: string } = { 1: "1st", 2: "2nd", 3: "3rd" };
 
     return (
-        <div className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
-            <div className="text-xl font-bold text-gray-400 w-10 text-center">{placeText[submission.position!]}</div>
-            <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center font-bold text-gray-500">
-                {student?.first_name?.[0]}{student?.last_name?.[0]}
+        <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <div className="flex items-center gap-4 flex-grow w-full">
+                <div className="text-xl font-bold text-gray-400 w-10 text-center">{placeText[submission.position!]}</div>
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center font-bold text-gray-500">
+                    {student?.first_name?.[0]}{student?.last_name?.[0]}
+                </div>
+                <div className="flex-grow">
+                    <p className="font-bold text-gray-800">{student?.first_name} {student?.last_name}</p>
+                    <p className="text-sm text-gray-500 -mt-1">@{student?.username}</p>
+                </div>
             </div>
-            <div className="flex-grow">
-                <p className="font-bold text-gray-800">{student?.first_name} {student?.last_name}</p>
-                <p className="text-sm text-gray-500 -mt-1">@{student?.username}</p>
+            <div className="flex flex-row gap-2 w-full sm:w-auto sm:flex-shrink-0">
+                <a 
+                    href={submission.file_url || submission.link || '#'} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity text-xs md:text-sm"
+                >
+                    <Download className="w-4 h-4" />
+                    <span>Řešení</span>
+                </a>
+                <Link 
+                    href={`/profile/${submission.student_id}`}
+                    className="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-white text-[var(--barva-primarni)] border-2 border-[var(--barva-primarni)] font-semibold hover:bg-gray-50 transition-colors text-xs md:text-sm"
+                >
+                    <User className="w-4 h-4" />
+                    <span>Profil</span>
+                </Link>
             </div>
-            <a 
-                href={submission.file_url || submission.link || '#'} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:opacity-90 transition-opacity"
-            >
-                <Download className="w-4 h-4" />
-                <span>Řešení</span>
-            </a>
         </div>
     );
 };
+
 export default function ChallengeRecapView({ submissions }: { submissions: Submission[] }) {
     
     const winners = useMemo(() => {

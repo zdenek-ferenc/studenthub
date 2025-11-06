@@ -109,7 +109,7 @@ export default function HomePage() {
     { src: '/sporteralogo.png', alt: 'Sportera' },
     { src: '/contributelogo.png', alt: 'Contribute' },
     { src: '/renownlogo.png', alt: 'Renown Media' },
-    { src: '/obzoremlogo.png', alt: 'Studio Obzorem' },
+    { src: '/obzoremlogo.svg', alt: 'Studio Obzorem' },
     { src: '/vdlogo.svg', alt: 'Virtigo Digital' }
   ];
 

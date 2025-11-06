@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import ChallengeRecapView from './ChallengeRecapView';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AlertCircle, CheckCircle, Lock, Clock, Users, ChevronLeft} from 'lucide-react';
+import { AlertCircle, CheckCircle, Lock, Clock, Users, ChevronLeft, Eye, EyeOff } from 'lucide-react'; // <-- PŘIDÁN IMPort Eye, EyeOff
 import { differenceInDays, format } from 'date-fns';
 import StartupChallengeHeader from './StartupChallengeHeader';
 
@@ -16,7 +16,7 @@ type Challenge = {
 id: string; status: 'draft' | 'open' | 'closed' | 'archived'; title: string;
 description: string; goals: string; expected_outputs: string;
 reward_first_place: number | null; reward_second_place: number | null; reward_third_place: number | null;
-reward_description: string | null; // Přidáno pro nefinanční odměnu
+reward_description: string | null; 
 attachments_urls: string[] | null;
 number_of_winners: number | null; 
 max_applicants: number | null; deadline: string;
@@ -102,7 +102,7 @@ const EvaluationStatusPanel = ({
                         <CheckCircle className="w-12 h-12 mx-auto text-green-500 mb-3" />
                         <h3 className="text-xl font-bold text-[var(--barva-tmava)]">Všechna řešení jsou ohodnocena!</h3>
                         <p className="text-gray-500 mt-2">Skvělá práce! Nyní můžete přejít k finálnímu výběru a přetáhnout nejlepší řešení na vítězné pozice.</p>
-                        <button onClick={onProceed} className="mt-6 px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:bg-blue-700 transition-all">
+                        <button onClick={onProceed} className="mt-6 px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:bg-[var(--barva-primarni)]/90 cursor-pointer transition-all ease-in-out duration-200">
                             Přejít k výběru vítězů
                         </button>
                     </>
@@ -128,144 +128,191 @@ const EvaluationStatusPanel = ({
 };
 
 
-export default function StartupChallengeDetail({ challenge }: { challenge: Challenge }) {
-const [submissions, setSubmissions] = useState<Submission[]>([]);
-const [loading, setLoading] = useState(true);
-const [view, setView] = useState<'evaluating' | 'selecting_winners'>('evaluating');
-const [isModalOpen, setIsModalOpen] = useState(false);
-const [winnersToConfirm, setWinnersToConfirm] = useState<{ [key: number]: string } | null>(null);
-const router = useRouter();
-const { showToast } = useAuth();
-
-const fetchInitialSubmissions = useCallback(async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-    .from('Submission')
-    .select(`*, StudentProfile(*)`)
-    .eq('challenge_id', challenge.id)
-    .order('created_at', { ascending: true });
-
-    if (error) {
-    console.error("Chyba při načítání přihlášek:", error);
-    } else {
-    setSubmissions(data as Submission[]);
-    }
-    setLoading(false);
-}, [challenge.id]);
-
-useEffect(() => {
-    fetchInitialSubmissions();
-}, [fetchInitialSubmissions]);
-
-const handleSubmissionUpdate = (updatedSubmission: Submission) => {
-setSubmissions(current => current.map(s => s.id === updatedSubmission.id ? updatedSubmission : s));
-};
-
-const { canFinalize, ratedCount } = useMemo(() => {
-    const isAfterDeadline = new Date() > new Date(challenge.deadline);
+export default function StartupChallengeDetail({ challenge: initialChallenge }: { challenge: Challenge }) {
+    const [challenge, setChallenge] = useState(initialChallenge); 
+    const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [view, setView] = useState<'evaluating' | 'selecting_winners'>('evaluating');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [winnersToConfirm, setWinnersToConfirm] = useState<{ [key: number]: string } | null>(null);
     
-    const maxApplicants = challenge.max_applicants || 0;
-    const appliedCount = challenge.Submission.length;
-    const submittedCount = submissions.filter(s => s.status === 'submitted' || s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected').length;
+    const [hiddenSubmissions, setHiddenSubmissions] = useState<Set<string>>(new Set());
+    // ------------------------------------
     
-    const isFullAndAllHaveSubmitted = 
-    maxApplicants > 0 &&
-    appliedCount === maxApplicants &&
-    submittedCount === appliedCount;
+    const router = useRouter();
+    const { showToast } = useAuth();
 
-    const rated = submissions.filter(s => s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected');
-    
-    return {
-        canFinalize: isAfterDeadline || isFullAndAllHaveSubmitted,
-        ratedCount: rated.length,
+    const fetchInitialSubmissions = useCallback(async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+        .from('Submission')
+        .select(`*, StudentProfile(*)`)
+        .eq('challenge_id', challenge.id)
+        .order('created_at', { ascending: true });
+
+        if (error) {
+        console.error("Chyba při načítání přihlášek:", error);
+        } else {
+        setSubmissions(data as Submission[]);
+        }
+        setLoading(false);
+    }, [challenge.id]);
+
+    useEffect(() => {
+        fetchInitialSubmissions();
+    }, [fetchInitialSubmissions]);
+
+    const hideSubmission = (submissionId: string) => {
+        setHiddenSubmissions(prev => new Set(prev).add(submissionId));
     };
-}, [challenge, submissions]);
 
-const anonymousSubmissions = useMemo(() => 
-    submissions.map((sub, index) => ({...sub, anonymousId: `Řešení #${index + 1}`})
-), [submissions]);
+    const showAllSubmissions = () => {
+        setHiddenSubmissions(new Set());
+    };
+    // ----------------------------------------
 
-const prepareToFinalize = (winners: { [key: number]: string }) => {
-    setWinnersToConfirm(winners);
-    setIsModalOpen(true);
-};
+    const handleSubmissionUpdate = (updatedSubmission: Submission) => {
+    setSubmissions(current => current.map(s => s.id === updatedSubmission.id ? updatedSubmission : s));
+    };
 
-const handleFinalizeChallenge = async () => {
-    if (!winnersToConfirm) return;
-    const updates = Object.entries(winnersToConfirm).map(([place, submissionId]) => 
-        supabase.from('Submission').update({ position: parseInt(place), status: 'winner' }).eq('id', submissionId)
-    );
-    await Promise.all(updates);
-    const { error } = await supabase.from('Challenge').update({ status: 'closed' }).eq('id', challenge.id);
-    if (error) showToast(`Chyba: ${error.message}`, 'error');
-    else {
-    showToast('Výsledky byly úspěšně vyhlášeny!', 'success');
-    router.push('/profile');
-    }
-    setIsModalOpen(false);
-};
+    const { canFinalize, ratedCount } = useMemo(() => {
+        const isAfterDeadline = new Date() > new Date(challenge.deadline);
+        
+        const maxApplicants = challenge.max_applicants || 0;
+        const appliedCount = challenge.Submission.length;
+        const submittedCount = submissions.filter(s => s.status === 'submitted' || s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected').length;
+        
+        const isFullAndAllHaveSubmitted = 
+        maxApplicants > 0 &&
+        appliedCount === maxApplicants &&
+        submittedCount === appliedCount;
 
-if (loading) return <p className="text-center py-20">Načítám přihlášky...</p>;
+        const rated = submissions.filter(s => s.status === 'reviewed' || s.status === 'winner' || s.status === 'rejected');
+        
+        return {
+            canFinalize: isAfterDeadline || isFullAndAllHaveSubmitted,
+            ratedCount: rated.length,
+        };
+    }, [challenge, submissions]);
 
-return (
-    <div className='lg:max-w-5xl 3xl:max-w-6xl mx-4 sm:mx-auto py-4 md:py-24 xl:py-32 md:px-4 space-y-4 sm:space-y-6 xl:space-y-7'>
-    <button
-          onClick={() => router.back()} // Použití router.back()
-          className="flex items-center gap-1 text-sm cursor-pointer font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-2"
-        >
-          <ChevronLeft size={16} />
-          Zpět na přehled
+    const anonymousSubmissions = useMemo(() => 
+        submissions.map((sub, index) => ({...sub, anonymousId: `Řešení #${index + 1}`})
+    ), [submissions]);
+
+    const displayedSubmissions = useMemo(() => 
+        anonymousSubmissions.filter(sub => !hiddenSubmissions.has(sub.id))
+    , [anonymousSubmissions, hiddenSubmissions]);
+    // --------------------------------------------------
+
+    const prepareToFinalize = (winners: { [key: number]: string }) => {
+        setWinnersToConfirm(winners);
+        setIsModalOpen(true);
+    };
+
+    const handleFinalizeChallenge = async () => {
+        if (!winnersToConfirm) return;
+        const updates = Object.entries(winnersToConfirm).map(([place, submissionId]) => 
+            supabase.from('Submission').update({ position: parseInt(place), status: 'winner' }).eq('id', submissionId)
+        );
+        await Promise.all(updates);
+        const { error } = await supabase.from('Challenge').update({ status: 'closed' }).eq('id', challenge.id);
+        
+        if (error) {
+            showToast(`Chyba: ${error.message}`, 'error');
+        } else {
+            showToast('Výsledky byly úspěšně vyhlášeny!', 'success');
+
+            await fetchInitialSubmissions(); 
+            setChallenge(prevChallenge => ({
+                ...prevChallenge,
+                status: 'closed' 
+            }));
+            router.refresh(); 
+        }
+        setIsModalOpen(false);
+    };
+
+    if (loading) return <p className="text-center py-20">Načítám přihlášky...</p>;
+
+    return (
+        <div className='lg:max-w-5xl 3xl:max-w-6xl mx-4 sm:mx-auto py-4 md:py-24 xl:py-32 md:px-4 space-y-4 sm:space-y-6 xl:space-y-7'>
+        <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1 text-sm cursor-pointer font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-2"
+            >
+            <ChevronLeft size={16} />
+            Zpět na přehled
         </button>
-    <StartupChallengeHeader challenge={challenge} />
-    {challenge.status === 'closed' || challenge.status === 'archived' ? (
-        <ChallengeRecapView submissions={submissions} />
-        ) : (
-        <>
-            {view === 'evaluating' && (
-                <>
-                    <EvaluationStatusPanel
-                        canFinalize={canFinalize}
-                        ratedCount={ratedCount}
-                        totalCount={submissions.length}
-                        onProceed={() => setView('selecting_winners')}
-                        deadline={challenge.deadline}
-                        applicants={challenge.Submission.length}
-                        maxApplicants={challenge.max_applicants}
+        <StartupChallengeHeader challenge={challenge} />
+        {challenge.status === 'closed' || challenge.status === 'archived' ? (
+            <ChallengeRecapView submissions={submissions} />
+            ) : (
+            <>
+                {view === 'evaluating' && (
+                    <>
+                        <EvaluationStatusPanel
+                            canFinalize={canFinalize}
+                            ratedCount={ratedCount}
+                            totalCount={submissions.length}
+                            onProceed={() => setView('selecting_winners')}
+                            deadline={challenge.deadline}
+                            applicants={challenge.Submission.length}
+                            maxApplicants={challenge.max_applicants}
+                        />
+                        {hiddenSubmissions.size > 0 && (
+                            <div className="flex justify-center mb-4">
+                                <button
+                                    onClick={showAllSubmissions}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[var(--barva-primarni)] cursor-pointer bg-blue-50 rounded-full hover:bg-blue-100 transition-colors"
+                                >
+                                    <Eye size={16} />
+                                    Zobrazit skrytá řešení ({hiddenSubmissions.size})
+                                </button>
+                            </div>
+                        )}
+                        {displayedSubmissions.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {displayedSubmissions.map(sub => (
+                                    <SubmissionCard 
+                                        key={sub.id} 
+                                        submission={sub} 
+                                        onUpdate={handleSubmissionUpdate} 
+                                        anonymousId={sub.anonymousId} 
+                                        onHide={hideSubmission} 
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="bg-white p-12 rounded-2xl text-center text-gray-500">
+                                <h3 className="text-xl font-bold text-[var(--barva-primarni)]">
+                                    {submissions.length > 0 ? "Všechna řešení jsou skryta" : "Čekáme na první řešení"}
+                                </h3>
+                                <p className="mt-2">
+                                    {submissions.length > 0 ? "Pro jejich zobrazení klikněte na tlačítko 'Zobrazit skrytá řešení'." : "Jakmile studenti začnou odevzdávat svá řešení, uvidíte je zde."}
+                                </p>
+                            </div>
+                        )}
+                    </>
+                )}
+                
+                {view === 'selecting_winners' && (
+                    <FinalSelection
+                        submissions={anonymousSubmissions.filter(s => s.status === 'reviewed')}
+                        challenge={challenge}
+                        onFinalize={prepareToFinalize}
+                        onBack={() => setView('evaluating')}
                     />
-                    
-                    {submissions.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {anonymousSubmissions.map(sub => (
-                            <SubmissionCard key={sub.id} submission={sub} onUpdate={handleSubmissionUpdate} anonymousId={sub.anonymousId} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="bg-white p-12 rounded-2xl text-center text-gray-500">
-                            <h3 className="text-xl font-bold text-[var(--barva-primarni)]">Čekáme na první řešení</h3>
-                            <p className="mt-2">Jakmile studenti začnou odevzdávat svá řešení, uvidíte je zde.</p>
-                        </div>
-                    )}
-                </>
-            )}
-            
-            {view === 'selecting_winners' && (
-                <FinalSelection
-                    submissions={anonymousSubmissions.filter(s => s.status === 'reviewed')}
-                    challenge={challenge}
-                    onFinalize={prepareToFinalize}
-                    onBack={() => setView('evaluating')}
-                />
-            )}
+                )}
 
-            <ConfirmationModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onConfirm={handleFinalizeChallenge}
-                title="Opravdu chcete vyhlásit výsledky?"
-                message="Tato akce je nevratná. Vítězům bude přiřazeno pořadí, výzva se uzavře a identity studentů se odhalí."
-            />
-        </>
-    )}
-    </div>
-);
+                <ConfirmationModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onConfirm={handleFinalizeChallenge}
+                    title="Opravdu chcete vyhlásit výsledky?"
+                    message="Tato akce je nevratná. Vítězům bude přiřazeno pořadí, výzva se uzavře a identity studentů se odhalí."
+                />
+            </>
+        )}
+        </div>
+    );
 }

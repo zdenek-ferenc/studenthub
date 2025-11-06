@@ -24,7 +24,7 @@ return (
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
         >
-        <div className="fixed inset-0 bg-black bg-opacity-50" />
+        <div className="fixed inset-0 bg-black/80 bg-opacity-50" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -49,7 +49,7 @@ return (
                 </div>
 
                 <div className="mt-4 flex justify-end gap-2">
-                <button type="button" className="px-8 py-2 rounded-full font-semibold text-[var(--barva-primarni)]" onClick={onClose}>
+                <button type="button" className="px-8 py-2 rounded-full cursor-pointer font-semibold text-[var(--barva-primarni)]" onClick={onClose}>
                     Zrušit
                 </button>
                 <button type="button" className="px-8 py-2 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-md cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out" onClick={onConfirm}>

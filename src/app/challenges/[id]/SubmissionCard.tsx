@@ -4,7 +4,7 @@ import { Fragment, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { supabase } from '../../../lib/supabaseClient';
 import { Listbox, Transition } from '@headlessui/react';
-import { User, Edit, Clock } from 'lucide-react';
+import { User, Edit, Clock, EyeOff } from 'lucide-react'; 
 import { useAuth } from '../../../contexts/AuthContext';
 
 type StudentProfile = {
@@ -25,7 +25,17 @@ const SelectorIcon = () => (
     </svg>
 );
 
-export default function SubmissionCard({ submission, onUpdate, anonymousId }: { submission: Submission, onUpdate: (updatedSubmission: Submission) => void, anonymousId: string }) {
+export default function SubmissionCard({ 
+    submission, 
+    onUpdate, 
+    anonymousId,
+    onHide 
+}: { 
+    submission: Submission, 
+    onUpdate: (updatedSubmission: Submission) => void, 
+    anonymousId: string,
+    onHide: (submissionId: string) => void
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useAuth();
   
@@ -61,8 +71,16 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-100 flex flex-col h-full gap-4">
-      {/* --- HLAVIČKA (vždy stejná) --- */}
+    <div className="relative bg-white p-6 rounded-2xl shadow-xs border border-gray-100 flex flex-col h-full gap-4">
+      {isReviewed && ( 
+        <button 
+            type="button" 
+            onClick={() => onHide(submission.id)} 
+            className="absolute top-4 right-4 p-2 cursor-pointer rounded-full text-gray-400 bg-white hover:text-[var(--barva-primarni)] hover:bg-gray-50 transition-colors z-10 shadow-sm" 
+            title="Skrýt ohodnocené řešení">
+            <EyeOff size={18} />
+        </button>
+      )}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center font-bold text-gray-500">
@@ -88,7 +106,7 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
       </div>
       <div>
         {submission.status === 'submitted' || isReviewed ? (
-          <a href={submission.file_url || '#'} target="_blank" rel="noopener noreferrer" className="w-full text-center block px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:bg-blue-700 transition-colors">
+          <a href={submission.file_url || '#'} target="_blank" rel="noopener noreferrer" className="w-full text-center block px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200">
             Stáhnout řešení
           </a>
         ) : (
@@ -103,11 +121,17 @@ export default function SubmissionCard({ submission, onUpdate, anonymousId }: { 
               <div className="flex justify-between items-center mb-2">
                 <h4 className="text-md font-bold text-gray-800">Hodnocení řešení</h4>
                 {!isEditing && isReviewed && (
-                  <button type="button" onClick={() => setIsEditing(true)} className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[var(--barva-primarni)] transition-colors">
-                    <Edit size={12} /> Upravit
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button 
+                        type="button" 
+                        onClick={() => setIsEditing(true)} 
+                        className="flex items-center gap-1.5 text-xs cursor-pointer ease-in-out duration-200 font-semibold text-gray-400 hover:text-[var(--barva-primarni)] transition-colors">
+                        <Edit size={12} /> Upravit
+                    </button>
+                  </div>
                 )}
-              </div>             
+              </div>
+              
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700">Hodnocení (1-10):</label>
                 <Controller

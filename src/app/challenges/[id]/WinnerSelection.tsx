@@ -201,7 +201,7 @@ export default function WinnerSelection({ favorites, challenge, onFinalize }: { 
                 <button 
                     onClick={handleFinalizeClick}
                     disabled={!allSlotsFilled}
-                    className="px-8 py-4 rounded-full bg-green-600 text-white font-bold text-lg shadow-lg hover:bg-green-700 transition-transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="px-8 py-4 rounded-full bg-red text-white font-bold text-lg shadow-lg hover:bg-[var(--barva-primarni)]/90 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     {allSlotsFilled ? 'Vyhlásit výsledky a uzavřít výzvu' : `Obsaďte všechny pozice (${winnerSlots.length})`}
                 </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { X, CheckCircle, PieChart, TrendingUp, FileText, Award, ShieldCheck, Star, MousePointerClick, CheckSquare } from 'lucide-react';
+import { X, CheckCircle, PieChart, TrendingUp, FileText, Award, ShieldCheck, Star, MousePointerClick, CheckSquare, UserCheck } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
@@ -14,21 +14,22 @@ const ICON_MAP: { [key: string]: React.ElementType } = {
   click: MousePointerClick,
   check: CheckSquare,
   default: CheckCircle,
+  contact: UserCheck,
 };
 
 export const MODAL_CONTENT_MAP = {
-  radar: {
-    title: 'Radar dovedností',
+    radar: {
+    title: 'Růst Dovedností',
     steps: [
       {
         icon: 'radar',
-        title: 'Vizuální přehled',
-        description: 'Radar graf ti okamžitě ukáže, ve kterých dovednostech jsi nejsilnější. Čím víc bodů, tím dál od středu.',
+        title: 'Radar Dovedností',
+        description: 'Tento graf vizualizuje tvé nejsilnější dovednosti. Čím vyšší level, tím dále je bod od středu.',
       },
       {
         icon: 'growth',
-        title: 'Jak se počítá?',
-        description: 'Graf se generuje automaticky z levelů, které získáváš plněním výzev. Není to jen něco, co si "naklikáš", je to reálný důkaz tvého růstu.',
+        title: 'Levelování',
+        description: 'Levely a XP získáváš automaticky za plnění výzev. Startup uvidí, že tvé dovednosti jsou ověřené praxí, ne jen "naklikané" v profilu.',
       },
     ],
   },
@@ -63,17 +64,22 @@ export const MODAL_CONTENT_MAP = {
     ],
   },
   selection: {
-    title: 'Finální výběr (Vizuální)',
+    title: 'Finální Výběr Vítězů',
     steps: [
       {
         icon: 'click',
         title: 'Snadné a rychlé',
-        description: 'Po ohodnocení všech řešení se startupu odemkne tato obrazovka. Zde jednoduše přetáhne nejlepší řešení na stupně vítězů.',
+        description: 'Po ohodnocení všech řešení se startupu odemkne tato obrazovka. Zde vizuálně přetáhne nejlepší řešení na stupně vítězů.',
       },
       {
         icon: 'check',
         title: 'Uzavření výzvy',
-        description: 'Jakmile startup potvrdí výběr, výzva se automaticky uzavře, studentům se rozešlou notifikace, připíšou XP a vítězům se zobrazí odměny.',
+        description: 'Jakmile startup potvrdí výběr, výzva se automaticky uzavře. Studentům se rozešlou notifikace a připíšou XP.',
+      },
+      {
+        icon: 'contact',
+        title: 'Spojení s talenty',
+        description: 'Po uzavření se odhalí identity vítězů. Startup si může prohlédnout jejich profily a přímo je kontaktovat ohledně odměny nebo budoucí spolupráce.',
       },
     ],
   },
@@ -108,7 +114,7 @@ export default function FeatureTooltip({ content, isOpen, onClose }: FeatureTool
               </button>
             </div>
 
-            <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+            <div className="px-5 pt-2 pb-5 space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
               {content.steps.map((step, index) => {
                 const IconComponent = ICON_MAP[step.icon] || ICON_MAP.default;
                 return (

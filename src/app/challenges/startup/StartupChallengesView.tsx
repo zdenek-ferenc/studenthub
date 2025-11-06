@@ -7,7 +7,8 @@ import { supabase } from '../../../lib/supabaseClient';
 import Image from 'next/image';
 import ChallengeCard from './components/ChallengeCard';
 import CommandCenter, { CommandCenterStats, RecentSubmission } from './components/CommandCenter';
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import ConfirmationModal from '../../../components/ConfirmationModal'; // <-- 1. IMPORT MODÁLU
 
 export type Challenge = {
     id: string;
@@ -24,10 +25,12 @@ export type Challenge = {
 type FilterType = 'active' | 'drafts' | 'completed';
 
 export default function StartupChallengesView() {
-    const { user } = useAuth();
+    const { user, showToast } = useAuth(); 
     const [allChallenges, setAllChallenges] = useState<Challenge[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<FilterType>('active');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [challengeToDelete, setChallengeToDelete] = useState<string | null>(null);
 
     const [underlineStyle, setUnderlineStyle] = useState({});
     const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
@@ -38,30 +41,73 @@ export default function StartupChallengesView() {
             setLoading(false);
             return;
         }
-        if (allChallenges.length === 0) {
-            setLoading(true);
-            const { data, error } = await supabase
-                .from('Challenge')
-                .select(`
-                    id, title, status, short_description, deadline, created_at, max_applicants,
-                    ChallengeSkill ( Skill ( id, name ) ),
-                    Submission ( id, status, submitted_at )
-                `)
-                .eq('startup_id', user.id);
+        
+        setLoading(true);
+        const { data, error } = await supabase
+            .from('Challenge')
+            .select(`
+                id, title, status, short_description, deadline, created_at, max_applicants,
+                ChallengeSkill ( Skill ( id, name ) ),
+                Submission ( id, status, submitted_at )
+            `)
+            .eq('startup_id', user.id);
 
-            if (error) {
-                console.error("Chyba při načítání výzev:", error);
-                setAllChallenges([]);
-            } else {
-                setAllChallenges(data as unknown as Challenge[] || []);
-            }
-            setLoading(false);
+        if (error) {
+            console.error("Chyba při načítání výzev:", error);
+            setAllChallenges([]);
+        } else {
+            setAllChallenges(data as unknown as Challenge[] || []);
         }
-    }, [user, allChallenges.length]);
+        setLoading(false);
+        
+    }, [user]);
 
     useEffect(() => {
+        if (allChallenges.length > 0) return;
         fetchChallenges();
-    }, [fetchChallenges]);
+    }, [fetchChallenges, allChallenges.length]);
+
+    const triggerDelete = (challengeId: string) => {
+        setChallengeToDelete(challengeId);
+        setIsModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!challengeToDelete) return;
+
+        const idToDelete = challengeToDelete;
+        
+        setAllChallenges(prev => prev.filter(c => c.id !== idToDelete));
+        setIsModalOpen(false);
+        setChallengeToDelete(null);
+
+        try {
+            const { error: skillError } = await supabase
+                .from('ChallengeSkill')
+                .delete()
+                .eq('challenge_id', idToDelete);
+
+            if (skillError) throw skillError;
+
+            const { error: challengeError } = await supabase
+                .from('Challenge')
+                .delete()
+                .eq('id', idToDelete);
+
+            if (challengeError) throw challengeError;
+
+            showToast('Koncept byl úspěšně smazán.', 'success');
+
+        } catch (error: unknown) { 
+            let errorMessage = "Došlo k neznámé chybě.";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            
+            showToast(`Chyba při mazání konceptu: ${errorMessage}`, 'error');
+            await fetchChallenges();
+        }
+    };
 
     const { sortedActiveChallenges, completedChallenges, draftChallenges, dashboardStats } = useMemo(() => {
         const active = allChallenges.filter(c => c.status === 'open');
@@ -137,7 +183,7 @@ export default function StartupChallengesView() {
         { id: 'active', label: 'Aktivní', count: sortedActiveChallenges.length },
         { id: 'drafts', label: 'Koncepty', count: draftChallenges.length },
         { id: 'completed', label: 'Dokončené', count: completedChallenges.length },
-    ], [sortedActiveChallenges, draftChallenges, completedChallenges]);
+    ], [sortedActiveChallenges.length, draftChallenges.length, completedChallenges.length]); // Zde byla chybka, opraveno na .length
 
     useEffect(() => {
         const activeIndex = filters.findIndex(f => f.id === activeFilter);
@@ -149,7 +195,7 @@ export default function StartupChallengesView() {
                 transform: `translateX(${activeButton.offsetLeft}px)`,
             });
         }
-    }, [activeFilter, filters, allChallenges]);
+    }, [activeFilter, filters, allChallenges]); // allChallenges přidáno pro přepočet při změně počtů
 
     if (loading) {
         return <div className='py-10 md:py-32'>
@@ -216,7 +262,11 @@ export default function StartupChallengesView() {
                 {displayedChallenges.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 3xl:gap-6 mb-4">
                         {displayedChallenges.map(challenge => (
-                        <ChallengeCard key={challenge.id} challenge={challenge} /> 
+                            <ChallengeCard 
+                                key={challenge.id} 
+                                challenge={challenge} 
+                                onDelete={triggerDelete} // <-- 5. PŘEDÁNÍ HANDLERU
+                            /> 
                         ))}
                     </div>
                 ) : (
@@ -227,6 +277,15 @@ export default function StartupChallengesView() {
                 )}
                 </div>
             )}
+
+            {/* --- 6. PŘIDÁNÍ MODÁLU --- */}
+            <ConfirmationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Opravdu smazat koncept?"
+                message="Tato akce je nevratná. Koncept bude trvale odstraněn i se všemi přiřazenými dovednostmi."
+            />
         </div>
     );
 }

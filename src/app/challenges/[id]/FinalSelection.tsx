@@ -85,7 +85,6 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
 
         return slots;
     }, [challenge]);
-    // --- KONEC OPRAVY ---
     
     const findContainer = (id: string): ContainerId | undefined => {
         if (place1.some(item => item.id === id)) return 'place1';
@@ -158,7 +157,7 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
     return (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="text-center mb-8">
-                <button onClick={onBack} className="text-sm text-gray-500 hover:underline flex items-center gap-1 mx-auto">
+                <button onClick={onBack} className="pb-2 text-sm text-[var(--barva-tmava)] hover:text-[var(--barva-primarni)] transition-all ease-in-out duration-200 cursor-pointer flex items-center gap-1 mx-auto">
                     <ArrowLeft size={14} /> Zpět na hodnocení
                 </button>
                 <h2 className="text-3xl font-bold text-center text-[var(--barva-tmava)] mt-2">Finální výběr vítězů</h2>
@@ -168,8 +167,8 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
                 <div className="lg:col-span-1 bg-gray-50 p-4 rounded-2xl">
                     <div className="flex justify-between items-center mb-4">
                         <h4 className="font-bold text-gray-700">Finalisté ({displayedShortlist.length})</h4>
-                        <button onClick={() => setShowLowRated(!showLowRated)} className="text-xs font-semibold text-gray-500 hover:text-gray-800 flex items-center gap-1">
-                            <ThumbsDown size={14} /> {showLowRated ? 'Skrýt' : 'Zobrazit i'} řešení s nízkým hodnocením
+                        <button onClick={() => setShowLowRated(!showLowRated)} className="text-xs font-semibold text-gray-500 cursor-pointer hover:text-gray-800 transition-all ease-in-out duration-200 flex items-center gap-1">
+                            <ThumbsDown size={14} /> {showLowRated ? 'Skrýt' : 'Zobrazit'} řešení s nízkým hodnocením
                         </button>
                     </div>
                     <SortableContext items={shortlist.map(c => c.id)} strategy={verticalListSortingStrategy}>
@@ -185,7 +184,7 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
                 </div>
             </div>
             <div className="text-center mt-10">
-                <button onClick={handleFinalizeClick} disabled={!allSlotsFilled} className="px-8 py-4 rounded-full bg-green-600 text-white font-bold text-lg shadow-lg hover:bg-green-700 transition-transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                <button onClick={handleFinalizeClick} disabled={!allSlotsFilled} className="px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-bold text-lg shadow-lg hover:bg-[var(--barva-primarni)]/90 cursor-pointer transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
                     {allSlotsFilled ? 'Vyhlásit výsledky a uzavřít výzvu' : `Obsaďte všechny pozice (${winnerSlots.length})`}
                 </button>
             </div>

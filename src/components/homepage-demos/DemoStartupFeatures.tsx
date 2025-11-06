@@ -5,7 +5,7 @@ import { useState } from 'react';
 import FeatureTooltip, { MODAL_CONTENT_MAP } from './FeatureTooltip'; 
 
 const DemoSubmissionCard = () => (
-<div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-5">
+<div className="bg-white rounded-2xl shadow-xs border-2 border-gray-100 p-5 h-full">
     <div className="flex flex-col justify-between items-start gap-2 mb-4">
     <h4 className="text-lg font-bold text-[var(--barva-tmava)]">Řešení #1</h4>
     <button className="px-4 py-2 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] text-sm font-semibold rounded-full flex items-center gap-2 cursor-pointer">
@@ -34,7 +34,7 @@ const DemoSubmissionCard = () => (
     <div>
         <label className="text-sm font-semibold text-gray-700">Slovní feedback</label>
         <textarea
-        className="w-full h-24 p-2 border border-gray-200 rounded-lg mt-1 bg-gray-50"
+        className="w-full h-24 p-2 border border-gray-200 rounded-lg mt-1 bg-gray-50 resize-none"
         placeholder="Skvělá práce! Líbí se nám..."
         disabled
         />
@@ -45,7 +45,7 @@ const DemoSubmissionCard = () => (
 
 
 const DemoFinalSelection = () => (
-<div className="grid grid-cols-2 gap-5 p-5 bg-gray-50 rounded-2xl border border-gray-200 h-full">
+<div className="grid grid-cols-2 gap-5 p-5 bg-gray-50 rounded-2xl shadow-xs border-2 border-gray-100 h-full">
     <div>
     <h4 className="font-semibold text-gray-800 mb-3">Finalisté k výběru</h4>
     <div className="space-y-3">
@@ -94,41 +94,49 @@ const handleToggle = (key: string, e: React.MouseEvent) => {
 
 return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6" onClick={() => setActiveTooltip(null)}>
-    <div className="relative">
-        <button
-        onClick={(e) => handleToggle('submission', e)}
-        className="absolute top-4 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center bg-blue-100 text-[var(--barva-primarni)] rounded-full hover:bg-blue-200 transition-all ease-in-out duration-200"
-        title="Co to je?"
-        >
-        {activeTooltip === 'submission' ? <X size={18} /> : <Info size={18} />}
-        </button>
-        
-        <FeatureTooltip
-        content={MODAL_CONTENT_MAP['submission']}
-        isOpen={activeTooltip === 'submission'}
-        onClose={() => setActiveTooltip(null)}
-        />
-        
-        <DemoSubmissionCard />
-    </div>
+  <div className="relative">
+    {/* Nadpis sekce */}
+    <h3 className="mb-2 text-lg font-semibold">Ohodnocení řešení</h3>
 
-    <div className="relative">
-        <button
-        onClick={(e) => handleToggle('selection', e)}
-        className="absolute top-4 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center bg-blue-100 text-[var(--barva-primarni)] rounded-full hover:bg-blue-200 transition-all ease-in-out duration-200"
-        title="Co to je?"
-        >
-        {activeTooltip === 'selection' ? <X size={18} /> : <Info size={18} />}
-        </button>
-        
-        <FeatureTooltip
-        content={MODAL_CONTENT_MAP['selection']}
-        isOpen={activeTooltip === 'selection'}
-        onClose={() => setActiveTooltip(null)}
-        />
-        
-        <DemoFinalSelection />
-    </div>
-    </div>
+    <button
+      onClick={(e) => handleToggle('submission', e)}
+      className="absolute top-12 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center bg-blue-100 text-[var(--barva-primarni)] rounded-full hover:bg-blue-200 transition-all ease-in-out duration-200"
+      title="Co to je?"
+    >
+      {activeTooltip === 'submission' ? <X size={18} /> : <Info size={18} />}
+    </button>
+
+    <FeatureTooltip
+      content={MODAL_CONTENT_MAP['submission']}
+      isOpen={activeTooltip === 'submission'}
+      onClose={() => setActiveTooltip(null)}
+    />
+
+    <DemoSubmissionCard />
+  </div>
+
+  <div className="relative">
+    {/* Nadpis sekce */}
+    <h3 className="mb-2 text-lg font-semibold">Výběr vítězů výzvy</h3>
+
+    <button
+      onClick={(e) => handleToggle('selection', e)}
+      className="absolute top-12 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center bg-blue-100 text-[var(--barva-primarni)] rounded-full hover:bg-blue-200 transition-all ease-in-out duration-200"
+      title="Co to je?"
+    >
+      {activeTooltip === 'selection' ? <X size={18} /> : <Info size={18} />}
+    </button>
+
+    <FeatureTooltip
+      content={MODAL_CONTENT_MAP['selection']}
+      isOpen={activeTooltip === 'selection'}
+      onClose={() => setActiveTooltip(null)}
+    />
+
+    <DemoFinalSelection />
+  </div>
+</div>
+
+
 );
 }

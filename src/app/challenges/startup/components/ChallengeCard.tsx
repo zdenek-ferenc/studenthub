@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import DeadlineTag from '../../../../components/DeadlineTag';
-import { Users, CheckCircle, AlertTriangle, Edit3, Award, Archive } from 'lucide-react';
+import { Users, CheckCircle, AlertTriangle, Edit3, Award, Archive, Trash2 } from 'lucide-react';
 import { Challenge } from '../StartupChallengesView'; 
 
 type ActionPriority = 'critical' | 'urgent' | 'default';
@@ -15,7 +15,7 @@ const StatItem = ({ icon: Icon, text, colorClass }: { icon: React.ElementType, t
     </div>
 );
 
-export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
+export default function ChallengeCard({ challenge, onDelete }: { challenge: Challenge, onDelete: (challengeId: string) => void }) {
     const applicantCount = challenge.Submission?.length || 0;
     const submittedCount = challenge.Submission?.filter(s => s.status === 'submitted' || s.status === 'reviewed').length || 0;
     const unreviewedCount = challenge.Submission?.filter((s: { status: string }) => s.status === 'submitted').length || 0;
@@ -145,19 +145,37 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
                             Konec: {new Date(challenge.deadline).toLocaleDateString('cs-CZ')}
                     </p>
                     )}
-
                 </div>
-                <Link 
-                    href={action.href} 
-                    className={`px-4 py-2 rounded-full text-xs 3xl:text-sm font-semibold transition-all duration-300 flex items-center gap-2
-                        ${action.priority !== 'default'
-                            ? 'bg-[var(--barva-primarni)] text-white hover:opacity-90' 
-                            : 'text-[var(--barva-primarni)]'
-                        }`}
-                >
-                    {action.icon && <action.icon size={16} />}
-                    {action.text}
-                </Link>
+
+                <div className="flex items-center gap-2">
+                    {/* Přidáme tlačítko pro smazání, pouze pokud je to koncept */}
+                    {isDraft && (
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault(); // Zabráníme prokliku, pokud by karta byla Link
+                                e.stopPropagation();
+                                onDelete(challenge.id);
+                            }}
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                            title="Smazat koncept"
+                        >
+                            <Trash2 size={16} />
+                        </button>
+                    )}
+                
+                    <Link 
+                        href={action.href} 
+                        className={`px-4 py-2 rounded-full text-xs 3xl:text-sm font-semibold transition-all duration-300 flex items-center gap-2
+                            ${action.priority !== 'default'
+                                ? 'bg-[var(--barva-primarni)] text-white hover:opacity-90' 
+                                : 'text-[var(--barva-primarni)]'
+                            }`}
+                    >
+                        {action.icon && <action.icon size={16} />}
+                        {action.text}
+                    </Link>
+                </div>
             </div>
         </div>
     );

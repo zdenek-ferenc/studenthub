@@ -211,7 +211,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
   return (
     <>
       <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-xs border border-gray-100 mt-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-[var(--barva-tmava)] mb-6">
+        <h2 className="text-lg !sm:text-xl font-bold text-center text-[var(--barva-tmava)] mb-6">
           {isSubmitted ? 'Tvoje odevzdané řešení' : 'Odevzdat řešení'}
         </h2>
         <form onSubmit={handleSubmit(onTriggerSubmit)} className="space-y-6">
@@ -304,7 +304,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
 
           {!isSubmitted && (
             <div className="pt-4 flex justify-center">
-              <button type="submit" disabled={isSubmitting} className="mt-6 text-xl sm:text-2xl px-6 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
+              <button type="submit" disabled={isSubmitting} className="mt-6 text-base sm:text-lg px-5 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
                 {isSubmitting ? 'Odevzdávám...' : 'Odevzdat řešení'}
               </button>
             </div>
