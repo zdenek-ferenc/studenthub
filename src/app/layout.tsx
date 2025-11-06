@@ -13,6 +13,7 @@ import ToastContainer from '../components/ToastContainer';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { ReactNode } from 'react';
 import BottomNavBar from '@/components/BottomNavBar';
+import { Analytics } from "@vercel/analytics/next"
 
 const sora = Sora({
   subsets: ["latin"],
@@ -61,6 +62,7 @@ export default function RootLayout({
             <ChallengesProvider>
               <DataProvider>
                 <AppContent>{children}</AppContent>
+                <Analytics/>
                 <ToastContainer />
               </DataProvider>
             </ChallengesProvider>
