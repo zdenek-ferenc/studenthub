@@ -56,7 +56,7 @@ export default function ProfilePortfolioCard({ submission }: PortfolioCardProps)
     const skills = Challenge.ChallengeSkill.map(cs => cs.Skill.name);
 
     const cardContent = (
-        <div className={`bg-white rounded-2xl p-2 sm:p-6 border border-gray-100 ${canClick ? 'group-hover:shadow-lg group-hover:border-blue-200' : 'shadow-none'} transition-all duration-300 h-full flex flex-col`}>
+        <div className={`bg-white rounded-2xl p-2 sm:p-6 border-2 shadow-xs border-gray-100 ${canClick ? 'group-hover:shadow-sm group-hover:border-blue-200' : 'shadow-none'} transition-all duration-300 h-full flex flex-col`}>
             <div className="flex items-center gap-4 mb-4">
                 <Image
                     src={Challenge.StartupProfile?.logo_url || '/logo.svg'}

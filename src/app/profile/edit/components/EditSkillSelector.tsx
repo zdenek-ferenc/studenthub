@@ -85,7 +85,7 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
                 key={skill.id}
                 type="button"
                 onClick={() => handleToggleSkill(skill.id)}
-                className="flex items-center gap-1.5 px-4 py-1.5 sm:px-4 sm:py-2 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-xs sm:text-sm font-semibold hover:opacity-70 transition-all ease-in-out duration-300 cursor-pointer"
+                className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-xs sm:text-sm font-semibold hover:opacity-70 transition-all ease-in-out duration-300 cursor-pointer"
               >
                 {skill.name}
                 <X size={14} />
@@ -111,7 +111,7 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
               key={skill.id}
               type="button"
               onClick={() => handleToggleSkill(skill.id)}
-              className="px-4 py-1.5 sm:px-4 sm:py-2 bg-white border border-gray-400 cursor-pointer text-gray-700 rounded-full text-xs sm:text-sm hover:bg-[var(--barva-svetle-pozadi)] hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-colors"
+              className="px-2 py-1.5 sm:px-3 sm:py-1.5 bg-white border border-gray-400 cursor-pointer text-gray-700 rounded-full text-xs sm:text-sm hover:bg-[var(--barva-svetle-pozadi)] hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-colors"
             >
               + {skill.name}
             </button>
