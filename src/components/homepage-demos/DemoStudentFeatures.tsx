@@ -8,7 +8,6 @@ import SkillRadarChart from '../../app/profile/[id]/components/SkillRadarChart';
 import { useState } from 'react';
 import FeatureTooltip, { MODAL_CONTENT_MAP } from './FeatureTooltip';
 
-// --- Mock Data (pro radar) ---
 const mockSkills = [
   { name: 'React', level: 7, xp: 100 },
   { name: 'Python', level: 8, xp: 150 },
@@ -17,7 +16,6 @@ const mockSkills = [
   { name: 'Node.js', level: 3, xp: 80 },
 ];
 
-// --- Mock Data (pro portfolio karty) ---
 const mockPortfolio1 = {
   rating: 9,
   position: 1,
@@ -43,7 +41,6 @@ const mockPortfolio2 = {
   },
 };
 
-// --- Mock Data (pro NOVOU sekci Top Dovednosti) ---
 const mockTopSkills = [
     { name: 'Python', level: 8, percentage: 30 },
     { name: 'React', level: 7, percentage: 80 },
@@ -51,7 +48,6 @@ const mockTopSkills = [
     { name: 'Figma', level: 4, percentage: 90 },
 ];
 
-// --- Vizuální klon ProfilePortfolioCard (nyní přijímá props) ---
 type PortfolioData = typeof mockPortfolio1;
 const DemoPortfolioCard = ({ portfolio }: { portfolio: PortfolioData }) => {
   const { Challenge, rating, position } = portfolio;
@@ -97,7 +93,6 @@ const DemoPortfolioCard = ({ portfolio }: { portfolio: PortfolioData }) => {
   );
 };
 
-// --- UPRAVENÁ Komponenta pro zobrazení levelu dovednosti ("Bublina") ---
 const SkillLevelDisplay = ({ name, level, percentage }: { name: string, level: number, percentage: number }) => (
   <div 
       className="flex items-center gap-2 px-2 sm:px-3 py-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-[11px] sm:text-[13px] font-medium w-fit"
@@ -106,15 +101,11 @@ const SkillLevelDisplay = ({ name, level, percentage }: { name: string, level: n
       <div 
           className="relative w-4 h-4 sm:w-5 sm:h-5 rounded-full grid place-items-center"
           style={{
-              // Vnější kroužek je progress bar
               background: `conic-gradient(var(--barva-primarni) ${percentage}%, var(--barva-primarni2) ${percentage}%)`
           }}
           title={`${percentage}% k dalšímu levelu`}
       >
-          {/* Vnitřní maska (díky ní je to kroužek) - barva musí odpovídat pozadí bubliny */}
-          <div className="absolute w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full" />
-          
-          {/* Číslo levelu je nad vnitřní maskou */}
+          <div className="absolute w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full" />          
           <span className="relative z-10 text-[var(--barva-primarni)] text-[8px] sm:text-[10px] font-bold">
               {level}
           </span>
@@ -123,7 +114,6 @@ const SkillLevelDisplay = ({ name, level, percentage }: { name: string, level: n
 );
 
 
-// --- Hlavní komponenta ---
 export default function DemoStudentFeatures() {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
@@ -139,14 +129,9 @@ export default function DemoStudentFeatures() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6" onClick={handleSectionClick}>
-      
-      {/* Karta 1: Radar a Top Dovednosti */}
-      <div> {/* Obalovací div pro headline */}
-        
-        {/* ZDE JE PŘIDÁN HEADLINE */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6" onClick={handleSectionClick}>     
+      <div> 
         <h3 className="mb-2 text-lg font-semibold">Růst Dovedností</h3>
-
         <div className="relative p-6 bg-white rounded-2xl shadow-xs border-2 border-gray-100">
           <button
             onClick={(e) => handleToggle('radar', e)}
@@ -162,13 +147,10 @@ export default function DemoStudentFeatures() {
             onClose={() => setActiveTooltip(null)}
           />
           
-          {/* Původní Radar Chart */}
           <SkillRadarChart skills={mockSkills} isOwner={false} />
 
-          {/* --- UPRAVENÁ SEKCE DOVEDNOSTÍ --- */}
           <div className="mt-6 pt-6 border-t border-gray-100">
             <h4 className="font-semibold text-gray-500 uppercase text-xs mb-3">Top Dovednosti</h4>
-            {/* Změněno ze space-y-2 na flex wrap */}
             <div className="flex flex-wrap gap-2">
               {mockTopSkills.map(skill => (
                 <SkillLevelDisplay
@@ -180,16 +162,10 @@ export default function DemoStudentFeatures() {
               ))}
             </div>
           </div>
-          {/* --- KONEC UPRAVENÉ SEKCE --- */}
         </div>
       </div>
-
-      {/* Karta 2: Sekce Portfolia */}
-      <div> {/* Obalovací div pro headline */}
-        
-        {/* ZDE JE PŘIDÁN HEADLINE */}
+      <div> 
         <h3 className="mb-2 text-lg font-semibold">Portfolio Úspěchů</h3>
-        
         <div className="space-y-4">
           <div className="relative">
             <button

@@ -308,7 +308,9 @@ export default function HomePage() {
                 <div className="flex-1 w-full 2xl:w-1/2">
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 flex flex-col gap-2">Nejsi jen číslo. <span className='text-2xl md:text-3xl opacity-70'>S námi rosteš.</span> </h2>
                   <p className="md:text-lg text-gray-600 mb-8">Všechny tvé úspěchy a dovednosti vizualizujeme. Sleduj, jak se zlepšuješ v konkrétních dovednostech a buduj si portfolio, které mluví za tebe.</p>
-                  <DemoStudentFeatures />
+                  <div className='w-full xl:w-4/5 mx-auto'>
+                    <DemoStudentFeatures />
+                  </div>
                 </div>
               </div>
             </ScrollAnimator>
@@ -317,7 +319,10 @@ export default function HomePage() {
                 <div className="flex-1 w-full 2xl:w-1/2">
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 mt-6 lg:mt-0">Rychlý nábor bez rizika.</h2>
                   <p className="md:text-lg text-gray-600 mb-8">Navrhli jsme proces, který ti šetří čas. Soustřeď se jen na kvalitu odevzdané práce. Anonymní hodnocení a snadný výběr vítězů.</p>
-                  <DemoStartupFeatures />
+                  <div className='w-full xl:w-4/5 mx-auto'>
+                    <DemoStartupFeatures />
+                  </div>
+                  
                 </div>
               </div>
             </ScrollAnimator>

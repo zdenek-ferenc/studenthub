@@ -39,6 +39,9 @@ const DemoSubmissionCard = () => (
         disabled
         />
     </div>
+    <button className='flex justify-center items-center mx-auto text-white bg-[var(--barva-primarni)] px-5 py-2 rounded-full hover:bg-[var(--barva-primarni)]/80 transition-all ease-in-out duration-200 cursor-pointer text-sm sm:text-base'>
+      Uložit hodnocení
+    </button>
     </div>
 </div>
 );
@@ -47,7 +50,8 @@ const DemoSubmissionCard = () => (
 const DemoFinalSelection = () => (
 <div className="grid grid-cols-2 gap-5 p-5 bg-gray-50 rounded-2xl shadow-xs border-2 border-gray-100 h-full">
     <div>
-    <h4 className="font-semibold text-gray-800 mb-3">Finalisté k výběru</h4>
+    <h4 className="block sm:hidden font-semibold text-gray-800 mb-3">Finalisté</h4>
+    <h4 className="hidden sm:block font-semibold text-gray-800 mb-3">Finalisté k výběru</h4>
     <div className="space-y-3">
         <div className="p-3 bg-white rounded-lg shadow-sm border flex items-center justify-between">
             <div className='flex flex-col'>
@@ -67,7 +71,8 @@ const DemoFinalSelection = () => (
     </div>
     </div>
     <div>
-    <h4 className="font-semibold text-gray-800 mb-3">Vítězné pozice</h4>
+    <h4 className="hidden sm:block font-semibold text-gray-800 mb-3">Vítězné pozice</h4>
+    <h4 className="sm:hidden font-semibold text-gray-800 mb-3">Vítězové</h4>
     <div className="space-y-3">
         <div className="p-3 bg-white rounded-lg shadow-md border-2 border-amber-400 flex gap-1 items-center justify-between">
         <span className="font-medium text-sm">1. místo: Řešení #1</span>
@@ -93,14 +98,14 @@ const handleToggle = (key: string, e: React.MouseEvent) => {
 };
 
 return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6" onClick={() => setActiveTooltip(null)}>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-6" onClick={() => setActiveTooltip(null)}>
   <div className="relative">
     {/* Nadpis sekce */}
     <h3 className="mb-2 text-lg font-semibold">Ohodnocení řešení</h3>
 
     <button
       onClick={(e) => handleToggle('submission', e)}
-      className="absolute top-12 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center bg-blue-100 text-[var(--barva-primarni)] rounded-full hover:bg-blue-200 transition-all ease-in-out duration-200"
+      className="absolute top-12 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center bg-blue-100/50 text-[var(--barva-primarni)] rounded-full hover:bg-blue-200 transition-all ease-in-out duration-200"
       title="Co to je?"
     >
       {activeTooltip === 'submission' ? <X size={18} /> : <Info size={18} />}
@@ -117,11 +122,11 @@ return (
 
   <div className="relative">
     {/* Nadpis sekce */}
-    <h3 className="mb-2 text-lg font-semibold">Výběr vítězů výzvy</h3>
+    <h3 className=" mb-2 text-lg font-semibold">Výběr vítězů výzvy</h3>
 
     <button
       onClick={(e) => handleToggle('selection', e)}
-      className="absolute top-12 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center bg-blue-100 text-[var(--barva-primarni)] rounded-full hover:bg-blue-200 transition-all ease-in-out duration-200"
+      className="absolute top-12 right-4 z-10 w-8 h-8 flex cursor-pointer items-center justify-center bg-blue-100/50 text-[var(--barva-primarni)] rounded-full hover:bg-blue-200 transition-all ease-in-out duration-200"
       title="Co to je?"
     >
       {activeTooltip === 'selection' ? <X size={18} /> : <Info size={18} />}
