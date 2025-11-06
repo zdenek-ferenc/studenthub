@@ -72,9 +72,9 @@ function StudentCatalogPage() {
                                 <p className="text-gray-500 mt-2">Zkuste upravit filtry pro lepší výsledky.</p>
                             </div>
                         )}
-                        <div className="text-center mt-12">
+                        <div className="text-center mt-8">
                             {hasMoreStudents && (
-                                <button onClick={loadMoreStudents} disabled={loadingStudents} className="px-8 py-3 rounded-full bg-[var(--barva-primarni)] cursor-pointer text-white font-semibold shadow-md hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                <button onClick={loadMoreStudents} disabled={loadingStudents} className="px-5 py-2 rounded-full bg-[var(--barva-primarni)] cursor-pointer text-white font-semibold shadow-md hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                     {loadingStudents ? 'Načítám...' : 'Načíst další'}
                                 </button>
                             )}

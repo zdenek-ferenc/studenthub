@@ -79,7 +79,7 @@ export const MODAL_CONTENT_MAP = {
       {
         icon: 'contact',
         title: 'Spojení s talenty',
-        description: 'Po uzavření se odhalí identity vítězů. Startup si může prohlédnout jejich profily a přímo je kontaktovat ohledně odměny nebo budoucí spolupráce.',
+        description: 'Po uzavření se odhalí identity vítězů. Startup si může prohlédnout jejich profily a přímo je kontaktovat ohledně budoucí spolupráce.',
       },
     ],
   },

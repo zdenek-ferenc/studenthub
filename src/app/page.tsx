@@ -90,7 +90,7 @@ const FinalCtaCard = ({
       href={href}
       className={`mt-6 inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full text-base font-semibold shadow-md transition-all duration-300 transform group ${
         isPrimary
-          ? 'bg-[var(--barva-primarni)] text-white hover:bg-blue-700 hover:shadow-none'
+          ? 'bg-[var(--barva-primarni)] text-white hover:bg-[var(--barva-primarni)]/80 hover:shadow-none'
           : 'bg-white text-[var(--barva-primarni)] border-2 border-[var(--barva-primarni)] hover:bg-gray-50'
       }`}
     >
@@ -153,7 +153,7 @@ export default function HomePage() {
           
           <div className=" md:w-4/5 mx-auto mt-22">
             <div className="container mx-auto px-4 sm:px-6">
-              <p className="text-sm text-center text-gray-400 uppercase tracking-widest mb-6">
+              <p className="text-sm text-center text-gray-200 uppercase tracking-widest mb-6">
                 Důvěřují nám partneři z praxe
               </p>
               <div className="w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">

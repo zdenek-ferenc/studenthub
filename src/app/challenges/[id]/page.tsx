@@ -54,6 +54,7 @@ function ChallengeDetailPage() {
         .from('Challenge')
         .select(`
           *,
+          created_at,
           ChallengeSkill ( Skill ( * ) ),
           StartupProfile ( * ),
           Submission ( *, StudentProfile ( * ) )

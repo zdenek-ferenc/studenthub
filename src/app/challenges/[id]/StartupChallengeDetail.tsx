@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import ChallengeRecapView from './ChallengeRecapView';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AlertCircle, CheckCircle, Lock, Clock, Users, ChevronLeft, Eye, EyeOff } from 'lucide-react'; // <-- PŘIDÁN IMPort Eye, EyeOff
-import { differenceInDays, format } from 'date-fns';
+import { AlertCircle, CheckCircle, Lock, Clock, Users, ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import { differenceInDays, format, differenceInHours } from 'date-fns';
 import StartupChallengeHeader from './StartupChallengeHeader';
 
 type Challenge = {
@@ -20,6 +20,7 @@ reward_description: string | null;
 attachments_urls: string[] | null;
 number_of_winners: number | null; 
 max_applicants: number | null; deadline: string;
+created_at: string;
 Submission: { id: string, student_id: string }[];
 ChallengeSkill: { Skill: { id: string, name: string } }[];
 StartupProfile: { company_name: string, logo_url: string | null } | null;
@@ -33,7 +34,8 @@ const EvaluationStatusPanel = ({
     onProceed,
     deadline,
     applicants,
-    maxApplicants
+    maxApplicants,
+    createdAt // <-- Prop pro datum vytvoření
 }: {
     canFinalize: boolean,
     ratedCount: number,
@@ -41,13 +43,29 @@ const EvaluationStatusPanel = ({
     onProceed: () => void,
     deadline: string,
     applicants: number,
-    maxApplicants: number | null
+    maxApplicants: number | null,
+    createdAt: string // <-- Typ pro datum vytvoření
 }) => {
     const allRated = ratedCount === totalCount && totalCount > 0;
     const deadlineDate = new Date(deadline);
     const daysRemaining = differenceInDays(deadlineDate, new Date());
-    const timeProgress = Math.max(0, 100 - (daysRemaining / 30) * 100);
+    const startDate = new Date(createdAt).getTime();
+    const today = new Date().getTime();
+    const deadlineMs = deadlineDate.getTime();
+    const totalDuration = deadlineMs - startDate;
+    const elapsedDuration = today - startDate;
+
+    let timeProgress = 0;
+    if (totalDuration > 0) {
+        timeProgress = (elapsedDuration / totalDuration) * 100;
+    } else if (daysRemaining < 0) {
+        timeProgress = 100;
+    }
+    timeProgress = Math.max(0, Math.min(100, timeProgress));
+    // --- KONEC VÝPOČTU ---
+
     const capacityProgress = maxApplicants ? (applicants / maxApplicants) * 100 : 0;
+
     if (!canFinalize) {
         return (
             <div className="lg:py-4 rounded-2xl">
@@ -59,8 +77,8 @@ const EvaluationStatusPanel = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                         <div>
                             <div className="flex justify-between items-center mb-1 font-semibold text-sm">
-                                <span className="text-gray-600 flex items-center gap-2"><Clock size={14}/> Čas do konce</span>
-                                <span className="text-[var(--barva-tmava)]">{daysRemaining > 0 ? `${daysRemaining} dní` : 'Po termínu'}</span>
+                                <span className="text-gray-600 flex items-center gap-2"><Clock size={14}/> Průběh výzvy</span>
+                                <span className="text-[var(--barva-tmava)]">{daysRemaining > 0 ? `Zbývá ${daysRemaining} dní` : 'Po termínu'}</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${timeProgress}%` }}></div></div>
                         </div>
@@ -94,6 +112,7 @@ const EvaluationStatusPanel = ({
             </div>
         );
     }
+    // ... (zbytek kódu komponenty EvaluationStatusPanel) ...
     return (
         <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-200 text-center">
             <div className="max-w-2xl mx-auto">
@@ -102,7 +121,7 @@ const EvaluationStatusPanel = ({
                         <CheckCircle className="w-12 h-12 mx-auto text-green-500 mb-3" />
                         <h3 className="text-xl font-bold text-[var(--barva-tmava)]">Všechna řešení jsou ohodnocena!</h3>
                         <p className="text-gray-500 mt-2">Skvělá práce! Nyní můžete přejít k finálnímu výběru a přetáhnout nejlepší řešení na vítězné pozice.</p>
-                        <button onClick={onProceed} className="mt-6 px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:bg-[var(--barva-primarni)]/90 cursor-pointer transition-all ease-in-out duration-200">
+                        <button onClick={onProceed} className="mt-6 px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold shadow-md hover:bg-blue-700 transition-all">
                             Přejít k výběru vítězů
                         </button>
                     </>
@@ -258,6 +277,7 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
                             deadline={challenge.deadline}
                             applicants={challenge.Submission.length}
                             maxApplicants={challenge.max_applicants}
+                            createdAt={challenge.created_at}
                         />
                         {hiddenSubmissions.size > 0 && (
                             <div className="flex justify-center mb-4">
