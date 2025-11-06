@@ -155,12 +155,12 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
     };
     return (
         <>
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs mt-8">
-                <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold uppercase text-[var(--barva-tmava)]">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs">
+                <div className="text-center mb-2 sm:mb-8">
+                    <h2 className="text-2xl sm:text-3xl font-bold uppercase text-[var(--barva-tmava)]">
                         {isFinal ? "Výsledky" : "Tvoje řešení bylo ohodnoceno!"}
                     </h2>
-                    <p className="text-lg text-gray-600 mt-4">
+                    <p className="text-sm sm:text-lg text-gray-600 mt-4">
                         {isFinal ? "Výzva je již uzavřena. Zde je finální zpětná vazba od startupu." : "Skvělá práce! Startup ti poslal zpětnou vazbu."}
                     </p>
                 </div>
@@ -191,7 +191,7 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                         </div>
                     )}
                 </div>
-                <div className="max-w-2xl mx-auto mt-8 space-y-6">
+                <div className="max-w-2xl mx-auto mt-2 sm:mt-8 space-y-6">
                     {submission.feedback_comment && (
                         <div>
                             <h5 className="font-semibold text-gray-700 flex items-center gap-2 mb-2 text-lg">

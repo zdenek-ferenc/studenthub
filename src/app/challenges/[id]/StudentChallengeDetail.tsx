@@ -36,7 +36,7 @@ type Challenge = {
 };
 
 const WaitingForResults = () => (
-    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs mt-8 text-center">
+    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs text-center">
         <Clock className="w-12 h-12 mx-auto text-blue-500 mb-4" />
         <h2 className="text-2xl font-bold text-[var(--barva-tmava)]">Tvoje řešení čeká na vyhodnocení</h2>
         <p className="text-gray-600 mt-2 max-w-lg mx-auto">

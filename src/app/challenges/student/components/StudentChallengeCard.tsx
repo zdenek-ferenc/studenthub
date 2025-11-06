@@ -127,7 +127,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
     <div className="relative bg-white rounded-2xl shadow-xs hover:shadow-none transition-all duration-300 ease-in-out border-2 border-gray-100 flex flex-col h-full pr-5 sm:pr-6">
       {isApplied ? (
     <div
-      className={`absolute top-2  sm:top-4 sm:right-3 flex items-center w-4 h-4 bg-green-400 border border-green-300 inset-shadow-sm inset-shadow-white/50 font-bold rounded-full z-10 shadow-sm
+      className={`absolute top-4 right-3 flex items-center w-4 h-4 bg-green-400 border border-green-300 inset-shadow-sm inset-shadow-white/50 font-bold rounded-full z-10 shadow-sm
                   transition-all duration-300 ease-in-out
                   group-hover:opacity-0 group-hover:scale-75 group-hover:-translate-y-2`}
     >
@@ -160,7 +160,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
                     width={50}
                     />
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-gray-200 flex-shrink-0"></div>
+                  <div className="w-14 h-14 hidden sm:block rounded-full bg-gray-200 flex-shrink-0"></div>
                 )}
                 <div className='flex flex-col gap-2 sm:gap-1'>
                   <p className="text-sm 3xl:text-base font-semibold text-gray-600">{challenge.StartupProfile?.company_name}</p>

@@ -56,7 +56,7 @@ export default function ProfilePortfolioCard({ submission }: PortfolioCardProps)
     const skills = Challenge.ChallengeSkill.map(cs => cs.Skill.name);
 
     const cardContent = (
-        <div className={`bg-white rounded-2xl p-6 border border-gray-100 ${canClick ? 'group-hover:shadow-lg group-hover:border-blue-200' : 'shadow-none'} transition-all duration-300 h-full flex flex-col`}>
+        <div className={`bg-white rounded-2xl p-2 sm:p-6 border border-gray-100 ${canClick ? 'group-hover:shadow-lg group-hover:border-blue-200' : 'shadow-none'} transition-all duration-300 h-full flex flex-col`}>
             <div className="flex items-center gap-4 mb-4">
                 <Image
                     src={Challenge.StartupProfile?.logo_url || '/logo.svg'}
@@ -66,7 +66,7 @@ export default function ProfilePortfolioCard({ submission }: PortfolioCardProps)
                     className="rounded-lg w-12 h-12 object-cover"
                 />
                 <div>
-                    <h4 className="font-bold text-lg text-[var(--barva-tmava)] line-clamp-2">{Challenge.title}</h4>
+                    <h4 className="font-bold sm:text-lg text-[var(--barva-tmava)] line-clamp-2">{Challenge.title}</h4>
                     <p className="text-sm text-gray-500 font-medium">{Challenge.StartupProfile?.company_name}</p>
                 </div>
             </div>
@@ -85,7 +85,7 @@ export default function ProfilePortfolioCard({ submission }: PortfolioCardProps)
                     )}
                 </div>
             </div>
-            <div className="mt-auto pt-4 border-t border-gray-100 flex justify-end">
+            <div className="mt-auto pt-1 sm:pt-4 sm:border-t border-gray-100 flex justify-end">
                 <ResultTag rating={rating} position={position} />
             </div>
         </div>
