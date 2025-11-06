@@ -98,7 +98,7 @@ export default function FeatureTooltip({ content, isOpen, onClose }: FeatureTool
           onClick={(e) => e.stopPropagation()}
         >
           <div className="relative z-10 w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-            <div className="flex justify-between items-center p-5 border-b border-gray-200">
+            <div className="flex justify-between items-center p-5">
               <h2 className="text-xl font-bold text-[var(--barva-tmava)]">{content.title}</h2>
               <button
                 onClick={onClose}
