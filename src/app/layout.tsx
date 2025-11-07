@@ -14,6 +14,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { ReactNode } from 'react';
 import BottomNavBar from '@/components/BottomNavBar';
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const sora = Sora({
   subsets: ["latin"],
@@ -63,6 +64,7 @@ export default function RootLayout({
               <DataProvider>
                 <AppContent>{children}</AppContent>
                 <Analytics/>
+                <SpeedInsights/>
                 <ToastContainer />
               </DataProvider>
             </ChallengesProvider>
