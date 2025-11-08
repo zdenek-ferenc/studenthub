@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../contexts/AuthContext';
-import { Bell, Briefcase, MessageSquare, Handshake, ChevronRight } from 'lucide-react'; 
+import { Bell, Briefcase, MessageSquare, Handshake, ChevronRight, Trophy, Star, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { cs } from 'date-fns/locale';
@@ -23,17 +23,25 @@ const NotificationIcon = ({ type, isRead }: { type: string; isRead: boolean }) =
 
     let icon;
     switch (type) {
-        case 'new_submission':
-            icon = <Briefcase size={16} />;
+        case 'submission_winner':
+            icon = <Trophy size={16} />; 
             break;
-        case 'challenge_closed':
-            icon = <MessageSquare size={16} />;
+        case 'submission_reviewed':
+            icon = <Star size={16} />; 
+            break;
+        case 'contact_request':
+            icon = <Handshake size={16} />; 
             break;
         
-        case 'contact_request':
-            icon = <Handshake size={16} />;
+        case 'new_applicant': 
+            icon = <UserPlus size={16} />; 
             break;
-            
+        case 'new_submission': 
+            icon = <Briefcase size={16} />; 
+            break;
+        case 'contact_accepted': 
+            icon = <Handshake size={16} />; 
+            break;
         default:
             icon = <Bell size={16} />;
             break;
