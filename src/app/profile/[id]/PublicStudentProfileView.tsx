@@ -8,7 +8,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import SkillRadarChart from './components/SkillRadarChart';
 import ProfilePortfolioSection from './components/ProfilePortfolioSection';
 import ProfileSkillsSection from './components/ProfileSkillsSection';
-import { Github, Linkedin, Dribbble, Link as LinkIcon, Briefcase, GraduationCap, Edit, PlusCircle,ChevronLeft,Settings } from 'lucide-react';
+import { Github, Linkedin, Dribbble, Link as LinkIcon, Briefcase, GraduationCap, Edit, PlusCircle,ChevronLeft,Settings, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -71,6 +71,7 @@ type StudentProfile = {
     StudentSkill: StudentSkill[];
     StudentLanguage: StudentLanguage[];
     Submission: Submission[];
+    recruitment_status: 'open_to_work' | 'not_looking' | null; // <-- KROK 2.2: PŘIDÁN TYP
 };
 
 const SocialLink = ({ href, Icon, label }: { href: string | null, Icon: React.ElementType, label: string }) => {
@@ -83,7 +84,39 @@ const SocialLink = ({ href, Icon, label }: { href: string | null, Icon: React.El
     );
 };
 
-const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwner: boolean }) => {
+// KROK 2.2: NOVÁ KOMPONENTA PRO ZOBRAZENÍ TAGU
+const RecruitmentStatusTag = ({ status, isOwner, viewerRole }: { status: StudentProfile['recruitment_status'], isOwner: boolean, viewerRole: 'student' | 'startup' | null }) => {
+    if (status === 'open_to_work') {
+        return (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs sm:text-sm font-semibold border border-green-200">
+                <CheckCircle size={14} />
+                Otevřený nabídkám
+            </div>
+        );
+    }
+
+    if (status === 'not_looking' && (isOwner || viewerRole === 'startup')) {
+        return (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs sm:text-sm font-semibold border border-gray-200">
+                <XCircle size={14} />
+                Momentálně nehledá
+            </div>
+        );
+    }
+    
+    if (status === null && isOwner) {
+         return (
+             <Link href="/profile/edit?tab=personal" className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 text-gray-500 text-xs sm:text-sm font-medium border border-gray-200 hover:border-gray-400 transition-colors">
+                <PlusCircle size={14} />
+                Nastavit pracovní status
+            </Link>
+         );
+    }
+
+    return null;
+}
+
+const ProfileInfoCard = ({ profile, isOwner, viewerRole }: { profile: StudentProfile, isOwner: boolean, viewerRole: 'student' | 'startup' | null }) => {
     const { user, showToast } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [bioText, setBioText] = useState(profile?.bio || '');
@@ -119,23 +152,29 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
 
             <div className="text-center">
                 <div className="h-16 w-16 sm:w-24 sm:h-24 rounded-full mx-auto mb-4 relative">
-        {profile.profile_picture_url ? (
-            <Image
-            src={profile.profile_picture_url}
-            alt={`Profilový obrázek ${profile.first_name} ${profile.last_name}`}
-            width={200}
-            height={200}
-            className="h-16 w-16 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-gray-100"
-            key={profile.profile_picture_url}
-            />
-        ) : (
-            <div className="h-16 w-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-xl sm:text-4xl font-bold">
-            {initials}
-            </div>
-        )}
-        </div>
+                    {profile.profile_picture_url ? (
+                        <Image
+                        src={profile.profile_picture_url}
+                        alt={`Profilový obrázek ${profile.first_name} ${profile.last_name}`}
+                        width={200}
+                        height={200}
+                        className="h-16 w-16 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-gray-100"
+                        key={profile.profile_picture_url}
+                        />
+                    ) : (
+                        <div className="h-16 w-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-xl sm:text-4xl font-bold">
+                        {initials}
+                        </div>
+                    )}
+                </div>
                 <h1 className="text-xl sm:text-2xl font-bold text-[var(--barva-tmava)]">{profile.first_name} {profile.last_name}</h1>
                 <p className="text-gray-500 text-sm sm:text-base">@{profile.username}</p>
+                
+                {/* KROK 2.2: VLOŽENÍ TAGU */}
+                <div className="mt-3 h-8">
+                    <RecruitmentStatusTag status={profile.recruitment_status} isOwner={isOwner} viewerRole={viewerRole} />
+                </div>
+
                 <div className="flex justify-center items-center gap-4 mt-2 sm:mt-4">
                     <SocialLink href={profile.linkedin_url} Icon={Linkedin} label="LinkedIn" />
                     <SocialLink href={profile.github_url} Icon={Github} label="GitHub" />
@@ -202,7 +241,7 @@ const ProfileInfoCard = ({ profile, isOwner }: { profile: StudentProfile, isOwne
 };
 
 export default function PublicStudentProfileView({ profileId }: { profileId: string }) {
-    const { user } = useAuth();
+    const { user, profile: viewerProfile } = useAuth(); // KROK 2.2: Získáme profil diváka
     const [profile, setProfile] = useState<StudentProfile | null>(null);
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -219,10 +258,12 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     useEffect(() => {
         if (!hasFetched && profileId) {
             const fetchProfileData = async () => {
+                // KROK 2.2: Upravíme dotaz, aby vždy obsahoval 'recruitment_status'
                 const { data, error } = await supabase
                     .from('StudentProfile')
                     .select(`
                         *,
+                        recruitment_status, 
                         StudentSkill (level, xp, Skill (name)),
                         StudentLanguage (Language (name)),
                         Submission ( rating, position, is_public_on_profile, Challenge (*, ChallengeSkill(Skill(name)), StartupProfile(company_name, logo_url)) )
@@ -256,7 +297,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     return (
         <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-4 md:py-32 px-4">
             {!isOwner && (
-                 <button
+                <button
                     onClick={() => router.back()}
                     className="flex items-center cursor-pointer gap-1 text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-4"
                 >
@@ -266,7 +307,15 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
             )}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
                 <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:sticky lg:top-28">
-                    <ProfileInfoCard profile={profile} isOwner={isOwner} />
+                    <ProfileInfoCard 
+                        profile={profile} 
+                        isOwner={isOwner} 
+                        viewerRole={
+                            viewerProfile?.role === 'student' ? 'student' :
+                            (viewerProfile?.role === 'startup' || viewerProfile?.role === 'admin') ? 'startup' :
+                            null
+                        }
+                    />
                     <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
                         <h3 className="font-bold text-lg sm:text-xl text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
                         <SkillRadarChart skills={skillsForChart} isOwner={isOwner} />

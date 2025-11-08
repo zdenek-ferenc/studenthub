@@ -23,6 +23,7 @@ type StudentProfile = {
     dribbble_url: string | null;
     personal_website_url: string | null;
     profile_picture_url: string | null; 
+    recruitment_status: string | null; // <-- KROK 2.1: PŘIDÁN TYP
 };
 
 type Tab = 'personal' | 'skills' | 'links';
@@ -40,7 +41,12 @@ export default function StudentEditForm() {
     );
 
     // Přidáváme watch a setValue z react-hook-form
-    const { register, handleSubmit, reset, watch, setValue, formState: { isDirty, isSubmitting } } = useForm<StudentProfile>(); // Upraven typ pro useForm
+    const { register, handleSubmit, reset, watch, setValue, formState: { isDirty, isSubmitting } } = useForm<StudentProfile>({
+        // KROK 2.1: PŘIDÁN VÝCHOZÍ STAV
+        defaultValues: {
+            recruitment_status: null,
+        }
+    }); 
 
     const [originalSkills, setOriginalSkills] = useState<string[]>([]);
     const [originalLanguages, setOriginalLanguages] = useState<string[]>([]);
@@ -58,7 +64,12 @@ export default function StudentEditForm() {
                 supabase.from('StudentLanguage').select('language_id').eq('student_id', user.id),
             ]).then(([profileRes, skillsRes, languagesRes]) => {
                 if (profileRes.data) {
-                    reset(profileRes.data); 
+                    // KROK 2.1: Nastavení výchozí hodnoty z DB (nebo null pokud není)
+                    const profileData = {
+                        ...profileRes.data,
+                        recruitment_status: profileRes.data.recruitment_status || null, 
+                    };
+                    reset(profileData); 
                 }
 
                 const skillIds = skillsRes.data?.map(s => s.skill_id) || [];
@@ -75,11 +86,20 @@ export default function StudentEditForm() {
 
     const handleProfileSubmit = async (data: Partial<StudentProfile>) => {
         if (!user) return;
-        const { profile_picture_url, ...profileData } = data;
+
+        const { profile_picture_url, recruitment_status, ...profileData } = data;
+        
         const sanitizedData = Object.fromEntries(
             Object.entries(profileData).map(([key, value]) => [key, value === '' ? null : value])
         );
-        const { error } = await supabase.from('StudentProfile').update(sanitizedData).eq('user_id', user.id);
+
+        const dataToUpdate = {
+            ...sanitizedData,
+            recruitment_status: recruitment_status || null, 
+        };
+
+        const { error } = await supabase.from('StudentProfile').update(dataToUpdate).eq('user_id', user.id);
+        
         if (error) {
             showToast(`Chyba: ${error.message}`, 'error');
         } else {
@@ -90,7 +110,7 @@ export default function StudentEditForm() {
             reset({}, { keepValues: true }); 
         }
     };
-
+    
     const handleSkillsSubmit = async () => { 
         if (!user) return;
         const originalSet = new Set(originalSkills);
@@ -199,6 +219,20 @@ export default function StudentEditForm() {
                                 <label htmlFor="bio" className="block mb-1 text-sm sm:text-base font-semibold text-[var(--barva-tmava)]">Bio (krátký popisek)</label>
                                 <textarea id="bio" {...register('bio')} className="input !font-normal min-h-[120px]" />
                             </div>
+
+                            <div >
+                                <label htmlFor="recruitment_status" className="block mb-1 text-sm sm:text-base font-semibold text-[var(--barva-tmava)]">Pracovní status</label>
+                                <p className="text-xs text-gray-500 mb-2">Dejte startupům vědět, zda jste otevření novým nabídkám.</p>
+                                <select 
+                                    id="recruitment_status" 
+                                    {...register('recruitment_status')} 
+                                    className="input cursor-pointer !font-normal bg-white"
+                                >
+                                    <option value="">Nespecifikováno</option>
+                                    <option value="open_to_work">✅ Jsem otevřený/á nabídkám</option>
+                                    <option value="not_looking">⛔ Momentálně nehledám</option>
+                                </select>
+                            </div>
                         </>
                     )}
                     {activeTab === 'skills' && (
@@ -219,7 +253,8 @@ export default function StudentEditForm() {
                     {activeTab === 'links' && (
                         <>
                             <h2 className="text-xl sm:text-2xl text-[var(--barva-primarni)] font-semibold mb-4">Sociální a profesní odkazy</h2>
-                            <EditSocialLinks register={register as unknown as UseFormRegister<FieldValues>} />                        </>
+                            <EditSocialLinks register={register as unknown as UseFormRegister<FieldValues>} />                        
+                        </>
                     )}
                     {(activeTab === 'personal' || activeTab === 'links') && (
                         <div className="pt-4">
