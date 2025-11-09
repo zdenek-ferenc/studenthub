@@ -148,12 +148,11 @@ export default function ChallengeCard({ challenge, onDelete }: { challenge: Chal
                 </div>
 
                 <div className="flex items-center gap-2">
-                    {/* Přidáme tlačítko pro smazání, pouze pokud je to koncept */}
                     {isDraft && (
                         <button
                             type="button"
                             onClick={(e) => {
-                                e.preventDefault(); // Zabráníme prokliku, pokud by karta byla Link
+                                e.preventDefault(); 
                                 e.stopPropagation();
                                 onDelete(challenge.id);
                             }}

@@ -44,7 +44,6 @@ const WinnerDropzone = ({ place, submission, reward }: { place: 1 | 2 | 3, submi
     return (
         <div ref={setNodeRef} className={`p-4 rounded-2xl border-2 border-dashed h-28 flex flex-col justify-center items-center transition-colors ${placeColors[place]} ${isOver ? 'bg-opacity-50 scale-[1.02]' : ''}`}>
             <p className="font-bold text-lg text-gray-700">{place}. Místo</p>
-            {/* Zobrazíme odměnu, jen pokud je finanční */}
             {reward ? <p className="text-sm text-gray-500 mb-2">{reward} Kč</p> : <p className="text-sm text-gray-500 mb-2">Nefinanční odměna</p>}
             <SortableContext items={items} strategy={verticalListSortingStrategy}>
                 <div className="w-full px-2">{submission && <SortableFinalistItem submission={submission} />}</div>
@@ -73,7 +72,6 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
         if (challenge.reward_second_place !== null) slots.push(2);
         if (challenge.reward_third_place !== null) slots.push(3);
 
-        // Pokud není finanční a máme počet vítězů, použijeme ten
         if (slots.length === 0 && challenge.number_of_winners) {
             for (let i = 1; i <= challenge.number_of_winners; i++) {
                 slots.push(i as 1 | 2 | 3);

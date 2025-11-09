@@ -8,7 +8,7 @@ import Image from 'next/image';
 import ChallengeCard from './components/ChallengeCard';
 import CommandCenter, { CommandCenterStats, RecentSubmission } from './components/CommandCenter';
 import LoadingSpinner from '../../../components/LoadingSpinner';
-import ConfirmationModal from '../../../components/ConfirmationModal'; // <-- 1. IMPORT MODÁLU
+import ConfirmationModal from '../../../components/ConfirmationModal'; 
 
 export type Challenge = {
     id: string;
