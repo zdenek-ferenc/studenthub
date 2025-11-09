@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../contexts/AuthContext';
-import { Bell, Briefcase, MessageSquare, Handshake, ChevronRight, Trophy, Star, UserPlus } from 'lucide-react';
+import { Bell, Briefcase, Handshake, ChevronRight, Trophy, Star, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { cs } from 'date-fns/locale';

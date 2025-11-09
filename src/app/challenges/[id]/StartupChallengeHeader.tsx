@@ -1,4 +1,3 @@
-// src/app/challenges/[id]/StartupChallengeHeader.tsx
 "use client";
 
 import { useState, useMemo } from 'react';

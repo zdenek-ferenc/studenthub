@@ -120,7 +120,6 @@ export default function StartupRegistrationPage() {
     const loadInitialProfileData = useCallback(async (userId: string): Promise<number | null> => {
         setIsSaving(true);
         setError(null);
-        console.log("loadInitialProfileData: Spuštěno...");
         try {
             const { data, error: selectError } = await supabase
                 .from('StartupProfile')
@@ -134,9 +133,7 @@ export default function StartupRegistrationPage() {
 
                     if(selectError.code !== 'PGRST116') {
                         setError("Chyba databáze: Nalezeno více profilů pro jednoho uživatele.");
-                    } else {
-                        console.log("Profil startupu nenalezen (loadInitialProfileData) - kód PGRST116.");
-                    }
+                    } 
                 } else {
                     setError(`Nepodařilo se načíst data profilu: ${selectError.message}`);
                 }
@@ -145,20 +142,14 @@ export default function StartupRegistrationPage() {
             }
 
             if (data) {
-                console.log("loadInitialProfileData: Profil nalezen, nastavuji formDataCache.");
                 setFormDataCache(prev => ({
                     ...prev,
                     ...data,
                     categories: data.StartupCategory?.map((c: { category_id: string }) => c.category_id) || [],
                 }));
                 const currentDBStep = data.registration_step || 2;
-                console.log(`loadInitialProfileData: Profil načten, DB krok je ${currentDBStep}.`);
-
                 return currentDBStep;
             }
-
-
-            console.log("Profil startupu nenalezen (loadInitialProfileData - konec).");
             return null;
 
         } catch (err: unknown) {
@@ -171,7 +162,6 @@ export default function StartupRegistrationPage() {
             return null;
         } finally {
             setIsSaving(false);
-            console.log("loadInitialProfileData: Dokončeno.");
         }
 
     }, [setError]);
@@ -184,28 +174,20 @@ export default function StartupRegistrationPage() {
             return;
         }
         const userId = session.user.id;
-        console.log(`handleUserSignedIn (startup) voláno pro userId: ${userId}`);
-
-
         if (isSaving) {
-            console.log("handleUserSignedIn: Přeskakuji, protože isSaving je true.");
             return;
         }
 
         try {
             setIsSaving(true);
-
             const { data: existingUser, error: selectUserError } = await supabase
                 .from('User')
                 .select('id, role')
                 .eq('id', userId)
                 .maybeSingle();
-
             if (selectUserError) {
                 console.error("Chyba RLS (406?) při kontrole User:", selectUserError);
-
             }
-
             if (existingUser && existingUser.role !== 'startup') {
                 setError(`Účet je již registrován s rolí: ${existingUser.role}.`);
                 await supabase.auth.signOut();
@@ -216,25 +198,16 @@ export default function StartupRegistrationPage() {
                 return;
             }
 
-
             let loadedDBStep: number | null = null;
-
             if (existingUser) {
-                console.log(`Uživatel (startup) ${userId} nalezen v User tabulce.`);
                 if (!localProfileLoaded) {
-                    console.log("Profil startupu ještě nebyl načten, volám loadInitialProfileData...");
                     loadedDBStep = await loadInitialProfileData(userId);
                     if (loadedDBStep !== null) {
                         setLocalProfileLoaded(true);
-                        console.log("Profil startupu úspěšně načten, localProfileLoaded=true");
                     } else {
-                        console.log("Načítání profilu selhalo nebo profil nenalezen.");
                     }
-                } else {
-                    console.log("Profil startupu již byl načten (localProfileLoaded=true).");
                 }
-            } else {
-                console.log(`Uživatel (startup) ${userId} nenalezen (nebo RLS selhal), vytvářím nové záznamy...`);
+                } else {
                 const { error: userInsertError } = await supabase
                     .from('User')
                     .insert({ id: userId, email: session.user.email, role: 'startup' });
@@ -247,26 +220,18 @@ export default function StartupRegistrationPage() {
                 loadedDBStep = 2;
                 setFormDataCache(prev => ({ ...prev, contact_email: session.user.email || '' }));
                 setLocalProfileLoaded(true);
-                console.log("Nový uživatel a profil startupu vytvořen, krok=2, localProfileLoaded=true");
             }
-
             const targetStep = loadedDBStep ?? step;
-
             if (step !== targetStep) {
-                console.log(`Nastavuji krok UI na ${targetStep}`);
                 setStep(targetStep);
             } else {
-                console.log(`Ponechávám krok UI na ${step}.`);
             }
-
             if (targetStep >= 6) {
-                console.log(`Registrace startupu dokončena (krok ${targetStep}), přesměrovávám na /challenges`);
                 if (typeof window !== 'undefined') {
                     sessionStorage.setItem('justFinishedRegistration', 'true');
                 }
                 router.push('/challenges');
             } else {
-                console.log(`Pokračuji v registraci startupu na kroku ${targetStep}`);
             }
 
         } catch (err: unknown) {
@@ -280,7 +245,6 @@ export default function StartupRegistrationPage() {
         } finally {
             setIsSaving(false);
             if (loading) {
-                console.log("handleUserSignedIn (startup) dokončil hlavní loading.");
                 setLoading(false);
             }
         }
@@ -299,7 +263,6 @@ export default function StartupRegistrationPage() {
 
     if (!user || isSaving) return;
     setIsSaving(true);
-    console.log(`Ukládám (startup) krok ${currentStep} pro uživatele ${user.id}`);
     setError(null);
 
     try {
@@ -309,7 +272,6 @@ export default function StartupRegistrationPage() {
             data: RelatedTableInsertData[]; 
             deleteCondition?: Record<string, string>;
         } | null = null;
-         // ------------------------------
 
         switch (currentStep) {
             case 2:
@@ -331,7 +293,6 @@ export default function StartupRegistrationPage() {
         }
 
         if (Object.keys(updateData).length > 0) {
-            console.log("Aktualizuji StartupProfile s daty:", updateData);
             const { error: profileUpdateError } = await supabase
                 .from('StartupProfile')
                 .update(updateData)
@@ -340,19 +301,16 @@ export default function StartupRegistrationPage() {
                 console.error("Supabase profile update error object:", profileUpdateError);
                 throw new Error(`Chyba při aktualizaci profilu: ${profileUpdateError.message} (Kód: ${profileUpdateError.code})`);
             }
-            console.log(`Startup profil úspěšně aktualizován pro krok ${currentStep}`);
         }
 
         if (relatedTableData) {
             if (relatedTableData.deleteCondition) {
                 const { error: deleteError } = await supabase.from(relatedTableData.table).delete().match(relatedTableData.deleteCondition);
                 if (deleteError && deleteError.code !== 'PGRST204') throw deleteError;
-                console.log(`Staré záznamy smazány (nebo neexistovaly) z ${relatedTableData.table}`);
             }
             if (relatedTableData.data.length > 0) {
                 const { error: insertError } = await supabase.from(relatedTableData.table).insert(relatedTableData.data);
                 if (insertError) throw insertError;
-                console.log(`Nové záznamy vloženy do ${relatedTableData.table}`);
             }
         }
 
@@ -362,7 +320,6 @@ export default function StartupRegistrationPage() {
             console.error("Supabase step update error object:", stepUpdateError);
             throw new Error(`Chyba při aktualizaci kroku registrace: ${stepUpdateError.message} (Kód: ${stepUpdateError.code})`);
         }
-        console.log(`Startup registration step aktualizován na ${nextStepInDB}`);
 
     } catch (error: unknown) {
         console.error("Detailní chyba při ukládání (startup) na pozadí:", error);
@@ -376,7 +333,6 @@ export default function StartupRegistrationPage() {
         throw error;
     } finally {
         setIsSaving(false);
-        console.log(`Ukládání (startup) kroku ${currentStep} dokončeno.`);
     }
 
 }, [user, isSaving, setError]);
@@ -393,7 +349,6 @@ export default function StartupRegistrationPage() {
             const nextStep = step + 1;
 
             if (nextStep > 5) {
-                console.log("Poslední krok startupu uložen, nastavuji flag a přesměrovávám...");
                 if (typeof window !== 'undefined') {
                     sessionStorage.setItem('justFinishedRegistration', 'true');
                 }
@@ -401,7 +356,6 @@ export default function StartupRegistrationPage() {
             } else {
                 setStep(nextStep);
             }
-
         } catch (error) {
             console.log("Ukládání selhalo, zůstávám na kroku:", step);
 
@@ -418,7 +372,6 @@ export default function StartupRegistrationPage() {
                 const { data } = await supabase.from('Category').select('id, name').order('name');
                 setAllCategories(data || []);
                 setStaticDataLoaded(true);
-                console.log("Statická data (kategorie) načtena.");
             } catch (err) {
                 console.error("Chyba při načítání kategorií:", err);
                 setError("Nepodařilo se načíst potřebná data pro formulář.");
@@ -435,8 +388,6 @@ export default function StartupRegistrationPage() {
 
 
     useEffect(() => {
-        console.log(`Auth useEffect (startup) spuštěn: authInit=${authInitialized}, loading=${loading}, user=${!!user}, profileLoaded=${localProfileLoaded}`);
-
         if (authInitialized || IS_DEVELOPMENT_MODE) {
 
             if (IS_DEVELOPMENT_MODE && !user) {
@@ -453,37 +404,29 @@ export default function StartupRegistrationPage() {
         let initialCheckDone = false;
 
         supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
-            console.log("getSession (startup) výsledek:", !!currentSession);
             initialCheckDone = true;
             if (!isSubscribed || authInitialized) {
-                console.log("getSession: Přeskakuji zpracování (unsubscribed nebo už inicializováno).");
                 return;
             }
 
             setAuthInitialized(true);
-            console.log("Auth inicializace nastavena na true v getSession.");
 
             if (currentSession) {
                 const currentUserForGetSession = currentSession.user;
-                console.log("Nalezena session (startup), nastavuji uživatele...");
                 setUser(currentUserForGetSession);
                 setSession(currentSession);
 
                 if (!localProfileLoaded) {
-                    console.log("getSession: Profil ještě nebyl načten (localProfileLoaded=false), volám handleUserSignedIn...");
                     await handleUserSignedIn(currentSession);
                 } else {
-                    console.log("getSession: Profil už byl načten (localProfileLoaded=true), přeskočeno volání handleUserSignedIn.");
 
                     const currentDBStep = formDataCache.registration_step || 2;
                     if (currentDBStep >= 6) {
-                        console.log("getSession: Registrace vypadá dokončená, přesměrovávám.");
                         if (typeof window !== 'undefined') { sessionStorage.setItem('justFinishedRegistration', 'true');}
                         router.push('/challenges');
                     }
                 }
             } else {
-                console.log("Session (startup) nenalezena.");
                 setLoading(false);
             }
 
@@ -497,7 +440,6 @@ export default function StartupRegistrationPage() {
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-            console.log("onAuthStateChange (startup) event:", _event, "Session:", !!newSession);
             if (!isSubscribed) return;
 
             const currentUser = newSession?.user ?? null;
@@ -507,7 +449,6 @@ export default function StartupRegistrationPage() {
             setUser(currentUser);
 
             if (currentUser?.id !== previousUserId) {
-                console.log("onAuthStateChange: Uživatel se změnil, resetuji localProfileLoaded.");
                 setLocalProfileLoaded(false);
                 setAuthInitialized(false);
                 setLoading(true);
@@ -515,7 +456,6 @@ export default function StartupRegistrationPage() {
             }
 
             if (!initialCheckDone && !loading) {
-                console.log("onAuthStateChange dokončil loading (před getSession?).");
                 setLoading(false);
 
             }
@@ -523,13 +463,10 @@ export default function StartupRegistrationPage() {
             if (_event === 'SIGNED_IN' && newSession) {
 
                 if (!localProfileLoaded) {
-                    console.log("onAuthStateChange: SIGNED_IN, profil nebyl načten, volám handleUserSignedIn...");
                     await handleUserSignedIn(newSession);
                 } else {
-                    console.log("onAuthStateChange: SIGNED_IN, profil už byl načten, přeskočeno volání handleUserSignedIn.");
                 }
             } else if (_event === 'SIGNED_OUT') {
-                console.log("Uživatel (startup) odhlášen, resetuji stav.");
                 setStep(1);
                 setFormDataCache(initialStartupFormData);
                 setLocalProfileLoaded(false);
@@ -539,7 +476,6 @@ export default function StartupRegistrationPage() {
         });
 
         return () => {
-            console.log("Unsubscribing (startup) from auth changes.");
             isSubscribed = false;
             subscription?.unsubscribe();
         };

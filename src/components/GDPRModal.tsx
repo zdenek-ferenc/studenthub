@@ -1,4 +1,3 @@
-// src/components/GDPRModal.tsx
 "use client";
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
@@ -101,7 +100,6 @@ const GDPRContent = () => (
             </ul>
         </div>
 
-        {/* Sekce 7: Vaše Práva Podle GDPR */}
         <div>
             <h3 className="text-lg font-semibold text-[var(--barva-tmava)] mb-2">7. Vaše Práva Podle GDPR</h3>
             <p>Jako subjekt údajů máte následující práva:</p>
@@ -118,13 +116,11 @@ const GDPRContent = () => (
             <p className="mt-2">Svá práva můžete uplatnit kontaktováním nás na e-mailu <a href="mailto:gdpr@risehigh.io" className="text-[var(--barva-primarni)] font-semibold">gdpr@risehigh.io</a>.</p>
         </div>
 
-        {/* Sekce 8: Zabezpečení Údajů */}
         <div>
             <h3 className="text-lg font-semibold text-[var(--barva-tmava)] mb-2">8. Zabezpečení Údajů</h3>
             <p>Přijímáme přiměřená technická a organizační opatření k ochraně vašich osobních údajů před ztrátou, zneužitím, neoprávněným přístupem, zveřejněním, úpravou nebo zničením. Využíváme zabezpečení poskytované platformou Supabase, včetně šifrování hesel a zabezpečeného ukládání dat.</p>
         </div>
 
-        {/* Sekce 9: Soubory Cookies */}
         <div>
             <h3 className="text-lg font-semibold text-[var(--barva-tmava)] mb-2">9. Soubory Cookies</h3>
             <p>Naše webové stránky používají soubory cookies k zajištění funkčnosti a analýze návštěvnosti.</p>
@@ -154,9 +150,7 @@ export default function GDPRModal({ isOpen, onClose }: GDPRModalProps) {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        {/* První Transition.Child pro backdrop */}
         <Transition.Child
-          // Odstraněno: as={Fragment}
           enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100"
           leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0"
         >
@@ -165,20 +159,18 @@ export default function GDPRModal({ isOpen, onClose }: GDPRModalProps) {
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            {/* Druhý Transition.Child pro panel */}
             <Transition.Child
-              // Odstraněno: as={Fragment}
               enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100"
               leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex justify-between items-center mb-4 pb-4 border-b">
-                   <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-900">
+                  <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-900">
                     Zásady ochrany osobních údajů
-                   </Dialog.Title>
-                   <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600">
-                     <X size={20} />
-                   </button>
+                  </Dialog.Title>
+                  <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+                    <X size={20} />
+                  </button>
                 </div>
                 <div className="mt-2 max-h-[75vh] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar">
                   <GDPRContent />

@@ -99,10 +99,10 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
             case 'ending_soon': query = query.order('deadline', { ascending: true }); break;
             case 'highest_reward': query = query.order('reward_first_place', { ascending: false, nullsFirst: false }); break;
             default:
-                 if (sortBy !== 'recommended') {
+                if (sortBy !== 'recommended') {
                       query = query.order('created_at', { ascending: false });
-                 }
-                 break;
+                }
+                break;
         }
 
         const { data: challengesData, error: challengesError } = await query;

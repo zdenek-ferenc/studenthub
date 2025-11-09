@@ -1,4 +1,3 @@
-// src/app/profile/[id]/components/StartupQnA.tsx
 "use client";
 
 import { useState, useEffect } from 'react';

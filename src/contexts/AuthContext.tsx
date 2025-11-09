@@ -98,12 +98,9 @@ useEffect(() => {
                     if (typeof window !== 'undefined') {
                         sessionStorage.removeItem('justFinishedRegistration');
                     }
-                    console.log("AuthContext: Detekováno dokončení registrace, přeskočena kontrola přesměrování.");
-                } else if (isRegistrationIncomplete && !onRegistrationPage) {
-                    console.log(`AuthContext: Nedokončená registrace (krok ${fetchedProfile.registration_step}), přesměrovávám na /register/${fetchedProfile.role}`);
+                  } else if (isRegistrationIncomplete && !onRegistrationPage) {
                     router.push(`/register/${fetchedProfile.role}`);
                 } else if (!isRegistrationIncomplete && onRegistrationPage) {
-                    console.log("AuthContext: Registrace dokončena, ale stále na registrační stránce. Přesměrovávám pryč.");
                     router.push(fetchedProfile.role === 'student' ? '/dashboard' : '/challenges');
                 }
             }

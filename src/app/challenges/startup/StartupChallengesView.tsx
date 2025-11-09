@@ -183,7 +183,7 @@ export default function StartupChallengesView() {
         { id: 'active', label: 'Aktivní', count: sortedActiveChallenges.length },
         { id: 'drafts', label: 'Koncepty', count: draftChallenges.length },
         { id: 'completed', label: 'Dokončené', count: completedChallenges.length },
-    ], [sortedActiveChallenges.length, draftChallenges.length, completedChallenges.length]); // Zde byla chybka, opraveno na .length
+    ], [sortedActiveChallenges.length, draftChallenges.length, completedChallenges.length]); 
 
     useEffect(() => {
         const activeIndex = filters.findIndex(f => f.id === activeFilter);
@@ -195,7 +195,7 @@ export default function StartupChallengesView() {
                 transform: `translateX(${activeButton.offsetLeft}px)`,
             });
         }
-    }, [activeFilter, filters, allChallenges]); // allChallenges přidáno pro přepočet při změně počtů
+    }, [activeFilter, filters, allChallenges]); 
 
     if (loading) {
         return <div className='py-10 md:py-32'>
@@ -265,7 +265,7 @@ export default function StartupChallengesView() {
                             <ChallengeCard 
                                 key={challenge.id} 
                                 challenge={challenge} 
-                                onDelete={triggerDelete} // <-- 5. PŘEDÁNÍ HANDLERU
+                                onDelete={triggerDelete} 
                             /> 
                         ))}
                     </div>
@@ -278,7 +278,6 @@ export default function StartupChallengesView() {
                 </div>
             )}
 
-            {/* --- 6. PŘIDÁNÍ MODÁLU --- */}
             <ConfirmationModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

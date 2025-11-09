@@ -23,7 +23,7 @@ type StudentProfile = {
     dribbble_url: string | null;
     personal_website_url: string | null;
     profile_picture_url: string | null; 
-    recruitment_status: string | null; // <-- KROK 2.1: PŘIDÁN TYP
+    recruitment_status: string | null;
 };
 
 type Tab = 'personal' | 'skills' | 'links';
@@ -87,7 +87,7 @@ export default function StudentEditForm() {
     const handleProfileSubmit = async (data: Partial<StudentProfile>) => {
         if (!user) return;
 
-        const { profile_picture_url, recruitment_status, ...profileData } = data;
+        const { recruitment_status, ...profileData } = data;
         
         const sanitizedData = Object.fromEntries(
             Object.entries(profileData).map(([key, value]) => [key, value === '' ? null : value])

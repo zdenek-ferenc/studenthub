@@ -169,8 +169,6 @@ export default function QnaManagement() {
                     </div>
                 </div>
             </div>
-
-            {/* Potvrzovací modál */}
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}

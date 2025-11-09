@@ -138,10 +138,8 @@ export default function StudentRegistrationPage() {
                 const currentDBStep = data.registration_step || 2;
 
                 setStep(prevStep => Math.max(prevStep, currentDBStep));
-                console.log(`Profil načten, krok nastaven/ponechán na ${Math.max(step, currentDBStep)}`);
                 return currentDBStep;
             }
-            console.log("Profil nenalezen, nový uživatel nebo chyba.");
             setStep(prevStep => Math.max(prevStep, 2));
             return 2;
         } catch (err) {
@@ -152,7 +150,7 @@ export default function StudentRegistrationPage() {
         } finally {
             setIsSaving(false);
         }
-    }, [step, setError, isSaving]);
+    }, [setError]);
 
 
     const handleUserSignedIn = useCallback(async (session: Session) => {
@@ -185,20 +183,15 @@ export default function StudentRegistrationPage() {
 
             let currentRegistrationStep = 1;
             if (existingUser) {
-                console.log(`Uživatel ${userId} nalezen v User tabulce.`);
-
                 if (!localProfileLoaded) {
-                    console.log("Profil ještě nebyl načten, volám loadInitialProfileData...");
                     currentRegistrationStep = await loadInitialProfileData(userId);
                     setLocalProfileLoaded(true);
                 } else {
-                    console.log("Profil již byl načten, používám krok ze stavu:", step);
                     currentRegistrationStep = step;
                 }
 
             } else {
 
-                console.log(`Uživatel ${userId} nenalezen, vytvářím nové záznamy...`);
                 const { error: userInsertError } = await supabase
                     .from('User')
                     .insert({ id: userId, email: session.user.email, role: 'student' });
@@ -212,14 +205,11 @@ export default function StudentRegistrationPage() {
                 currentRegistrationStep = 2;
                 setStep(2);
                 setLocalProfileLoaded(true);
-                console.log("Nový uživatel a profil vytvořen, krok nastaven na 2.");
             }
 
             if (currentRegistrationStep >= 6) {
-                console.log(`Registrace dokončena (krok ${currentRegistrationStep}), přesměrovávám na /dashboard`);
                 router.push('/dashboard');
             } else {
-                console.log(`Pokračuji v registraci na kroku ${currentRegistrationStep}`);
                 if (step !== currentRegistrationStep) {
                     setStep(currentRegistrationStep);
                 }
@@ -240,7 +230,6 @@ export default function StudentRegistrationPage() {
         } finally {
 
             if (loading) {
-                console.log("handleUserSignedIn dokončil hlavní loading.");
                 setLoading(false);
             }
         }
@@ -263,7 +252,6 @@ export default function StudentRegistrationPage() {
 
         if (!user || isSaving) return;
         setIsSaving(true);
-        console.log(`Ukládám krok ${currentStep} pro uživatele ${user.id}`);
         setError(null);
 
         try {
@@ -303,7 +291,6 @@ export default function StudentRegistrationPage() {
                     .update(updateData)
                     .eq('user_id', user.id);
                 if (profileUpdateError) throw profileUpdateError;
-                console.log(`Profil aktualizován pro krok ${currentStep}`);
             }
 
             if (relatedTableData) {
@@ -314,14 +301,12 @@ export default function StudentRegistrationPage() {
                         .match(relatedTableData.deleteCondition);
 
                     if (deleteError && deleteError.code !== 'PGRST204') throw deleteError;
-                    console.log(`Staré záznamy smazány (nebo neexistovaly) z ${relatedTableData.table}`);
                 }
                 if (relatedTableData.data.length > 0) {
                     const { error: insertError } = await supabase
                         .from(relatedTableData.table)
                         .insert(relatedTableData.data);
                     if (insertError) throw insertError;
-                    console.log(`Nové záznamy vloženy do ${relatedTableData.table}`);
                 }
             }
 
@@ -331,7 +316,6 @@ export default function StudentRegistrationPage() {
                 .update({ registration_step: nextStepInDB })
                 .eq('user_id', user.id);
             if (stepUpdateError) throw stepUpdateError;
-            console.log(`Registration step aktualizován na ${nextStepInDB}`);
 
         } catch (error: unknown) {
             console.error("Detailní chyba při ukládání na pozadí:", error);
@@ -348,7 +332,6 @@ export default function StudentRegistrationPage() {
 
         } finally {
         setIsSaving(false);
-        console.log(`Ukládání kroku ${currentStep} dokončeno.`);
         }
     }, [user, isSaving, setStep, setError]);
 
@@ -364,8 +347,6 @@ export default function StudentRegistrationPage() {
             const nextStep = step + 1;
 
             if (nextStep > 5) {
-                console.log("Poslední krok uložen, nastavuji flag a přesměrovávám...");
-
                 if (typeof window !== 'undefined') {
                     sessionStorage.setItem('justFinishedRegistration', 'true');
                 }
@@ -374,8 +355,6 @@ export default function StudentRegistrationPage() {
                 setStep(nextStep);
             }
         } catch (error) {
-            console.log("Ukládání selhalo, zůstávám na kroku:", step);
-
         }
     };
 
@@ -392,7 +371,6 @@ export default function StudentRegistrationPage() {
                 setAllSkills(skillsRes.data || []);
                 setAllLanguages(languagesRes.data || []);
                 setStaticDataLoaded(true);
-                console.log("Statická data (skills, languages) načtena.");
             } catch (err) {
                 console.error("Chyba při načítání skills/languages:", err);
                 setError("Nepodařilo se načíst potřebná data pro formulář.");
@@ -424,36 +402,28 @@ export default function StudentRegistrationPage() {
 
         let isSubscribed = true;
         let initialCheckDone = false;
-        console.log("Auth useEffect spuštěn...");
 
         supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
-            console.log("getSession výsledek:", currentSession);
             initialCheckDone = true;
             if (isSubscribed && !authInitialized) {
                 if (currentSession) {
                     const currentUserForGetSession = currentSession.user;
-                    console.log("Nalezena session, nastavuji uživatele...");
                     setUser(currentUserForGetSession);
                     setSession(currentSession);
 
                     if (!user) {
-                        console.log("Volám handleUserSignedIn z getSession...");
                         await handleUserSignedIn(currentSession);
                     } else {
-                        console.log("Přeskakuji handleUserSignedIn v getSession (user už byl nastaven).");
 
                         if (!localProfileLoaded) {
-                            console.log("Profil ještě nebyl načten v getSession, volám loadInitialProfileData...");
                             await loadInitialProfileData(currentUserForGetSession.id);
                             setLocalProfileLoaded(true);
                         }
                     }
                 } else {
-                    console.log("Session nenalezena.");
                 }
                 setLoading(false);
                 setAuthInitialized(true);
-                console.log("Auth inicializace dokončena v getSession.");
             }
         }).catch(err => {
             console.error("Chyba v getSession:", err);
@@ -465,7 +435,6 @@ export default function StudentRegistrationPage() {
         });
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-            console.log("onAuthStateChange event:", _event, "Session:", !!newSession);
             if (!isSubscribed) return;
 
             const currentUser = newSession?.user ?? null;
@@ -477,25 +446,20 @@ export default function StudentRegistrationPage() {
 
 
             if (currentUser?.id !== previousUserId) {
-                console.log("Uživatel se změnil v onAuthStateChange, resetuji localProfileLoaded.");
                 setLocalProfileLoaded(false);
             }
 
             if (!initialCheckDone && !loading) {
-                console.log("onAuthStateChange dokončil loading.");
                 setLoading(false);
                 setAuthInitialized(true);
             }
 
             if (_event === 'SIGNED_IN' && newSession) {
                 if (currentUser?.id !== previousUserId || !localProfileLoaded) {
-                    console.log("Volám handleUserSignedIn z onAuthStateChange (nový uživatel nebo nenačtený profil)...");
                     await handleUserSignedIn(newSession);
                 } else {
-                    console.log("Přeskakuji handleUserSignedIn v onAuthStateChange (stejný uživatel a profil načten).");
                 }
             } else if (_event === 'SIGNED_OUT') {
-                console.log("Uživatel odhlášen, resetuji stav.");
                 setStep(1);
                 setFormDataCache(initialStudentFormData);
                 setLocalProfileLoaded(false);
@@ -504,7 +468,6 @@ export default function StudentRegistrationPage() {
         });
 
         return () => {
-            console.log("Unsubscribing from auth changes.");
             isSubscribed = false;
             subscription?.unsubscribe();
         };

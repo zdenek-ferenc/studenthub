@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import ChallengeRecapView from './ChallengeRecapView';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AlertCircle, CheckCircle, Lock, Clock, Users, ChevronLeft, Eye, EyeOff } from 'lucide-react';
-import { differenceInDays, format, differenceInHours } from 'date-fns';
+import { AlertCircle, CheckCircle, Lock, Clock, Users, ChevronLeft, Eye} from 'lucide-react';
+import { differenceInDays, format} from 'date-fns';
 import StartupChallengeHeader from './StartupChallengeHeader';
 
 type Challenge = {
@@ -35,7 +35,7 @@ const EvaluationStatusPanel = ({
     deadline,
     applicants,
     maxApplicants,
-    createdAt // <-- Prop pro datum vytvoření
+    createdAt 
 }: {
     canFinalize: boolean,
     ratedCount: number,
@@ -44,7 +44,7 @@ const EvaluationStatusPanel = ({
     deadline: string,
     applicants: number,
     maxApplicants: number | null,
-    createdAt: string // <-- Typ pro datum vytvoření
+    createdAt: string 
 }) => {
     const allRated = ratedCount === totalCount && totalCount > 0;
     const deadlineDate = new Date(deadline);
@@ -62,7 +62,6 @@ const EvaluationStatusPanel = ({
         timeProgress = 100;
     }
     timeProgress = Math.max(0, Math.min(100, timeProgress));
-    // --- KONEC VÝPOČTU ---
 
     const capacityProgress = maxApplicants ? (applicants / maxApplicants) * 100 : 0;
 
@@ -112,7 +111,6 @@ const EvaluationStatusPanel = ({
             </div>
         );
     }
-    // ... (zbytek kódu komponenty EvaluationStatusPanel) ...
     return (
         <div className="bg-white p-6 rounded-2xl shadow-xs border border-gray-200 text-center">
             <div className="max-w-2xl mx-auto">
@@ -154,9 +152,7 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
     const [view, setView] = useState<'evaluating' | 'selecting_winners'>('evaluating');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [winnersToConfirm, setWinnersToConfirm] = useState<{ [key: number]: string } | null>(null);
-    
     const [hiddenSubmissions, setHiddenSubmissions] = useState<Set<string>>(new Set());
-    // ------------------------------------
     
     const router = useRouter();
     const { showToast } = useAuth();
@@ -188,7 +184,6 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
     const showAllSubmissions = () => {
         setHiddenSubmissions(new Set());
     };
-    // ----------------------------------------
 
     const handleSubmissionUpdate = (updatedSubmission: Submission) => {
     setSubmissions(current => current.map(s => s.id === updatedSubmission.id ? updatedSubmission : s));
@@ -221,7 +216,6 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
     const displayedSubmissions = useMemo(() => 
         anonymousSubmissions.filter(sub => !hiddenSubmissions.has(sub.id))
     , [anonymousSubmissions, hiddenSubmissions]);
-    // --------------------------------------------------
 
     const prepareToFinalize = (winners: { [key: number]: string }) => {
         setWinnersToConfirm(winners);

@@ -30,7 +30,6 @@ function DashboardPage() {
   const { profile, loading: authLoading } = useAuth();
   const { studentProfile, loading: dashboardLoading } = useDashboard();
   const [activeTab, setActiveTab] = useState<TabId>('challenges');
-  console.log(`Dashboard Stránka - Stavy načítání: authLoading: ${authLoading}, dashboardLoading: ${dashboardLoading}`);
   const displayName = studentProfile?.username ? studentProfile.username : "zpět";
 
   if (authLoading || dashboardLoading) {
