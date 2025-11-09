@@ -1,0 +1,17 @@
+User-agent: *
+
+Allow: /
+Allow: /zasady-ochrany-udaju/
+
+Disallow: /login
+Disallow: /register
+Disallow: /welcome
+Disallow: /dashboard
+Disallow: /profile/
+Disallow: /challenges/
+Disallow: /students/
+Disallow: /startups/
+Disallow: /notifications/
+Disallow: /test-notifications/
+
+Sitemap: https://www.risehigh.io/sitemap.xml
