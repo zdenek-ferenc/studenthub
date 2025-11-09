@@ -110,7 +110,8 @@ export default function HomePage() {
     { src: '/contributelogo.png', alt: 'Contribute' },
     { src: '/renownlogo.png', alt: 'Renown Media' },
     { src: '/obzoremlogo.svg', alt: 'Studio Obzorem' },
-    { src: '/vdlogo.svg', alt: 'Virtigo Digital' }
+    { src: '/vdlogo.svg', alt: 'Virtigo Digital' },
+    { src: '/citroneklogo.svg', alt: 'Citronek' }
   ];
 
 
