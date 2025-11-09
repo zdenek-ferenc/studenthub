@@ -1,16 +1,11 @@
-"use client";
+import type { Metadata } from 'next'
+import CreateChallengeView from './CreateChallengeView' 
 
-import withAuth from '../../../components/withAuth';
-import CreateChallengeWizard from './CreateChallengeWizard';
-
-function CreateChallengePage() {
-  return (
-      <div className="container mx-auto px-4 py-4 md:py-32">
-        <div className="max-w-6xl mx-auto">
-            <CreateChallengeWizard />
-        </div>
-      </div>
-  );
+export const metadata: Metadata = {
+    title: 'Vytvořit novou výzvu',
+    description: 'Zadejte novou výzvu pro studenty a talenty na platformě RiseHigh.',
 }
 
-export default withAuth(CreateChallengePage);
+export default function CreateChallengePage() {
+    return <CreateChallengeView />
+}

@@ -1,28 +1,11 @@
-"use client";
+import type { Metadata } from 'next'
+import ChallengesView from './ChallengesView' 
 
-import { useAuth } from '../../contexts/AuthContext'; 
-import withAuth from '../../components/withAuth'; 
-
-import StartupChallengesView from './startup/StartupChallengesView';
-import StudentChallengesView from './student/StudentChallengesView';
-import LoadingSpinner from '../../components/LoadingSpinner'
-
-function ChallengesPage() {
-  const { profile, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (profile?.role === 'startup') {
-    return <StartupChallengesView />;
-  }
-
-  if (profile?.role === 'student') {
-    return <StudentChallengesView />;
-  }
-
-  return <p className="text-center py-20">Pro zobrazení této stránky nemáte oprávnění.</p>;
+export const metadata: Metadata = {
+    title: 'Přehled výzev',
+    description: 'Prohlížejte a filtrujte výzvy od startupů nebo spravujte své vlastní.',
 }
 
-export default withAuth(ChallengesPage);
+export default function ChallengesPage() {
+    return <ChallengesView />
+}

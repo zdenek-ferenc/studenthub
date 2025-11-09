@@ -1,66 +1,72 @@
-"use client";
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import type { Metadata } from 'next'
+import ProfileView from './ProfileView' 
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { supabase } from '../../../lib/supabaseClient';
-import LoadingSpinner from '../../../components/LoadingSpinner';
-import PublicStudentProfileView from './PublicStudentProfileView';
-import PublicStartupProfileView from './PublicStartupProfileView';
+async function createSupabaseServerClient() {
+    const cookieStore = await cookies() 
+        return createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value
+                },
+                set(name: string, value: string, options: CookieOptions) {
+                    cookieStore.set({ name, value, ...options })
+                },
+                remove(name: string, options: CookieOptions) {
+                    cookieStore.set({ name, value: '', ...options })
+                },
+            },
+        }
+    )
+}
 
-type ProfileData = {
-  id: string;
-  role: 'student' | 'startup';
-};
+
+export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const { id } = await props.params 
+
+    const supabase = await createSupabaseServerClient()
+
+    let title = 'Profil'
+    let description = 'Profil uživatele na platformě RiseHigh.'
+
+
+    const { data: user } = await supabase
+        .from('User')
+        .select('role')
+        .eq('id', id)
+        .single()
+
+    if (user?.role === 'student') {
+        const { data: student } = await supabase
+        .from('StudentProfile')
+        .select('first_name, last_name, bio')
+        .eq('user_id', id)
+        .single()
+    if (student) {
+        title = `${student.first_name || ''} ${student.last_name || ''}`.trim()
+        description = student.bio || `Profil studenta ${title} na RiseHigh.`
+    }
+    } else if (user?.role === 'startup') {
+    const { data: startup } = await supabase
+        .from('StartupProfile')
+        .select('company_name, description')
+        .eq('user_id', id)
+        .single()
+    if (startup) {
+        title = startup.company_name
+        description =
+        startup.description || `Profil startupu ${title} na RiseHigh.`
+    }
+    }
+
+return { title, description }
+}
+
 
 export default function PublicProfilePage() {
-  const params = useParams();
-  const profileId = params.id as string;
-
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!profileId) return;
-
-    const fetchProfileRole = async () => {
-      setLoading(true);
-      setError(null);
-
-      const { data, error } = await supabase
-        .from('User')
-        .select(`id, role`)
-        .eq('id', profileId)
-        .single();
-
-      if (error) {
-        console.error("Chyba při načítání role profilu:", error);
-        setError("Tento profil se nepodařilo najít.");
-      } else if (data) {
-        setProfileData(data as ProfileData);
-      }
-      
-      setLoading(false);
-    };
-
-    fetchProfileRole();
-  }, [profileId]);
-
-  if (loading) {
-    return <div className='pt-32'><LoadingSpinner /></div>;
-  }
-
-  if (error || !profileData) {
-    return <p className="text-center py-20 text-xl text-gray-600">{error || 'Profil nebyl nalezen.'}</p>;
-  }
-
-  if (profileData.role === 'student') {
-    return <PublicStudentProfileView profileId={profileId} />;
-  }
-
-  if (profileData.role === 'startup') {
-    return <PublicStartupProfileView profileId={profileId} />;
-  }
-
-  return <p className="text-center py-20">Tento profil nelze zobrazit.</p>;
+    return <ProfileView />
 }

@@ -1,53 +1,38 @@
-"use client";
-
-import { AuthProvider, useAuth } from '../contexts/AuthContext';
-import { ChallengesProvider } from '../contexts/ChallengesContext';
-import { DataProvider } from '../contexts/DataContext';
-import { DashboardProvider } from '../contexts/DashboardContext';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import MainContent from '../components/MainContent';
-import './globals.css';
+import type { Metadata } from 'next' 
 import { Sora } from "next/font/google";
-import ToastContainer from '../components/ToastContainer';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { ReactNode } from 'react';
-import BottomNavBar from '@/components/BottomNavBar';
-import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import ClientLayoutWrapper from './ClientLayoutWrapper'; 
+import './globals.css';
 
 const sora = Sora({
   subsets: ["latin"],
   variable: '--font-sora',
 });
 
-function AppContent({ children }: { children: ReactNode }) {
-  const { loading: authLoading } = useAuth();
-
-  if (authLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <Header />
-      <MainContent>
-        {children}
-      </MainContent>
-      <Footer />
-      <BottomNavBar />
-    </>
-  );
-}
+export const metadata: Metadata = {
+  title: {
+    template: '%s | RiseHigh',
+    default: 'RiseHigh | Propojení talentů a startupů',
+  },
+  description: 'Platforma, kde talentovaní studenti potkávají inovativní startupy skrze reálné výzvy a projekty. Získej praxi, buduj portfolio a nastartuj kariéru.',
+  openGraph: {
+    title: 'RiseHigh | Propojení talentů a startupů',
+    description: 'Získej praxi a propoj se s inovativními firmami.',
+    // TODO: Vytvořit obrázky a nahrát je tu
+    // images: ['https://www.risehigh.io/og.png'], 
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'RiseHigh | Propojení talentů a startupů',
+    description: 'Získej praxi a propoj se s inovativními firmami.',
+    // TODO: Vytvořit obrázky a nahrát je tu
+    // images: ['https://www.risehigh.io/twitter.png'],
+  },
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <html lang="cs">
@@ -58,18 +43,7 @@ export default function RootLayout({
         />
       </head>
       <body className={sora.variable}>
-        <AuthProvider>
-          <DashboardProvider>
-            <ChallengesProvider>
-              <DataProvider>
-                <AppContent>{children}</AppContent>
-                <Analytics/>
-                <SpeedInsights/>
-                <ToastContainer />
-              </DataProvider>
-            </ChallengesProvider>
-          </DashboardProvider>
-        </AuthProvider>
+        <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
       </body>
     </html>
   );
