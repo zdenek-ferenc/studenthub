@@ -111,7 +111,7 @@ export default function HomePage() {
     { src: '/renownlogo.png', alt: 'Renown Media' },
     { src: '/obzoremlogo.svg', alt: 'Studio Obzorem' },
     { src: '/vdlogo.svg', alt: 'Virtigo Digital' },
-    { src: '/citroneklogo.svg', alt: 'Citronek' }
+    { src: '/citroneklogo.png', alt: 'Citronek' }
   ];
 
 
