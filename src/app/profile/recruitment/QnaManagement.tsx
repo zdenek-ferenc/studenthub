@@ -78,13 +78,12 @@ export default function QnaManagement() {
         }
     };
     const handleRejectPending = async (questionId: string) => {
-        setPendingQuestions(prev => prev.filter(q => q.id !== questionId));
-
         const { error } = await supabase.from('StartupQuestion').delete().eq('id', questionId);
         if (error) {
-            showToast('Smazání dotazu selhalo.', 'error');
-            await fetchQuestions();
+            showToast(`Smazání dotazu selhalo: ${error.message}`, 'error');
+            console.error("Chyba při mazání Q&A:", error);
         } else {
+            setPendingQuestions(prev => prev.filter(q => q.id !== questionId));
             showToast('Dotaz byl smazán.', 'success');
         }
     };
@@ -98,13 +97,14 @@ export default function QnaManagement() {
         const idToDelete = questionToDeleteId;
         setIsDeleteModalOpen(false); 
         setQuestionToDeleteId(null); 
-        setAnsweredQuestions(prev => prev.filter(q => q.id !== idToDelete));
 
         const { error } = await supabase.from('StartupQuestion').delete().eq('id', idToDelete);
         if (error) {
-            showToast('Smazání zodpovězené otázky selhalo.', 'error');
-            await fetchQuestions();
+            showToast(`Smazání zodpovězené otázky selhalo: ${error.message}`, 'error');
+            console.error("Chyba při mazání Q&A:", error);
+            
         } else {
+            setAnsweredQuestions(prev => prev.filter(q => q.id !== idToDelete));
             showToast('Zodpovězená otázka byla smazána.', 'success');
         }
     };

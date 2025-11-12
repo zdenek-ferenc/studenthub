@@ -152,7 +152,18 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
     const [view, setView] = useState<'evaluating' | 'selecting_winners'>('evaluating');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [winnersToConfirm, setWinnersToConfirm] = useState<{ [key: number]: string } | null>(null);
-    const [hiddenSubmissions, setHiddenSubmissions] = useState<Set<string>>(new Set());
+
+    // ZMĚNA #1: Vytvoření unikátního klíče pro localStorage
+    const getStorageKey = useCallback(() => `hiddenSubmissions_${initialChallenge.id}`, [initialChallenge.id]);
+
+    // ZMĚNA #2: Inicializace stavu z localStorage
+    const [hiddenSubmissions, setHiddenSubmissions] = useState<Set<string>>(() => {
+        if (typeof window === 'undefined') {
+            return new Set<string>();
+        }
+        const stored = window.localStorage.getItem(getStorageKey());
+        return stored ? new Set<string>(JSON.parse(stored)) : new Set<string>();
+    });
     
     const router = useRouter();
     const { showToast } = useAuth();
@@ -177,12 +188,23 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
         fetchInitialSubmissions();
     }, [fetchInitialSubmissions]);
 
+    // ZMĚNA #3: Funkce `hideSubmission` nyní ukládá do localStorage
     const hideSubmission = (submissionId: string) => {
-        setHiddenSubmissions(prev => new Set(prev).add(submissionId));
+        setHiddenSubmissions(prev => {
+            const newSet = new Set(prev).add(submissionId);
+            if (typeof window !== 'undefined') {
+                window.localStorage.setItem(getStorageKey(), JSON.stringify(Array.from(newSet)));
+            }
+            return newSet;
+        });
     };
 
+    // ZMĚNA #4: Funkce `showAllSubmissions` nyní čistí localStorage
     const showAllSubmissions = () => {
         setHiddenSubmissions(new Set());
+        if (typeof window !== 'undefined') {
+            window.localStorage.removeItem(getStorageKey());
+        }
     };
 
     const handleSubmissionUpdate = (updatedSubmission: Submission) => {
