@@ -153,10 +153,8 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [winnersToConfirm, setWinnersToConfirm] = useState<{ [key: number]: string } | null>(null);
 
-    // ZMĚNA #1: Vytvoření unikátního klíče pro localStorage
     const getStorageKey = useCallback(() => `hiddenSubmissions_${initialChallenge.id}`, [initialChallenge.id]);
 
-    // ZMĚNA #2: Inicializace stavu z localStorage
     const [hiddenSubmissions, setHiddenSubmissions] = useState<Set<string>>(() => {
         if (typeof window === 'undefined') {
             return new Set<string>();
@@ -188,7 +186,6 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
         fetchInitialSubmissions();
     }, [fetchInitialSubmissions]);
 
-    // ZMĚNA #3: Funkce `hideSubmission` nyní ukládá do localStorage
     const hideSubmission = (submissionId: string) => {
         setHiddenSubmissions(prev => {
             const newSet = new Set(prev).add(submissionId);
