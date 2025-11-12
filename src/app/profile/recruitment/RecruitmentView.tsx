@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import withAuth from '../../../components/withAuth';
 import { useAuth } from '../../../contexts/AuthContext';
 import Link from 'next/link';
@@ -11,9 +11,27 @@ import { motion } from 'framer-motion';
 
 type Tab = 'candidate' | 'qna';
 
+const TAB_STORAGE_KEY = 'recruitmentActiveTab';
+
 function RecruitmentView() {
     const { profile } = useAuth();
-    const [activeTab, setActiveTab] = useState<Tab>('candidate');
+
+    const [activeTab, setActiveTab] = useState<Tab>(() => {
+        if (typeof window === 'undefined') {
+            return 'candidate';
+        }
+        const savedTab = window.localStorage.getItem(TAB_STORAGE_KEY);
+        if (savedTab === 'candidate' || savedTab === 'qna') {
+            return savedTab;
+        }
+        return 'candidate';
+    });
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem(TAB_STORAGE_KEY, activeTab);
+        }
+    }, [activeTab]); 
 
     if (profile?.role !== 'startup') {
         return <p className="text-center py-20">Tato sekce je dostupná pouze pro startupy.</p>;

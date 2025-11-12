@@ -118,7 +118,7 @@ export default function QnaManagement() {
                     <h3 className="text-lg font-bold text-[var(--barva-tmava)]">Čeká na odpověď ({pendingQuestions.length})</h3>
                     <div className="space-y-4 mt-4">
                         {pendingQuestions.length > 0 ? pendingQuestions.map(q => (
-                            <div key={q.id} className="p-4 bg-[var(--barva-svetle-pozadi)]/70 rounded-lg border">
+                            <div key={q.id} className="p-4 bg-[var(--barva-svetle-pozadi)]/70 rounded-lg border-1 border-gray-100 shadow-xs">
                                 <p className="text-gray-800">{q.question_text}</p>
                                 <div className="flex items-center gap-2 mt-3">
                                     <input
@@ -130,7 +130,7 @@ export default function QnaManagement() {
                                     />
                                     <button
                                         onClick={() => handleAnswer(q.id)}
-                                        className="p-2.5 rounded-lg bg-green-400 text-white cursor-pointer hover:bg-green-500/80 transition"
+                                        className="p-2.5 rounded-lg border-2 border-green-400 bg-white text-green-500 cursor-pointer hover:bg-green-100/80 transition"
                                         title="Odpovědět a zveřejnit" 
                                         disabled={!editingAnswer[q.id]?.trim()}
                                         >
@@ -138,10 +138,10 @@ export default function QnaManagement() {
                                     </button>
                                     <button
                                         onClick={() => handleRejectPending(q.id)} 
-                                        className="p-2.5 rounded-lg bg-red-400 text-white cursor-pointer hover:bg-red-500/80 transition"
+                                        className="p-2.5 rounded-lg border-2 border-red-400 bg-white text-red-500 cursor-pointer hover:bg-red-100/80 transition"
                                         title="Smazat otázku" 
                                         >
-                                        <Trash size={16}/>
+                                        <Trash2 size={16}/>
                                     </button>
                                 </div>
                             </div>
@@ -159,7 +159,7 @@ export default function QnaManagement() {
                                 </div>
                                 <button
                                     onClick={() => triggerDeleteAnswered(q.id)}
-                                    className="p-2 rounded-lg text-gray-400 hover:bg-red-100 hover:text-red-600 transition flex-shrink-0"
+                                    className="p-2 rounded-full text-red-500 cursor-pointer hover:bg-red-100 hover:text-red-600 transition flex-shrink-0"
                                     title="Smazat tuto otázku a odpověď"
                                 >
                                     <Trash2 size={16} />
