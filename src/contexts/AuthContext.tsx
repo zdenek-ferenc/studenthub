@@ -4,163 +4,230 @@ import { createContext, useContext, useState, ReactNode, useCallback, useMemo, u
 import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
-import { Student, Startup } from './DataContext';
+
+type SimpleStudentSkill = {
+    skill_id: string;
+};
+
+type SimpleStudentProfile = {
+    registration_step?: number;
+    first_name: string | null;
+    last_name: string | null;
+    bio: string | null;
+    profile_picture_url: string | null;
+    StudentSkill: SimpleStudentSkill[];
+};
+
+type SimpleStartupChallenge = {
+    id: string;
+};
+
+type SimpleStartupProfile = {
+    registration_step?: number;
+    company_name: string | null;
+    description: string | null;
+    logo_url: string | null;
+    Challenge: SimpleStartupChallenge[];
+};
+
 
 export type Profile = {
-  id: string;
-  email: string;
-  role: 'student' | 'startup' | 'admin';
-  registration_step?: number; 
-  company_name: string | null; 
-  first_name: string | null;
-  last_name: string | null;
-  StudentProfile?: Student | Student[] | null;
-  StartupProfile?: Startup | Startup[] | null;
+    id: string;
+    email: string;
+    role: 'student' | 'startup' | 'admin';
+    registration_step?: number;
+    company_name: string | null;
+    first_name: string | null;
+    last_name: string | null;
+
+    StudentProfile: SimpleStudentProfile | null;
+    StartupProfile: SimpleStartupProfile | null;
 };
 
 export type Toast = {
-  id: number;
-  message: string;
-  type: 'success' | 'error';
+    id: number;
+    message: string;
+    type: 'success' | 'error';
 };
 
 type AuthContextType = {
-  user: User | null;
-  profile: Profile | null;
-  loading: boolean;
-  refetchProfile: () => void;
-  toasts: Toast[];
-  showToast: (message: string, type: 'success' | 'error') => void;
-  hideToast: (id: number) => void;
+    user: User | null;
+    profile: Profile | null;
+    loading: boolean;
+    refetchProfile: () => void;
+    toasts: Toast[];
+    showToast: (message: string, type: 'success' | 'error') => void;
+    hideToast: (id: number) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [toasts, setToasts] = useState<Toast[]>([]);
+    const [user, setUser] = useState<User | null>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const router = useRouter();
-  const pathname = usePathname();
+    const router = useRouter();
+    const pathname = usePathname();
 
-const fetchAndSetProfile = useCallback(async (currentUser: User | null) => {
-    if (!currentUser) {
-      setProfile(null);
-      return null;
-      }
-    const { data: userProfile } = await supabase.from('User').select('*, StudentProfile(*), StartupProfile(*)').eq('id', currentUser.id).single();
-    if (userProfile) {
-        let registration_step;
-        let company_name = null;
-        let first_name = null;
-        let last_name = null;
-
-        if (userProfile.role === 'student') {
-          const studentData = Array.isArray(userProfile.StudentProfile) ? userProfile.StudentProfile[0] : userProfile.StudentProfile;
-          registration_step = studentData?.registration_step;
-            first_name = studentData?.first_name; 
-            last_name = studentData?.last_name;   
-        } else if (userProfile.role === 'startup') {
-          const startupData = Array.isArray(userProfile.StartupProfile) ? userProfile.StartupProfile[0] : userProfile.StartupProfile;
-          registration_step = startupData?.registration_step;
-          company_name = startupData?.company_name; 
+    const fetchAndSetProfile = useCallback(async (currentUser: User | null): Promise<Profile | null> => {
+        if (!currentUser) {
+            setProfile(null);
+            return null;
         }
-        const finalProfile = { 
-            ...userProfile, 
-            registration_step, 
-            company_name, 
-            first_name, 
-            last_name 
-        } as Profile;
-        setProfile(finalProfile);
-        return finalProfile;
-    }
-    setProfile(null);
-    return null;
-  }, []);
+        const { data: userProfile, error: userError } = await supabase
+            .from('User')
+            .select('id, email, role')
+            .eq('id', currentUser.id)
+            .single();
 
-useEffect(() => {
-    const initializeAuth = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
+        if (userError || !userProfile) {
+            console.error("AuthContext: Chyba při načítání User data:", userError);
+            setProfile(null);
+            return null;
+        }
+        const finalProfile: Profile = {
+            id: userProfile.id,
+            email: userProfile.email,
+            role: userProfile.role as Profile['role'],
+            registration_step: 0,
+            company_name: null,
+            first_name: null,
+            last_name: null,
+            StudentProfile: null,
+            StartupProfile: null,
+        };
+        if (userProfile.role === 'student') {
+            const { data: studentData, error: studentError } = await supabase
+                .from('StudentProfile')
+                .select(`
+                registration_step,
+                first_name,
+                last_name,
+                bio,
+                profile_picture_url,
+                StudentSkill ( skill_id )
+            `)
+                .eq('user_id', currentUser.id)
+                .single();
 
-        if (currentUser) {
-            const fetchedProfile = await fetchAndSetProfile(currentUser);
-            if (fetchedProfile) {
-                const isRegistrationIncomplete = fetchedProfile.registration_step && fetchedProfile.registration_step < 6;
-                const onRegistrationPage = pathname.startsWith('/register/');
-                const justFinishedRegistration = typeof window !== 'undefined' ? sessionStorage.getItem('justFinishedRegistration') : null;
+            if (studentError && studentError.code !== 'PGRST116') {
+                console.error("AuthContext: Chyba při načítání StudentProfile:", studentError);
+            } else if (studentData) {
+                finalProfile.registration_step = studentData.registration_step;
+                finalProfile.first_name = studentData.first_name;
+                finalProfile.last_name = studentData.last_name;
+                finalProfile.StudentProfile = studentData as SimpleStudentProfile;
+            }
 
-                if (justFinishedRegistration && pathname !== `/register/${fetchedProfile.role}`) {
-                    if (typeof window !== 'undefined') {
-                        sessionStorage.removeItem('justFinishedRegistration');
-                    }
-                  } else if (isRegistrationIncomplete && !onRegistrationPage) {
-                    router.push(`/register/${fetchedProfile.role}`);
-                } else if (!isRegistrationIncomplete && onRegistrationPage) {
-                    router.push(fetchedProfile.role === 'student' ? '/dashboard' : '/challenges');
-                }
+        } else if (userProfile.role === 'startup') {
+            const { data: startupData, error: startupError } = await supabase
+                .from('StartupProfile')
+                .select(`
+                registration_step,
+                company_name,
+                description,
+                logo_url,
+                Challenge ( id )
+            `)
+                .eq('user_id', currentUser.id)
+                .single();
+
+            if (startupError && startupError.code !== 'PGRST116') {
+                console.error("AuthContext: Chyba při načítání StartupProfile:", startupError);
+            } else if (startupData) {
+                finalProfile.registration_step = startupData.registration_step;
+                finalProfile.company_name = startupData.company_name;
+                finalProfile.StartupProfile = startupData as SimpleStartupProfile;
             }
         }
-        setLoading(false);
-    };
 
-    initializeAuth();
+        setProfile(finalProfile);
+        return finalProfile;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        const currentUser = session?.user ?? null;
-        if (currentUser?.id !== user?.id && typeof window !== 'undefined') {
-            sessionStorage.removeItem('justFinishedRegistration');
+    }, []);
+
+    useEffect(() => {
+        const initializeAuth = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            const currentUser = session?.user ?? null;
+            setUser(currentUser);
+
+            if (currentUser) {
+                const fetchedProfile = await fetchAndSetProfile(currentUser);
+                if (fetchedProfile) {
+                    const isRegistrationIncomplete = fetchedProfile.registration_step && fetchedProfile.registration_step < 6;
+                    const onRegistrationPage = pathname.startsWith('/register/');
+                    const justFinishedRegistration = typeof window !== 'undefined' ? sessionStorage.getItem('justFinishedRegistration') : null;
+
+                    if (justFinishedRegistration && pathname !== `/register/${fetchedProfile.role}`) {
+                        if (typeof window !== 'undefined') {
+                            sessionStorage.removeItem('justFinishedRegistration');
+                        }
+                    } else if (isRegistrationIncomplete && !onRegistrationPage) {
+                        router.push(`/register/${fetchedProfile.role}`);
+                    } else if (!isRegistrationIncomplete && onRegistrationPage) {
+                        router.push(fetchedProfile.role === 'student' ? '/dashboard' : '/challenges');
+                    }
+                }
+            }
+            setLoading(false);
+        };
+
+        initializeAuth();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            const currentUser = session?.user ?? null;
+            if (currentUser?.id !== user?.id && typeof window !== 'undefined') {
+                sessionStorage.removeItem('justFinishedRegistration');
+            }
+            setUser(currentUser);
+            fetchAndSetProfile(currentUser);
+        });
+
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [fetchAndSetProfile, pathname, router, user?.id]);
+
+
+    const refetchProfile = useCallback(async () => {
+        if (user) {
+            await fetchAndSetProfile(user);
         }
-        setUser(currentUser);
-        fetchAndSetProfile(currentUser);
-    });
+    }, [user, fetchAndSetProfile]);
 
+    const showToast = useCallback((message: string, type: 'success' | 'error') => {
+        const newToast = { id: Date.now() + Math.random(), message, type };
+        setToasts((prev) => [...prev, newToast]);
+        setTimeout(() => {
+            setToasts((current) => current.filter((t) => t.id !== newToast.id));
+        }, 4000);
+    }, []);
 
-    return () => {
-        subscription.unsubscribe();
-    };
-}, [fetchAndSetProfile, pathname, router, user?.id]);
+    const hideToast = useCallback((id: number) => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, []);
 
+    const value = useMemo(() => ({
+        user,
+        profile,
+        loading,
+        refetchProfile,
+        toasts,
+        showToast,
+        hideToast
+    }), [user, profile, loading, toasts, refetchProfile, showToast, hideToast]);
 
-  const refetchProfile = useCallback(async () => {
-    if (user) {
-        await fetchAndSetProfile(user);
-    }
-  }, [user, fetchAndSetProfile]);
-
-  const showToast = useCallback((message: string, type: 'success' | 'error') => {
-  const newToast = { id: Date.now() + Math.random(), message, type };
-    setToasts((prev) => [...prev, newToast]);
-    setTimeout(() => {
-      setToasts((current) => current.filter((t) => t.id !== newToast.id));
-    }, 4000);
-  }, []);
-
-  const hideToast = useCallback((id: number) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
-
-  const value = useMemo(() => ({
-    user,
-    profile,
-    loading,
-    refetchProfile,
-    toasts,
-    showToast,
-    hideToast
-  }), [user, profile, loading, toasts, refetchProfile, showToast, hideToast]);
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 }

@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { ChallengesProvider } from '../contexts/ChallengesContext';
@@ -12,7 +12,10 @@ import './globals.css';
 import ToastContainer from '../components/ToastContainer';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { ReactNode } from 'react';
-import BottomNavBar from '@/components/BottomNavBar';
+
+import BottomNavBar from '../components/BottomNavBar';
+import OnboardingGuide from '../components/OnboardingGuide';
+
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
@@ -20,38 +23,39 @@ function AppContent({ children }: { children: ReactNode }) {
     const { loading: authLoading } = useAuth();
 
     if (authLoading) {
-    return (
-        <div className="flex h-screen items-center justify-center">
-            <LoadingSpinner />
-        </div>
-    );
-}
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <LoadingSpinner />
+            </div>
+        );
+    }
 
     return (
-    <>
-        <Header />
+        <>
+            <Header />
             <MainContent>
                 {children}
             </MainContent>
-        <Footer />
-        <BottomNavBar />
-    </>
+            <Footer />
+            <BottomNavBar />
+            {/*  <OnboardingGuide />*/}
+        </>
     );
 }
 
 export default function ClientLayoutWrapper({ children }: { children: ReactNode }) {
     return (
         <AuthProvider>
-        <DashboardProvider>
-            <ChallengesProvider>
-            <DataProvider>
-                <AppContent>{children}</AppContent>
-                <Analytics/>
-                <SpeedInsights/>
-                <ToastContainer />
-            </DataProvider>
-            </ChallengesProvider>
-        </DashboardProvider>
+            <DashboardProvider>
+                <ChallengesProvider>
+                    <DataProvider>
+                        <AppContent>{children}</AppContent>
+                        <Analytics />
+                        <SpeedInsights />
+                        <ToastContainer />
+                    </DataProvider>
+                </ChallengesProvider>
+            </DashboardProvider>
         </AuthProvider>
-);
+    );
 }
