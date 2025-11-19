@@ -34,8 +34,6 @@ const ContactStudentButton = ({ profile, isOwner, viewerProfile }: ContactStuden
 
     useEffect(() => {
         if ((viewerProfile?.role === 'startup' || viewerProfile?.role === 'admin') && !isOwner && user) {
-            // Only set loading if we don't have a status yet or if we want to show loading indicator
-            // For now, we'll keep the loading state but rely on user.id to prevent unnecessary runs
             setContactState(prev => ({ ...prev, loading: true }));
 
             const checkEligibility = async () => {
