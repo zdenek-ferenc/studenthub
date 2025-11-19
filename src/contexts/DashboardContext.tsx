@@ -21,7 +21,7 @@ type ChallengeFromDB = {
     expected_outputs: string;
     deadline: string | null;
     StartupProfile: StartupProfileFromDB | StartupProfileFromDB[] | null;
-    ChallengeSkill: ChallengeSkillFromDB[] | null; 
+    ChallengeSkill: ChallengeSkillFromDB[] | null;
 };
 
 
@@ -39,7 +39,7 @@ type CleanChallenge = {
     expected_outputs: string;
     deadline: string | null;
     StartupProfile: StartupProfileFromDB | null;
-    ChallengeSkill: CleanChallengeSkill[]; 
+    ChallengeSkill: CleanChallengeSkill[];
 };
 
 
@@ -49,19 +49,19 @@ export type CleanSubmission = {
     status: string;
     rating: number | null;
     position: number | null;
-    Challenge: CleanChallenge | null; 
+    Challenge: CleanChallenge | null;
 };
 
 
 export type SavedChallenge = {
-    Challenge: CleanChallenge; 
+    Challenge: CleanChallenge;
     saved_at: string;
 };
 
 
 type SavedChallengeResponse = {
     saved_at: string;
-    Challenge: ChallengeFromDB | ChallengeFromDB[] | null; 
+    Challenge: ChallengeFromDB | ChallengeFromDB[] | null;
 };
 
 
@@ -92,6 +92,7 @@ type DashboardContextType = {
     studentProfile: { username: string; } | null;
     savedChallenges: SavedChallenge[];
     refetchDashboardData: () => void;
+    refreshSavedChallenges: () => Promise<void>;
 };
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -114,7 +115,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             setNotifications([]); setStats(null); setStudentProfile(null); setSavedChallenges([]);
             return;
         }
-        
+
         if (notifications.length === 0 && submissions.length === 0) {
             setLoading(true);
         }
@@ -139,19 +140,19 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
                 .order('created_at', { ascending: false })
         ]);
 
-        
+
         if (submissionsRes.data) {
             const cleanedSubmissions = submissionsRes.data.map(sub => {
-                
+
                 const challengeData = sub.Challenge ? (Array.isArray(sub.Challenge) ? sub.Challenge[0] : sub.Challenge) as ChallengeFromDB : null;
                 if (!challengeData) return { ...sub, Challenge: null };
 
                 const cleanedStartupProfile = challengeData.StartupProfile ? (Array.isArray(challengeData.StartupProfile) ? challengeData.StartupProfile[0] : challengeData.StartupProfile) : null;
-                
+
                 const cleanedChallengeSkills: CleanChallengeSkill[] = (challengeData.ChallengeSkill || []).map((cs: ChallengeSkillFromDB) => ({
                     Skill: cs.Skill ? (Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill) : null,
                 }));
-                
+
                 const cleanChallenge: CleanChallenge = {
                     ...challengeData,
                     StartupProfile: cleanedStartupProfile,
@@ -160,16 +161,16 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
                 return { ...sub, Challenge: cleanChallenge };
             });
-            
+
             const newSubmissions = cleanedSubmissions as CleanSubmission[];
-            if (newSubmissions.length !== submissions.length || 
+            if (newSubmissions.length !== submissions.length ||
                 (newSubmissions.length > 0 && newSubmissions[0].id !== submissions[0]?.id)) {
                 setSubmissions(newSubmissions);
             }
         } else {
             if (submissions.length > 0) setSubmissions([]);
         }
-        
+
         if (progressRes.data) {
             const rawProgress = progressRes.data;
             const cleanedSkills = (rawProgress.StudentSkill || []).map((ss: { Skill: SkillFromDB | SkillFromDB[] | null, level: number, xp: number }) => ({
@@ -194,7 +195,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
             (newNotifications.length > 0 && newNotifications[0].id !== notifications[0]?.id)) {
             setNotifications(newNotifications);
         }
-        
+
         let performanceStats = { avgRating: 0, completedCount: 0, successRate: 0 };
         if (!statsPerformanceRes.error && statsPerformanceRes.data) {
             const ratedSubmissions = statsPerformanceRes.data.filter(s => s.rating !== null);
@@ -221,37 +222,37 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
         if (savedChallengesRes.data) {
             const cleanedSavedChallenges = (savedChallengesRes.data as SavedChallengeResponse[])
-                
+
                 .filter(item => item.Challenge && !Array.isArray(item.Challenge))
                 .map((item: SavedChallengeResponse) => {
-                    
+
                     const challenge = item.Challenge as ChallengeFromDB;
 
                     const cleanedStartupProfile = challenge.StartupProfile
                         ? (Array.isArray(challenge.StartupProfile) ? challenge.StartupProfile[0] : challenge.StartupProfile)
                         : null;
 
-                    
+
                     const cleanedChallengeSkills: CleanChallengeSkill[] = (challenge.ChallengeSkill || []).map((cs: ChallengeSkillFromDB) => ({
                         Skill: cs.Skill ? (Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill) : null,
                     }));
 
-                    
+
                     const cleanChallenge: CleanChallenge = {
                         ...challenge,
                         StartupProfile: cleanedStartupProfile,
                         ChallengeSkill: cleanedChallengeSkills,
                     };
 
-                    
+
                     return {
                         saved_at: item.saved_at,
                         Challenge: cleanChallenge
                     };
-                }); 
+                });
 
             if (JSON.stringify(cleanedSavedChallenges) !== JSON.stringify(savedChallenges)) {
-                setSavedChallenges(cleanedSavedChallenges); 
+                setSavedChallenges(cleanedSavedChallenges);
             }
         } else {
             if (savedChallenges.length > 0) setSavedChallenges([]);
@@ -268,6 +269,51 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         }
     }, [user?.id, fetchDashboardData]);
 
+    const refreshSavedChallenges = useCallback(async () => {
+        if (!user?.id) return;
+
+        const { data, error } = await supabase
+            .from('SavedChallenge')
+            .select(`
+                saved_at:created_at,
+                Challenge (id, title, StartupProfile (company_name, logo_url), ChallengeSkill (Skill (id, name)))
+            `)
+            .eq('student_id', user.id)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error("Error refreshing saved challenges:", error);
+            return;
+        }
+
+        if (data) {
+            const cleanedSavedChallenges = (data as SavedChallengeResponse[])
+                .filter(item => item.Challenge && !Array.isArray(item.Challenge))
+                .map((item: SavedChallengeResponse) => {
+                    const challenge = item.Challenge as ChallengeFromDB;
+                    const cleanedStartupProfile = challenge.StartupProfile
+                        ? (Array.isArray(challenge.StartupProfile) ? challenge.StartupProfile[0] : challenge.StartupProfile)
+                        : null;
+
+                    const cleanedChallengeSkills: CleanChallengeSkill[] = (challenge.ChallengeSkill || []).map((cs: ChallengeSkillFromDB) => ({
+                        Skill: cs.Skill ? (Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill) : null,
+                    }));
+
+                    const cleanChallenge: CleanChallenge = {
+                        ...challenge,
+                        StartupProfile: cleanedStartupProfile,
+                        ChallengeSkill: cleanedChallengeSkills,
+                    };
+
+                    return {
+                        saved_at: item.saved_at,
+                        Challenge: cleanChallenge
+                    };
+                });
+
+            setSavedChallenges(cleanedSavedChallenges);
+        }
+    }, [user?.id]);
 
     useEffect(() => {
         if (authLoading) return;
@@ -281,8 +327,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     }, [user, profile, authLoading, hasFetched, fetchDashboardData]);
 
     const value = useMemo(() => ({
-        loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData
-    }), [loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData]);
+        loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData, refreshSavedChallenges
+    }), [loading, submissions, progress, notifications, stats, studentProfile, savedChallenges, refetchDashboardData, refreshSavedChallenges]);
 
     return (
         <DashboardContext.Provider value={value}>

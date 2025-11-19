@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight, Bookmark } from 'lucide-react';
-import { SavedChallenge } from '../../contexts/DashboardContext'; 
+import { SavedChallenge } from '../../contexts/DashboardContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ import { useDashboard } from '../../contexts/DashboardContext';
 
 export default function SavedChallengeCard({ savedChallenge }: { savedChallenge: SavedChallenge }) {
     const { user, showToast } = useAuth();
-    const { refetchDashboardData } = useDashboard(); 
+    const { refreshSavedChallenges } = useDashboard();
     const [isRemoving, setIsRemoving] = useState(false);
     if (!savedChallenge || !savedChallenge.Challenge) {
         return null;
@@ -34,15 +34,15 @@ export default function SavedChallengeCard({ savedChallenge }: { savedChallenge:
 
             if (error) throw error;
             showToast('Výzva odebrána z uložených.', 'success');
-            refetchDashboardData();
+            refreshSavedChallenges();
         } catch (error: unknown) {
             let errorMessage = "Odebrání se nezdařilo: Neznámá chyba.";
-            if (error instanceof Error) { 
-            errorMessage = `Odebrání se nezdařilo: ${error.message}`; 
+            if (error instanceof Error) {
+                errorMessage = `Odebrání se nezdařilo: ${error.message}`;
+            }
+            showToast(errorMessage, 'error');
+            setIsRemoving(false);
         }
-    showToast(errorMessage, 'error');
-    setIsRemoving(false);
-}
     };
 
     const skills = Challenge.ChallengeSkill.map(cs => cs.Skill?.name).filter(Boolean);
