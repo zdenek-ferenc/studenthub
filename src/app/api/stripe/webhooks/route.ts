@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseAdmin = createClient(
@@ -20,16 +21,22 @@ export async function POST(request: Request) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch (err: any) {
-    console.error(`Webhook signature verification failed.`, err.message);
-    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error(`Webhook signature verification failed.`, errorMessage);
+    return new NextResponse(`Webhook Error: ${errorMessage}`, { status: 400 });
   }
 
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as any;
-        const { challengeId, type } = session.metadata;
+        const session = event.data.object as Stripe.Checkout.Session;
+        const { challengeId, type } = session.metadata || {};
+
+        if (!challengeId || !type) {
+             console.error('Missing metadata in checkout session');
+             break;
+        }
 
         if (type === 'fee') {
           await supabaseAdmin
@@ -53,7 +60,7 @@ export async function POST(request: Request) {
         break;
       }
       case 'account.updated': {
-        const account = event.data.object as any;
+        const account = event.data.object as Stripe.Account;
         if (account.charges_enabled) {
           await supabaseAdmin
             .from('StudentProfile')

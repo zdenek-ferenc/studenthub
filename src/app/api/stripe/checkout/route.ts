@@ -50,8 +50,8 @@ export async function POST(request: Request) {
       return new NextResponse('Challenge not found', { status: 404 });
     }
 
-    let lineItems = [];
-    let metadata = {
+    const lineItems = [];
+    const metadata = {
       challengeId,
       type: paymentType,
       userId: user.id,
