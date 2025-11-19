@@ -13,16 +13,22 @@ import { differenceInDays, format } from 'date-fns';
 import StartupChallengeHeader from './StartupChallengeHeader';
 
 type Challenge = {
-    id: string; status: 'draft' | 'open' | 'closed' | 'archived'; title: string;
-    description: string; goals: string; expected_outputs: string;
-    reward_first_place: number | null; reward_second_place: number | null; reward_third_place: number | null;
+    id: string; 
+    status: 'draft' | 'open' | 'closed' | 'archived'; 
+    title: string;
+    description: string; 
+    goals: string; 
+    expected_outputs: string;
+    reward_first_place: number | null; 
+    reward_second_place: number | null; 
+    reward_third_place: number | null;
     reward_description: string | null;
     attachments_urls: string[] | null;
     number_of_winners: number | null;
-    max_applicants: number | null; deadline: string;
+    max_applicants: number | null; 
+    deadline: string;
     created_at: string;
-    prize_pool_paid: boolean;
-    prize_amount: number;
+    prize_pool_paid: boolean; 
     Submission: { id: string, student_id: string }[];
     ChallengeSkill: { Skill: { id: string, name: string } }[];
     StartupProfile: { company_name: string, logo_url: string | null } | null;
@@ -356,7 +362,7 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
                                             </p>
                                             <button
                                                 onClick={handleUnlock}
-                                                className="px-6 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-bold shadow-lg hover:bg-[var(--barva-primarni)]/90 transition-all transform hover:scale-105 cursor-pointer"
+                                                className="px-6 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-bold shadow-lg hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 cursor-pointer"
                                             >
                                                 Složit odměnu ({totalPrizePool.toLocaleString('cs-CZ')} Kč)
                                             </button>
@@ -374,7 +380,7 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
                                                 anonymousId={sub.anonymousId}
                                                 onHide={hideSubmission}
                                                 isLocked={false} 
-                                                prizeAmount={challenge.prize_amount}
+                                                prizeAmount={totalPrizePool} 
                                                 challengeId={challenge.id}
                                             />
                                         ))}

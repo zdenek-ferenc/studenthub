@@ -23,6 +23,7 @@ type Challenge = {
   reward_second_place: number | null;
   reward_third_place: number | null;
   reward_description: string | null;
+  prize_pool_paid: boolean;
   attachments_urls: string[] | null; 
   deadline: string;
   created_at: string;

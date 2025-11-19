@@ -310,7 +310,7 @@ export default function StudentEditForm() {
                                     <button
                                         type="button"
                                         onClick={handleStripeConnect}
-                                        className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#635BFF] text-white font-bold hover:bg-[#534be0] transition-all shadow-md"
+                                        className="flex items-center gap-2 px-6 py-3 cursor-pointer rounded-full bg-[var(--barva-primarni)] text-white font-bold hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 shadow-md"
                                     >
                                         <span>Připojit účet Stripe</span>
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
