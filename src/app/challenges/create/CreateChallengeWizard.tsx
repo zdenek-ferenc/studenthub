@@ -30,7 +30,7 @@ export type ChallengeFormData = {
     max_applicants: number;
     type: 'public' | 'anonymous';
     status: 'draft' | 'open';
-    number_of_winners?: number; 
+    number_of_winners?: number;
 };
 
 const STEPS = [
@@ -44,7 +44,7 @@ export default function CreateChallengeWizard() {
     const { user, showToast } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
-    
+
     const [step, setStep] = useState(1);
     const [challengeId, setChallengeId] = useState<string | null>(searchParams.get('draft_id'));
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -64,7 +64,7 @@ export default function CreateChallengeWizard() {
             max_applicants: 10,
             type: 'public',
             status: 'draft',
-            number_of_winners: 1, 
+            number_of_winners: 1,
         }
     });
 
@@ -76,17 +76,17 @@ export default function CreateChallengeWizard() {
                     .select('*, ChallengeSkill(skill_id)')
                     .eq('id', challengeId)
                     .single();
-                
+
                 if (data) {
                     const fetchedData = {
                         ...data,
-                        expected_outputs: data.expected_outputs 
+                        expected_outputs: data.expected_outputs
                             ? data.expected_outputs.split('\n').map((item: string) => ({ value: item }))
                             : [{ value: '' }],
                         skills: data.ChallengeSkill.map((s: { skill_id: string }) => s.skill_id)
                     };
                     methods.reset(fetchedData);
-                    
+
                     const newCompleted = new Set<number>();
                     if (data.title && data.short_description) newCompleted.add(1);
                     if (data.description && data.goals && data.expected_outputs) newCompleted.add(2);
@@ -123,8 +123,8 @@ export default function CreateChallengeWizard() {
         } else {
             numberOfWinners = formData.number_of_winners || 1;
         }
-        if (numberOfWinners === 0) numberOfWinners = 1; 
-        
+        if (numberOfWinners === 0) numberOfWinners = 1;
+
         const challengeDataToSave = {
             title: formData.title,
             short_description: formData.short_description,
@@ -162,10 +162,10 @@ export default function CreateChallengeWizard() {
             if (error) {
                 console.error("Chyba při vytváření konceptu:", error);
                 showToast("Vytvoření konceptu se nezdařilo.", "error");
-                setSaveStatus('idle'); 
+                setSaveStatus('idle');
                 return;
             }
-            if(newChallenge) {
+            if (newChallenge) {
                 currentChallengeId = newChallenge.id;
                 setChallengeId(newChallenge.id);
                 router.replace(`/challenges/create?draft_id=${newChallenge.id}`, { scroll: false });
@@ -204,18 +204,36 @@ export default function CreateChallengeWizard() {
             }
             return;
         }
-        await handleSaveAndContinue(); 
+
+        // Save first
+        await handleSaveAndContinue();
+
         if (!challengeId) {
             showToast('Před zveřejněním se výzvu nepodařilo uložit.', 'error');
             return;
         }
 
-        const { error } = await supabase.from('Challenge').update({ status: 'open' }).eq('id', challengeId);
-        if (error) {
-            showToast(`Chyba při zveřejňování: ${error.message}`, 'error');
-        } else {
-            showToast('Výzva byla úspěšně zveřejněna!', 'success');
-            router.push('/challenges');
+        try {
+            const response = await fetch('/api/stripe/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    challengeId: challengeId,
+                    paymentType: 'fee',
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Payment initiation failed');
+            }
+
+            const { url } = await response.json();
+            window.location.href = url;
+        } catch (error) {
+            console.error('Payment Error:', error);
+            showToast('Chyba při iniciaci platby.', 'error');
         }
     };
 
@@ -229,7 +247,7 @@ export default function CreateChallengeWizard() {
             default: return null;
         }
     };
-    
+
     return (
         <FormProvider {...methods}>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8">
@@ -258,7 +276,7 @@ export default function CreateChallengeWizard() {
                         })}
                         <div className="hidden md:block md:pt-4 text-center text-sm text-gray-500 h-6">
                             {saveStatus === 'saving' && 'Ukládám...'}
-                            {saveStatus === 'saved' && <span className="flex md:items-center md:justify-center gap-1 text-green-600"><CheckCircle size={16}/> Koncept uložen</span>}
+                            {saveStatus === 'saved' && <span className="flex md:items-center md:justify-center gap-1 text-green-600"><CheckCircle size={16} /> Koncept uložen</span>}
                         </div>
                     </nav>
                 </aside>
@@ -266,9 +284,9 @@ export default function CreateChallengeWizard() {
                     <form onSubmit={(e) => e.preventDefault()} className="bg-white p-4 md:p-8 rounded-2xl shadow-sm">
                         {renderStepContent()}
                         <div className="mt-8 pt-6 border-t flex justify-between items-center">
-                            <button 
-                                type="button" 
-                                onClick={() => setStep(s => s - 1)} 
+                            <button
+                                type="button"
+                                onClick={() => setStep(s => s - 1)}
                                 disabled={step === 1}
                                 className="px-6 py-2 rounded-full font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
                             >
@@ -280,7 +298,7 @@ export default function CreateChallengeWizard() {
                                 </button>
                             ) : (
                                 <button type="button" onClick={handlePublish} className="px-8 py-3 rounded-full font-bold text-white bg-[var(--barva-primarni)] hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 cursor-pointer text-lg">
-                                    Zveřejnit výzvu
+                                    Zaplatit 1 000 Kč a zveřejnit
                                 </button>
                             )}
                         </div>

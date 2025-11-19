@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../contexts/AuthContext';
 import { Bell, Briefcase, Handshake, ChevronRight, Trophy, Star, UserPlus } from 'lucide-react';
@@ -32,7 +32,6 @@ const NotificationIcon = ({ type, isRead }: { type: string; isRead: boolean }) =
         case 'contact_request':
             icon = <Handshake size={16} />; 
             break;
-        
         case 'new_applicant': 
             icon = <UserPlus size={16} />; 
             break;
@@ -55,27 +54,34 @@ export default function NotificationsWidget() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const fetchNotifications = useCallback(async (isBackgroundRefresh = false) => {
+        if (!user) return;
+
+
+        if (!isBackgroundRefresh) {
+            setLoading(true);
+        }
+
+        const { data, error } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(4);
+
+        if (error) {
+            console.error('Error fetching notifications:', error);
+        } else {
+            setNotifications(data || []);
+        }
+        
+        setLoading(false);
+    }, [user]);
+
     useEffect(() => {
         if (!user) return;
 
-        const fetchNotifications = async () => {
-            setLoading(true);
-            const { data, error } = await supabase
-                .from('notifications')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false })
-                .limit(4);
-
-            if (error) {
-                console.error('Error fetching notifications:', error);
-            } else {
-                setNotifications(data || []);
-            }
-            setLoading(false);
-        };
-
-        fetchNotifications();
+        fetchNotifications(false);
 
         const channel = supabase
             .channel(`notifications:user_id=eq.${user.id}`)
@@ -92,7 +98,25 @@ export default function NotificationsWidget() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [user]);
+    }, [user, fetchNotifications]);
+
+    useEffect(() => {
+        const handleRefetchOnFocus = () => {
+            if (document.visibilityState === 'visible') {
+                fetchNotifications(true);
+            }
+        };
+
+        window.addEventListener('focus', handleRefetchOnFocus);
+        document.addEventListener('visibilitychange', handleRefetchOnFocus);
+
+        return () => {
+            window.removeEventListener('focus', handleRefetchOnFocus);
+            document.removeEventListener('visibilitychange', handleRefetchOnFocus);
+        };
+    }, [fetchNotifications]);
+
+    const showSkeleton = loading && notifications.length === 0;
 
     return (
         <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100 h-full">
@@ -103,7 +127,7 @@ export default function NotificationsWidget() {
                 </Link>
             </div>
             <div className="space-y-4">
-                {loading ? (
+                {showSkeleton ? (
                     Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className="flex items-center gap-3">
                             <Skeleton className="w-8 h-8 rounded-full" />
@@ -117,7 +141,7 @@ export default function NotificationsWidget() {
                     <p className="text-sm text-gray-500 text-center py-4">Zatím tu nic není. 🔔</p>
                 ) : (
                     notifications.map(notif => (
-                        <Link href={notif.link_url || '#'} key={notif.id} className={`block p-2 rounded-lg transition-colors ${notif.is_read ? 'hover:bg-gray-50' : 'bg-blue-50 hover:bg-blue-100'}`}>
+                        <Link href={notif.link_url || '#'} key={notif.id} className={`block p-3 rounded-xl border border-gray-100 transition-colors ${notif.is_read ? 'hover:bg-gray-50' : 'bg-blue-50 hover:bg-blue-100'}`}>
                             <div className="flex items-center gap-3">
                                 <NotificationIcon type={notif.type} isRead={notif.is_read} />
                                 <div className="flex-1 overflow-hidden">

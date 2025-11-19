@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { Loader2, MessageSquare, CheckCircle, Handshake, Info } from 'lucide-react';
 import { supabase } from '../../../../lib/supabaseClient';
@@ -34,8 +36,6 @@ const ContactStudentButton = ({ profile, isOwner, viewerProfile }: ContactStuden
 
     useEffect(() => {
         if ((viewerProfile?.role === 'startup' || viewerProfile?.role === 'admin') && !isOwner && user) {
-            setContactState(prev => ({ ...prev, loading: true }));
-
             const checkEligibility = async () => {
                 const { data, error } = await supabase.rpc('check_contact_eligibility', {
                     p_startup_id: user.id,
@@ -61,12 +61,7 @@ const ContactStudentButton = ({ profile, isOwner, viewerProfile }: ContactStuden
 
     const renderButton = () => {
         if (contactState.loading) {
-            return (
-                <button disabled className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gray-200 text-gray-500 cursor-wait">
-                    <Loader2 className="animate-spin" size={18} />
-                    Načítám...
-                </button>
-            );
+            return null; 
         }
 
         if (contactState.status === 'pending') {
