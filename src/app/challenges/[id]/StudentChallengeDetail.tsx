@@ -36,17 +36,17 @@ type Challenge = {
 };
 
 const WaitingForResults = () => (
-    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs text-center">
-        <Clock className="w-12 h-12 mx-auto text-blue-500 mb-4" />
-        <h2 className="text-2xl font-bold text-[var(--barva-tmava)]">Tvoje řešení čeká na vyhodnocení</h2>
-        <p className="text-gray-600 mt-2 max-w-lg mx-auto">
-            Skvělá práce! Tvoje řešení bylo odevzdáno. Startup ho nyní vyhodnotí. Výsledky se dozvíš, jakmile bude výzva kompletně uzavřena.
-        </p>
-    </div>
+  <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs text-center">
+    <Clock className="w-12 h-12 mx-auto text-blue-500 mb-4" />
+    <h2 className="text-2xl font-bold text-[var(--barva-tmava)]">Tvoje řešení čeká na vyhodnocení</h2>
+    <p className="text-gray-600 mt-2 max-w-lg mx-auto">
+      Skvělá práce! Tvoje řešení bylo odevzdáno. Startup ho nyní vyhodnotí. Výsledky se dozvíš, jakmile bude výzva kompletně uzavřena.
+    </p>
+  </div>
 );
 
 
-export default function StudentChallengeDetail({ challenge }: { challenge: Challenge }) {
+export default function StudentChallengeDetail({ challenge, applicantCount }: { challenge: Challenge, applicantCount: number | null }) {
   const { user, loading: authLoading, showToast } = useAuth();
   const router = useRouter();
   const { refetchChallenges } = useChallenges();
@@ -62,14 +62,14 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
 
   useEffect(() => {
     if (user) {
-        const submission = challenge.Submission.find(sub => sub.student_id === user.id);
-        setUserSubmission(submission);
+      const submission = challenge.Submission.find(sub => sub.student_id === user.id);
+      setUserSubmission(submission);
 
-        const fetchStudentSkills = async () => {
-            const { data } = await supabase.from('StudentSkill').select('skill_id').eq('student_id', user.id);
-            if (data) setStudentSkillIds(new Set(data.map(s => s.skill_id)));
-        };
-        fetchStudentSkills();
+      const fetchStudentSkills = async () => {
+        const { data } = await supabase.from('StudentSkill').select('skill_id').eq('student_id', user.id);
+        if (data) setStudentSkillIds(new Set(data.map(s => s.skill_id)));
+      };
+      fetchStudentSkills();
     }
   }, [challenge.Submission, user]);
 
@@ -78,7 +78,7 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
   }
 
   const isApplied = !!userSubmission;
-  const isChallengeFull = challenge.max_applicants ? challenge.Submission.length >= challenge.max_applicants : false;
+  const isChallengeFull = challenge.max_applicants ? (applicantCount ?? challenge.Submission.length) >= challenge.max_applicants : false;
   const showResults = challenge.status === 'closed' || challenge.status === 'archived';
   const isReviewedByStartup = userSubmission && ['reviewed', 'winner', 'rejected'].includes(userSubmission.status);
 
@@ -106,12 +106,12 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
     setUserSubmission(updatedSubmission);
     refetchChallenges();
     refetchDashboardData();
-    router.refresh(); 
+    router.refresh();
   };
 
   const assignmentBoxProps = {
     challenge, isApplied, studentSkillIds,
-    onApply: handleApply, isApplying, isChallengeFull
+    onApply: handleApply, isApplying, isChallengeFull, applicantCount
   };
 
   return (
@@ -125,8 +125,8 @@ export default function StudentChallengeDetail({ challenge }: { challenge: Chall
       </button>
       {showResults && userSubmission && (
         <StudentChallengeRecap
-            submission={userSubmission}
-            challengeStatus={challenge.status}
+          submission={userSubmission}
+          challengeStatus={challenge.status}
         />
       )}
       <ChallengeAssignmentBox {...assignmentBoxProps} />

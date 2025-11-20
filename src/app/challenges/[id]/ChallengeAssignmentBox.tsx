@@ -32,6 +32,7 @@ type Props = {
     onApply: () => void;
     isApplying: boolean;
     isChallengeFull: boolean;
+    applicantCount: number | null;
 };
 
 const getFileNameFromUrl = (url: string) => {
@@ -51,7 +52,7 @@ const StatItem = ({ icon: Icon, label, value }: { icon: React.ElementType, label
     </div>
 );
 
-export default function ChallengeAssignmentBox({ challenge, isApplied, studentSkillIds, onApply, isApplying, isChallengeFull }: Props) {
+export default function ChallengeAssignmentBox({ challenge, isApplied, studentSkillIds, onApply, isApplying, isChallengeFull, applicantCount }: Props) {
     const { user } = useAuth();
     const router = useRouter();
 
@@ -75,6 +76,8 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
 
     const daysRemaining = differenceInDays(new Date(challenge.deadline), new Date());
 
+    const currentApplicants = applicantCount ?? challenge.Submission.length;
+
     return (
         <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xs border border-gray-100">
             <header className="flex items-center gap-4 sm:gap-6 mb-6">
@@ -92,7 +95,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
             </header>
             <section className="flex justify-between md:grid grid-cols-3 gap-4 py-4 border-y border-gray-100 mb-4 sm:mb-5">
                 <StatItem icon={Award} label="Hlavní odměna" value={topReward} />
-                <StatItem icon={Users} label="Kapacita" value={`${challenge.Submission.length} / ${challenge.max_applicants || '∞'}`} />
+                <StatItem icon={Users} label="Kapacita" value={`${currentApplicants} / ${challenge.max_applicants || '∞'}`} />
                 <StatItem icon={Calendar} label="Termín" value={daysRemaining >= 0 ? `${daysRemaining} dní` : 'Ukončeno'} />
             </section>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

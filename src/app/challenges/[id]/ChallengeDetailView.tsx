@@ -44,6 +44,7 @@ function CreateChallengeView() {
   const challengeId = params.id as string;
 
   const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [applicantCount, setApplicantCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,6 +62,14 @@ function CreateChallengeView() {
         `)
         .eq('id', challengeId)
         .single();
+
+      // Fetch applicant count for guests/students (bypassing RLS on Submission table)
+      const { data: countData } = await supabase
+        .rpc('get_challenge_applicant_count', { challenge_id: challengeId });
+
+      if (countData !== null) {
+        setApplicantCount(countData);
+      }
 
       if (error) {
         console.error("Chyba při načítání detailu výzvy:", error);
@@ -91,7 +100,7 @@ function CreateChallengeView() {
 
   // Allow public access (guests treated as students for view purposes)
   if (!profile || profile.role === 'student') {
-    return <StudentChallengeDetail challenge={challenge} />;
+    return <StudentChallengeDetail challenge={challenge} applicantCount={applicantCount} />;
   }
 
   if (profile.role === 'startup') {
