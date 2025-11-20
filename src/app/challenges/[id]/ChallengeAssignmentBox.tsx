@@ -113,8 +113,8 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
 
                     {challenge.attachments_urls && challenge.attachments_urls.length > 0 && (
                         <>
-                            <h3>Podklady ke stažení</h3>
-                            <div className="not-prose space-y-3">
+                            <h3 className='sm:text-lg text-[var(--barva-primarni)] font-semibold'>Podklady ke stažení</h3>
+                            <div className="not-prose space-y-3 p-2">
                                 {challenge.attachments_urls.map((url, index) => (
                                     isApplied ? (
                                         <a key={index} href={url} target="_blank" rel="noopener noreferrer" download className="flex items-center gap-3 w-full sm:w-auto sm:inline-flex p-3 text-[var(--barva-primarni)] bg-blue-50 rounded-lg font-semibold hover:bg-blue-100 transition-colors">
