@@ -33,8 +33,16 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
+  console.log('Middleware:', request.nextUrl.pathname, 'User:', user?.id);
+
+  if (!user && request.nextUrl.pathname === '/challenges') {
+    console.log('Redirecting to /register');
+    return NextResponse.redirect(new URL('/register', request.url));
+  }
+
+  console.log('Allowing access');
   return response;
 }
 

@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Download, Lock, Award, Users, Calendar } from 'lucide-react';
 import { useMemo } from 'react';
 import { differenceInDays } from 'date-fns';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 type Challenge = {
     id: string;
@@ -50,6 +52,9 @@ const StatItem = ({ icon: Icon, label, value }: { icon: React.ElementType, label
 );
 
 export default function ChallengeAssignmentBox({ challenge, isApplied, studentSkillIds, onApply, isApplying, isChallengeFull }: Props) {
+    const { user } = useAuth();
+    const router = useRouter();
+
     const expectedOutputsArray = useMemo(() => challenge.expected_outputs.split('\n').filter(line => line.trim() !== ''), [challenge.expected_outputs]);
 
     const sortedSkills = useMemo(() => {
@@ -137,8 +142,8 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                                     <span
                                         key={Skill.id}
                                         className={`px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${isMatch
-                                                ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)]'
-                                                : 'bg-white text-gray-600 border border-gray-300'
+                                            ? 'bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)]'
+                                            : 'bg-white text-gray-600 border border-gray-300'
                                             }`}
                                     >
                                         {Skill.name}
@@ -150,12 +155,18 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                 </aside>
             </div>
             {!isApplied && (
-                        <div className="flex justify-center mt-6">
-                            <button onClick={onApply} disabled={isApplying || isChallengeFull} className="px-6 py-2 cursor-pointer text-white bg-[var(--barva-primarni)] rounded-full text-lg transition-all ease-in-out duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed hover:opacity-90">
-                                {isApplying ? 'Přihlašuji...' : (isChallengeFull ? 'Kapacita naplněna' : 'Přihlásit se k výzvě')}
-                            </button>
-                        </div>
+                <div className="flex justify-center mt-6">
+                    {user ? (
+                        <button onClick={onApply} disabled={isApplying || isChallengeFull} className="px-6 py-2 cursor-pointer text-white bg-[var(--barva-primarni)] rounded-full text-lg transition-all ease-in-out duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed hover:opacity-90">
+                            {isApplying ? 'Přihlašuji...' : (isChallengeFull ? 'Kapacita naplněna' : 'Přihlásit se k výzvě')}
+                        </button>
+                    ) : (
+                        <button onClick={() => router.push('/register')} className="px-6 py-2 cursor-pointer text-white bg-[var(--barva-primarni)] rounded-full text-lg transition-all ease-in-out duration-200 hover:opacity-90">
+                            Zaregistrujte se pro účast
+                        </button>
                     )}
+                </div>
+            )}
         </div>
     );
 }

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '../../../lib/supabaseClient';
-import withAuth from '../../../components/withAuth';
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import StudentChallengeDetail from './StudentChallengeDetail';
 import StartupChallengeDetail from './StartupChallengeDetail';
@@ -24,12 +23,12 @@ type Challenge = {
   reward_third_place: number | null;
   reward_description: string | null;
   prize_pool_paid: boolean;
-  attachments_urls: string[] | null; 
+  attachments_urls: string[] | null;
   deadline: string;
   created_at: string;
   max_applicants: number;
   number_of_winners: number | null;
-  ChallengeSkill: { Skill: { id: string, name: string } }[]; 
+  ChallengeSkill: { Skill: { id: string, name: string } }[];
   StartupProfile: { company_name: string, logo_url: string | null } | null;
   Submission: Submission[];
 };
@@ -71,9 +70,9 @@ function CreateChallengeView() {
           ...rawData,
           ChallengeSkill: (rawData.ChallengeSkill || []).map(cs => ({
             Skill: Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill
-          })).filter(cs => cs.Skill), 
+          })).filter(cs => cs.Skill),
         };
-        
+
         setChallenge(cleanedData);
       }
       setLoading(false);
@@ -90,11 +89,12 @@ function CreateChallengeView() {
     return <p className="text-center py-20">Výzva nebyla nalezena.</p>;
   }
 
-  if (profile?.role === 'student') {
+  // Allow public access (guests treated as students for view purposes)
+  if (!profile || profile.role === 'student') {
     return <StudentChallengeDetail challenge={challenge} />;
   }
 
-  if (profile?.role === 'startup') {
+  if (profile.role === 'startup') {
     if (challenge.startup_id === profile.id) {
       return <StartupChallengeDetail challenge={challenge} />;
     } else {
@@ -105,4 +105,4 @@ function CreateChallengeView() {
   return <p>Pro zobrazení detailu se musíte přihlásit.</p>;
 }
 
-export default withAuth(CreateChallengeView);
+export default CreateChallengeView;
