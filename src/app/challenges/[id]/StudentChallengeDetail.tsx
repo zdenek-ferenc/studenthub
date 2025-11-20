@@ -115,7 +115,7 @@ export default function StudentChallengeDetail({ challenge, applicantCount, acti
     onApply: handleApply, isApplying, isChallengeFull, applicantCount
   };
 
-  const effectiveTab = user ? (activeTab || 'assignment') : 'assignment';
+  const effectiveTab = user ? ((activeTab === 'qna' && !isApplied) ? 'assignment' : (activeTab || 'assignment')) : 'assignment';
 
   return (
     <div className="p-4 lg:max-w-1/2 mx-auto md:py-24 xl:py-32 md:px-4 space-y-8">
@@ -132,9 +132,18 @@ export default function StudentChallengeDetail({ challenge, applicantCount, acti
           <button onClick={() => setActiveTab('assignment')} className={`px-4 text-sm py-2 rounded-full font-semibold ${activeTab === 'assignment' ? 'bg-[var(--barva-primarni)] text-white' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]'}`}>
             Zadání
           </button>
-          <button onClick={() => setActiveTab('qna')} className={`px-4 py-2 text-sm rounded-full font-semibold flex items-center gap-2 ${activeTab === 'qna' ? 'bg-[var(--barva-primarni)] text-white' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]'}`}>
-            Dotazy
-          </button>
+          {(() => {
+            const qnaDisabled = !isApplied;
+            return (
+              <button
+                onClick={() => { if (!qnaDisabled) setActiveTab('qna'); }}
+                title={qnaDisabled ? 'Musíš se přihlásit k výzvě, abys viděl dotazy' : undefined}
+                aria-disabled={qnaDisabled}
+                className={`px-4 py-2 text-sm rounded-full font-semibold flex items-center gap-2 ${activeTab === 'qna' ? 'bg-[var(--barva-primarni)] text-white' : (qnaDisabled ? 'opacity-50 cursor-not-allowed text-gray-400' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]')}`}>
+                Dotazy
+              </button>
+            );
+          })()}
         </div>
       )}
 
