@@ -61,7 +61,7 @@ const expectedOutputsArray = useMemo(() => challenge.expected_outputs.split('\n'
 const deadlineFormatted = format(new Date(challenge.deadline), 'd. M. yyyy', { locale: cs });
 
 return (
-    <div className="bg-white px-4 3xl:px-6 pt-4 3xl:pt-6 sm:pb-4 rounded-2xl shadow-xs border border-gray-100 3xl:mb-8">
+    <div className="bg-white px-4 3xl:px-6 pt-4 3xl:pt-6 sm:pb-4 rounded-2xl shadow-xs border border-gray-100">
     <header className="flex items-center gap-4 3xl:gap-6  mb-2 3xl:mb-4">
         <Image
             src={challenge.StartupProfile?.logo_url || '/logo.svg'}

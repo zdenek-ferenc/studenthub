@@ -11,6 +11,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { AlertCircle, CheckCircle, Lock, Clock, Users, ChevronLeft, Eye } from 'lucide-react';
 import { differenceInDays, format } from 'date-fns';
 import StartupChallengeHeader from './StartupChallengeHeader';
+import ChallengeQnA from './components/ChallengeQnA';
 
 type Challenge = {
     id: string; 
@@ -160,7 +161,7 @@ const EvaluationStatusPanel = ({
 };
 
 
-export default function StartupChallengeDetail({ challenge: initialChallenge }: { challenge: Challenge }) {
+export default function StartupChallengeDetail({ challenge: initialChallenge, activeTab, setActiveTab, unansweredCount, setUnansweredCount }: { challenge: Challenge, activeTab?: 'assignment'|'qna', setActiveTab?: import('react').Dispatch<import('react').SetStateAction<'assignment'|'qna'>> , unansweredCount?: number, setUnansweredCount?: import('react').Dispatch<import('react').SetStateAction<number>> }) {
     const [challenge, setChallenge] = useState(initialChallenge);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState(true);
@@ -236,21 +237,21 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
 
     const handleUnlock = async () => {
         try {
-          const response = await fetch('/api/stripe/checkout', {
+        const response = await fetch('/api/stripe/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              challengeId: challenge.id,
-              paymentType: 'pool',
+            challengeId: challenge.id,
+            paymentType: 'pool',
             }),
-          });
+        });
     
-          if (!response.ok) throw new Error('Payment initiation failed');
-          const { url } = await response.json();
-          window.location.href = url;
+        if (!response.ok) throw new Error('Payment initiation failed');
+        const { url } = await response.json();
+        window.location.href = url;
         } catch (error) {
-          console.error('Unlock Error:', error);
-          showToast('Chyba při odemykání.', 'error');
+        console.error('Unlock Error:', error);
+        showToast('Chyba při odemykání.', 'error');
         }
     };
 
@@ -273,6 +274,25 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
             ratedCount: rated.length,
         };
     }, [challenge, submissions]);
+
+    function SlideTransition({ show, children }: { show: boolean, children: React.ReactNode }) {
+        const [mounted, setMounted] = useState(show);
+        useEffect(() => {
+            if (show) setMounted(true);
+            else {
+                const t = setTimeout(() => setMounted(false), 320);
+                return () => clearTimeout(t);
+            }
+        }, [show]);
+
+        if (!mounted) return null;
+
+        return (
+            <div className={`transform transition-all duration-300 ease-out ${show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+                {children}
+            </div>
+        );
+    }
 
     const anonymousSubmissions = useMemo(() =>
         submissions.map((sub, index) => ({ ...sub, anonymousId: `Řešení #${index + 1}` })
@@ -321,102 +341,128 @@ export default function StartupChallengeDetail({ challenge: initialChallenge }: 
                 <ChevronLeft size={16} />
                 Zpět na přehled
             </button>
-            <StartupChallengeHeader challenge={challenge} />
-            {challenge.status === 'closed' || challenge.status === 'archived' ? (
-                <ChallengeRecapView submissions={submissions} />
-            ) : (
-                <>
-                    {view === 'evaluating' && (
-                        <>
-                            <EvaluationStatusPanel
-                                canFinalize={canFinalize}
-                                ratedCount={ratedCount}
-                                totalCount={submissions.length}
-                                onProceed={() => setView('selecting_winners')}
-                                deadline={challenge.deadline}
-                                applicants={challenge.Submission.length}
-                                maxApplicants={challenge.max_applicants}
-                                createdAt={challenge.created_at}
-                                isLocked={isLocked}
-                            />
-                            {hiddenSubmissions.size > 0 && (
-                                <div className="flex justify-center mb-4">
-                                    <button
-                                        onClick={showAllSubmissions}
-                                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[var(--barva-primarni)] cursor-pointer bg-blue-50 rounded-full hover:bg-blue-100 transition-colors"
-                                    >
-                                        <Eye size={16} />
-                                        Zobrazit skrytá řešení ({hiddenSubmissions.size})
-                                    </button>
-                                </div>
-                            )}
-                            
-                            <div className="relative min-h-[200px]">
-                                {isLocked && (
-                                    <div className="absolute inset-0 z-20 backdrop-blur-md bg-white/30 flex flex-col items-center justify-center rounded-2xl border border-white/40 shadow-xl">
-                                        <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md border border-white/50">
-                                            <Lock className="w-12 h-12 text-[var(--barva-primarni)] mx-auto mb-4 opacity-80" />
-                                            <h3 className="text-xl font-bold text-[var(--barva-tmava)] mb-2">Řešení jsou uzamčena</h3>
-                                            <p className="text-gray-600 mb-6 text-sm">
-                                                Pro zobrazení řešení a výběr vítěze je nutné složit odměnu, která bude následně vyplacena studentům.
-                                            </p>
-                                            <button
-                                                onClick={handleUnlock}
-                                                className="px-6 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-bold shadow-lg hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 cursor-pointer"
-                                            >
-                                                Složit odměnu ({totalPrizePool.toLocaleString('cs-CZ')} Kč)
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
+                        <StartupChallengeHeader challenge={challenge} />
 
-                                {displayedSubmissions.length > 0 ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {displayedSubmissions.map(sub => (
-                                            <SubmissionCard
-                                                key={sub.id}
-                                                submission={sub}
-                                                onUpdate={handleSubmissionUpdate}
-                                                anonymousId={sub.anonymousId}
-                                                onHide={hideSubmission}
-                                                isLocked={false} 
-                                                prizeAmount={totalPrizePool} 
-                                                challengeId={challenge.id}
-                                            />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="bg-white p-12 rounded-2xl text-center text-gray-500">
-                                        <h3 className="text-xl font-bold text-[var(--barva-primarni)]">
-                                            {submissions.length > 0 ? "Všechna řešení jsou skryta" : "Čekáme na první řešení"}
-                                        </h3>
-                                        <p className="mt-2">
-                                            {submissions.length > 0 ? "Pro jejich zobrazení klikněte na tlačítko 'Zobrazit skrytá řešení'." : "Jakmile studenti začnou odevzdávat svá řešení, uvidíte je zde."}
-                                        </p>
-                                    </div>
-                                )}
+                        {setActiveTab && activeTab && (
+                            <div className="flex items-center gap-3 w-fit mb-4 bg-white p-2 rounded-full shadow-sm">
+                                <button onClick={() => setActiveTab('assignment')} className={`px-4 text-sm py-2 rounded-full font-semibold ${activeTab === 'assignment' ? 'bg-[var(--barva-primarni)] text-white' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]'}`}>
+                                    Řešení
+                                </button>
+                                <button onClick={() => setActiveTab('qna')} className={`px-4 py-2 text-sm rounded-full font-semibold flex items-center gap-2 ${activeTab === 'qna' ? 'bg-[var(--barva-primarni)] text-white' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]'}`}>
+                                    Dotazy
+                                    {typeof unansweredCount === 'number' && unansweredCount > 0 ? (
+                                        <span className="inline-flex items-center justify-center border-2 border-[var(--barva-primarni)] px-2 py-0.5 text-xs font-medium rounded-full bg-white text-[var(--barva-tmava)]">{unansweredCount}</span>
+                                    ) : null}
+                                </button>
                             </div>
-                        </>
-                    )}
+                        )}
 
-                    {view === 'selecting_winners' && (
-                        <FinalSelection
-                            submissions={anonymousSubmissions.filter(s => s.status === 'reviewed')}
-                            challenge={challenge}
-                            onFinalize={prepareToFinalize}
-                            onBack={() => setView('evaluating')}
-                        />
-                    )}
+                        <SlideTransition show={!!activeTab && activeTab === 'qna'}>
+                            <ChallengeQnA
+                                challengeId={challenge.id}
+                                role="startup"
+                                visible={!!activeTab && activeTab === 'qna'}
+                                onAnswered={() => { if (setUnansweredCount) setUnansweredCount(prev => Math.max(0, prev - 1)); }}
+                            />
+                        </SlideTransition>
 
-                    <ConfirmationModal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        onConfirm={handleFinalizeChallenge}
-                        title="Opravdu chcete vyhlásit výsledky?"
-                        message="Tato akce je nevratná. Vítězům bude přiřazeno pořadí, výzva se uzavře a identity studentů se odhalí."
-                    />
-                </>
-            )}
+                        {(!activeTab || activeTab !== 'qna') && (
+                            (challenge.status === 'closed' || challenge.status === 'archived') ? (
+                                <ChallengeRecapView submissions={submissions} />
+                            ) : (
+                                <>
+                                    {view === 'evaluating' && (
+                                        <>
+                                            <EvaluationStatusPanel
+                                                canFinalize={canFinalize}
+                                                ratedCount={ratedCount}
+                                                totalCount={submissions.length}
+                                                onProceed={() => setView('selecting_winners')}
+                                                deadline={challenge.deadline}
+                                                applicants={challenge.Submission.length}
+                                                maxApplicants={challenge.max_applicants}
+                                                createdAt={challenge.created_at}
+                                                isLocked={isLocked}
+                                            />
+                                            {hiddenSubmissions.size > 0 && (
+                                                <div className="flex justify-center mb-4">
+                                                    <button
+                                                        onClick={showAllSubmissions}
+                                                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[var(--barva-primarni)] cursor-pointer bg-blue-50 rounded-full hover:bg-blue-100 transition-colors"
+                                                    >
+                                                        <Eye size={16} />
+                                                        Zobrazit skrytá řešení ({hiddenSubmissions.size})
+                                                    </button>
+                                                </div>
+                                            )}
+                                            
+                                            <div className="relative min-h-[200px]">
+                                                {isLocked && (
+                                                    <div className="absolute inset-0 z-20 backdrop-blur-xs bg-white/30 flex flex-col items-center justify-center rounded-2xl border border-white/40">
+                                                        <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md border border-white/50">
+                                                            <Lock className="w-12 h-12 text-[var(--barva-primarni)] mx-auto mb-4 opacity-80" />
+                                                            <h3 className="text-xl font-bold text-[var(--barva-tmava)] mb-2">Řešení jsou uzamčena</h3>
+                                                            <p className="text-gray-600 mb-6 text-sm">
+                                                                Pro zobrazení řešení a výběr vítěze je nutné složit odměnu, která bude následně vyplacena studentům.
+                                                            </p>
+                                                            <button
+                                                                onClick={handleUnlock}
+                                                                className="px-6 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-bold shadow-lg hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 cursor-pointer"
+                                                            >
+                                                                Složit odměnu ({totalPrizePool.toLocaleString('cs-CZ')} Kč)
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {displayedSubmissions.length > 0 ? (
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                        {displayedSubmissions.map(sub => (
+                                                            <SubmissionCard
+                                                                key={sub.id}
+                                                                submission={sub}
+                                                                onUpdate={handleSubmissionUpdate}
+                                                                anonymousId={sub.anonymousId}
+                                                                onHide={hideSubmission}
+                                                                isLocked={false} 
+                                                                prizeAmount={totalPrizePool} 
+                                                                challengeId={challenge.id}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="bg-white p-12 rounded-2xl text-center text-gray-500">
+                                                        <h3 className="text-xl font-bold text-[var(--barva-primarni)]">
+                                                            {submissions.length > 0 ? "Všechna řešení jsou skryta" : "Čekáme na první řešení"}
+                                                        </h3>
+                                                        <p className="mt-2">
+                                                            {submissions.length > 0 ? "Pro jejich zobrazení klikněte na tlačítko 'Zobrazit skrytá řešení'." : "Jakmile studenti začnou odevzdávat svá řešení, uvidíte je zde."}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {view === 'selecting_winners' && (
+                                        <FinalSelection
+                                            submissions={anonymousSubmissions.filter(s => s.status === 'reviewed')}
+                                            challenge={challenge}
+                                            onFinalize={prepareToFinalize}
+                                            onBack={() => setView('evaluating')}
+                                        />
+                                    )}
+
+                                    <ConfirmationModal
+                                        isOpen={isModalOpen}
+                                        onClose={() => setIsModalOpen(false)}
+                                        onConfirm={handleFinalizeChallenge}
+                                        title="Opravdu chcete vyhlásit výsledky?"
+                                        message="Tato akce je nevratná. Vítězům bude přiřazeno pořadí, výzva se uzavře a identity studentů se odhalí."
+                                    />
+                                </>
+                            )
+                        )}
         </div>
     );
 }

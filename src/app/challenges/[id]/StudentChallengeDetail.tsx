@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Dispatch, SetStateAction } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { supabase } from '../../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import StudentChallengeRecap from './StudentChallengeRecap';
 import SubmissionForm from './SubmissionForm';
 import ChallengeAssignmentBox from './ChallengeAssignmentBox';
+import ChallengeQnA from './components/ChallengeQnA';
 import { useChallenges } from '../../../contexts/ChallengesContext';
 import { useDashboard } from '../../../contexts/DashboardContext';
 
@@ -46,7 +47,7 @@ const WaitingForResults = () => (
 );
 
 
-export default function StudentChallengeDetail({ challenge, applicantCount }: { challenge: Challenge, applicantCount: number | null }) {
+export default function StudentChallengeDetail({ challenge, applicantCount, activeTab, setActiveTab }: { challenge: Challenge, applicantCount: number | null, activeTab?: 'assignment' | 'qna', setActiveTab?: Dispatch<SetStateAction<'assignment'|'qna'>> }) {
   const { user, loading: authLoading, showToast } = useAuth();
   const router = useRouter();
   const { refetchChallenges } = useChallenges();
@@ -114,6 +115,8 @@ export default function StudentChallengeDetail({ challenge, applicantCount }: { 
     onApply: handleApply, isApplying, isChallengeFull, applicantCount
   };
 
+  const effectiveTab = user ? (activeTab || 'assignment') : 'assignment';
+
   return (
     <div className="p-4 lg:max-w-1/2 mx-auto md:py-24 xl:py-32 md:px-4 space-y-8">
       <button
@@ -123,27 +126,45 @@ export default function StudentChallengeDetail({ challenge, applicantCount }: { 
         <ChevronLeft size={16} />
         Zpět
       </button>
-      {showResults && userSubmission && (
-        <StudentChallengeRecap
-          submission={userSubmission}
-          challengeStatus={challenge.status}
-        />
+
+      {setActiveTab && user && (
+        <div className="flex items-center gap-3 w-fit mb-4 bg-white p-2 rounded-full shadow-sm">
+          <button onClick={() => setActiveTab('assignment')} className={`px-4 text-sm py-2 rounded-full font-semibold ${activeTab === 'assignment' ? 'bg-[var(--barva-primarni)] text-white' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]'}`}>
+            Zadání
+          </button>
+          <button onClick={() => setActiveTab('qna')} className={`px-4 py-2 text-sm rounded-full font-semibold flex items-center gap-2 ${activeTab === 'qna' ? 'bg-[var(--barva-primarni)] text-white' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]'}`}>
+            Dotazy
+          </button>
+        </div>
       )}
-      <ChallengeAssignmentBox {...assignmentBoxProps} />
-      {!showResults && isApplied && (
+
+      {(effectiveTab === 'assignment') ? (
         <>
-          {!isReviewedByStartup && userSubmission ? (
-            <SubmissionForm
-              challengeId={challenge.id}
-              submissionId={userSubmission.id}
-              initialSubmission={userSubmission}
-              expectedOutputs={expectedOutputsArray}
-              onSuccess={handleSubmissionUpdate}
+          {showResults && userSubmission && (
+            <StudentChallengeRecap
+              submission={userSubmission}
+              challengeStatus={challenge.status}
             />
-          ) : (
-            <WaitingForResults />
+          )}
+          <ChallengeAssignmentBox {...assignmentBoxProps} />
+          {!showResults && isApplied && (
+            <>
+              {!isReviewedByStartup && userSubmission ? (
+                <SubmissionForm
+                  challengeId={challenge.id}
+                  submissionId={userSubmission.id}
+                  initialSubmission={userSubmission}
+                  expectedOutputs={expectedOutputsArray}
+                  onSuccess={handleSubmissionUpdate}
+                />
+              ) : (
+                <WaitingForResults />
+              )}
+            </>
           )}
         </>
+      ) : (
+        <ChallengeQnA challengeId={challenge.id} role="student" />
       )}
     </div>
   );

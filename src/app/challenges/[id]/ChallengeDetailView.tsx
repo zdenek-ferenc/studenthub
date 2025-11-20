@@ -45,6 +45,8 @@ function CreateChallengeView() {
 
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [applicantCount, setApplicantCount] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'assignment' | 'qna'>('assignment');
+  const [unansweredCount, setUnansweredCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -90,6 +92,23 @@ function CreateChallengeView() {
     fetchChallenge();
   }, [challengeId]);
 
+  useEffect(() => {
+    if (!challengeId) return;
+    const fetchUnanswered = async () => {
+      const { error, count } = await supabase
+        .from('ChallengeQuestion')
+        .select('*', { count: 'exact', head: true })
+        .eq('challenge_id', challengeId)
+        .is('answer_text', null);
+
+      if (!error) {
+        setUnansweredCount(count || 0);
+      }
+    };
+
+    fetchUnanswered();
+  }, [challengeId]);
+
   if (authLoading || loading) {
     return <div className='pt-12 lg:pt-28 3xl:pt-34'><LoadingSpinner /></div>
   }
@@ -100,12 +119,12 @@ function CreateChallengeView() {
 
   // Allow public access (guests treated as students for view purposes)
   if (!profile || profile.role === 'student') {
-    return <StudentChallengeDetail challenge={challenge} applicantCount={applicantCount} />;
+    return <StudentChallengeDetail challenge={challenge} applicantCount={applicantCount} activeTab={activeTab} setActiveTab={setActiveTab} />;
   }
 
   if (profile.role === 'startup') {
     if (challenge.startup_id === profile.id) {
-      return <StartupChallengeDetail challenge={challenge} />;
+      return <StartupChallengeDetail challenge={challenge} activeTab={activeTab} setActiveTab={setActiveTab} unansweredCount={unansweredCount} setUnansweredCount={setUnansweredCount} />;
     } else {
       return <p className="text-center py-20">K zobrazení této stránky nemáte oprávnění.</p>;
     }

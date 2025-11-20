@@ -72,8 +72,8 @@ export async function POST(request: Request) {
     } else if (paymentType === 'pool') {
       
       const totalPrizeAmount = (challenge.reward_first_place || 0) + 
-                               (challenge.reward_second_place || 0) + 
-                               (challenge.reward_third_place || 0);
+                              (challenge.reward_second_place || 0) + 
+                              (challenge.reward_third_place || 0);
 
       if (totalPrizeAmount <= 0) {
         return new NextResponse('Prize amount is zero or invalid', { status: 400 });
