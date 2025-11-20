@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAuth } from '../contexts/AuthContext';
 import {
   ArrowRight,
   Check,
@@ -102,6 +103,7 @@ const FinalCtaCard = ({
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('challenges');
+  const { user, profile } = useAuth();
 
   const logos = [
     { src: '/unklogo.png', alt: 'Unknown Agency' },
@@ -137,18 +139,29 @@ export default function HomePage() {
           </div>
           <div className="overflow-hidden mt-10">
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 animate-slide-in-reveal delay-400">
-              <Link
-                href="/register/student"
-                className="w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center"
-              >
-                Chci výzvu
-              </Link>
-              <Link
-                href="/register/startup"
-                className="w-full sm:w-auto px-8 py-4 rounded-full border-2 border-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#00284d] hover:shadow-none transition-all duration-500 flex justify-center items-center"
-              >
-                Hledám talent
-              </Link>
+              {!user ? (
+                <>
+                  <Link
+                    href="/register/student"
+                    className="w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center"
+                  >
+                    Chci výzvu
+                  </Link>
+                  <Link
+                    href="/register/startup"
+                    className="w-full sm:w-auto px-8 py-4 rounded-full border-2 border-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#00284d] hover:shadow-none transition-all duration-500 flex justify-center items-center"
+                  >
+                    Hledám talent
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href={profile?.role === 'student' ? '/dashboard' : '/challenges'}
+                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center"
+                >
+                  Přejít do aplikace
+                </Link>
+              )}
             </div>
           </div>
           

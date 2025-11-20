@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, ReactNode } from 'react';
 import { Provider } from '@supabase/supabase-js';
+import { useAuth } from '../../contexts/AuthContext';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 
 const SocialButton = ({ provider, label, icon }: { provider: Provider, label: string, icon: ReactNode }) => {
@@ -12,7 +14,7 @@ const SocialButton = ({ provider, label, icon }: { provider: Provider, label: st
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/login`,
       },
     });
   };
@@ -59,10 +61,24 @@ const ImageSlideshow = () => {
 
 export default function LoginView() {
   const router = useRouter();
+  const { user, profile, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (authLoading) return; 
+    if (user && profile) {
+      if (profile.role === 'student') {
+        router.replace('/dashboard');
+      } else if (profile.role === 'startup') {
+        router.replace('/challenges');
+      } else {
+        router.replace('/');
+      }
+    }
+  }, [user, profile, authLoading, router]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +92,14 @@ export default function LoginView() {
       router.push('/challenges');
     }
   };
+
+  if (authLoading || user) {
+    return (
+      <div className="w-full min-h-screen py-10 md:py-32 flex items-center justify-center bg-white sm:bg-[var(--barva-svetle-pozadi)] p-4">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen py-10 md:py-32 flex items-start justify-center bg-white sm:bg-[var(--barva-svetle-pozadi)] p-4">
