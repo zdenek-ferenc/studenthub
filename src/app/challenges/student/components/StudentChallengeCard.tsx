@@ -21,6 +21,7 @@ type Challenge = {
   reward_third_place: number | null;
   max_applicants: number | null;
   deadline: string;
+  created_at: string;
   Submission: { student_id: string }[];
   ChallengeSkill: { Skill: Skill }[];
   StartupProfile: StartupProfile | null;
@@ -212,11 +213,11 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
               <Image src="/icons/award.svg" alt="" width={16} height={16} />
               <RewardsDisplay challenge={challenge} />
             </div>
-            <div className="col-span-2 flex items-center gap-2">
+            <div className="col-span-2 flex items-center gap-2 pt-1">
               <Image src="/icons/calendar.svg" alt="" height={0}
                 width={0}
                 style={{ width: '16px', height: "auto" }} />
-              <span className='text-xs 3xl:text-base'>{challenge.deadline ? new Date(challenge.deadline).toLocaleDateString('cs-CZ') : 'N/A'}</span>
+              <span className='text-xs 3xl:text-sm'>{new Date(challenge.created_at).toLocaleDateString('cs-CZ')} - {new Date(challenge.deadline).toLocaleDateString('cs-CZ')} </span>
             </div>
           </div>
           <div className="absolute right-3 bottom-3 leading-none">

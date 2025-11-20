@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import { Download, Lock, Award, Users, Calendar } from 'lucide-react';
+import { Download, Lock, Award, Users, Clock } from 'lucide-react';
 import { useMemo } from 'react';
 import { differenceInDays } from 'date-fns';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -19,6 +19,7 @@ type Challenge = {
     reward_description: string | null;
     attachments_urls: string[] | null;
     deadline: string;
+    created_at: string;
     ChallengeSkill: { Skill: { id: string, name: string } }[];
     StartupProfile: { company_name: string, logo_url: string | null } | null;
     Submission: { student_id: string }[];
@@ -96,7 +97,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
             <section className="flex justify-between md:grid grid-cols-3 gap-4 py-4 border-y border-gray-100 mb-4 sm:mb-5">
                 <StatItem icon={Award} label="Hlavní odměna" value={topReward} />
                 <StatItem icon={Users} label="Kapacita" value={`${currentApplicants} / ${challenge.max_applicants || '∞'}`} />
-                <StatItem icon={Calendar} label="Termín" value={daysRemaining >= 0 ? `${daysRemaining} dní` : 'Ukončeno'} />
+                <StatItem icon={Clock} label="Zbývá" value={daysRemaining >= 0 ? `${daysRemaining} dní` : 'Ukončeno'} />
             </section>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <main className="md:col-span-2 prose max-w-none text-gray-800 prose-h3:font-bold prose-h3:text-xl prose-h3:text-[var(--barva-tmava)] prose-h3:mb-2 prose-ul:list-disc prose-ul:pl-5">
@@ -153,6 +154,13 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                                     </span>
                                 );
                             })}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 className="sm:text-lg font-bold text-[var(--barva-tmava)] mb-3">Doba trvání</h3>
+                        <div className="space-y-2">
+                            <p className="text-sm text-gray-600">Vytvořeno: {new Date(challenge.created_at).toLocaleDateString('cs-CZ')}</p>
+                            <p className="text-sm text-gray-600">Deadline: {new Date(challenge.deadline).toLocaleDateString('cs-CZ')}</p>
                         </div>
                     </div>
                 </aside>
