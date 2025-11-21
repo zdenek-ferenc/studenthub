@@ -159,11 +159,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const from = currentPage * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
 
-        let query = supabase.from('StudentProfile').select(`
-            user_id, first_name, last_name, username, profile_picture_url, university, bio, created_at, level, xp,
-            StudentSkill ( Skill ( id, name ) ),
-            StudentLanguage ( Language ( id, name ) )
-        `);
+        let query = supabase.from('StudentProfile')
+            .select(`
+                user_id, first_name, last_name, username, profile_picture_url, university, bio, created_at, level, xp,
+                StudentSkill ( Skill ( id, name ) ),
+                StudentLanguage ( Language ( id, name ) )
+            `)
+            .not('first_name', 'is', null)
+            .neq('first_name', '')
+            .not('last_name', 'is', null)
+            .neq('last_name', '');
 
         try {
             if (studentSkills.length > 0) {
