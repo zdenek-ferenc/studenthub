@@ -8,7 +8,12 @@ import { useDebounce } from '../hooks/useDebounce';
 type Category = { id: string; name: string; };
 type Skill = { id: string; name: string; };
 type Language = { id: string; name: string; };
-type ChallengeStatus = { status: 'open' | 'closed' | 'draft' | 'archived'; };
+
+// 1. ÚPRAVA: Přidán deadline do typu
+type ChallengeStatus = { 
+    status: 'open' | 'closed' | 'draft' | 'archived'; 
+    deadline: string; 
+};
 
 export type Startup = {
     user_id: string;
@@ -113,8 +118,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setLoadingStartups(true);
         const from = currentPage * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
-
-        let query = supabase.from('StartupProfile').select(`*, StartupCategory(Category(id, name)), Challenge(status)`);
+        let query = supabase.from('StartupProfile').select(`*, StartupCategory(Category(id, name)), Challenge(status, deadline)`);
 
         try {
             if (startupCategories.length > 0) {

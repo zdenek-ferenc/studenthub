@@ -265,13 +265,28 @@ export default function HomePage() {
                   </div>
                   <div className="min-h-[400px]">
                     {activeTab === 'challenges' && (
-                      <DemoChallengeView />
+                      <div className="flex flex-col">
+                        <DemoChallengeView />
+                        <p className="mt-8 text-gray-600 text-center max-w-3xl mx-auto leading-relaxed px-4">
+                          Přehled výzev je místem, kde objevuješ jednorázové výzvy šité na míru tvým dovednostem. Díky chytrým filtrům si snadno najdeš projekt, který ti sedne. Ať už chceš soutěžit o finanční odměnu v placených výzvách, nebo se předvést ve free zadáních, která ti často otevřou dveře k nabídce placené stáže
+                        </p>
+                      </div>
                     )}
                     {activeTab === 'talents' && (
-                      <DemoTalentView />
+                      <div className="flex flex-col">
+                        <DemoTalentView />
+                        <p className="mt-8 text-gray-600 text-center max-w-3xl mx-auto leading-relaxed px-4">
+                          Zapomeňte na procházení stohů životopisů. Zde vidíte talenty v akci. Startupy mohou filtrovat studenty podle konkrétních hard-skills, úrovně zkušeností (levelu) a počtu hotových nebo vyhráných výzev. Okamžitý přehled o tom, kdo má drive a výsledky.
+                        </p>
+                      </div>
                     )}
                     {activeTab === 'growth' && (
-                      <DemoCareerGrowthWidget />
+                      <div className="flex flex-col">
+                        <DemoCareerGrowthWidget />
+                        <p className="mt-8 text-gray-600 text-center max-w-3xl mx-auto leading-relaxed px-4">
+                          Více než jen profil. Toto je živý záznam profesního růstu. Interaktivní grafy ukazují, jak se student zlepšuje v čase, kolik XP získal a jaké dovednosti ovládá. Gamifikace, která motivuje k lepším výkonům a slouží jako ověřitelná reference.
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>

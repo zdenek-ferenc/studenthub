@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import type { Submission } from './SubmissionCard';
 import { Clock, ChevronLeft } from 'lucide-react';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import Tooltip from '../../../components/Tooltip';
 
 import StudentChallengeRecap from './StudentChallengeRecap';
 import SubmissionForm from './SubmissionForm';
@@ -134,15 +135,17 @@ export default function StudentChallengeDetail({ challenge, applicantCount, acti
           </button>
           {(() => {
             const qnaDisabled = !isApplied;
-            return (
+            const qnaButton = (
               <button
                 onClick={() => { if (!qnaDisabled) setActiveTab('qna'); }}
-                title={qnaDisabled ? 'Musíš se přihlásit k výzvě, abys viděl dotazy' : undefined}
                 aria-disabled={qnaDisabled}
                 className={`px-4 py-2 text-sm rounded-full font-semibold flex items-center gap-2 ${activeTab === 'qna' ? 'bg-[var(--barva-primarni)] text-white' : (qnaDisabled ? 'opacity-50 cursor-not-allowed text-gray-400' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]')}`}>
                 Dotazy
               </button>
             );
+            return qnaDisabled ? (
+              <Tooltip content="Musíš se přihlásit k výzvě, abys viděl dotazy">{qnaButton}</Tooltip>
+            ) : qnaButton;
           })()}
         </div>
       )}

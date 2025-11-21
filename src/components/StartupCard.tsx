@@ -39,8 +39,17 @@ export default function StartupCard({ startup }: StartupCardProps) {
     return null;
   }
 
-  const activeChallenges = startup.Challenge?.filter(c => c.status === 'open').length ?? 0;
-  const completedChallenges = startup.Challenge?.filter(c => c.status === 'closed').length ?? 0;
+  const now = new Date();
+
+  const activeChallenges = startup.Challenge?.filter(c => {
+    const deadlineDate = new Date(c.deadline);
+    return c.status === 'open' && deadlineDate >= now;
+  }).length ?? 0;
+
+  const completedChallenges = startup.Challenge?.filter(c => {
+    const deadlineDate = new Date(c.deadline);
+    return c.status === 'closed' || (c.status === 'open' && deadlineDate < now);
+  }).length ?? 0;
 
   const websiteUrl = startup.website && (startup.website.startsWith('http') ? startup.website : `https://${startup.website}`);
 
