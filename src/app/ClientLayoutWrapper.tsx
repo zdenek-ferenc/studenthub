@@ -38,7 +38,7 @@ function AppContent({ children }: { children: ReactNode }) {
             </MainContent>
             <Footer />
             <BottomNavBar />
-            {/*  <OnboardingGuide />*/}
+            <OnboardingGuide />
         </>
     );
 }

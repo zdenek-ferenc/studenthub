@@ -71,7 +71,7 @@ const FilterContent = ({
       </div>
       <div className="mb-6">
         <label htmlFor="sort-by" className="text-sm font-bold text-[var(--barva-tmava)] block mb-2">Seřadit podle</label>
-        <select id="sort-by" className="w-full text-[var(--barva-tmava)] text-sm 3xl:text-base px-2 3xl:px-4 py-1.5 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition bg-white" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+        <select id="sort-by" className="w-full text-[var(--barva-tmava)] text-sm 3xl:text-base px-2 3xl:px-4 py-2 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition bg-white" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
           <option value="match">Největší shoda</option>
           <option value="newest">Nejnovější</option>
         </select>
@@ -128,8 +128,8 @@ export default function StartupFilterSidebar(props: FilterSidebarProps) {
               <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all p-6">
                   <div className="flex justify-between items-center pb-4">
-                    <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-gray-900 flex items-center gap-2"><SlidersHorizontal size={20} /> Filtry</Dialog.Title>
-                    <button onClick={() => setMobileOpen(false)} className="p-1 rounded-full hover:bg-gray-100"><X size={20} /></button>
+                    <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-[var(--barva-primarni)] flex items-center gap-2"><SlidersHorizontal size={20} /> Filtry</Dialog.Title>
+                    <button onClick={() => setMobileOpen(false)} className="p-1 rounded-full text-[var(--barva-primarni)] hover:bg-gray-100"><X size={20} /></button>
                   </div>
                   <div className="max-h-[80vh] overflow-y-auto">
                     <FilterContent {...props} />

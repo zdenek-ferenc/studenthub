@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useDashboard } from '../contexts/DashboardContext';
 import { usePathname } from 'next/navigation';
-import { Briefcase, User, Feather, Search, Image as ImageIcon } from 'lucide-react';
+import { Briefcase, User, Feather, Rocket } from 'lucide-react';
 
 export type OnboardingTask = {
     id: string;
@@ -21,7 +21,20 @@ export function useOnboardingState() {
     const pathname = usePathname();
 
     const [tasks, setTasks] = useState<OnboardingTask[]>([]);
+    const [isPermanentlyCompleted, setIsPermanentlyCompleted] = useState(false);
+    const [showCelebration, setShowCelebration] = useState(false);
+    const [isStorageLoaded, setIsStorageLoaded] = useState(false);
     
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedStatus = localStorage.getItem('risehigh_onboarding_completed');
+            if (savedStatus === 'true') {
+                setIsPermanentlyCompleted(true);
+            }
+            setIsStorageLoaded(true);
+        }
+    }, []);
+
     useEffect(() => {
         if (authLoading || !profile) {
             setTasks([]);
@@ -33,32 +46,46 @@ export function useOnboardingState() {
         if (profile.role === 'student' && profile.StudentProfile) {
             const student = profile.StudentProfile;
             
-            const hasAvatar = !!student.profile_picture_url;
             const hasBio = !!student.bio && student.bio.trim().length > 0;
-            
             const hasSkills = student.StudentSkill && student.StudentSkill.length > 0;
+            const hasAvatar = !!student.profile_picture_url;
             const hasAppliedToChallenge = !dashboardLoading && submissions.length > 0;
 
             newTasks = [
-                { id: 'avatar', title: 'Přidej si fotku', description: 'Dej svému profilu tvář.', href: '/profile/edit', icon: User, isCompleted: hasAvatar },
-                { id: 'bio', title: 'Napiš si bio', description: 'Řekni startupům, kdo jsi.', href: '/profile/edit', icon: Feather, isCompleted: hasBio },
-                { id: 'skills', title: 'Doplň dovednosti', description: 'Ukaž, co v tobě je.', href: '/profile/edit?tab=skills', icon: Briefcase, isCompleted: hasSkills },
-                { id: 'find_challenge', title: 'Najdi si výzvu', description: 'Začni budovat své portfolio.', href: '/challenges', icon: Search, isCompleted: hasAppliedToChallenge }
+                { 
+                    id: 'bio', 
+                    title: 'Napiš krátké bio', 
+                    description: 'Představ se startupům.', 
+                    href: '/profile/edit?tab=personal', 
+                    icon: Feather, 
+                    isCompleted: hasBio 
+                },
+                { 
+                    id: 'skills', 
+                    title: 'Doplň dovednosti', 
+                    description: 'Vyber, co umíš.', 
+                    href: '/profile/edit?tab=skills', 
+                    icon: Briefcase, 
+                    isCompleted: hasSkills 
+                },
+                { 
+                    id: 'avatar', 
+                    title: 'Nahraj profilovku', 
+                    description: 'Dej svému profilu tvář.', 
+                    href: '/profile/edit?tab=personal', 
+                    icon: User, 
+                    isCompleted: hasAvatar 
+                },
+                { 
+                    id: 'challenge', 
+                    title: 'Přihlaš se do výzvy', 
+                    description: 'Zkus své první zadání.', 
+                    href: '/challenges', 
+                    icon: Rocket, 
+                    isCompleted: hasAppliedToChallenge 
+                }
             ];
-
-        } else if (profile.role === 'startup' && profile.StartupProfile) {
-            const startup = profile.StartupProfile;
-
-            const hasLogo = !!startup.logo_url; 
-            const hasDescription = !!startup.description && startup.description.trim().length > 0;
-            const hasCreatedChallenge = startup.Challenge && startup.Challenge.length > 0;
-
-            newTasks = [
-                { id: 'logo', title: 'Nahrajte logo', description: 'Logo je klíčové pro vaši vizibilitu.', href: '/profile/edit', icon: ImageIcon, isCompleted: hasLogo },
-                { id: 'bio_startup', title: 'Popište firmu', description: 'Představte se talentům.', href: '/profile/edit', icon: Feather, isCompleted: hasDescription },
-                { id: 'create_challenge', title: 'Vytvořte výzvu', description: 'Oslovte první talenty.', href: '/challenges/create', icon: Briefcase, isCompleted: hasCreatedChallenge }
-            ];
-        }
+        } 
 
         setTasks(newTasks);
 
@@ -72,17 +99,40 @@ export function useOnboardingState() {
         return tasks.filter(task => task.isCompleted).length;
     }, [tasks]);
 
-    const progressPercent = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 100;
+    const progressPercent = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0;
+
+    useEffect(() => {
+        if (tasks.length > 0 && progressPercent === 100 && !isPermanentlyCompleted && !showCelebration) {
+            
+            setShowCelebration(true);
+            
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('risehigh_onboarding_completed', 'true');
+            }
+
+            const timer = setTimeout(() => {
+                setIsPermanentlyCompleted(true);
+                setShowCelebration(false);
+            }, 4000); 
+
+            return () => clearTimeout(timer); 
+        }
+    }, [progressPercent, tasks.length, isPermanentlyCompleted, showCelebration]);
 
     const isHiddenOnPage = useMemo(() => {
-        return pathname.startsWith('/register') || pathname === '/login' || pathname === '/welcome';
+        if (!pathname) return false;
+        return pathname.startsWith('/register') || pathname === '/login' || pathname === '/welcome' || pathname === '/';
     }, [pathname]);
 
-    const isRegistrationComplete = profile?.registration_step && profile.registration_step >= 6;
-
-    const isComplete = activeTask === undefined && tasks.length > 0;
-
-    const finalIsVisible = !authLoading && !!profile && isRegistrationComplete && !isHiddenOnPage && !isComplete;
+    // 4. Finální logika viditelnosti
+    const isVisible = 
+        isStorageLoaded &&
+        !isHiddenOnPage &&
+        (!isPermanentlyCompleted || showCelebration) && 
+        !authLoading && 
+        !dashboardLoading && 
+        !!profile && 
+        profile.role === 'student';
 
     return {
         tasks,
@@ -90,6 +140,7 @@ export function useOnboardingState() {
         progressPercent,
         completedCount,
         totalTasks: tasks.length,
-        isVisible: finalIsVisible,
+        isVisible,
+        showCelebration, 
     };
 }

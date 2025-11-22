@@ -38,7 +38,7 @@ function DashboardClientView() {
   if (profile?.role !== 'student') return <p className="text-center py-20">Tato stránka je určena pouze pro studenty.</p>;
 
   return (
-    <div className="h-full flex flex-col sm:max-w-5/6 mx-auto px-4 py-4 sm:py-8 md:py-28 3xl:py-32">
+    <div className="min-h-screen h-full flex flex-col sm:max-w-5/6 mx-auto px-4 py-4 sm:py-8 md:py-28 3xl:py-32">
       <div className="hidden lg:flex flex-col item-center lg:flex-row items-start gap-6 3xl:gap-5">
         <div className="w-full mx-auto space-y-6 3xl:space-y-5">
             <StudentChallengesWidget />
