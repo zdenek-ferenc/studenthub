@@ -98,7 +98,7 @@ export default function LanguageSelector({ onSelectionChange, initialSelectedIds
             })}
         </div>
       )}
-      <div className="w-full max-w-4xl px-4 sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4 min-h-[12rem] content-start">
+      <div className="w-full max-w-4xl px-4 sm:px-8 flex flex-wrap justify-center sm:gap-3 md:gap-4 min-h-[12rem] content-start">
         {availableLanguages.map(lang => {
           const countryCode = languageCountryCodes[lang.name];
           return (

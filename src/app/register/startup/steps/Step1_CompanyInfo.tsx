@@ -37,8 +37,8 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
   const [isGdprModalOpen, setIsGdprModalOpen] = useState(false);
 
   return (
-    <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
-      <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-4">Informace o firmě</h2>
+    <div className='max-w-lg mx-auto py-6 sm:py-8 md:py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
+      <h2 className="text-2xl sm:text-3xl md:text-4xl text-center text-[var(--barva-primarni)] mb-4">Informace o firmě</h2>
       
       <form onSubmit={handleSubmit(onNext)} className="space-y-4">
         <p className="text-sm text-gray-400 text-center">Položky označené <span className='text-red-400'>*</span> jsou povinné.</p>
@@ -49,7 +49,7 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
             {...register('company_name', { required: 'Název firmy je povinný' })} 
             className="input" 
           />
-          {errors.company_name && <p className="error pt-2 text-blue-400 text-center">{errors.company_name.message}</p>}
+          {errors.company_name && <p className="error text-sm md:text-base pt-2 text-blue-400 text-center">{errors.company_name.message}</p>}
         </div>
 
         <div>
@@ -60,7 +60,7 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
             {...register('contact_email', { required: 'Kontaktní e-mail je povinný' })} 
             className="input" 
           />
-          {errors.contact_email && <p className="error pt-2 text-blue-400 text-center">{errors.contact_email.message}</p>}
+          {errors.contact_email && <p className="error text-sm md:text-base pt-2 text-blue-400 text-center">{errors.contact_email.message}</p>}
         </div>
 
         <div>
@@ -82,7 +82,7 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
               />
             )}
           />
-          {errors.phone_number && <p className="error pt-2 text-red-500 text-center">{errors.phone_number.message}</p>}
+          {errors.phone_number && <p className="error text-sm md:text-base pt-2 text-blue-400 text-center">{errors.phone_number.message}</p>}
         </div>
 
         <div>
@@ -119,10 +119,10 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
                   id="gdpr_consent"
                   type="checkbox"
                   {...register('gdpr_consent', { required: 'Pro pokračování je nutné udělit souhlas.' })}
-                  className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                  className="focus:ring-indigo-500 h-4 w-4 bg-[var(--barva-primarni)] border-gray-300 rounded"
                 />
               </div>
-              <div className="ml-3 text-sm">
+              <div className="ml-3 text-xs md:text-sm">
                 <label htmlFor="gdpr_consent" className="font-medium text-gray-700">
                   Souhlasím se zpracováním osobních údajů
                 </label>
@@ -137,10 +137,10 @@ export default function Step1_CompanyInfo({ onNext, initialData }: StepProps) {
                 </p>
               </div>
             </div>
-            {errors.gdpr_consent && <p className="error text-blue-400 text-center mt-2">{errors.gdpr_consent.message}</p>}
+            {errors.gdpr_consent && <p className="error text-red-500 text-sm sm:text-base text-center mt-2">{errors.gdpr_consent.message}</p>}
           </div>
-        <div className="pt-6 flex justify-center">
-          <button type="submit" className="px-4 py-2 md:px-6 md:py-3 rounded-3xl bg-[var(--barva-primarni)] text-sm cursor-pointer md:text-base text-white font-semibold shadow-sm hover:opacity-90 transition-all duration-300 ease-in-out">Pokračovat</button>
+        <div className="pt-3 md:pt-6 flex justify-center">
+          <button type="submit" className="px-5 py-3 md:px-6 md:py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-sm sm:text-base md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400">Pokračovat</button>
         </div>
       </form>
       <GDPRModal isOpen={isGdprModalOpen} onClose={() => setIsGdprModalOpen(false)} />

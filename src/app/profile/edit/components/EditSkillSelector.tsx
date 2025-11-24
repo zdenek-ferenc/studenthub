@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../../../lib/supabaseClient';
 import { X } from 'lucide-react';
+import MissingItemSuggestion from '../../../../components/MissingItemSuggestion';
+
 
 type Skill = {
   id: string;
@@ -120,6 +122,7 @@ export default function SkillSelectorEdit({ onSelectionChange, initialSelectedId
             <p className="text-sm text-gray-400 p-2">Dovednost nenalezena.</p>
           )}
         </div>
+        <MissingItemSuggestion type="skill" label="dovednost" />
       </div>
     </div>
   );

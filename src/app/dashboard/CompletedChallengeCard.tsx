@@ -24,7 +24,7 @@ const ResultTag = ({ rating, position }: { rating: number | null, position: numb
         <div className="items-center flex gap-1.5 text-sm font-semibold text-yellow-500">
           <div className="items-center flex gap-1.5">
             <Trophy size={16} />
-            <span className='leading-none bg-gradient-to-r from-yellow-600 to-yellow-500 bg-clip-text text-transparent'>{position}. místo</span>
+            <span className='leading-none bg-yellow-500 bg-clip-text text-transparent'>{position}. místo</span>
           </div>
         </div>
         {rating && (

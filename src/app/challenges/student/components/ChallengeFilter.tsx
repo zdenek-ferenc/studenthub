@@ -5,21 +5,21 @@ import { useState, useMemo, Fragment } from 'react';
 import { Dialog, Transition, Popover } from '@headlessui/react';
 
 type Skill = {
-  id: string;
-  name: string;
+    id: string;
+    name: string;
 };
 
 type ChallengeFilterProps = {
-  allSkills: Skill[];
-  studentSkills: Skill[]; 
-  selectedSkillIds: string[];
-  setSelectedSkillIds: (ids: string[]) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  sortBy: string;
-  setSortBy: (sort: string) => void;
-  isMobileOpen: boolean;
-  setMobileOpen: (isOpen: boolean) => void;
+    allSkills: Skill[];
+    studentSkills: Skill[]; 
+    selectedSkillIds: string[];
+    setSelectedSkillIds: (ids: string[]) => void;
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
+    sortBy: string;
+    setSortBy: (sort: string) => void;
+    isMobileOpen: boolean;
+    setMobileOpen: (isOpen: boolean) => void;
 };
 
 const popularSkillsListFallback = ['Marketing', 'React', 'Python', 'UX Design', 'Figma', 'Copywriting', 'SEO', 'Frontend', 'Backend', 'Analýza dat'];
@@ -34,43 +34,43 @@ const DesktopFilterContent = ({
     sortBy,
     setSortBy,
 }: Omit<ChallengeFilterProps, 'isMobileOpen' | 'setMobileOpen'>) => {
-  const [skillSearch, setSkillSearch] = useState('');
+    const [skillSearch, setSkillSearch] = useState('');
 
-  const handleSkillToggle = (skillId: string) => {
-      const newSelectedIds = new Set(selectedSkillIds);
-      if (newSelectedIds.has(skillId)) newSelectedIds.delete(skillId);
-      else newSelectedIds.add(skillId);
-      setSelectedSkillIds(Array.from(newSelectedIds));
-  };
-  
-  const selectedSkills = useMemo(() => 
-      allSkills.filter(skill => selectedSkillIds.includes(skill.id)),
-      [allSkills, selectedSkillIds]
-  );
-  
-  const availableSkillsInPopover = useMemo(() => {
-    let skills = allSkills.filter(skill => !selectedSkillIds.includes(skill.id));
-    if (skillSearch) {
-      skills = skills.filter(skill => 
-          skill.name.toLowerCase().includes(skillSearch.toLowerCase())
-      );
-    }
-    return skills;
-  }, [allSkills, selectedSkillIds, skillSearch]);
-  
+    const handleSkillToggle = (skillId: string) => {
+        const newSelectedIds = new Set(selectedSkillIds);
+        if (newSelectedIds.has(skillId)) newSelectedIds.delete(skillId);
+        else newSelectedIds.add(skillId);
+        setSelectedSkillIds(Array.from(newSelectedIds));
+    };
+    
+    const selectedSkills = useMemo(() => 
+        allSkills.filter(skill => selectedSkillIds.includes(skill.id)),
+        [allSkills, selectedSkillIds]
+    );
+    
+    const availableSkillsInPopover = useMemo(() => {
+        let skills = allSkills.filter(skill => !selectedSkillIds.includes(skill.id));
+        if (skillSearch) {
+        skills = skills.filter(skill => 
+            skill.name.toLowerCase().includes(skillSearch.toLowerCase())
+        );
+        }
+        return skills;
+    }, [allSkills, selectedSkillIds, skillSearch]);
+    
 
-  const quickSelectSkills = studentSkills.length > 0 ? studentSkills : popularSkillsListFallback.map(name => allSkills.find(s => s.name === name)).filter((s): s is Skill => !!s);
+    const quickSelectSkills = studentSkills.length > 0 ? studentSkills : popularSkillsListFallback.map(name => allSkills.find(s => s.name === name)).filter((s): s is Skill => !!s);
 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const clearFilters = () => {
-    setSearchQuery('');
-    setSelectedSkillIds([]);
-    setSortBy('recommended');
-  }
+    const clearFilters = () => {
+        setSearchQuery('');
+        setSelectedSkillIds([]);
+        setSortBy('recommended');
+    }
 
-  return (
-    <div className="space-y-3">
+    return (
+    <div className="space-y-2 2xl:space-y-3">
         <div className="bg-white p-1 3xl:p-2 rounded-xl border border-gray-100 shadow-sm w-full flex flex-col md:flex-row items-center gap-2">
             <div className="relative w-full flex-grow">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -84,12 +84,12 @@ const DesktopFilterContent = ({
                 />
             </div>
             <div className="w-full md:w-1/5 xl:w-1/8 bg-gray-100 rounded-xl md:border-l border-gray-100 md:px-2">
-                <select 
+                <select
                     id="sort-by"
-                    className="w-full text-sm 3xl:text-base text-[var(--barva-tmava)] py-2 px-3 xl:p-3 xl:px-2 border-none rounded-lg focus:outline-none transition bg-gray-50 md:bg-transparent focus:ring-0 cursor-pointer"
+                    className="min-w-max w-full whitespace-nowrap text-sm 3xl:text-base text-[var(--barva-tmava)] py-2 px-3 xl:p-3 xl:px-2 border-none rounded-lg focus:outline-none transition bg-gray-50 md:bg-transparent focus:ring-0 cursor-pointer"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                >
+                    >
                     <option value="recommended">Doporučené</option>
                     <option value="newest">Nejnovější</option>
                     <option value="ending_soon">Brzy končí</option>

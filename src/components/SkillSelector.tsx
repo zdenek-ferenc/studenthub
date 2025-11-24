@@ -2,6 +2,7 @@
 
 import { useState,useRef, useMemo, useEffect } from 'react';
 import { X, ChevronDown } from 'lucide-react'; 
+import MissingItemSuggestion from './MissingItemSuggestion';
 
 type Skill = {
   id: string;
@@ -78,41 +79,41 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Hledej dovednost"
-        className="px-3 py-1.5 sm:px-5 sm:py-2 text-[var(--barva-primarni)] rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-text focus:outline-2 outline-[var(--barva-primarni)]"
+        className="px-3 py-1.5 sm:px-5 sm:py-2 text-[var(--barva-primarni)] rounded-full font-base sm:font-light text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-text focus:outline-2 outline-[var(--barva-primarni)]/50"
       />
       {selectedSkillsObjects.length > 0 && (
-        <div className="w-full max-w-4xl sm:px-8 flex flex-wrap gap-3 md:gap-4 py-4">
+        <div className="w-full max-w-4xl sm:px-8 flex flex-wrap gap-3 md:gap-4 lg:mb-4 pt-4">
             {selectedSkillsObjects.map(skill => (
                 <button
                     key={`selected-${skill.id}`}
                     type="button"
                     onClick={() => handleToggleSkill(skill.id)}
-                    className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] bg-[var(--barva-svetle-pozadi)] rounded-full text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer"
+                    className="flex items-center gap-2 px-2 py-1 sm:px-3 sm:py-1.5 text-[var(--barva-primarni)] bg-[var(--barva-svetle-pozadi)] rounded-full text-xs sm:text-sm md:text-base lg:text-lg outline-1 md:outline-2 transition-colors duration-200 cursor-pointer"
                 >
                     {skill.name}
-                    <X size={20} className='w-4 h-4' />
+                    <X size={20} className='bg-white hover:bg-blue-200 transition-all ease-in-out duration-200 rounded-full p-0.5 w-4 h-4 md:w-5 md:h-5' />
                 </button>
             ))}
         </div>
       )}
 
-      <div className="w-full max-w-4xl px-2 md:px-4 sm:px-8 flex justify-between items-center mb-2 xl:mb-4 3xl:mb-8">
-            <h4 className="text-xs sm:text-lg font-semibold opacity-70 text-[var(--barva-primarni)]">{getSkillsTitle()}</h4>
+      <div className="w-full max-w-4xl pt-4 lg:pt-0 flex justify-between items-center mb-2 md:mb-4">
+            <h4 className="text-xs sm:text-sm md:text-base font-semibold opacity-70 text-[var(--barva-primarni)]">{getSkillsTitle()}</h4>
             {!searchTerm && (
-                <button type="button" onClick={() => setShowAll(!showAll)} className="text-xs sm:text-lg font-semibold text-[var(--barva-primarni)] flex items-center gap-1">
+                <button type="button" onClick={() => setShowAll(!showAll)} className="text-xs sm:text-sm md:text-base font-semibold text-[var(--barva-primarni)] flex items-center gap-1">
                     {showAll ? 'Skrýt' : 'Zobrazit vše'}
                     <ChevronDown className={`h-5 w-5 transition-transform ${showAll ? 'rotate-180' : ''}`} />
                 </button>
             )}
         </div>
 
-      <div className="w-full max-w-4xl pt-4 sm:px-8 flex flex-wrap justify-center gap-3 md:gap-4 min-h-[12rem] content-start">
+      <div className="w-full max-w-4xl sm:px-8 flex flex-wrap justify-center gap-2 sm:gap-3 content-start">
         {availableSkills.map(skill => (
           <button
             key={skill.id}
             type="button"
             onClick={() => handleToggleSkill(skill.id)}
-            className={`px-3 py-1.5 sm:px-4 sm:py-2 text-[var(--barva-primarni)] rounded-full text-sm sm:text-xl outline-1 md:outline-2 transition-colors duration-200 cursor-pointer
+            className={`px-2 py-1 sm:px-3 sm:py-1.5 text-[var(--barva-primarni)] rounded-full text-xs sm:text-sm md:text-base lg:text-lg outline-1 md:outline-2 transition-colors duration-200 cursor-pointer
               ${selectedIds.includes(skill.id)
                 ? 'bg-[var(--barva-primarni2)]'
                 : 'bg-white hover:bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni2)]'
@@ -123,6 +124,7 @@ export default function SkillSelector({ onSelectionChange, initialSelectedIds = 
         ))}
         {searchTerm && availableSkills.length === 0 && <p className="text-sm text-gray-500 py-4">Dovednost nenalezena.</p>}
       </div>
+      <MissingItemSuggestion type="skill" label="dovednost" />
     </div>
   );
 }

@@ -86,8 +86,8 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
   }, [isValidating, errors.username, debouncedUsername, usernameValue]);
 
   return (
-    <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
-      <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-8">Vytvoř si profil</h2>
+    <div className='max-w-lg mx-auto py-6 sm:py-8 md:py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
+      <h2 className="text-2xl sm:text-3xl md:text-4xl text-center text-[var(--barva-primarni)] mb-4 md:mb-8">Vytvoř si profil</h2>
       
       <form onSubmit={handleSubmit(onNext)} className="space-y-4">
         <p className="text-sm text-gray-400 text-center">Položky označené <span className='text-red-400'>*</span> jsou povinné.</p>
@@ -168,7 +168,7 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
             className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
           />
         </div>
-        <div className="ml-3 text-sm">
+        <div className="ml-3 text-xs md:text-sm">
           <label htmlFor="gdpr_consent" className="font-medium text-gray-700">
             Souhlasím se zpracováním osobních údajů
           </label>
@@ -183,13 +183,13 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
           </p>
         </div>
       </div>
-      {errors.gdpr_consent && <p className="error text-red-500 text-center mt-2">{errors.gdpr_consent.message}</p>}
+      {errors.gdpr_consent && <p className="error text-red-500 text-sm sm:text-base text-center mt-2">{errors.gdpr_consent.message}</p>}
     </div>
-        <div className="pt-6 flex justify-center">
+        <div className="pt-3 md:pt-6 flex justify-center">
           <button 
             type="submit" 
             disabled={isSubmitting || isValidating || usernameValue !== debouncedUsername}
-            className="px-6 py-3 md:px-8 md:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed">
+            className="px-5 py-3 md:px-6 md:py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-sm sm:text-base md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400">
               {isValidating || usernameValue !== debouncedUsername ? 'Ověřuji...' : 'Pokračovat'}
           </button>
         </div>

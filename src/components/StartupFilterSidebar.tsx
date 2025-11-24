@@ -98,7 +98,7 @@ const FilterContent = ({
         </div>
         <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
           {availableCategories.map(cat => (
-            <button key={cat.id} onClick={() => handleCategoryToggle(cat.id)} className="cursor-pointer px-2 py-1 rounded-full text-sm text-[var(--barva-primarni)] font-normal border bg-white border-[var(--barva-primarni)] hover:bg-[var(--barva-svetle-pozadi)] transition-colors">
+            <button key={cat.id} onClick={() => handleCategoryToggle(cat.id)} className="cursor-pointer px-3 py-1 rounded-full text-sm text-[var(--barva-primarni)] font-normal border bg-white border-[var(--barva-primarni)] hover:bg-[var(--barva-svetle-pozadi)] transition-colors">
               {cat.name}
             </button>
           ))}
@@ -114,7 +114,7 @@ export default function StartupFilterSidebar(props: FilterSidebarProps) {
 
   return (
     <>
-      <aside className="hidden lg:block w-full lg:w-80 p-4 3xl:p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit sticky top-28 flex-shrink-0">
+      <aside className="hidden lg:block w-full lg:w-80 p-4 3xl:p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
         <FilterContent {...props} />
       </aside>
 

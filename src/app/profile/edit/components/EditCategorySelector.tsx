@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../../../lib/supabaseClient';
 import { X } from 'lucide-react';
+import MissingItemSuggestion from '../../../../components/MissingItemSuggestion';
 
 type Category = {
   id: string;
@@ -119,6 +120,7 @@ export default function CategorySelectorEdit({ onSelectionChange, initialSelecte
             <p className="text-sm text-gray-400 p-2">Kategorie nenalezena.</p>
           )}
         </div>
+        <MissingItemSuggestion type="category" label="kategorie" />
       </div>
     </div>
   );

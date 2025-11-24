@@ -49,8 +49,10 @@ export default function StudentChallengesWidget() {
     return (
         <div className="bg-white p-3 sm:p-4 3xl:p-6 rounded-2xl shadow-xs border-2 border-gray-100">
             <div className="flex justify-between items-start sm:items-center mb-4">
-                <h3 className="3xl:text-xl pb-2 md:pb-0 font-semibold text-[var(--barva-tmava)]">Výzvy</h3>
-                {/* Přidáme nové tlačítko do přepínače */}
+                <div className="flex items-center gap-2 mb-5">
+                    <div className="h-6 w-1 bg-[var(--barva-primarni)] rounded-full"></div>
+                    <h3 className="font-bold sm:text-lg text-[var(--barva-tmava)]">Výzvy</h3>
+                </div>
                 <div className="flex items-center rounded-lg space-x-1 sm:space-x-2">
                     <SwitchButton buttonView="active" label="Aktivní" count={activeChallenges.length} />
                     <SwitchButton buttonView="completed" label="Hotové" count={completedChallenges.length} />

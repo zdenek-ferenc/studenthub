@@ -42,17 +42,17 @@ const RegistrationHeader = ({ currentStep, onBack, isLoading }: { currentStep: n
     const activeStepIndex = Math.max(0, currentStep - 2);
 
     return (
-        <div className="w-full max-w-lg mx-auto mb-4">
-            <div className="flex items-center justify-between mb-2">
+        <div className="w-full max-w-lg mx-auto mb-2 sm:mb-4">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
                 <button
                     onClick={onBack}
                     disabled={currentStep <= 2 || isLoading}
-                    className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex cursor-pointer items-center gap-1 text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     <ArrowLeft size={16} />
                     Zpět
                 </button>
-                <span className="text-sm font-bold text-[var(--barva-primarni)]">
+                <span className="text-xs sm:text-sm font-bold text-[var(--barva-primarni)]">
                     Krok {currentStep - 1} / {TOTAL_STEPS}
                 </span>
             </div>
@@ -553,7 +553,7 @@ export default function StartupRegistrationPage() {
     return (
         <div className="w-full min-h-screen flex sm:pt-0 items-start justify-center bg-[var(--barva-svetle-pozadi)] px-4">
             {session ? (
-                <div className="w-full py-6 md:py-12">
+                <div className="w-full py-4 sm:py-6 md:py-12">
                     {step >= 2 && step <= 5 && (
                         <RegistrationHeader
                             currentStep={step}

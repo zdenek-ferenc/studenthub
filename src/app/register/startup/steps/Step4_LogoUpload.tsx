@@ -53,11 +53,11 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
 
   return (
     <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xl bg-white'>
-      <div className="space-y-6 text-center">
-        <h2 className="text-4xl text-[var(--barva-primarni)] mb-4">Firemní logo</h2>
-        <p className="text-gray-600 mb-6">Nahrajte své logo. Tento krok můžete přeskočit.</p>
+      <div className="space-y-4 sm:space-y-6 text-center">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl text-[var(--barva-primarni)] mb-4">Firemní logo</h2>
+        <p className="text-gray-600 text-xs sm:text-sm md:text-base mb-6">Nahrajte své logo. Tento krok můžete přeskočit.</p>
         
-        <div className='my-12'>
+        <div className='my-8 sm:my-12'>
           <input 
             type="file" 
             id="logoUpload" 
@@ -81,7 +81,7 @@ export default function Step4_LogoUpload({ onNext, userId }: StepProps) {
         <div className="pt-6 flex justify-center">
           <button 
             onClick={() => onNext({ logo_url: null })}
-            className="text-gray-500 hover:text-gray-800 hover:underline cursor-pointer"
+            className="text-gray-500 text-sm md:text-base hover:text-gray-800 hover:underline cursor-pointer"
           >
             Přeskočit a dokončit registraci
           </button>

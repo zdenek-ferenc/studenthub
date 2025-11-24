@@ -25,8 +25,8 @@ export default function Step2_EducationInfo({ onNext, initialData }: StepProps) 
 
   return (
     
-    <div className='max-w-lg mx-auto py-12 px-8 sm:px-12 rounded-3xl shadow-xs bg-white'>
-      <h2 className="text-4xl text-center text-[var(--barva-primarni)] mb-8">Vzdělání</h2>
+    <div className='max-w-lg mx-auto py-6 sm:py-8 md:py-12 px-8 sm:px-12 rounded-3xl shadow-xs bg-white'>
+      <h2 className="text-2xl sm:text-3xl md:text-4xl text-center text-[var(--barva-primarni)] mb-4 md:mb-8">Vzdělání</h2>
       
       <form onSubmit={handleSubmit(onNext)} className="space-y-4">
         <p className="text-sm text-gray-400 text-center">Položky označené <span className='text-red-400'>*</span> jsou povinné.</p>
@@ -37,7 +37,7 @@ export default function Step2_EducationInfo({ onNext, initialData }: StepProps) 
             {...register('university', { required: 'Škola je povinná' })} 
             className="input" 
           />
-          {errors.university && <p className="error pt-2 text-blue-400 text-center">{errors.university.message}</p>}
+          {errors.university && <p className="error text-sm md:text-base pt-2 text-blue-400 text-center">{errors.university.message}</p>}
         </div>
 
         <div>
@@ -74,8 +74,8 @@ export default function Step2_EducationInfo({ onNext, initialData }: StepProps) 
   />
         </div>
 
-        <div className="pt-6 flex justify-center">
-          <button type="submit" className="px-6 py-3 md:px-8 md:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400">Pokračovat</button>
+        <div className="pt-3 md:pt-6 flex justify-center">
+          <button type="submit" className="px-5 py-3 md:px-6 md:py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-sm sm:text-base md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400">Pokračovat</button>
         </div>
       </form>
     </div>

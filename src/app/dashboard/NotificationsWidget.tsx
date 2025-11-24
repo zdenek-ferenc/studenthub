@@ -119,9 +119,12 @@ export default function NotificationsWidget() {
     const showSkeleton = loading && notifications.length === 0;
 
     return (
-        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100 h-full">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border-2 border-gray-100 h-full">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-lg sm:text-xl text-[var(--barva-tmava)]">Notifikace</h3>
+                <div className="flex items-center gap-2 mb-5">
+                    <div className="h-6 w-1 bg-[var(--barva-primarni)] rounded-full"></div>
+                    <h3 className="font-bold sm:text-lg text-[var(--barva-tmava)]">Notifikace</h3>
+                </div>
                 <Link href="/notifications" className="text-xs sm:text-sm font-semibold text-[var(--barva-primarni)] hover:underline">
                     Zobrazit vše
                 </Link>

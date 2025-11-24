@@ -23,9 +23,9 @@ export default function Step4_Languages({ onNext, allLanguages, isLoading, initi
   };
 
   return (
-    <div className="flex items-center flex-col py-12 px-8 sm:px-12 w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl">
-      <h2 className="text-4xl text-[var(--barva-primarni)] mb-2 text-center">Jazyky</h2>
-      <p className="text-gray-600 mb-6 sm:mb-8 text-center">Jakými jazyky se domluvíš?</p>
+    <div className="flex items-center flex-col py-6 sm:py-8 md:py-12 px-8 sm:px-12 w-full max-w-5xl mx-auto bg-white shadow-lg rounded-3xl">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl text-[var(--barva-primarni)] mb-2 text-center">Jazyky</h2>
+      <p className="text-gray-600 mb-6 text-sm md:text-base sm:mb-8 text-center">Jakými jazyky se domluvíš?</p>
 
       {isLoading ? (
         <p className='text-2xl sm:text-4xl font-bold'>Načítám jazyky...</p>
@@ -40,7 +40,7 @@ export default function Step4_Languages({ onNext, allLanguages, isLoading, initi
       <button 
         onClick={handleContinue} 
         disabled={isLoading}
-        className="mt-8 sm:mt-12 px-8 py-3 sm:px-14 sm:py-4 rounded-3xl font-semibold text-white bg-[var(--barva-primarni)] text-lg sm:text-2xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400"
+        className="mt-4 px-5 py-3 md:px-6 md:py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-sm sm:text-base md:text-xl cursor-pointer hover:opacity-90 transition-all duration-300 ease-in-out disabled:bg-gray-400"
       >
         Dokončit registraci
       </button>

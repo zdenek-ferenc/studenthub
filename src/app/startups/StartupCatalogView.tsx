@@ -25,7 +25,7 @@ function StartupCatalogView() {
     return (
         <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-4 md:py-32 lg:flex-row items-start gap-8">
             {loadingFilters ? (
-                <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit sticky top-28 flex-shrink-0">
+                <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
                     <p className="text-gray-500">Načítám filtry...</p>
                 </aside>
             ) : (
@@ -44,7 +44,7 @@ function StartupCatalogView() {
             <main className="flex-1 w-full">
                 <div className='mb-3 3xl:mb-4 flex justify-between items-center'>
                     <div>
-                    <h1 className="text-xl 3xl:text-3xl font-semibold text-[var(--barva-tmava)]">Objev inovativní startupy</h1>
+                    <h1 className="text-xl 3xl:text-2xl font-semibold text-[var(--barva-tmava)]">Objev inovativní startupy</h1>
                 </div>
                 <div className="lg:hidden flex justify-between items-center">
                     <button 
