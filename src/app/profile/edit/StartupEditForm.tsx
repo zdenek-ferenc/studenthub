@@ -7,17 +7,19 @@ import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'next/navigation';
 import CategorySelectorEdit from './components/EditCategorySelector';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import AvatarUploader from './components/AvatarUploader'; 
 
 type StartupProfile = {
     company_name: string; website: string; description: string | null;
     ico: string | null; phone_number: string | null; address: string | null;
     contact_first_name: string; contact_last_name: string; contact_position: string | null;
+    logo_url: string | null; 
 };
 
 type Tab = 'company' | 'contact' | 'categories';
 
 export default function StartupEditForm() {
-    const { user, showToast, loading: authLoading } = useAuth();
+    const { user, showToast, refetchProfile, loading: authLoading } = useAuth(); 
     const searchParams = useSearchParams();
     const [loading, setLoading] = useState(true);
     
@@ -30,6 +32,7 @@ export default function StartupEditForm() {
     
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [originalCategories, setOriginalCategories] = useState<string[]>([]);
+    const [logoUrl, setLogoUrl] = useState<string | null>(null); 
 
     const [hasFetched, setHasFetched] = useState(false);
 
@@ -43,7 +46,10 @@ export default function StartupEditForm() {
                 supabase.from('StartupCategory').select('category_id').eq('startup_id', user.id),
             ]);
 
-            if (profileRes.data) reset(profileRes.data);
+            if (profileRes.data) {
+                reset(profileRes.data);
+                setLogoUrl(profileRes.data.logo_url); 
+            }
             if (categoriesRes.data) {
                 const categoryIds = categoriesRes.data.map(c => c.category_id);
                 setSelectedCategories(categoryIds);
@@ -63,7 +69,8 @@ export default function StartupEditForm() {
         if (error) showToast(`Chyba: ${error.message}`, 'error');
         else {
             showToast('Profil byl úspěšně uložen!', 'success');
-            reset({}, { keepValues: true });
+            await refetchProfile(); 
+            reset(data, { keepValues: true }); 
         }
     };
 
@@ -87,6 +94,15 @@ export default function StartupEditForm() {
         }
         showToast('Kategorie byly úspěšně uloženy!', 'success');
         setOriginalCategories(selectedCategories); 
+    };
+    const handleLogoSuccess = (newUrl: string) => {
+        setLogoUrl(newUrl);
+        refetchProfile(); 
+    };
+
+    const handleLogoDelete = () => {
+        setLogoUrl(null);
+        refetchProfile();
     };
     
     if (loading || authLoading) {
@@ -113,48 +129,64 @@ export default function StartupEditForm() {
             </aside>
             <main className="md:col-span-3">
                 {(activeTab === 'company' || activeTab === 'contact') && (
-                    <form onSubmit={handleSubmit(handleProfileSubmit)} className="space-y-4 bg-white text-[var(--barva-tmava)] p-5 3xl:p-8 rounded-xl shadow-xs">
-                        {activeTab === 'company' && (
+                    <div className="bg-white text-[var(--barva-tmava)] p-5 3xl:p-8 rounded-xl shadow-xs">
+                        {activeTab === 'company' && user && (
+                            <div className="mb-8 border-b pb-8 border-gray-100">
+                                <h2 className="text-xl 3xl:text-2xl text-[var(--barva-primarni)] font-bold mb-6">Logo firmy</h2>
+                                <AvatarUploader 
+                                    userId={user.id}
+                                    currentAvatarUrl={logoUrl}
+                                    onUploadSuccess={handleLogoSuccess}
+                                    onDeleteSuccess={handleLogoDelete}
+                                    tableName="StartupProfile"
+                                    columnName="logo_url"
+                                />
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit(handleProfileSubmit)} className="space-y-4">
+                            {activeTab === 'company' && (
+                                <>
+                                    <h2 className="text-xl 3xl:text-2xl text-[var(--barva-primarni)] font-bold mb-4">Informace o firmě</h2>
+                                    <div>
+                                        <label htmlFor="company_name" className="block mb-1 font-semibold">Název firmy</label>
+                                        <input id="company_name" {...register('company_name')} className="input !font-normal" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="website" className="block mb-1 font-semibold">Webová stránka</label>
+                                        <input id="website" {...register('website')} className="input !font-normal" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="description" className="block mb-1 font-semibold">Popis firmy</label>
+                                        <textarea id="description" {...register('description')} className="input !font-normal min-h-[150px]" />
+                                    </div>
+                                </>
+                            )}
+                            {activeTab === 'contact' && (
                             <>
-                                <h2 className="text-xl 3xl:text-2xl text-[var(--barva-primarni)] font-bold mb-4">Informace o firmě</h2>
-                                <div>
-                                    <label htmlFor="company_name" className="block mb-1 font-semibold">Název firmy</label>
-                                    <input id="company_name" {...register('company_name')} className="input !font-normal" />
-                                </div>
-                                <div>
-                                    <label htmlFor="website" className="block mb-1 font-semibold">Webová stránka</label>
-                                    <input id="website" {...register('website')} className="input !font-normal" />
-                                </div>
-                                <div>
-                                    <label htmlFor="description" className="block mb-1 font-semibold">Popis firmy</label>
-                                    <textarea id="description" {...register('description')} className="input !font-normal min-h-[150px]" />
-                                </div>
-                            </>
-                        )}
-                        {activeTab === 'contact' && (
-                        <>
-                                <h2 className="text-xl 3xl:text-2xl text-[var(--barva-primarni)] font-bold mb-4">Kontaktní osoba</h2>
-                                <div>
-                                    <label htmlFor="contact_first_name" className="block mb-1 font-semibold">Jméno</label>
-                                    <input id="contact_first_name" {...register('contact_first_name')} className="input !font-normal" />
-                                </div>
-                                <div>
-                                    <label htmlFor="contact_last_name" className="block mb-1 font-semibold">Příjmení</label>
-                                    <input id="contact_last_name" {...register('contact_last_name')} className="input !font-normal" />
-                                </div>
-                                <div>
-                                    <label htmlFor="contact_position" className="block mb-1 font-semibold">Pozice ve firmě</label>
-                                    <input id="contact_position" {...register('contact_position')} className="input !font-normal" />
-                                </div>
-                            </>
-                        )}
-                        
-                        <div className="pt-4">
-                            <button type="submit" disabled={!isDirty || isSubmitting} className="px-5 py-2 mt-4 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 disabled:bg-gray-300">
-                                {isSubmitting ? 'Ukládám...' : 'Uložit změny'}
-                            </button>
-                        </div>
-                    </form>
+                                    <h2 className="text-xl 3xl:text-2xl text-[var(--barva-primarni)] font-bold mb-4">Kontaktní osoba</h2>
+                                    <div>
+                                        <label htmlFor="contact_first_name" className="block mb-1 font-semibold">Jméno</label>
+                                        <input id="contact_first_name" {...register('contact_first_name')} className="input !font-normal" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="contact_last_name" className="block mb-1 font-semibold">Příjmení</label>
+                                        <input id="contact_last_name" {...register('contact_last_name')} className="input !font-normal" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="contact_position" className="block mb-1 font-semibold">Pozice ve firmě</label>
+                                        <input id="contact_position" {...register('contact_position')} className="input !font-normal" />
+                                    </div>
+                                </>
+                            )}
+                            
+                            <div className="pt-4">
+                                <button type="submit" disabled={!isDirty || isSubmitting} className="px-5 py-2 mt-4 rounded-full font-semibold text-white bg-[var(--barva-primarni)] text-lg cursor-pointer hover:opacity-90 disabled:bg-gray-300">
+                                    {isSubmitting ? 'Ukládám...' : 'Uložit změny'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 )}
                 {activeTab === 'categories' && (
                     <div className="space-y-4 bg-white text-[var(--barva-tmava)] p-5 3xl:p-8 rounded-xl shadow-xs">

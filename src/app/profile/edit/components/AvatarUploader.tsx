@@ -3,7 +3,7 @@
 import { useState, ChangeEvent } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
-import { UploadCloud, Loader2, Edit2, User as UserIcon } from 'lucide-react';
+import { Loader2, Edit2, User as UserIcon, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface AvatarUploaderProps {
@@ -11,15 +11,19 @@ interface AvatarUploaderProps {
   currentAvatarUrl: string | null; 
   onUploadSuccess: (newUrl: string) => void;
   onDeleteSuccess: () => void;
+  tableName?: 'StudentProfile' | 'StartupProfile';
+  columnName?: string;
+  bucketName?: string;
 }
-
-const BUCKET_NAME = 'profile-pictures';
 
 export default function AvatarUploader({
   userId,
   currentAvatarUrl, 
   onUploadSuccess,
   onDeleteSuccess,
+  tableName = 'StudentProfile', 
+  columnName = 'profile_picture_url',
+  bucketName = 'profile-pictures'
 }: AvatarUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,13 +34,13 @@ export default function AvatarUploader({
     try {
       const oldFileName = oldUrl.split('/').pop();
       if (oldFileName) {
-        const { error: removeError } = await supabase.storage.from(BUCKET_NAME).remove([oldFileName]);
+        const { error: removeError } = await supabase.storage.from(bucketName).remove([oldFileName]);
         if (removeError && !removeError.message.includes('Not Found')) {
-            console.warn("Nepodařilo se smazat starý avatar (ale pokračujeme):", removeError);
+            console.warn("Nepodařilo se smazat starý obrázek (ale pokračujeme):", removeError);
         }
       }
     } catch (err) {
-      console.error("Chyba při pokusu o smazání starého avataru:", err);
+      console.error("Chyba při pokusu o smazání starého obrázku:", err);
     }
   };
 
@@ -60,30 +64,30 @@ export default function AvatarUploader({
     try {
       await deleteOldAvatar(currentAvatarUrl);
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from(BUCKET_NAME)
+      const { error: uploadError } = await supabase.storage
+        .from(bucketName)
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data: publicUrlData } = supabase.storage
-        .from(BUCKET_NAME)
+        .from(bucketName)
         .getPublicUrl(filePath);
 
       const newUrl = publicUrlData.publicUrl;
 
       const { error: dbError } = await supabase
-        .from('StudentProfile')
-        .update({ profile_picture_url: newUrl })
+        .from(tableName)
+        .update({ [columnName]: newUrl })
         .eq('user_id', userId);
 
       if (dbError) throw dbError;
 
       onUploadSuccess(newUrl);
-      showToast('Profilovka úspěšně nahrána!', 'success');
+      showToast(tableName === 'StartupProfile' ? 'Logo úspěšně nahráno!' : 'Profilovka úspěšně nahrána!', 'success');
 
     } catch (err: unknown) {
-      console.error("Chyba při nahrávání avataru:", err);
+      console.error("Chyba při nahrávání:", err);
       const message = (err instanceof Error) ? err.message : "Neznámá chyba";
       setError(`Nahrávání selhalo: ${message}`);
       showToast(`Nahrávání selhalo: ${message}`, 'error');
@@ -94,25 +98,24 @@ export default function AvatarUploader({
 
   const handleDelete = async () => {
     if (!currentAvatarUrl) return;
-    if (!confirm("Opravdu chcete smazat profilový obrázek?")) return;
+    if (!confirm(tableName === 'StartupProfile' ? "Opravdu chcete smazat logo firmy?" : "Opravdu chcete smazat profilový obrázek?")) return;
 
     setUploading(true);
     try {
-
         await deleteOldAvatar(currentAvatarUrl);
 
         const { error: dbError } = await supabase
-            .from('StudentProfile')
-            .update({ profile_picture_url: null })
+            .from(tableName)
+            .update({ [columnName]: null })
             .eq('user_id', userId);
 
         if (dbError) throw dbError;
 
         onDeleteSuccess();
-        showToast('Profilovka smazána.', 'success');
+        showToast(tableName === 'StartupProfile' ? 'Logo smazáno.' : 'Profilovka smazána.', 'success');
 
     } catch (err: unknown) {
-        console.error("Chyba při mazání avataru:", err);
+        console.error("Chyba při mazání:", err);
         showToast("Mazání selhalo.", "error");
     } finally {
         setUploading(false);
@@ -121,19 +124,19 @@ export default function AvatarUploader({
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative w-21 h-21 md:w-32 md:h-32 rounded-full group">
+      <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full group bg-white shadow-sm">
         {currentAvatarUrl ? ( 
           <Image
             src={currentAvatarUrl} 
             alt="Profilový obrázek"
-            width={1000}
-            height={1000}
-            className="w-21 h-21 md:w-32 md:h-32 rounded-full object-cover border-2 border-gray-200"
+            width={128}
+            height={128}
+            className="w-full h-full rounded-full object-contain p-1 border border-gray-100"
             key={currentAvatarUrl}
           />
         ) : (
-          <div className="w-21 h-21 md:w-32 md:h-32 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center border-2 border-dashed border-gray-300">
-            <UserIcon size={48} />
+          <div className="w-full h-full rounded-full bg-gray-50 text-gray-300 flex items-center justify-center border-2 border-dashed border-gray-200">
+            {tableName === 'StartupProfile' ? <Building2 size={40} /> : <UserIcon size={40} />}
           </div>
         )}
         <label
@@ -156,11 +159,11 @@ export default function AvatarUploader({
         />
       </div>
 
-      <div className="flex items-center gap-2">
-         <label htmlFor="avatar-upload" className="text-sm font-semibold text-[var(--barva-primarni)] cursor-pointer hover:underline">
-            {uploading ? "Nahrávám..." : "Změnit obrázek"}
-         </label>
-         {currentAvatarUrl && (
+      <div className="flex items-center gap-3">
+        <label htmlFor="avatar-upload" className="text-sm font-semibold text-[var(--barva-primarni)] cursor-pointer hover:underline">
+            {uploading ? "Nahrávám..." : (tableName === 'StartupProfile' ? "Změnit logo" : "Změnit obrázek")}
+        </label>
+        {currentAvatarUrl && (
             <button
                 type="button"
                 onClick={handleDelete}
@@ -169,11 +172,11 @@ export default function AvatarUploader({
             >
                 Odebrat
             </button>
-         )}
+        )}
       </div>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
-      <p className="text-gray-500 text-xs">Max 2MB (PNG, JPG)</p>
+      <p className="text-gray-400 text-xs">Max 2MB (PNG, JPG)</p>
     </div>
   );
 }

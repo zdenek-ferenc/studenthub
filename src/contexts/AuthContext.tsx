@@ -15,6 +15,7 @@ type SimpleStudentProfile = {
     last_name: string | null;
     bio: string | null;
     profile_picture_url: string | null;
+    onboarding_completed: boolean; 
     StudentSkill: SimpleStudentSkill[];
 };
 
@@ -27,6 +28,8 @@ type SimpleStartupProfile = {
     company_name: string | null;
     description: string | null;
     logo_url: string | null;
+    website: string | null; 
+    onboarding_completed: boolean;
     Challenge: SimpleStartupChallenge[];
 };
 
@@ -54,7 +57,7 @@ type AuthContextType = {
     user: User | null;
     profile: Profile | null;
     loading: boolean;
-    refetchProfile: () => void;
+    refetchProfile: () => Promise<void>;
     toasts: Toast[];
     showToast: (message: string, type: 'success' | 'error') => void;
     hideToast: (id: number) => void;
@@ -98,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             StudentProfile: null,
             StartupProfile: null,
         };
+        
         if (userProfile.role === 'student') {
             const { data: studentData, error: studentError } = await supabase
                 .from('StudentProfile')
@@ -107,14 +111,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 last_name,
                 bio,
                 profile_picture_url,
+                onboarding_completed,
                 StudentSkill ( skill_id )
             `)
                 .eq('user_id', currentUser.id)
                 .single();
 
-            if (studentError && studentError.code !== 'PGRST116') {
-                console.error("AuthContext: Chyba při načítání StudentProfile:", studentError);
-            } else if (studentData) {
+            if (studentData) {
                 finalProfile.registration_step = studentData.registration_step;
                 finalProfile.first_name = studentData.first_name;
                 finalProfile.last_name = studentData.last_name;
@@ -129,14 +132,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 company_name,
                 description,
                 logo_url,
+                website,
+                onboarding_completed,
                 Challenge ( id )
-            `)
+            `) 
                 .eq('user_id', currentUser.id)
                 .single();
 
-            if (startupError && startupError.code !== 'PGRST116') {
-                console.error("AuthContext: Chyba při načítání StartupProfile:", startupError);
-            } else if (startupData) {
+            if (startupData) {
                 finalProfile.registration_step = startupData.registration_step;
                 finalProfile.company_name = startupData.company_name;
                 finalProfile.StartupProfile = startupData as SimpleStartupProfile;

@@ -74,7 +74,7 @@ export default function MissingItemSuggestion({ type, label }: MissingItemSugges
                     Chybí vám zde {label}?
                 </button>
             ) : (
-                <div className="bg-[var(--barva-svetle-pozadi)] p-3 rounded-lg shadow-sm border-2 border-gray-100 animate-in fade-in slide-in-from-top-2">
+                <div className="p-3 rounded-lg animate-in fade-in slide-in-from-top-2">
                     <p className="font-semibold text-[var(--barva-tmava)] mb-2">Jakou {label} postrádáte?</p>
                     <textarea
                         value={suggestion}

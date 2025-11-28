@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Check, ChevronDown, Rocket, PartyPopper, Trophy } from 'lucide-react';
 
 
-const SuccessView = ({ onClose }: { onClose: () => void }) => {
+const SuccessView = ({ onClose, title, message }: { onClose: () => void, title: string, message: string }) => {
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -44,7 +44,7 @@ const SuccessView = ({ onClose }: { onClose: () => void }) => {
                 transition={{ delay: 0.4 }}
                 className="font-bold text-xl text-white mb-2 relative z-10"
             >
-                Skvělá práce!
+                {title}
             </motion.h3>
             <motion.p 
                 initial={{ opacity: 0, y: 10 }}
@@ -52,7 +52,7 @@ const SuccessView = ({ onClose }: { onClose: () => void }) => {
                 transition={{ delay: 0.5 }}
                 className="text-gray-200 text-sm mb-6 relative z-10"
             >
-                Tvůj profil je kompletní. Jsi připraven zazářit před startupy.
+                {message}
             </motion.p>
 
             <motion.button
@@ -133,7 +133,9 @@ export default function OnboardingGuide() {
         progressPercent,
         completedCount,
         totalTasks,
-        showCelebration 
+        showCelebration,
+        markAsCompleted,
+        guideTexts
     } = useOnboardingState();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -145,7 +147,10 @@ export default function OnboardingGuide() {
         }
     }, [isVisible, progressPercent, showCelebration]);
 
-    const handleClose = () => {
+    const handleClose = async () => {
+        if (showCelebration) {
+            await markAsCompleted();
+        }
         setIsOpen(false);
         setCelebrationDismissed(true); 
         localStorage.setItem('guide_closed', 'true');
@@ -170,7 +175,11 @@ export default function OnboardingGuide() {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                         >
-                            <SuccessView onClose={handleClose} />
+                            <SuccessView 
+                                onClose={handleClose} 
+                                title={guideTexts.successTitle}
+                                message={guideTexts.successMessage}
+                            />
                         </motion.div>
                     )}
 
@@ -187,9 +196,9 @@ export default function OnboardingGuide() {
                                     <div className="flex justify-between items-start mb-2">
                                         <div>
                                             <h3 className="font-bold text-lg flex items-center gap-2">
-                                                Startovní čára <Rocket size={18} />
+                                                {guideTexts.title} <Rocket size={18} />
                                             </h3>
-                                            <p className="text-blue-100 text-xs">Nastartuj svou kariéru naplno.</p>
+                                            <p className="text-blue-100 text-xs">{guideTexts.subtitle}</p>
                                         </div>
                                         <button onClick={handleClose} className="text-white/80 hover:text-white cursor-pointer">
                                             <ChevronDown size={20} />

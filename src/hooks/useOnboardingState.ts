@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useDashboard } from '../contexts/DashboardContext';
 import { usePathname } from 'next/navigation';
-import { Briefcase, User, Feather, Rocket } from 'lucide-react';
+import { Briefcase, User, Feather, Rocket, Globe, FileText, Image as ImageIcon } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient';
 
 export type OnboardingTask = {
     id: string;
@@ -16,24 +17,30 @@ export type OnboardingTask = {
 };
 
 export function useOnboardingState() {
-    const { profile, loading: authLoading } = useAuth();
+    const { profile, user, refetchProfile, loading: authLoading } = useAuth();
     const { submissions, loading: dashboardLoading } = useDashboard(); 
     const pathname = usePathname();
 
     const [tasks, setTasks] = useState<OnboardingTask[]>([]);
-    const [isPermanentlyCompleted, setIsPermanentlyCompleted] = useState(false);
     const [showCelebration, setShowCelebration] = useState(false);
-    const [isStorageLoaded, setIsStorageLoaded] = useState(false);
     
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const savedStatus = localStorage.getItem('risehigh_onboarding_completed');
-            if (savedStatus === 'true') {
-                setIsPermanentlyCompleted(true);
-            }
-            setIsStorageLoaded(true);
+    const markAsCompleted = async () => {
+        if (!user || !profile) return;
+        
+        try {
+            const table = profile.role === 'student' ? 'StudentProfile' : 'StartupProfile';
+            const { error } = await supabase
+                .from(table)
+                .update({ onboarding_completed: true })
+                .eq('user_id', user.id);
+
+            if (error) throw error;
+
+            await refetchProfile();
+        } catch (error) {
+            console.error("Chyba při ukládání onboarding statusu:", error);
         }
-    }, []);
+    };
 
     useEffect(() => {
         if (authLoading || !profile) {
@@ -86,6 +93,49 @@ export function useOnboardingState() {
                 }
             ];
         } 
+        else if (profile.role === 'startup' && profile.StartupProfile) {
+            const startup = profile.StartupProfile;
+
+            const hasLogo = !!startup.logo_url;
+            const hasDescription = !!startup.description && startup.description.length > 50;
+            const hasWebsite = !!startup.website; // Předpokládá existenci pole website
+            const hasChallenge = startup.Challenge && startup.Challenge.length > 0;
+
+            newTasks = [
+                { 
+                    id: 'logo', 
+                    title: 'Nahraj logo firmy', 
+                    description: 'Budujte svůj brand.', 
+                    href: '/profile/edit', 
+                    icon: ImageIcon, 
+                    isCompleted: hasLogo 
+                },
+                { 
+                    id: 'about', 
+                    title: 'Představte firmu', 
+                    description: 'Napište něco o sobě (> 50 znaků).', 
+                    href: '/profile/edit', 
+                    icon: FileText, 
+                    isCompleted: hasDescription 
+                },
+                { 
+                    id: 'web', 
+                    title: 'Doplňte web', 
+                    description: 'Odkaz na vaši prezentaci.', 
+                    href: '/profile/edit', 
+                    icon: Globe, 
+                    isCompleted: hasWebsite 
+                },
+                { 
+                    id: 'challenge', 
+                    title: 'Vytvořte první výzvu', 
+                    description: 'Zadejte úkol pro talenty.', 
+                    href: '/challenges/create', 
+                    icon: Rocket, 
+                    isCompleted: hasChallenge 
+                }
+            ];
+        }
 
         setTasks(newTasks);
 
@@ -100,39 +150,46 @@ export function useOnboardingState() {
     }, [tasks]);
 
     const progressPercent = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0;
+        const isDbCompleted = 
+        (profile?.role === 'student' && profile?.StudentProfile?.onboarding_completed) ||
+        (profile?.role === 'startup' && profile?.StartupProfile?.onboarding_completed) ||
+        false;
 
     useEffect(() => {
-        if (tasks.length > 0 && progressPercent === 100 && !isPermanentlyCompleted && !showCelebration) {
-            
+        if (tasks.length > 0 && progressPercent === 100 && !isDbCompleted && !showCelebration) {
             setShowCelebration(true);
-            
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('risehigh_onboarding_completed', 'true');
-            }
-
-            const timer = setTimeout(() => {
-                setIsPermanentlyCompleted(true);
-                setShowCelebration(false);
-            }, 4000); 
-
-            return () => clearTimeout(timer); 
         }
-    }, [progressPercent, tasks.length, isPermanentlyCompleted, showCelebration]);
+    }, [progressPercent, tasks.length, isDbCompleted, showCelebration]);
 
     const isHiddenOnPage = useMemo(() => {
         if (!pathname) return false;
         return pathname.startsWith('/register') || pathname === '/login' || pathname === '/welcome' || pathname === '/';
     }, [pathname]);
 
-    // 4. Finální logika viditelnosti
     const isVisible = 
-        isStorageLoaded &&
         !isHiddenOnPage &&
-        (!isPermanentlyCompleted || showCelebration) && 
+        !isDbCompleted && 
         !authLoading && 
         !dashboardLoading && 
         !!profile && 
-        profile.role === 'student';
+        (profile.role === 'student' || profile.role === 'startup');
+
+    const guideTexts = useMemo(() => {
+        if (profile?.role === 'startup') {
+            return {
+                title: 'Rozjezd firmy',
+                subtitle: 'Připravte profil pro talenty.',
+                successTitle: 'Profil je připraven!',
+                successMessage: 'Skvělá práce. Teď už jen čekejte na první řešení od studentů.'
+            };
+        }
+        return {
+            title: 'Startovní čára',
+            subtitle: 'Nastartuj svou kariéru naplno.',
+            successTitle: 'Skvělá práce!',
+            successMessage: 'Tvůj profil je kompletní. Jsi připraven zazářit před startupy.'
+        };
+    }, [profile?.role]);
 
     return {
         tasks,
@@ -141,6 +198,8 @@ export function useOnboardingState() {
         completedCount,
         totalTasks: tasks.length,
         isVisible,
-        showCelebration, 
+        showCelebration,
+        markAsCompleted,
+        guideTexts 
     };
 }

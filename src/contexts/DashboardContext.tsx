@@ -319,7 +319,11 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         if (authLoading) return;
         if (user && profile?.role === 'student' && !hasFetched) {
             fetchDashboardData(user.id);
-        } else if (!user && hasFetched) {
+        } 
+        else if (user && profile?.role === 'startup') {
+            setLoading(false);
+        }
+        else if (!user && hasFetched) {
             fetchDashboardData(undefined);
         } else if (!user && !authLoading) {
             setLoading(false);
