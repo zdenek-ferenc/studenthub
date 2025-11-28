@@ -67,7 +67,7 @@ export default function RegisterChoiceView() {
                 animationClass="animate-slide-in-from-left"
                 className="w-full md:w-1/2 h-1/2 md:h-full"
             />
-            {/* <ChoiceSection 
+            <ChoiceSection 
                 href="/register/professor"
                 titleStart="Jsem"
                 titleHighlight="vyučující"
@@ -76,7 +76,7 @@ export default function RegisterChoiceView() {
                 bgImage="/professor-bg.jpg" 
                 animationClass="animate-fade-in-up"
                 className="w-full md:w-1/3 h-1/3 md:h-full border-y md:border-y-0 md:border-x border-white/10"
-            /> */}
+            />
             <ChoiceSection 
                 href="/register/startup"
                 titleStart="Jsme"

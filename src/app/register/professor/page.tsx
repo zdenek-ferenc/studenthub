@@ -4,78 +4,35 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
 import { useAuth } from '../../../contexts/AuthContext';
-import Step1_Personal from './Step1_Personal';
-import Step2_University from './Step2_University';
-import Step3_Credentials from './Step3_Credentials';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-
-type PersonalData = {
-    title_before: string;
-    first_name: string;
-    last_name: string;
-    title_after: string;
-};
-
-type UniversityData = {
-    university_name: string;
-    faculty_name: string;
-    bio: string;
-};
+import { ArrowLeft, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
 type CredentialsData = {
     email: string;
     password: string;
-    confirm_password: string;
-};
-
-type ProfessorRegistrationData = PersonalData & UniversityData & CredentialsData;
-
-const initialData: ProfessorRegistrationData = {
-    title_before: '',
-    first_name: '',
-    last_name: '',
-    title_after: '',
-    university_name: '',
-    faculty_name: '',
-    bio: '',
-    email: '',
-    password: '',
-    confirm_password: ''
 };
 
 export default function ProfessorRegistrationPage() {
-    const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState<ProfessorRegistrationData>(initialData);
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const router = useRouter();
     const { showToast } = useAuth();
+    
+    const { register, handleSubmit, formState: { errors } } = useForm<CredentialsData>();
 
-    const handleNext = (data: Partial<ProfessorRegistrationData>) => {
-        setFormData(prev => ({ ...prev, ...data }));
-        setStep(prev => prev + 1);
-    };
-
-    const handleBack = () => {
-        setStep(prev => prev - 1);
-    };
-
-    const handleFinalSubmit = async (credentials: CredentialsData) => {
+    const onSubmit = async (data: CredentialsData) => {
         setIsLoading(true);
-        const finalData = { ...formData, ...credentials };
-
         try {
+            // 1. Sign Up with Metadata
             const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: finalData.email,
-                password: finalData.password,
+                email: data.email,
+                password: data.password,
                 options: {
                     data: {
                         role: 'professor',
-                        first_name: finalData.first_name,
-                        last_name: finalData.last_name,
-                        title_before: finalData.title_before,
-                        title_after: finalData.title_after,
-                        full_name: `${finalData.title_before ? finalData.title_before + ' ' : ''}${finalData.first_name} ${finalData.last_name}${finalData.title_after ? ' ' + finalData.title_after : ''}`.trim()
+                        // We don't have names yet, will be collected in onboarding
                     }
                 }
             });
@@ -83,37 +40,12 @@ export default function ProfessorRegistrationPage() {
             if (authError) throw authError;
             if (!authData.user) throw new Error("Registrace se nezdařila (žádný uživatel).");
 
-            const userId = authData.user.id;
-            const { error: profileError } = await supabase
-                .from('ProfessorProfile')
-                .insert({
-                    user_id: userId,
-                    university_name: finalData.university_name,
-                    faculty_name: finalData.faculty_name,
-                    title_before: finalData.title_before || null,
-                    title_after: finalData.title_after || null,
-                    bio: finalData.bio
-                });
-             const { error: userTableError } = await supabase
-                .from('User')
-                .insert({ 
-                    id: userId, 
-                    email: finalData.email, 
-                    role: 'professor'
-                });
+            // 2. Success - Show Success View
+            setIsSuccess(true);
             
-            if (profileError) {
-                 console.error("Profile Error:", profileError);
-                 throw new Error("Chyba při vytváření profilu.");
-            }
-
-             if (userTableError) {
-                 console.error("User Table Error:", userTableError);
-            }
-
-            showToast("Registrace úspěšná!", 'success');
-            router.push('/dashboard'); 
-
+            // Optional: Auto-redirect after some time if email confirmation is not required or if we want to push them to login
+            // But usually we want them to check email first.
+            
         } catch (error: unknown) {
             console.error("Registration error:", error);
             const errorMessage = error instanceof Error ? error.message : "Registrace se nezdařila.";
@@ -122,6 +54,28 @@ export default function ProfessorRegistrationPage() {
             setIsLoading(false);
         }
     };
+
+    if (isSuccess) {
+        return (
+            <div className="min-h-screen bg-[var(--barva-svetle-pozadi)] flex flex-col items-center justify-center p-4">
+                <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl text-center">
+                    <div className="flex justify-center mb-6">
+                        <CheckCircle size={64} className="text-green-500" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-[var(--barva-primarni)] mb-4">Registrace úspěšná!</h2>
+                    <p className="text-gray-600 mb-8">
+                        Odeslali jsme vám potvrzovací e-mail. Prosím zkontrolujte svou schránku a potvrďte svou registraci.
+                    </p>
+                    <Link 
+                        href="/"
+                        className="inline-block w-full py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                        Zpět na domovskou stránku
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[var(--barva-svetle-pozadi)] flex flex-col">
@@ -132,40 +86,60 @@ export default function ProfessorRegistrationPage() {
                 </Link>
             </div>
             
-            <div className="flex-grow flex items-center justify-center p-4 pb-12">
-                <div className="w-full max-w-lg">
-                    {/* Progress Bar */}
-                    <div className="mb-4 flex items-center justify-between gap-3 relative">
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 -z-10 rounded-full"></div>
-                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-[var(--barva-primarni)] -z-10 rounded-full transition-all duration-300`} style={{ width: `${((step - 1) / 2) * 100}%` }}></div>
-                        
-                        {[1, 2, 3].map((s) => (
-                            <div key={s} className={`w-full rounded-full flex items-center justify-center font-semibold text-sm transition-colors duration-300 ${step >= s ? 'bg-[var(--barva-primarni)] text-white' : 'bg-gray-200/70 text-gray-500'}`}>
-                                {s}
-                            </div>
-                        ))}
-                    </div>
+            <div className="flex-grow flex items-center justify-center p-4 pb-20">
+                <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl">
+                    <h2 className="text-3xl font-bold text-center text-[var(--barva-primarni)] mb-2">Registrace Vyučujícího</h2>
+                    <p className="text-center text-gray-500 mb-8">Vytvořte si účet pro správu výzev.</p>
 
-                    {step === 1 && (
-                        <Step1_Personal 
-                            onNext={handleNext} 
-                            initialData={formData} 
-                        />
-                    )}
-                    {step === 2 && (
-                        <Step2_University 
-                            onNext={handleNext} 
-                            initialData={formData} 
-                            onBack={handleBack}
-                        />
-                    )}
-                    {step === 3 && (
-                        <Step3_Credentials 
-                            onSubmit={handleFinalSubmit} 
-                            onBack={handleBack}
-                            isLoading={isLoading}
-                        />
-                    )}
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input 
+                                type="email" 
+                                {...register('email', { 
+                                    required: 'Email je povinný',
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                        message: "Neplatný email"
+                                    }
+                                })} 
+                                className="input" 
+                                placeholder="jan.novak@univerzita.cz"
+                            />
+                            {errors.email && <p className="error text-sm text-red-400 pt-1">{errors.email.message}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Heslo</label>
+                            <div className="relative">
+                                <input 
+                                    type={showPassword ? "text" : "password"} 
+                                    {...register('password', { 
+                                        required: 'Heslo je povinné',
+                                        minLength: { value: 6, message: "Heslo musí mít alespoň 6 znaků" }
+                                    })} 
+                                    className="input pr-10" 
+                                    placeholder="••••••••"
+                                />
+                                <button 
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
+                            {errors.password && <p className="error text-sm text-red-400 pt-1">{errors.password.message}</p>}
+                        </div>
+
+                        <button 
+                            type="submit" 
+                            disabled={isLoading}
+                            className="w-full py-3 mt-4 rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? 'Vytvářím účet...' : 'Vytvořit účet'}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

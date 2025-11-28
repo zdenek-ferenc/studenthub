@@ -74,6 +74,8 @@ export default function LoginView() {
         router.replace('/dashboard');
       } else if (profile.role === 'startup') {
         router.replace('/challenges');
+      } else if (profile.role === 'professor') {
+        router.replace('/dashboard');
       } else {
         router.replace('/');
       }
