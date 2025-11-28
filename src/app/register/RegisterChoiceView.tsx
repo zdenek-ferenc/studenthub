@@ -55,28 +55,38 @@ const ChoiceSection = ({
 
 
 export default function RegisterChoiceView() {
-return (
-    <div className="flex flex-col md:flex-row h-screen bg-[var(--barva-tmava)]">
-        <ChoiceSection 
-            href="/register/student"
-            titleStart="Jsem"
-            titleHighlight="talent"
-            highlightBgClass="bg-[var(--barva-primarni)]"
-            description="Chci se zapojit do výzev a budovat kariéru."
-            bgImage="/talent-bg.jpg" 
-            animationClass="animate-slide-in-from-left"
-            className="w-full md:w-1/2 h-1/2 md:h-full"
-        />
-        <ChoiceSection 
-            href="/register/startup"
-            titleStart="Jsme"
-            titleHighlight="firma"
-            highlightBgClass="bg-[var(--barva-tmava)]"
-            description="Chci zadávat výzvy a najít nové talenty."
-            bgImage="/company-bg.jpg" 
-            animationClass="animate-slide-in-from-right"
-            className="w-full md:w-1/2 h-1/2 md:h-full"
-        />
-    </div>
-);
+    return (
+        <div className="flex flex-col md:flex-row h-screen bg-[var(--barva-tmava)]">
+            <ChoiceSection 
+                href="/register/student"
+                titleStart="Jsem"
+                titleHighlight="talent"
+                highlightBgClass="bg-[var(--barva-primarni)]"
+                description="Chci se zapojit do výzev a budovat kariéru."
+                bgImage="/talent-bg.jpg" 
+                animationClass="animate-slide-in-from-left"
+                className="w-full md:w-1/2 h-1/2 md:h-full"
+            />
+            {/* <ChoiceSection 
+                href="/register/professor"
+                titleStart="Jsem"
+                titleHighlight="vyučující"
+                highlightBgClass="bg-emerald-600"
+                description="Chci propojit výuku s praxí."
+                bgImage="/professor-bg.jpg" 
+                animationClass="animate-fade-in-up"
+                className="w-full md:w-1/3 h-1/3 md:h-full border-y md:border-y-0 md:border-x border-white/10"
+            /> */}
+            <ChoiceSection 
+                href="/register/startup"
+                titleStart="Jsme"
+                titleHighlight="firma"
+                highlightBgClass="bg-[var(--barva-tmava)]"
+                description="Chci zadávat výzvy a najít nové talenty."
+                bgImage="/company-bg.jpg" 
+                animationClass="animate-slide-in-from-right"
+                className="w-full md:w-1/2 h-1/2 md:h-full"
+            />
+        </div>
+    );
 }
