@@ -37,7 +37,7 @@ const DemoSubmissionCard = () => {
                 <div>
                     <label className="text-sm font-semibold text-gray-700">Slovní feedback</label>
                     <textarea
-                        className="w-full h-24 p-2 border border-gray-200 rounded-lg focus:outline-none mt-1 bg-gray-50 resize-none"
+                        className="w-full h-24 p-3 border border-gray-200 rounded-lg focus:outline-none mt-1 bg-gray-50 resize-none"
                         placeholder="Skvělá práce! Líbí se nám..."
                     />
                 </div>
