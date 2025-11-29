@@ -119,15 +119,12 @@ export default function NotificationsWidget() {
     const showSkeleton = loading && notifications.length === 0;
 
     return (
-        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border-2 border-gray-100 h-full">
-            <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2 mb-5">
+        <div className="bg-white p-4 sm:p-6 mb-12 sm:mb-0 rounded-2xl shadow-xs border-2 border-gray-100 h-full">
+            <div className="flex justify-between items-center sm:mb-2">
+                <div className="flex items-center gap-2 sm:mb-4 mb-3">
                     <div className="h-6 w-1 bg-[var(--barva-primarni)] rounded-full"></div>
                     <h3 className="font-bold sm:text-lg text-[var(--barva-tmava)]">Notifikace</h3>
                 </div>
-                <Link href="/notifications" className="text-xs sm:text-sm font-semibold text-[var(--barva-primarni)] hover:underline">
-                    Zobrazit vše
-                </Link>
             </div>
             <div className="space-y-4">
                 {showSkeleton ? (
@@ -144,11 +141,11 @@ export default function NotificationsWidget() {
                     <p className="text-sm text-gray-500 text-center py-4">Zatím tu nic není. 🔔</p>
                 ) : (
                     notifications.map(notif => (
-                        <Link href={notif.link_url || '#'} key={notif.id} className={`block p-3 rounded-xl border border-gray-100 transition-colors ${notif.is_read ? 'hover:bg-gray-50' : 'bg-blue-50 hover:bg-blue-100'}`}>
+                        <Link href={notif.link_url || '#'} key={notif.id} className={`block p-3 rounded-xl border-2 border-gray-100 transition-colors ${notif.is_read ? 'hover:bg-[var(--barva-primarni)]/5 hover:border-[var(--barva-primarni)]/5' : 'hover:bg-[var(--barva-primarni)]/5 hover:border-[var(--barva-primarni)]/5'}`}>
                             <div className="flex items-center gap-3">
                                 <NotificationIcon type={notif.type} isRead={notif.is_read} />
-                                <div className="flex-1 overflow-hidden">
-                                    <p className={`text-sm truncate ${notif.is_read ? 'text-gray-600' : 'text-gray-900 font-semibold'}`}>
+                                <div className="flex-1 flex flex-col gap-1 overflow-hidden">
+                                    <p className={`text-xs sm:text-sm sm:truncate ${notif.is_read ? 'text-gray-600' : 'text-gray-900 font-semibold'}`}>
                                         {notif.message}
                                     </p>
                                     <p className="text-xs text-gray-400">
@@ -162,8 +159,15 @@ export default function NotificationsWidget() {
                 )}
             </div>
             {notifications.length > 0 && (
-                <Link href="/notifications" className="flex items-center justify-center gap-1 text-sm font-semibold text-[var(--barva-primarni)] hover:underline mt-4 pt-4 border-t border-gray-100">
-                    Zobrazit všechny notifikace <ChevronRight size={16} />
+                <Link
+                    href="/notifications"
+                    className="group flex items-center justify-center gap-1 text-xs sm:text-sm font-semibold text-[var(--barva-primarni)] sm:pt-6 pt-4"
+                    >
+                    Zobrazit všechny notifikace
+                <ChevronRight
+                    size={16}
+                    className="transition-transform duration-200 group-hover:translate-x-1"
+                />
                 </Link>
             )}
         </div>

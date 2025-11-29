@@ -119,17 +119,18 @@ export default function StudentChallengeDetail({ challenge, applicantCount, acti
   const effectiveTab = user ? ((activeTab === 'qna' && !isApplied) ? 'assignment' : (activeTab || 'assignment')) : 'assignment';
 
   return (
-    <div className="p-4 lg:max-w-1/2 mx-auto md:py-24 xl:py-32 md:px-4 space-y-4 sm:space-y-8">
-      <button
+    <div className="p-4 md:max-w-4/5 2xl:max-w-1/2 mx-auto md:py-24 xl:py-32 md:px-4 space-y-4 sm:space-y-4">
+      <div className="flex justify-between md:items-end gap-2">
+        <button
         onClick={() => router.back()}
-        className="flex items-center gap-1 cursor-pointer text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-1 sm:mb-2"
+        className="flex items-center gap-1 cursor-pointer text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors"
       >
         <ChevronLeft size={16} />
         Zpět
       </button>
 
       {setActiveTab && user && (
-        <div className="flex items-center gap-3 w-fit mb-2 sm:mb-4 bg-white p-1 sm:p-2 rounded-full shadow-sm">
+        <div className="flex items-center gap-3 w-fit bg-white p-1 sm:p-2 rounded-full shadow-sm">
           <button onClick={() => setActiveTab('assignment')} className={`px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm rounded-full font-semibold ${activeTab === 'assignment' ? 'bg-[var(--barva-primarni)] text-white' : 'hover:bg-gray-100/50 transition-all ease-in-out duration-200 cursor-pointer text-[var(--barva-tmava)]'}`}>
             Zadání
           </button>
@@ -149,6 +150,8 @@ export default function StudentChallengeDetail({ challenge, applicantCount, acti
           })()}
         </div>
       )}
+      </div>
+      
 
       {(effectiveTab === 'assignment') ? (
         <>

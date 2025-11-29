@@ -63,22 +63,38 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
     };
 
     return (
-        <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100 flex flex-col gap-2">
+        <div className="bg-white pt-4 px-4 3xl:p-6 rounded-2xl lg:shadow-xs lg:border lg:border-gray-100 flex flex-col gap-2">
             <div className="flex items-start justify-start gap-4">
                 <div>
-                    <Image src={profile.logo_url || '/logo.svg'} alt={`${profile.company_name} logo`} width={96} height={96}
-                    className="w-16 h-16 3xl:w-20 3xl:h-20 rounded-2xl mx-auto mb-2 sm:mb-4 object-contain"
-                />
+                    {profile.logo_url ? (
+                        <Image 
+                            src={profile.logo_url} 
+                            alt={`${profile.company_name} logo`} 
+                            width={96} 
+                            height={96}
+                            className="w-12 h-12 sm:w-16 sm:h-16 3xl:w-20 3xl:h-20 rounded-full mx-auto lg:mb-4 object-contain"
+                        />
+                    ) : (
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 3xl:w-20 3xl:h-20 rounded-full mx-auto mb-2 lg:mb-4 bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-lg sm:text-xl 3xl:text-2xl font-bold">
+                            {profile.company_name
+                                .split(' ')
+                                .map(word => word[0])
+                                .filter(Boolean)
+                                .join('')
+                                .toUpperCase()
+                                .slice(0, 2)}
+                        </div>
+                    )}
                 </div>
                 
                 <div>
-                    <h1 className="text-xl 3xl:text-2xl font-bold text-[var(--barva-tmava)]">{profile.company_name}</h1>
+                    <h1 className="text-lg sm:text-xl 3xl:text-2xl font-bold text-[var(--barva-tmava)]">{profile.company_name}</h1>
                     {websiteUrl && (
                     <a 
                         href={websiteUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[var(--barva-primarni)] hover:underline break-all"
+                        className="text-[var(--barva-primarni)] text-sm sm:text-base hover:underline break-all"
                     >
                         {profile.website}
                     </a>
@@ -93,8 +109,8 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
                             className="w-full min-h-[120px] text-[10px] 3xl:text-sm rounded-lg border text-[var(--barva-tmava)] border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
                         />
                         <div className="flex items-center gap-2">
-                            <button onClick={handleSaveDescription} disabled={saving} className="text-sm font-semibold text-[var(--barva-primarni)] disabled:text-gray-400">{saving ? 'Ukládám...' : 'Uložit'}</button>
-                            <button onClick={() => setIsEditing(false)} className="text-sm text-gray-500">Zrušit</button>
+                            <button onClick={handleSaveDescription} disabled={saving} className="text-sm cursor-pointer font-semibold text-[var(--barva-primarni)] disabled:text-gray-400">{saving ? 'Ukládám...' : 'Uložit'}</button>
+                            <button onClick={() => setIsEditing(false)} className="text-sm cursor-pointer text-gray-500">Zrušit</button>
                         </div>
                     </div>
                 ) : (
@@ -174,21 +190,21 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
     const showIdealCandidateSection = hasIdealCandidateInfo || isOwner;
 
     return (
-        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-5 md:py-28 3xl:py-32 px-4">
+        <div className="flex flex-col md:mx-20 min-h-screen 2xl:mx-28 3xl:mx-32 py-3 md:py-28 3xl:py-32 px-4">
             {!isOwner && (
                 <button
                     onClick={() => router.back()}
-                    className="flex items-center cursor-pointer gap-1 text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-4"
+                    className="flex items-center cursor-pointer gap-1 text-xs sm:text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-3 sm:mb-4"
                 >
                     <ChevronLeft size={16} />
                     Zpět na přehled
                 </button>
             )}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 3xl:gap-6 items-start">
-                <aside className="lg:col-span-1 space-y-3 sm:space-y-5 3xl:space-y-6 lg:top-28">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 3xl:gap-6 items-start">
+                <aside className="lg:col-span-1 bg-white lg:bg-transparent space-y-3 lg:space-y-5 3xl:space-y-6 lg:top-28 rounded-2xl">
                     <StartupInfoCard profile={profile} isOwner={isOwner} />
-                    <div className="bg-white p-4 3xl:p-6 rounded-2xl shadow-xs border border-gray-100">
-                        <div className="flex justify-between items-center mb-3">
+                    <div className="bg-white p-4 pt-0 lg:pt-6 xl:p-6 rounded-2xl lg:shadow-xs lg:border lg:border-gray-100">
+                        <div className="hidden lg:block flex justify-between items-center mb-3">
                             <h3 className="font-bold text-lg text-[var(--barva-tmava)]">Kategorie</h3>
                             {isOwner && (
                                 <Link href="/profile/edit?tab=categories" title="Upravit kategorie" className="text-gray-400 hover:text-[var(--barva-primarni)] transition-colors">

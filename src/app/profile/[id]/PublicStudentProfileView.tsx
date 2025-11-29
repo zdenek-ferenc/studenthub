@@ -79,7 +79,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     }));
 
     return (
-        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-4 md:py-32 px-4">
+        <div className="flex min-h-screen flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-4 md:py-32 px-4">
             {!isOwner && (
                 <button
                     onClick={() => router.back()}
@@ -97,7 +97,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
                         viewerProfile={viewerProfile}
                     />
                     <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
-                        <h3 className="font-bold text-lg sm:text-xl text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
+                        <h3 className="font-bold text-base sm:text-xl text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
                         <SkillRadarChart skills={skillsForChart} isOwner={isOwner} />
                     </div>
                 </aside>

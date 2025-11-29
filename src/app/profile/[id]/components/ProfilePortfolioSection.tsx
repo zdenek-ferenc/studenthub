@@ -27,9 +27,9 @@ type Props = {
 export default function ProfilePortfolioSection({ submissions, isOwner }: Props) {
     return (
         <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
-            <h2 className="text-lg sm:text-xl  font-bold text-[var(--barva-tmava)] mb-4">Portfolio úspěchů</h2>
+            <h2 className="text-base sm:text-xl  font-bold text-[var(--barva-tmava)] mb-4">Portfolio úspěchů</h2>
             {submissions && submissions.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     {submissions.map((sub, index) => (
                         <ProfilePortfolioCard key={sub.Challenge?.id || index} submission={sub} />
                     ))}

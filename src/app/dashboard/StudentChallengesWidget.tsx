@@ -8,8 +8,6 @@ import SavedChallengeCard from './SavedChallengeCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { Bookmark } from 'lucide-react';
-
 
 type View = 'active' | 'completed' | 'saved';
 
@@ -39,7 +37,7 @@ export default function StudentChallengesWidget() {
     const SwitchButton = ({ buttonView, label, icon: Icon }: { buttonView: View, label: string, count: number, icon?: React.ElementType }) => (
         <button
             onClick={() => setView(buttonView)}
-            className={`px-1 sm:px-4 sm:py-1 text-[10px] sm:text-xs font-semibold transition-colors border border-[var(--barva-primarni)] rounded-xl relative flex items-center justify-center gap-1.5 ${view === buttonView ? 'text-[var(--barva-primarni)]' : 'border-white hover:border-[var(--barva-primarni)] cursor-pointer transition-all ease-in-out duration-200 text-gray-500 hover:text-[var(--barva-primarni)]'}`}
+            className={`px-2 sm:px-4 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold transition-colors border border-[var(--barva-primarni)] rounded-xl relative flex items-center justify-center gap-1.5 ${view === buttonView ? 'text-[var(--barva-primarni)]' : 'border-white hover:border-[var(--barva-primarni)] cursor-pointer transition-all ease-in-out duration-200 text-gray-500 hover:text-[var(--barva-primarni)]'}`}
         >
             {Icon && <Icon size={14} className="hidden sm:inline-block" />} {/* Volitelná ikona */}
             {label}
@@ -74,7 +72,7 @@ export default function StudentChallengesWidget() {
                                 ) : (
                                     <div className="text-sm 3xl:text-base text-center py-5 3xl:py-8">
                                         <p className="text-gray-500">Momentálně nepracuješ na žádné výzvě.</p>
-                                        <Link href="/challenges" className="inline-block mt-4 px-6 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer text-xs 3xl:text-sm hover:opacity-90 transition-all ease-in-out duration-200">
+                                        <Link href="/challenges" className="inline-block mt-4 px-6 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer text-xs 3xl:text-sm hover:opacity-90 transition-all ease-in-out duration-200">
                                             Najít novou výzvu
                                         </Link>
                                     </div>

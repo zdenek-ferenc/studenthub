@@ -13,21 +13,21 @@ import BottomNavBar from './BottomNavBar';
 
 function LoggedOutBottomNavBar() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-40 md:hidden">
-      <div className="w-full h-full max-w-md mx-auto flex items-center justify-around gap-2 px-2"> 
+    <nav className="fixed bottom-6 left-4 right-4 h-16 backdrop-blur-lg border border-white/40 shadow-2xl rounded-2xl z-50 md:hidden overflow-hidden">
+      <div className="w-full h-full flex items-center justify-between px-2 gap-2"> 
         <Link
           href="/register"
-          className="flex-1 flex items-center justify-center gap-2 text-center group py-3 px-4 bg-[var(--barva-primarni)] hover:opacity-90 rounded-xl transition-opacity"
+          className="flex-1 flex items-center justify-center gap-2 h-12 bg-[var(--barva-primarni)] hover:opacity-90 rounded-xl transition-all shadow-md active:scale-95"
         >
-          <UserPlus size={20} className="text-white" />
-          <span className="text-sm font-semibold text-white">Vytvořit účet</span>
+          <UserPlus size={18} className="text-white" />
+          <span className="text-sm font-bold text-white">Vytvořit účet</span>
         </Link>
         <Link
           href="/login"
-          className="flex-1 flex items-center justify-center gap-2 text-center group py-3 px-4 border-2 border-[var(--barva-primarni)] bg-white rounded-xl transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 h-12 bg-white hover:bg-white border border-gray-200 hover:border-[var(--barva-primarni)]/30 rounded-xl transition-all active:scale-95"
         >
-          <LogIn size={20} className="text-[var(--barva-primarni)]" />
-          <span className="text-sm font-semibold text-[var(--barva-primarni)]">Přihlásit se</span>
+          <LogIn size={18} className="text-[var(--barva-primarni)]" />
+          <span className="text-sm font-bold text-[var(--barva-primarni)]">Přihlásit se</span>
         </Link>
       </div>
     </nav>
@@ -54,6 +54,7 @@ function PillSwitch({ role, pathname }: { role: 'student' | 'startup', pathname:
     </div>
   );
 }
+
 function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: string }) {
     const router = useRouter();
     const { user } = useAuth();
@@ -143,6 +144,7 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
         </div>
     );
 }
+
 type Notification = { id: string; message: string; link_url: string; is_read: boolean; created_at: string; };
 function NotificationBell() {
     const { user } = useAuth();

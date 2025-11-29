@@ -63,7 +63,7 @@ export default function Step2_University({ onNext, initialData, onBack }: StepPr
             <button type="button" onClick={onBack} className="text-gray-500 hover:text-gray-800 font-medium px-4">
                 Zpět
             </button>
-            <button type="submit" className="px-8 py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+            <button type="submit" className="px-8 py-3 cursor-pointer rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                 Pokračovat
             </button>
         </div>

@@ -160,7 +160,7 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                     <h2 className="text-2xl sm:text-3xl font-bold uppercase text-[var(--barva-tmava)]">
                         {isFinal ? "Výsledky" : "Tvoje řešení bylo ohodnoceno!"}
                     </h2>
-                    <p className="text-sm sm:text-lg text-gray-600 mt-4">
+                    <p className="text-sm sm:text-lg text-gray-600 mt-2sm:mt-4">
                         {isFinal ? "Výzva je již uzavřena. Zde je finální zpětná vazba od startupu." : "Skvělá práce! Startup ti poslal zpětnou vazbu."}
                     </p>
                 </div>
@@ -173,7 +173,7 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                         </div>
                     </div>
                 )}
-                <div className="flex flex-col sm:flex-row justify-around items-center p-4 max-w-lg mx-auto gap-6">
+                <div className="flex flex-col sm:flex-row justify-around items-center p-2 sm:p-4 max-w-lg mx-auto gap-6">
                     {isFinal && submission.position && [1, 2, 3].includes(submission.position) && (
                         <div className="text-center">
                             <div className="flex items-center gap-2 mt-1">
@@ -194,7 +194,7 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                 <div className="max-w-2xl mx-auto mt-2 sm:mt-8 space-y-6">
                     {submission.feedback_comment && (
                         <div>
-                            <h5 className="font-semibold text-gray-700 flex items-center gap-2 mb-2 sm:text-lg">
+                            <h5 className="font-semibold text-gray-700 flex items-center gap-2 mb-2 text-sm sm:text-lg">
                                 <MessageSquareText className="w-4 h-4 sm:w-6 sm:h-6" />
                                 Zpětná vazba od startupu
                             </h5>
@@ -205,7 +205,7 @@ export default function StudentChallengeRecap({ submission, challengeStatus }: {
                     )}
                     {(submission.file_url || submission.link) && (
                         <div>
-                            <h5 className="font-semibold text-gray-700 flex items-center gap-2 mb-2 sm:text-lg">
+                            <h5 className="font-semibold text-gray-700 flex items-center gap-2 mb-2 text-sm sm:text-lg">
                                 <Download className="w-4 h-4 sm:w-6 sm:h-6" />
                                 Tvoje odevzdané řešení
                             </h5>

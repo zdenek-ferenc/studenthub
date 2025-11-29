@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { CheckCircle, XCircle, PlusCircle } from 'lucide-react';
 import { StudentProfile } from '../types';
 
-const RecruitmentStatusTag = ({ status, isOwner, viewerRole }: { status: StudentProfile['recruitment_status'], isOwner: boolean, viewerRole: 'student' | 'startup' | 'admin' | null }) => {
+const RecruitmentStatusTag = ({ status, isOwner, viewerRole }: { status: StudentProfile['recruitment_status'], isOwner: boolean, viewerRole: 'student' | 'startup' | 'admin' | 'professor' | null }) => {
     if (status === 'open_to_work') {
         return (
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs sm:text-sm font-semibold border border-green-200">

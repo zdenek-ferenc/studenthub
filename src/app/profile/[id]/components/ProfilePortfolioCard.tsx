@@ -58,13 +58,25 @@ export default function ProfilePortfolioCard({ submission }: PortfolioCardProps)
     const cardContent = (
         <div className={`bg-white rounded-2xl p-3 sm:p-6 border-2 shadow-xs border-gray-100 ${canClick ? 'group-hover:shadow-sm group-hover:border-blue-200' : 'shadow-none'} transition-all duration-300 h-full flex flex-col`}>
             <div className="flex items-center gap-4 mb-4">
-                <Image
-                    src={Challenge.StartupProfile?.logo_url || '/logo.svg'}
-                    alt={Challenge.StartupProfile?.company_name || 'Logo'}
-                    width={48}
-                    height={48}
-                    className="rounded-lg w-12 h-12 object-cover"
-                />
+                {Challenge.StartupProfile?.logo_url ? (
+                    <Image
+                        src={Challenge.StartupProfile.logo_url}
+                        alt={Challenge.StartupProfile?.company_name || 'Logo'}
+                        width={48}
+                        height={48}
+                        className="rounded-lg w-12 h-12 object-cover"
+                    />
+                ) : (
+                    <div className="min-w-12 h-12 rounded-lg bg-gradient-to-b from-[var(--barva-primarni2)] to-[var(--barva-primarni2)]/70 text-[var(--barva-primarni)] flex items-center justify-center text-base font-bold">
+                        {(Challenge.StartupProfile?.company_name || '')
+                            .split(' ')
+                            .map(word => word[0])
+                            .filter(Boolean)
+                            .join('')
+                            .toUpperCase()
+                            .slice(0, 2)}
+                    </div>
+                )}
                 <div>
                     <h4 className="font-bold sm:text-lg text-[var(--barva-tmava)] line-clamp-2">{Challenge.title}</h4>
                     <p className="text-sm text-gray-500 font-medium">{Challenge.StartupProfile?.company_name}</p>
@@ -72,14 +84,14 @@ export default function ProfilePortfolioCard({ submission }: PortfolioCardProps)
             </div>
 
             <div className="flex-grow mb-2 sm:mb-4">
-                <div className="flex flex-wrap gap-2">
+                <div className="flex items-center flex-wrap gap-2">
                     {skills.slice(0, 3).map(skillName => (
-                        <span key={skillName} className="px-2.5 py-1 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] rounded-md text-xs font-medium">
+                        <span key={skillName} className="px-2.5 py-1 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)] rounded-2xl text-xs font-medium">
                             {skillName}
                         </span>
                     ))}
                     {skills.length > 3 && (
-                        <span className="px-1 py-1 text-[var(--barva-primarni)] rounded-md text-xs">
+                        <span className="px-1 py-1 text-[var(--barva-primarni)] rounded-2xl text-xs">
                             +{skills.length - 3}
                         </span>
                     )}

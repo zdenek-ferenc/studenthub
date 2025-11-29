@@ -64,7 +64,7 @@ export default function StudentChallengesView() {
   const studentSkillIdsForCard = useMemo(() => studentSkills.map(s => s.id), [studentSkills]);
 
   return (
-    <div className="min-h-screen flex flex-col max-w-5/6 mx-auto py-4 sm:py-8 md:py-24 xl:py-28 3xl:py-32 items-start gap-2 xl:gap-3">
+    <div className="min-h-screen flex flex-col max-w-5/6 mx-auto py-4 sm:py-8 md:py-24 xl:py-28 3xl:py-32 items-start gap-1 lg:gap-3">
       <div className="w-full">
         <div className="xl:mb-4 flex justify-between items-center">
           <div>
@@ -91,7 +91,7 @@ export default function StudentChallengesView() {
           isMobileOpen={isFilterOpen}
           setMobileOpen={setIsFilterOpen}
         />
-        <p className="text-base lg:pt-3 lg:p-2 text-gray-500 xl:mt-1">
+        <p className="text-xs sm:text-base lg:pt-3 lg:p-2 text-gray-500 sm:mt-2">
             Nalezeno <span className='text-[var(--barva-primarni)] font-bold'>{availableChallenges.length}</span> výzev na základě tvých filtrů.
         </p>
         <ChallengeViewSwitch
@@ -121,7 +121,7 @@ export default function StudentChallengesView() {
                 })}
               </div>
             ) : (
-              <div className="text-center bg-white p-12 rounded-2xl col-span-full">
+              <div className="text-center sm:bg-white py-12 rounded-2xl col-span-full">
                 <h2 className="text-xl font-bold text-[var(--barva-tmava)]">
                   {currentView === 'available' ? 'Žádné další dostupné výzvy' : 'Zatím žádné přihlášené výzvy'}
                 </h2>

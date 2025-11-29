@@ -44,12 +44,12 @@ const getFileNameFromUrl = (url: string) => {
 };
 
 const StatItem = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | React.ReactNode }) => (
-    <div className="flex flex-col items-center text-center">
+    <div className="flex md:flex-col items-center gap-2 md:gap-0 text-center">
         <div className="flex items-center gap-2 text-gray-500 font-semibold">
             <Icon size={16} />
-            <span className="text-xs md:text-sm">{label}</span>
+            <span className="text-xs md:text-sm">{label}<span className="md:hidden text-sm text-gray-500"> :</span></span>
         </div>
-        <span className="font-bold sm:text-lg text-[var(--barva-tmava)] mt-1">{value}</span>
+        <span className="font-bold sm:text-lg text-[var(--barva-tmava)] md:mt-1">{value}</span>
     </div>
 );
 
@@ -91,10 +91,10 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                 />
                 <div className='space-y-1'>
                     <h3 className="font-bold text-xs sm:text-base text-gray-800/70">{challenge.StartupProfile?.company_name}</h3>
-                    <h1 className="text-base sm:text-2xl font-bold text-[var(--barva-tmava)] -mt-1">{challenge.title}</h1>
+                    <h1 className="text-base sm:text-xl lg:text-2xl font-bold text-[var(--barva-tmava)] -mt-1">{challenge.title}</h1>
                 </div>
             </header>
-            <section className="flex justify-between md:grid grid-cols-3 gap-4 py-4 border-y border-gray-100 mb-4 sm:mb-5">
+            <section className="flex items-start md:justify-between flex-col md:flex-row gap-4 py-4 border-y border-gray-100 mb-4 sm:mb-5">
                 <StatItem icon={Award} label="Hlavní odměna" value={topReward} />
                 <StatItem icon={Users} label="Kapacita" value={`${currentApplicants} / ${challenge.max_applicants || '∞'}`} />
                 <StatItem icon={Clock} label="Zbývá" value={daysRemaining >= 0 ? `${daysRemaining} dní` : 'Ukončeno'} />

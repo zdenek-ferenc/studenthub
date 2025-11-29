@@ -38,8 +38,8 @@ const ProfileBio = ({ bio, isOwner }: ProfileBioProps) => {
                         className="w-full min-h-[100px] text-xs sm:text-sm rounded-lg border border-gray-200 bg-gray-50 p-2 focus:border-[var(--barva-primarni)] focus:ring-1 focus:ring-[var(--barva-primarni)] focus:outline-none"
                     />
                     <div className="flex items-center gap-2">
-                        <button onClick={handleSaveBio} disabled={saving} className="text-sm font-semibold text-[var(--barva-primarni)] disabled:text-gray-400">{saving ? 'Ukládám...' : 'Uložit'}</button>
-                        <button onClick={() => setIsEditing(false)} className="text-sm text-gray-500">Zrušit</button>
+                        <button onClick={handleSaveBio} disabled={saving} className="text-sm cursor-pointer font-semibold text-[var(--barva-primarni)]/90 hover:text-[var(--barva-primarni)] disabled:text-gray-400">{saving ? 'Ukládám...' : 'Uložit'}</button>
+                        <button onClick={() => setIsEditing(false)} className="text-sm cursor-pointer text-gray-500 hover:text-gray-700">Zrušit</button>
                     </div>
                 </div>
             ) : (

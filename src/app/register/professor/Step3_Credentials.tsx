@@ -94,7 +94,7 @@ export default function Step3_Credentials({ onSubmit, onBack, isLoading }: StepP
             <button type="button" onClick={onBack} disabled={isLoading} className="text-gray-500 hover:text-gray-800 font-medium px-4 disabled:opacity-50">
                 Zpět
             </button>
-            <button type="submit" disabled={isLoading} className="px-8 py-3 rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
+            <button type="submit" disabled={isLoading} className="px-8 py-3 cursor-pointer rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
                 {isLoading ? 'Registruji...' : 'Dokončit registraci'}
             </button>
         </div>

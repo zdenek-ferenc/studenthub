@@ -1,6 +1,6 @@
 "use client";
 
-import { Languages, PlusCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
 type StudentSkill = {
@@ -25,7 +25,7 @@ export default function ProfileSkillsSection({ skills, languages, isOwner }: { s
     const validLanguages = languages.filter(l => l.Language);
 
     return (
-        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs mb-10 border border-gray-100">
             <div className="space-y-6">
                 <div>
                     <h3 className="font-semibold text-gray-500 uppercase text-xs mb-3">Dovednosti a level</h3>
@@ -35,17 +35,17 @@ export default function ProfileSkillsSection({ skills, languages, isOwner }: { s
                                 const xpForNextLevel = calculateXpForNextSkillLevel(s.level);
                                 const percentage = xpForNextLevel > 0 ? (s.xp / xpForNextLevel) * 100 : 0;
                                 return (
-                                    <span key={i} className="flex items-center gap-2 px-3 py-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-sm font-medium">
+                                    <span key={i} className="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] rounded-full text-xs sm:text-sm font-medium">
                                         <span>{s.Skill!.name}</span>
                                         <div 
-                                            className="relative w-6 h-6 rounded-full"
+                                            className="relative w-5 h-5 sm:w-7 sm:h-7 rounded-full"
                                             style={{
                                                 background: `conic-gradient(var(--barva-primarni) ${percentage}%, var(--barva-primarni2) ${percentage}%)`
                                             }}
                                             title={`${s.xp} / ${xpForNextLevel} XP do dalšího levelu`}
                                         >
-                                            <div className="absolute top-1/2 left-1/2 w-5 h-5 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full" />
-                                            <span className="absolute inset-0 grid place-items-center text-[var(--barva-primarni)] text-xs font-bold">
+                                            <div className="absolute top-1/2 left-1/2 w-4 h-4 sm:w-6 sm:h-6 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full" />
+                                            <span className="absolute inset-0 grid place-items-center text-[var(--barva-primarni)] text-[10px] sm:text-xs font-bold">
                                                 {s.level}
                                             </span>
                                         </div>
@@ -61,14 +61,14 @@ export default function ProfileSkillsSection({ skills, languages, isOwner }: { s
                         )}
                         {isOwner && (
                             <Link href="/profile/edit?tab=skills" title="Přidat dovednosti nebo jazyky" className="text-gray-400 flex items-center gap-1 hover:text-[var(--barva-primarni)] transition-colors ml-1">
-                                <PlusCircle size={22} />
-                                <span className='text-sm'>Přidat dovednosti</span>
+                                <PlusCircle size={22} className="w-4 sm:w-6" />
+                                <span className='text-xs sm:text-sm'>Přidat dovednosti</span>
                             </Link>
                         )}
                     </div>
                 </div>
                 <div>
-                    <h3 className="font-semibold text-gray-500 uppercase text-xs mb-3 flex items-center gap-2"><Languages size={14} /> Jazyky</h3>
+                    <h3 className="font-semibold text-gray-500 uppercase text-xs mb-3 flex items-center gap-2">Jazyky</h3>
                     <div className="flex flex-wrap gap-2">
                         {validLanguages.map((l, i) => (
                             <span key={i} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">

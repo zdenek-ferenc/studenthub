@@ -25,26 +25,20 @@ export default function ProfessorRegistrationPage() {
     const onSubmit = async (data: CredentialsData) => {
         setIsLoading(true);
         try {
-            // 1. Sign Up with Metadata
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: data.email,
                 password: data.password,
                 options: {
                     data: {
                         role: 'professor',
-                        // We don't have names yet, will be collected in onboarding
                     }
                 }
             });
 
             if (authError) throw authError;
             if (!authData.user) throw new Error("Registrace se nezdařila (žádný uživatel).");
-
-            // 2. Success - Show Success View
             setIsSuccess(true);
             
-            // Optional: Auto-redirect after some time if email confirmation is not required or if we want to push them to login
-            // But usually we want them to check email first.
             
         } catch (error: unknown) {
             console.error("Registration error:", error);
@@ -57,8 +51,8 @@ export default function ProfessorRegistrationPage() {
 
     if (isSuccess) {
         return (
-            <div className="min-h-screen bg-[var(--barva-svetle-pozadi)] flex flex-col items-center justify-center p-4">
-                <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl text-center">
+            <div className="min-h-screen bg-white sm:bg-[var(--barva-svetle-pozadi)] flex flex-col items-center sm:justify-center p-6 sm:p-4">
+                <div className="w-full max-w-md bg-white p-8 rounded-3xl sm:shadow-xl text-center">
                     <div className="flex justify-center mb-6">
                         <CheckCircle size={64} className="text-green-500" />
                     </div>
@@ -78,17 +72,17 @@ export default function ProfessorRegistrationPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--barva-svetle-pozadi)] flex flex-col">
-            <div className="p-4 md:p-8">
-                <Link href="/register" className="inline-flex items-center text-gray-500 hover:text-[var(--barva-primarni)] transition-colors">
-                    <ArrowLeft size={20} className="mr-2" />
+        <div className="min-h-screen bg-white sm:bg-[var(--barva-svetle-pozadi)] flex flex-col">
+                    
+            <div className="flex-grow flex flex-col items-center sm:justify-center p-4 pb-20">
+                <div className="w-full max-w-md sm:bg-white px-8 py-6 rounded-3xl sm:shadow-xl">
+                    <div className="p-4 self-start">
+                <Link href="/register" className="inline-flex text-sm items-center text-gray-500 hover:text-[var(--barva-primarni)] transition-colors">
+                    <ArrowLeft size={16} className="mr-2" />
                     Zpět na výběr
                 </Link>
             </div>
-            
-            <div className="flex-grow flex items-center justify-center p-4 pb-20">
-                <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl">
-                    <h2 className="text-3xl font-bold text-center text-[var(--barva-primarni)] mb-2">Registrace Vyučujícího</h2>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center text-[var(--barva-primarni)] mb-2">Registrace Vyučujícího</h2>
                     <p className="text-center text-gray-500 mb-8">Vytvořte si účet pro správu výzev.</p>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -135,7 +129,7 @@ export default function ProfessorRegistrationPage() {
                         <button 
                             type="submit" 
                             disabled={isLoading}
-                            className="w-full py-3 mt-4 rounded-full font-semibold text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full py-3 mt-4 rounded-full font-semibold cursor-pointer text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isLoading ? 'Vytvářím účet...' : 'Vytvořit účet'}
                         </button>

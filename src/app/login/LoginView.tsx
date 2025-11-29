@@ -75,7 +75,7 @@ export default function LoginView() {
       } else if (profile.role === 'startup') {
         router.replace('/challenges');
       } else if (profile.role === 'professor') {
-        router.replace('/dashboard');
+        router.replace('/dashboard/professor');
       } else {
         router.replace('/');
       }
@@ -91,7 +91,6 @@ export default function LoginView() {
       setError("Neplatné přihlašovací údaje.");
       setLoading(false);
     } else {
-      router.push('/challenges');
     }
   };
 

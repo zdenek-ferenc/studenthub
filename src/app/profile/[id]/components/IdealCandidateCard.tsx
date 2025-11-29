@@ -18,7 +18,7 @@ export type IdealCandidateCardProps = {
 export default function IdealCandidateCard({ description, technologies, isOwner, hasData, isPreview = false }: IdealCandidateCardProps) {
     if (isPreview) {
         return (
-            <div className="bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white p-6 rounded-2xl shadow-lg border-t border-blue-400/30">
+            <div className="bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white p-6 rounded-2xl shadow-xs border-t border-blue-400/30">
                 <div className="flex items-center gap-3 mb-4">
                     <Target size={24} className="text-[var(--barva-primarni)]" />
                     <h3 className="text-xl font-bold">Hledáme právě tebe!</h3>
@@ -60,7 +60,7 @@ export default function IdealCandidateCard({ description, technologies, isOwner,
     }
 
     return (
-        <div className="bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white p-3 sm:p-6 rounded-2xl shadow-lg border-t border-blue-400/30">
+        <div className="bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white p-3 sm:p-6 rounded-2xl shadow-xs border-t border-blue-400/30">
             <div className="flex items-center gap-3 mb-4">
                 <Target size={24} className="text-[var(--barva-primarni)]" />
                 <h3 className="text-base sm:text-xl font-bold">Hledáme právě tebe!</h3>

@@ -18,7 +18,7 @@ type TabId = 'challenges' | 'growth' | 'activities';
 const PillButton = ({ id, label, icon: Icon, activeTab, setActiveTab }: { id: TabId, label: string, icon: React.ElementType, activeTab: TabId, setActiveTab: (id: TabId) => void }) => {
 const isActive = activeTab === id;
 return (
-    <button onClick={() => setActiveTab(id)} className="relative flex-1 flex items-center justify-center gap-2 p-2 m-1 text-xs sm:text-sm font-semibold transition-colors z-10">
+    <button onClick={() => setActiveTab(id)} className="relative cursor-pointer hover:bg-gray-100/60 rounded-full flex-1 flex items-center justify-center gap-2 p-2 m-1 text-xs sm:text-sm font-semibold transition-colors z-10">
     {isActive && ( <motion.div className="absolute inset-0 bg-[var(--barva-primarni)] rounded-full shadow-md" layoutId="activePill" /> )}
     <div className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}><Icon size={20} /></div>
     <span className={`relative transition-colors ${isActive ? 'text-white' : 'cursor-pointer text-gray-500'}`}>{label}</span>
@@ -72,7 +72,7 @@ return (
                 transition={{ duration: 0.2 }}
             >
                 {activeTab === 'challenges' && (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-6">
                         <StudentChallengesWidget />
                         <RecommendedChallengesWidget />
                     </div>

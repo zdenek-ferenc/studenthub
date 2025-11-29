@@ -3,17 +3,30 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
-import { LayoutDashboard, Briefcase, Rocket, UserCircle } from 'lucide-react';
-
+import { LayoutGrid, Briefcase, Rocket, UserCircle } from 'lucide-react';
 
 const NavItem = ({ href, icon: Icon, label }: { href: string, icon: React.ElementType, label: string }) => {
     const pathname = usePathname();
-    const isActive = pathname.startsWith(href);
+    const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
 
     return (
-        <Link href={href} className="flex-1 flex flex-col items-center justify-center gap-1 text-center group">
-            <Icon size={24} className={`transition-colors ${isActive ? 'text-[var(--barva-primarni)]' : 'text-gray-400 group-hover:text-gray-600'}`} />
-            <span className={`text-xs font-semibold transition-colors ${isActive ? 'text-[var(--barva-primarni)]' : 'text-gray-500 group-hover:text-gray-700'}`}>
+        <Link href={href} className="flex-1 relative flex flex-col items-center rounded-xl justify-center gap-1 py-2 group">
+            {isActive && (
+                <span className="absolute inset-0 bg-[var(--barva-primarni)]/10 rounded-xl -z-10 scale-90 transition-transform duration-300" />
+            )}
+            <Icon 
+                size={24} 
+                className={`transition-all duration-300 ${
+                    isActive 
+                        ? 'text-[var(--barva-primarni)] scale-110' 
+                        : 'text-gray-500 group-hover:text-gray-600 group-active:scale-95'
+                }`} 
+            />
+            <span className={`text-[10px] font-bold transition-colors duration-300 ${
+                isActive 
+                    ? 'text-[var(--barva-primarni)]' 
+                    : 'text-gray-500 group-hover:text-gray-600'
+            }`}>
                 {label}
             </span>
         </Link>
@@ -27,9 +40,8 @@ export default function BottomNavBar() {
         return null; 
     }
     
-    
     const studentLinks = [
-        { href: '/dashboard', icon: LayoutDashboard, label: 'Přehled' },
+        { href: '/dashboard', icon: LayoutGrid, label: 'Přehled' },
         { href: '/challenges', icon: Briefcase, label: 'Výzvy' },
         { href: '/startups', icon: Rocket, label: 'Startupy' },
         { href: `/profile/${user.id}`, icon: UserCircle, label: 'Profil' }
@@ -44,8 +56,8 @@ export default function BottomNavBar() {
     const links = profile.role === 'student' ? studentLinks : startupLinks;
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-40 md:hidden">
-            <div className="w-full h-full max-w-md mx-auto flex items-center justify-around pb-2">
+        <nav className="fixed bottom-4 left-2 right-2 h-20 bg-white/60 backdrop-blur-sm border-2 border-gray-100 rounded-2xl z-50 md:hidden overflow-hidden">
+            <div className="w-full h-full flex items-center justify-around px-2">
                 {links.map(link => (
                     <NavItem key={link.href} {...link} />
                 ))}

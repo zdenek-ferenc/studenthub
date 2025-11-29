@@ -98,7 +98,7 @@ export function useOnboardingState() {
 
             const hasLogo = !!startup.logo_url;
             const hasDescription = !!startup.description && startup.description.length > 50;
-            const hasWebsite = !!startup.website; // Předpokládá existenci pole website
+            const hasWebsite = !!startup.website;
             const hasChallenge = startup.Challenge && startup.Challenge.length > 0;
 
             newTasks = [

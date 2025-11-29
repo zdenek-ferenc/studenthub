@@ -61,7 +61,7 @@ export default function CompletedChallengeCard({ submission }: { submission: Com
 
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
-      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs hover:border-blue-200 hover:shadow-sm hover:bg-blue-50/50 transition-all duration-300 flex items-center gap-4">
+      <div className="bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-xs hover:border-blue-200 hover:shadow-sm hover:bg-blue-50/50 transition-all duration-300 flex items-center gap-4">
         <Image
           src={Challenge.StartupProfile?.logo_url || '/logo.svg'}
           alt="logo"

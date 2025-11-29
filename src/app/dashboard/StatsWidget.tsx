@@ -18,7 +18,7 @@ const StatCard = ({
     textColor: string,
 }) => (
     <div className={`
-        flex flex-col items-start justify-between p-4 rounded-2xl transition-all duration-200
+        flex flex-col items-start justify-between p-3 sm:p-4 rounded-2xl transition-all duration-200
         bg-white border-2 shadow-xs border-gray-100
     `}>
         <div className="flex items-center justify-between w-full mb-3">
@@ -28,10 +28,10 @@ const StatCard = ({
         </div>
         
         <div>
-            <p className="text-2xl font-bold tracking-tight text-[var(--barva-tmava)]">
+            <p className="sm:text-2xl text-xl font-bold tracking-tight text-[var(--barva-tmava)]">
                 {value}
             </p>
-            <p className="text-xs font-medium mt-1 text-gray-400">
+            <p className="text-[10px] sm:text-xs font-medium mt-1 text-gray-400">
                 {label}
             </p>
         </div>
@@ -88,17 +88,17 @@ export default function StatsWidget() {
 
                     <div className="col-span-2 md:col-span-4 2xl:col-span-2">
                         <div className={`
-                            flex items-center gap-4 p-4 rounded-2xl h-full transition-all duration-200
+                            flex items-center gap-4 p-3 sm:p-4 rounded-2xl h-full transition-all duration-200
                             bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100
                         `}>
-                            <div className="p-3 rounded-xl bg-amber-100 text-amber-600 flex-shrink-0">
+                            <div className="p-2 sm:p-3 rounded-xl bg-amber-100 text-amber-600 flex-shrink-0">
                                 <DollarSign className="w-5 h-5" />
                             </div>
                             <div className="flex flex-col">
-                                <p className="text-2xl font-bold tracking-tight text-amber-900 leading-none">
+                                <p className="text-xl sm:text-2xl font-bold tracking-tight text-amber-900 leading-none">
                                     {stats.totalEarnings.toLocaleString('cs-CZ')} Kč
                                 </p>
-                                <p className="text-xs font-medium text-amber-700/70 mt-1">
+                                <p className="text-[10px] sm:text-sm font-medium text-amber-700/70 mt-1">
                                     Celkem vyděláno
                                 </p>
                             </div>

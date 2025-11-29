@@ -31,9 +31,9 @@ const HowItWorksStep = ({
   title: string;
   text: string;
 }) => (
-  <div className="bg-white/60 backdrop-blur-lg p-4 md:p-6 rounded-3xl shadow-sm border-2 border-gray-100 h-full">
+  <div className="bg-white/60 backdrop-blur-lg p-5 md:p-6 rounded-3xl shadow-sm border-2 border-gray-100 h-full">
     <div className='flex md:items-start items-center gap-4 md:flex-col pb-4 md:pb-0'>
-      <div className="w-10 h-10 md:w-14 md:h-14 bg-[var(--barva-primarni)] text-white rounded-xl md:rounded-2xl flex items-center justify-center md:mb-5 shadow-lg">
+      <div className="w-10 h-10 p-2 md:w-14 md:h-14 bg-[var(--barva-primarni)] text-white rounded-xl md:rounded-2xl flex items-center justify-center md:mb-5 shadow-lg">
       <Icon size={32} />
     </div>
     <h3 className="text-lg xl:text-2xl font-bold mb-3">{title}</h3>
@@ -119,12 +119,12 @@ export default function HomePage() {
 
   return (
     <div className="w-full overflow-x-hidden text-[var(--barva-tmava)] !pt-0">
-      <header className="relative h-[90vh] sm:h-screen flex items-center justify-center text-white bg-[var(--barva-tmava)] overflow-hidden">
+      <header className="relative sm:h-[90vh] sm:h-screen flex items-center flex-col gap-32 py-20 sm:justify-center text-white bg-[var(--barva-tmava)] overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 smooth-shimmer-bg opacity-40"></div>
+          <div className="absolute inset-0 smooth-shimmer-bg opacity-0 sm:opacity-20"></div>
         </div>
         <div className="container mx-auto text-center relative z-10 px-4 sm:px-6">
-          <h1 className="text-4xl sm:text-5xl md:text-7xl 3xl:text-8xl font-extrabold tracking-tighter leading-tight">
+          <h1 className="text-4xl sm:text-5xl flex flex-col sm:gap-1 md:text-7xl 3xl:text-8xl font-extrabold tracking-tighter leading-tight">
             <div className="overflow-hidden">
               <div className="animate-slide-in-reveal delay-100">Praxe, co má smysl.</div>
             </div>
@@ -133,23 +133,23 @@ export default function HomePage() {
             </div>
           </h1>
           <div className="overflow-hidden mt-6">
-            <p className="max-w-3xl mx-auto text-base sm:text-lg 3xl:text-xl text-gray-300 leading-relaxed animate-slide-in-reveal delay-300">
+            <p className="max-w-3xl mx-auto font-light sm:text-lg 3xl:text-xl text-gray-300 leading-relaxed animate-slide-in-reveal delay-300">
               Propojujeme nejlepší studenty s inovativními startupy skrze reálné projekty.
             </p>
           </div>
           <div className="overflow-hidden mt-10">
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 animate-slide-in-reveal delay-400">
+            <div className="flex flex-row justify-center items-center gap-4 sm:gap-8 animate-slide-in-reveal delay-400">
               {!user ? (
                 <>
                   <Link
                     href="/register/student"
-                    className="w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center"
+                    className="w-auto sm:px-8 px-6 py-3 sm:py-4 rounded-full bg-[var(--barva-primarni)] sm:text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center"
                   >
                     Chci výzvu
                   </Link>
                   <Link
                     href="/register/startup"
-                    className="w-full sm:w-auto px-8 py-4 rounded-full border-2 border-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#00284d] hover:shadow-none transition-all duration-500 flex justify-center items-center"
+                    className="w-auto sm:px-8 px-6 py-3 sm:py-4 rounded-full border-2 border-[var(--barva-primarni)] sm:text-lg text-white font-semibold shadow-lg hover:bg-[#00284d] hover:shadow-none transition-all duration-500 flex justify-center items-center"
                   >
                     Hledám talent
                   </Link>
@@ -157,7 +157,7 @@ export default function HomePage() {
               ) : (
                 <Link
                   href={profile?.role === 'student' ? '/dashboard' : '/challenges'}
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-[var(--barva-primarni)] text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center"
+                  className="w-auto sm:px-8 px-6 py-3 sm:py-4 rounded-full bg-[var(--barva-primarni)] sm:text-lg text-white font-semibold shadow-lg hover:bg-[#0058aa] hover:shadow-none transition-all duration-300 flex justify-center items-center"
                 >
                   Přejít do aplikace
                 </Link>
@@ -167,7 +167,7 @@ export default function HomePage() {
           
           <div className=" md:w-4/5 mx-auto mt-22">
             <div className="container mx-auto px-4 sm:px-6">
-              <p className="text-sm text-center text-gray-200 uppercase tracking-widest mb-6">
+              <p className="text-xs sm:text-sm text-center text-gray-200 uppercase tracking-widest mb-8 sm:mb-10">
                 Důvěřují nám partneři z praxe
               </p>
               <div className="w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
@@ -179,7 +179,7 @@ export default function HomePage() {
                         alt={logo.alt}
                         width={140}
                         height={50}
-                        className="h-7 md:h-12 w-auto object-contain"
+                        className="h-5 sm:h-7 md:h-12 w-auto object-contain"
                         priority 
                       />
                     </div>
@@ -193,14 +193,14 @@ export default function HomePage() {
 
       <main>
         <section className="py-16 md:py-32 bg-[var(--barva-svetle-pozadi)]">
-          <div className="w-5/6 3xl:w-4/5 mx-auto px-4 sm:px-6">
+          <div className="w-5/6 3xl:w-4/5 mx-auto sm:px-6">
             <ScrollAnimator>
               <div className="text-center mb-6 md:mb-16">
-                <h2 className="text-3xl md:text-4xl 3xl:text-5xl font-bold tracking-tight">Jednoduchý proces, maximální dopad</h2>
-                <p className="mt-4 max-w-2xl mx-auto md:text-lg text-gray-600">Náš ověřený 3-krokový proces zaručuje výsledky pro obě strany.</p>
+                <h2 className="text-2xl md:text-4xl 3xl:text-5xl font-bold tracking-tight">Jednoduchý proces, maximální dopad</h2>
+                <p className="mt-4 max-w-2xl mx-auto text- md:text-lg text-gray-600">Náš ověřený 3-krokový proces zaručuje výsledky pro obě strany.</p>
               </div>
             </ScrollAnimator>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
               <ScrollAnimator delay={0}>
                 <HowItWorksStep
                   icon={Target}
@@ -211,7 +211,7 @@ export default function HomePage() {
               <ScrollAnimator delay={200}>
                 <HowItWorksStep
                   icon={FileText}
-                  title="2. Talenty odevzdají řešení"
+                  title="2. Odevzdání řešení"
                   text="Studenti se přihlásí, pracují na výzvě a odevzdají svá řešení, aby ukázali, co v nich je."
                 />
               </ScrollAnimator>
@@ -331,7 +331,7 @@ export default function HomePage() {
           </div>
         </section>
         <section className="py-16 md:py-32 bg-white">
-          <div className="w-5/6 3xl:w-4/5 mx-auto px-4 sm:px-6 space-y-4 lg:space-y-24">
+          <div className="w-5/6 3xl:w-4/5 mx-auto lg:px-6 space-y-4 lg:space-y-24">
             <ScrollAnimator>
               <div className="flex flex-col 2xl:flex-row items-center gap-8 md:gap-12">
                 <div className="flex-1 w-full 2xl:w-1/2">
