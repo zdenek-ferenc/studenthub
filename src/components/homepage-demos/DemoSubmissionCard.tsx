@@ -26,7 +26,7 @@ const DemoSubmissionCard = () => {
                                 className={`w-8 h-8 grid place-items-center text-sm font-bold border rounded transition-all ${
                                     selectedRating === i + 1
                                         ? 'bg-[var(--barva-primarni)] text-white border-[var(--barva-primarni)]'
-                                        : 'bg-gray-100 text-gray-600 cursor-pointer hover:text-white transition-all ease-in-out duration-200 hover:bg-[var(--barva-primarni)] border-gray-200'
+                                        : 'bg-gray-100 text-gray-600 cursor-pointer transition-all ease-in-out duration-200 hover:bg-gray-300 border-gray-200'
                                 }`}
                             >
                                 {i + 1}
