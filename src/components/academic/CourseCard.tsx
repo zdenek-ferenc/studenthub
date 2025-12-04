@@ -30,7 +30,7 @@ export default function CourseCard({ request }: CourseCardProps) {
     };
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 overflow-hidden flex flex-col h-full">
+        <div className="bg-white rounded-2xl shadow-sm duration-300 border-2 border-gray-100 overflow-hidden flex flex-col h-full">
             {/* Header */}
             <div className="p-5 border-b border-gray-50 bg-gray-50/50">
                 <div className="flex justify-between items-start mb-2">
@@ -58,25 +58,23 @@ export default function CourseCard({ request }: CourseCardProps) {
                     </div>
                     <button 
                         onClick={handleCopyCode}
-                        className="p-2 rounded-lg hover:bg-indigo-100 text-indigo-600 transition-colors focus:outline-none"
+                        className="p-2 rounded-lg cursor-pointer hover:bg-indigo-100 text-indigo-600 transition-colors focus:outline-none"
                         title="Zkopírovat kód"
                     >
                         {copied ? <Check size={20} /> : <Copy size={20} />}
                     </button>
                 </div>
             </div>
-
-            {/* Footer Actions */}
             <div className="p-3 bg-gray-50 border-t border-gray-100 grid grid-cols-3 gap-1">
-                <button className="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-indigo-600 text-xs gap-1">
+                <button className="flex cursor-pointer flex-col items-center justify-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-[var(--barva-primarni)] text-xs gap-1">
                     <Edit size={16} />
                     <span>Upravit</span>
-                </button>
-                <button className="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-indigo-600 text-xs gap-1">
+                </button>   
+                <button className="flex cursor-pointer flex-col items-center justify-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-[var(--barva-primarni)] text-xs gap-1">
                     <Eye size={16} />
                     <span>Studenti</span>
                 </button>
-                <button className="flex flex-col items-center justify-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-indigo-600 text-xs gap-1">
+                <button className="flex cursor-pointer flex-col items-center justify-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-[var(--barva-primarni)] text-xs gap-1">
                     <Download size={16} />
                     <span>Export</span>
                 </button>

@@ -6,15 +6,15 @@ import { Search } from 'lucide-react';
 
 export default function DemoTalentView() {
   return (
-    <div className="p-4 rounded-lg max-h-[500px] overflow-y-auto custom-scrollbar">
+    <div className="p-2 sm:p-4 rounded-lg sm:max-h-[500px] overflow-y-auto custom-scrollbar">
       <div className="relative mb-4">
         <input
           type="text"
-          placeholder="Hledat talenty podle dovedností (např. 'React')..."
-          className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 shadow-sm"
+          placeholder="Hledat podle dovedností ..."
+          className="w-full pl-8 sm:pl-10 pr-4 py-2 text-sm sm:text-base sm:py-3 rounded-full border border-gray-300"
           disabled
         />
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -22,10 +22,13 @@ export default function DemoTalentView() {
           student={mockStudentData1} 
           demoStats={{ completed: 4, won: 1 }} 
         />
-        <StudentCard 
+        <div className='hidden md:block'>
+          <StudentCard 
           student={mockStudentData2} 
           demoStats={{ completed: 9, won: 3 }}
         />
+        </div>
+        
       </div>
     </div>
   );

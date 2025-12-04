@@ -10,7 +10,7 @@ const LevelProgress = ({ level, xp, xpForNextLevel }: { level: number; xp: numbe
     <div>
       <div className="flex justify-between items-end mb-1">
         <div className="flex items-center gap-2">
-          <span className="text-3xl font-bold text-[var(--barva-primarni)]">Level {level}</span>
+          <span className="text-xl sm:text-3xl font-bold text-[var(--barva-primarni)]">Level {level}</span>
         </div>
         <span className="text-sm font-semibold text-gray-600">{xp} / {xpForNextLevel} XP</span>
       </div>
@@ -43,12 +43,8 @@ export default function DemoCareerGrowthWidget() {
   const { totalLevel, totalXp, xpForNextLevel, topSkills } = mockCareerData;
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg border border-gray-100">
+    <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg border border-gray-100 mt-4 sm:mt-0">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold text-[var(--barva-tmava)] flex items-center gap-2">
-          <TrendingUp size={22} />
-          Růst kariéry
-        </h3>
         <Link href="/register/student" className="text-sm font-semibold text-[var(--barva-primarni)] hover:underline">
           Chci taky růst
         </Link>

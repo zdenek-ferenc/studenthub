@@ -68,7 +68,7 @@ const DemoPortfolioCard = ({ portfolio }: { portfolio: PortfolioData }) => {
           <p className="text-sm text-gray-500">{Challenge.StartupProfile.company_name}</p>
         </div>
       </div>
-      <div className="flex-grow mb-4">
+      <div className="flex-grow mb-2 lg:mb-4">
         <div className="flex flex-wrap gap-2">
           {skills.map(name => (
             <span key={name} className="px-2.5 py-1 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)] rounded-full text-xs font-medium">
@@ -77,7 +77,7 @@ const DemoPortfolioCard = ({ portfolio }: { portfolio: PortfolioData }) => {
           ))}
         </div>
       </div>
-      <div className="mt-auto pt-3 border-t border-gray-100 flex justify-end gap-2">
+      <div className="mt-auto pt-3 lg:border-t border-gray-100 flex justify-end gap-2">
         {position && position <= 3 && (
             <div className="flex items-center gap-1.5 text-sm font-semibold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
                 <Trophy size={14} />
@@ -149,7 +149,7 @@ export default function DemoStudentFeatures() {
           
           <SkillRadarChart skills={mockSkills} isOwner={false} />
 
-          <div className="mt-6 pt-6 border-t border-gray-100">
+          <div className="lg:mt-6 lg:pt-6 lg:border-t border-gray-100">
             <h4 className="font-semibold text-gray-500 uppercase text-xs mb-3">Top Dovednosti</h4>
             <div className="flex flex-wrap gap-2">
               {mockTopSkills.map(skill => (
@@ -184,9 +184,7 @@ export default function DemoStudentFeatures() {
             
             <DemoPortfolioCard portfolio={mockPortfolio1} />
           </div>
-
-          <DemoPortfolioCard portfolio={mockPortfolio2} />
-          
+            <DemoPortfolioCard portfolio={mockPortfolio2}/>
         </div>
       </div>
     </div>

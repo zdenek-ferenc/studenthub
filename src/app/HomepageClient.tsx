@@ -79,17 +79,17 @@ const FinalCtaCard = ({
   isPrimary: boolean;
 }) => (
   <div
-    className={`p-8 rounded-3xl h-full flex flex-col ${
+    className={`p-5 md:p-8 rounded-3xl h-full flex flex-col ${
       isPrimary
         ? 'bg-gradient-to-br from-[var(--barva-tmava)] to-[#002952] text-white'
-        : 'bg-white shadow-lg border border-gray-100'
+        : 'bg-white border border-gray-100'
     }`}
   >
-    <h3 className="text-2xl font-bold mb-3">{title}</h3>
-    <p className={`flex-1 ${isPrimary ? 'text-gray-300' : 'text-gray-600'}`}>{description}</p>
+    <h3 className="text-xl sm:text-2xl font-bold mb-3">{title}</h3>
+    <p className={`text-sm md:text-base flex-1 ${isPrimary ? 'text-gray-300' : 'text-gray-600'}`}>{description}</p>
     <Link
       href={href}
-      className={`mt-6 inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full text-base font-semibold shadow-md transition-all duration-300 transform group ${
+      className={`mt-6 inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 transform group ${
         isPrimary
           ? 'bg-[var(--barva-primarni)] text-white hover:bg-[var(--barva-primarni)]/80 hover:shadow-none'
           : 'bg-white text-[var(--barva-primarni)] border-2 border-[var(--barva-primarni)] hover:bg-gray-50'
@@ -119,7 +119,7 @@ export default function HomePage() {
 
   return (
     <div className="w-full overflow-x-hidden text-[var(--barva-tmava)] !pt-0">
-      <header className="relative sm:h-[90vh] sm:h-screen flex items-center flex-col gap-32 py-20 sm:justify-center text-white bg-[var(--barva-tmava)] overflow-hidden">
+      <header className="relative md:h-screen flex items-center flex-col gap-32 pt-20 pb-14 sm:py-20 sm:justify-center text-white bg-[var(--barva-tmava)] overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 smooth-shimmer-bg opacity-0 sm:opacity-20"></div>
         </div>
@@ -197,7 +197,7 @@ export default function HomePage() {
             <ScrollAnimator>
               <div className="text-center mb-6 md:mb-16">
                 <h2 className="text-2xl md:text-4xl 3xl:text-5xl font-bold tracking-tight">Jednoduchý proces, maximální dopad</h2>
-                <p className="mt-4 max-w-2xl mx-auto text- md:text-lg text-gray-600">Náš ověřený 3-krokový proces zaručuje výsledky pro obě strany.</p>
+                <p className="mt-4 max-w-2xl mx-auto text-sm md:text-lg text-gray-600">Náš ověřený 3-krokový proces zaručuje výsledky pro obě strany.</p>
               </div>
             </ScrollAnimator>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
@@ -228,13 +228,13 @@ export default function HomePage() {
         <section className="py-16 md:py-32 bg-white">
           <div className="container mx-auto px-4 sm:px-6">
             <ScrollAnimator>
-              <div className="text-center mb-12 md:mb-16">
+              <div className="text-center mb-6 sm:mb-12 md:mb-16">
                 <h2 className="text-3xl md:text-4xl 3xl:text-5xl font-bold tracking-tight">Platforma, která funguje</h2>
-                <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600">Podívej se, jak vypadá jádro naší aplikace v praxi.</p>
+                <p className="mt-4 max-w-2xl mx-auto text-sm md:text-lg text-gray-600">Podívej se, jak vypadá jádro naší aplikace v praxi.</p>
               </div>
             </ScrollAnimator>
             
-            <ScrollAnimator delay={200}>
+            <ScrollAnimator className="" delay={200}>
               <div className="w-full max-w-5xl mx-auto">
                 <div className="bg-gray-100 rounded-t-xl p-3 flex items-center gap-1.5 border-2 border-gray-100">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
@@ -242,8 +242,8 @@ export default function HomePage() {
                   <div className="w-3 h-3 rounded-full bg-green-400"></div>
                 </div>
                 
-                <div className="bg-white p-6 rounded-b-xl shadow-xs border-x border-2 border-gray-100">
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 border-b border-gray-200 mb-6">
+                <div className="bg-white p-4 sm:p-6 rounded-b-xl shadow-xs border-x border-2 border-gray-100">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:border-b border-gray-200 sm:mb-6">
                     <TabButton
                       title="Prohlížení výzev"
                       icon={LayoutGrid}
@@ -263,11 +263,11 @@ export default function HomePage() {
                       onClick={() => setActiveTab('growth')}
                     />
                   </div>
-                  <div className="min-h-[400px]">
+                  <div className="min-h-fit">
                     {activeTab === 'challenges' && (
                       <div className="flex flex-col">
                         <DemoChallengeView />
-                        <p className="mt-8 text-[var(--barva-tmava)] mx-auto leading-relaxed px-4">
+                        <p className="mt-4 sm:mt-8 text-sm sm:text-base text-[var(--barva-tmava)] mx-auto leading-relaxed px-4">
                           Přehled výzev je místem, kde objevuješ jednorázové výzvy šité na míru tvým dovednostem. Díky chytrým filtrům si snadno najdeš projekt, který ti sedne. Ať už chceš soutěžit o finanční odměnu v placených výzvách, nebo se předvést ve free zadáních, která ti často otevřou dveře k nabídce placené stáže
                         </p>
                       </div>
@@ -275,7 +275,7 @@ export default function HomePage() {
                     {activeTab === 'talents' && (
                       <div className="flex flex-col">
                         <DemoTalentView />
-                        <p className="mt-8 text-[var(--barva-tmava)] mx-auto leading-relaxed px-4">
+                        <p className="mt-4 sm:mt-8 text-sm sm:text-base text-[var(--barva-tmava)] mx-auto leading-relaxed px-4">
                           Zapomeňte na procházení stohů životopisů. Zde vidíte talenty v akci. Startupy mohou filtrovat studenty podle konkrétních hard-skills, úrovně zkušeností (levelu) a počtu hotových nebo vyhráných výzev. Okamžitý přehled o tom, kdo má drive a výsledky.
                         </p>
                       </div>
@@ -283,7 +283,7 @@ export default function HomePage() {
                     {activeTab === 'growth' && (
                       <div className="flex flex-col">
                         <DemoCareerGrowthWidget />
-                        <p className="mt-8 text-[var(--barva-tmava)] mx-auto leading-relaxed px-4">
+                        <p className="mt-6 sm:mt-8 text-sm sm:text-base text-[var(--barva-tmava)] mx-auto leading-relaxed px-4">
                           Více než jen profil. Toto je živý záznam profesního růstu. Interaktivní grafy ukazují, jak se student zlepšuje v čase, kolik XP získal a jaké dovednosti ovládá. Gamifikace, která motivuje k lepším výkonům a slouží jako ověřitelná reference.
                         </p>
                       </div>
@@ -330,7 +330,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-        <section className="py-16 md:py-32 bg-white">
+        <section className="py-16 pb-32 md:py-32 bg-white">
           <div className="w-5/6 3xl:w-4/5 mx-auto lg:px-6 space-y-4 lg:space-y-24">
             <ScrollAnimator>
               <div className="flex flex-col 2xl:flex-row items-center gap-8 md:gap-12">
@@ -360,14 +360,14 @@ export default function HomePage() {
         <section className="py-16 md:py-32 bg-[var(--barva-svetle-pozadi)]">
           <div className="container mx-auto text-center px-4 sm:px-6">
             <ScrollAnimator>
-              <h2 className="text-3xl md:text-4xl 3xl:text-5xl font-bold tracking-tight text-[var(--barva-tmava)]">
+              <h2 className="text-3xl z-10 md:text-4xl 3xl:text-5xl font-bold tracking-tight text-[var(--barva-tmava)]">
                 Připraven/a nastartovat budoucnost?
               </h2>
-              <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+              <p className="mt-4 max-w-2xl mx-auto md:text-lg text-gray-600">
                 Přidej se k rostoucí komunitě nejlepších studentů a inovativních firem v Česku. Registrace je zdarma.
               </p>
             </ScrollAnimator>
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
+            <div className="mt-6 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
               <ScrollAnimator delay={0}>
                 <FinalCtaCard
                   href="/register/student"
@@ -408,7 +408,7 @@ const TabButton = ({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-3 rounded-t-lg font-semibold border-b-4 transition-all ${
+      className={`flex items-center gap-2 px-2 sm:px-4 py-2 sm:py-3 rounded-t-lg font-semibold border-b-4 transition-all ${
         isActive
           ? 'border-[var(--barva-primarni)] text-[var(--barva-primarni)]'
           : 'border-transparent text-gray-500 cursor-pointer hover:text-gray-800 hover:bg-gray-50'

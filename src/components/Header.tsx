@@ -126,16 +126,16 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
                 )}
             </button>
             <div className={`absolute right-0 pt-2 transition-opacity duration-200 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                <div className="w-36 3xl:w-48 bg-white py-2 rounded-xl shadow-lg z-10 space-y-2">
-                  <Link href={`/profile/${user?.id}`} className="flex items-center gap-2 px-2 md:text-xs 3xl:text-sm text-[var(--barva-tmava)] rounded-tr-xl rounded-tl-xl hover:text-[var(--barva-primarni)] transition-all ease-in-out duration-200" onClick={() => setIsOpen(false)}>
+                <div className="w-36 3xl:w-40 bg-white py-4 rounded-xl shadow-lg z-10 space-y-4">
+                  <Link href={`/profile/${user?.id}`} className="flex items-center gap-2 px-3 md:text-xs 3xl:text-sm text-[var(--barva-tmava)] rounded-tr-xl rounded-tl-xl hover:text-[var(--barva-primarni)] transition-all ease-in-out duration-200" onClick={() => setIsOpen(false)}>
                     <User className="w-4 h-4 text-[var(--barva-primarni)]" />
                     <span>Můj profil</span>
                   </Link>
-                  <Link href="/profile/edit" className="flex items-center gap-2 px-2 md:text-xs 3xl:text-sm text-[var(--barva-tmava)] transition-all ease-in-out hover:text-[var(--barva-primarni)] duration-200" onClick={() => setIsOpen(false)}>
+                  <Link href="/profile/edit" className="flex items-center gap-2 px-3 md:text-xs 3xl:text-sm text-[var(--barva-tmava)] transition-all ease-in-out hover:text-[var(--barva-primarni)] duration-200" onClick={() => setIsOpen(false)}>
                     <Settings className="w-4 h-4 text-[var(--barva-primarni)]" />
                     <span>Upravit profil</span>
                   </Link>
-                  <button onClick={handleLogout} className="w-full flex items-center gap-2 px-2 cursor-pointer text-left md:text-xs 3xl:text-sm rounded-br-xl rounded-bl-xl text-[var(--barva-tmava)] hover:text-[var(--barva-primarni)]  transition-all ease-in-out duration-200">
+                  <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 cursor-pointer text-left md:text-xs 3xl:text-sm rounded-br-xl rounded-bl-xl text-[var(--barva-tmava)] hover:text-[var(--barva-primarni)]  transition-all ease-in-out duration-200">
                     <LogOut className="w-4 h-4 text-[var(--barva-primarni)]" />
                     <span>Odhlásit se</span>
                   </button>

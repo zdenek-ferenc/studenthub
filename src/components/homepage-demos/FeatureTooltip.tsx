@@ -103,7 +103,7 @@ export default function FeatureTooltip({ content, isOpen, onClose }: FeatureTool
           className="absolute top-14 right-0 z-20 w-full max-w-md"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative z-10 w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+          <div className="relative z-50 w-full bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-100">
             <div className="flex justify-between items-center p-5">
               <h2 className="text-xl font-bold text-[var(--barva-tmava)]">{content.title}</h2>
               <button

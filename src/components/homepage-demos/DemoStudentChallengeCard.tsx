@@ -53,9 +53,8 @@ export default function DemoStudentChallengeCard({ challenge, isBookmarked }: De
   const matchPercentage = (skills.filter(s => ['React', 'Figma'].includes(s)).length / skills.length) * 100;
 
   return (
-    <Link href="/register" className="block">
+    <Link href="/register">
       <div className="bg-white border-2 border-gray-100 rounded-2xl shadow-xs hover:shadow-none hover:border-blue-200 transition-all ease-in-out duration-200 overflow-hidden h-full flex flex-col">
-        {/* Hlavička karty */}
         <div className="p-5">
           <div className="flex justify-between items-start gap-4">
             <div className="flex items-center gap-4">

@@ -76,58 +76,55 @@ export default function ProfessorDashboard() {
     if (!user || profile?.role !== 'professor') return null;
 
     return (
-        <div className="min-h-screen bg-[var(--barva-svetle-pozadi)] md:py-32">
-            <div className="max-w-5/6 mx-auto">
-                <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-6">
+        <div className="min-h-screen bg-[var(--barva-svetle-pozadi)] py-4 md:py-32">
+            <div className="px-4 sm:px-0 sm:max-w-5/6 mx-auto">
+                <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3 sm:gap-6">
                     <div>
-                        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                            Vítejte, {profile.ProfessorProfile?.title_before} {profile.last_name}
-                        </h1>
-                        <p className="text-gray-500 text-lg">
+                        <p className="text-[var(--barva-tmava)] hidden md:inline-block text-xl">
                             {profile.ProfessorProfile?.university_name} • {profile.ProfessorProfile?.faculty_name}
                         </p>
                     </div>
                     <Link 
                         href="/dashboard/professor/create"
-                        className="px-6 py-3 bg-[var(--barva-primarni)] text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:bg-opacity-90 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
+                        className="px-4 sm:px-6 py-3 sm:py-3 bg-[var(--barva-primarni)] text-sm md:text-base text-white rounded-full font-semibold hover:bg-opacity-90 transition-all flex items-center gap-2 transform hover:-translate-y-0.5"
                     >
                         <Plus size={20} />
                         Nová Poptávka
                     </Link>
                 </header>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6">
+                    <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-2 border-gray-100 flex items-center gap-4">
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
                             <BookOpen size={24} />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500 font-medium">Aktivní Předměty</p>
+                            <p className="text-xs md:text-sm text-gray-500 font-medium"> <span className='hidden lg:inline-block'>Aktivní</span> Předměty</p>
                             <p className="text-2xl font-bold text-gray-900">{stats.totalSubjects}</p>
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-2 border-gray-100 flex items-center gap-4">
                         <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
                             <Users size={24} />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500 font-medium">Zapsaní Studenti</p>
+                            <p className="text-xs md:text-sm text-gray-500 font-medium"><span className='hidden lg:inline-block'>Zapsaní</span> Studenti</p>
                             <p className="text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border-2 border-gray-100 flex items-center gap-4">
                         <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
                             <Briefcase size={24} />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500 font-medium">Nabídky od Startupů</p>
+                            <p className="text-xs md:text-sm text-gray-500 font-medium">Nabídky <span className='hidden lg:inline-block'>od Startupů</span></p>
                             <p className="text-2xl font-bold text-gray-900">{stats.pendingOffers}</p>
                         </div>
                     </div>
                 </div>
                 <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Moje Předměty</h2>
+                    <h2 className="text-xl md:text-2xl font-bold text-[var(--barva-tmava)] mb-6">Moje Předměty</h2>
                     
                     {requests.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

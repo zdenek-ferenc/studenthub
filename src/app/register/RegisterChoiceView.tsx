@@ -78,7 +78,7 @@ export default function RegisterChoiceView() {
                 className="w-full md:w-1/2 h-1/2 md:h-full"
             />
 
-            {/* <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-sm px-4">
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-sm px-4">
                 <Link 
                     href="/register/professor"
                     className="group block relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-1"
@@ -105,7 +105,7 @@ export default function RegisterChoiceView() {
                         </div>
                     </div>
                 </Link>
-            </div> */}
+            </div>
         </div>
     );
 }

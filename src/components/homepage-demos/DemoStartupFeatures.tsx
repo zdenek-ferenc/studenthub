@@ -15,7 +15,7 @@ export default function DemoStartupFeatures() {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-6" onClick={() => setActiveTooltip(null)}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-14 md:gap-6" onClick={() => setActiveTooltip(null)}>
             <div className="relative">
                 <h3 className="mb-2 text-lg font-semibold">Ohodnocení řešení</h3>
 
