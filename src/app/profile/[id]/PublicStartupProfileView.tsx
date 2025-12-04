@@ -64,7 +64,7 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
     };
 
     return (
-        <div className="bg-white pt-4 px-4 3xl:p-6 rounded-2xl lg:shadow-xs lg:border lg:border-gray-100 flex flex-col gap-2">
+        <div className="bg-white pt-4 px-4 lg:p-4 3xl:p-6 rounded-2xl lg:shadow-xs lg:border lg:border-gray-100 flex flex-col gap-2">
             <div className="flex items-start justify-start gap-4">
                 <div>
                     {profile.logo_url ? (
@@ -202,11 +202,11 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                 </button>
             )}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 3xl:gap-6 items-start">
-                <aside className="lg:col-span-1 bg-white lg:bg-transparent space-y-3 lg:space-y-5 3xl:space-y-6 lg:top-28 rounded-2xl">
+                <aside className="lg:col-span-1 bg-white lg:bg-transparent space-y-3 lg:space-y-3 3xl:space-y-6 lg:top-28 rounded-2xl">
                     <StartupInfoCard profile={profile} isOwner={isOwner} />
                     <div className="bg-white p-4 pt-0 lg:pt-6 xl:p-6 rounded-2xl lg:shadow-xs lg:border lg:border-gray-100">
                         <div className="lg:block flex justify-between items-center mb-3">
-                            <h3 className="font-bold text-lg text-[var(--barva-tmava)]">Kategorie</h3>
+                            <h3 className="hidden lg:flex font-bold text-lg text-[var(--barva-tmava)]">Kategorie</h3>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                             {profile.StartupCategory.map((cat, i) => (
@@ -223,7 +223,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                     </div>
                 </aside>
 
-                <main className="lg:col-span-2 space-y-3 sm:space-y-5 3xl:space-y-6">
+                <main className="lg:col-span-2 space-y-3 sm:space-y-3 3xl:space-y-6">
                     {showIdealCandidateSection && (
                         <div className="relative">
                             {isOwner && hasIdealCandidateInfo && (
@@ -264,7 +264,7 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                     </div>
                 </main>
             </div>
-            <div className='mt-6'>
+            <div className=' md:hidden mt-6'>
                 <LogoutButton />
             </div>
         </div>
