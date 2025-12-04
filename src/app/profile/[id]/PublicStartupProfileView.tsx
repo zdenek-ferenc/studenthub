@@ -11,6 +11,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PlusCircle, Edit, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import LogoutButton from '@/components/auth/LogoutButton';
 
 type Skill = { id: string; name: string; };
 type Technology = { name: string; };
@@ -262,6 +263,9 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                         <StartupQnA startupId={profile.user_id} />
                     </div>
                 </main>
+            </div>
+            <div className='mt-6'>
+                <LogoutButton />
             </div>
         </div>
     );

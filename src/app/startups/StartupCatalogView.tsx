@@ -23,7 +23,7 @@ function StartupCatalogView() {
     }
 
     return (
-        <div className="flex flex-col md:mx-20 2xl:mx-28 3xl:mx-32 px-4 py-4 md:py-32 lg:flex-row items-start gap-8">
+        <div className="min-h-screen flex flex-col max-w-5/6 mx-auto py-4 sm:py-8 md:py-24 xl:py-28 3xl:py-32 items-start gap-1 lg:gap-3">
             {loadingFilters ? (
                 <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
                     <p className="text-gray-500">Načítám filtry...</p>

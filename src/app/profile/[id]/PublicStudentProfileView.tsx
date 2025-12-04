@@ -11,6 +11,7 @@ import ProfileInfoCard from './components/ProfileInfoCard';
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { StudentProfile } from './types';
+import LogoutButton from '@/components/auth/LogoutButton';
 
 export default function PublicStudentProfileView({ profileId }: { profileId: string }) {
     const { user, profile: viewerProfile } = useAuth();
@@ -105,6 +106,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
                     <ProfilePortfolioSection isOwner={isOwner} submissions={profile.Submission} />
                     <ProfileSkillsSection skills={profile.StudentSkill} languages={profile.StudentLanguage} isOwner={isOwner} />
                 </main>
+                <LogoutButton />
             </div>
         </div>
     );

@@ -182,7 +182,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
         <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4 sm:mb-6 flex-grow">
           {challenge.short_description}
         </p>
-        <div className="flex flex-wrap items-center gap-2 mb-6">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2 sm:mb-6">
           {sortedSkills.slice(0, 3).map(({ Skill }) => {
             const isMatch = studentSkillIds.includes(Skill.id);
             return (
@@ -199,12 +199,12 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
             );
           })}
           {sortedSkills.length > 3 && (
-            <span className="px-2 py-1 rounded-full text-[11px] font-semibold bg-gray-50 text-gray-500">
+            <span className="rounded-full text-[11px] font-semibold text-gray-500">
               +{sortedSkills.length - 3}
             </span>
           )}
         </div>
-        <div className="pt-4 border-t border-gray-100 grid grid-cols-2 gap-y-3">
+        <div className="pt-4 border-gray-100 grid grid-cols-2 gap-y-3">
           
           <div className="flex items-center gap-2 text-gray-500">
             <Users size={14} />

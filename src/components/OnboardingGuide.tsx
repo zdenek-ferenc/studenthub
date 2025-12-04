@@ -164,7 +164,7 @@ export default function OnboardingGuide() {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed right-4 z-50 bottom-24 md:bottom-6 w-auto h-auto">
+        <div className="fixed right-4 z-50 bottom-26 md:bottom-6 w-auto h-auto">
             <div className="relative flex items-end justify-end">
                 <AnimatePresence mode="wait">
                     {showCelebration && !celebrationDismissed && (

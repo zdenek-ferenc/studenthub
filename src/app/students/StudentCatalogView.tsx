@@ -30,7 +30,7 @@ function StudentCatalogView() {
     }
 
     return (
-        <div className="flex flex-col max-w-5/6 mx-auto px-4 md:py-22 lg:py-28 3xl:py-32 lg:flex-row items-start gap-8">
+        <div className="min-h-screen flex flex-col max-w-5/6 mx-auto py-2 sm:py-8 md:py-24 xl:py-28 3xl:py-32 items-start gap-1 lg:gap-3">
             {loadingFilters ? (
                 <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
                     <p className="text-gray-500">Načítám filtry...</p>
@@ -49,10 +49,10 @@ function StudentCatalogView() {
                 />
             )}
             <main className="flex-1 w-full ">
-                <div className="sticky md:relative top-0 z-30 pt-2 pb-2 lg:hidden flex justify-end">
+                <div className="md:relative top-0 z-30 pt-2 pb-2 lg:hidden flex justify-end">
                         <button 
                             onClick={() => setIsFilterOpen(true)}
-                            className="p-3 rounded-full bg-[var(--barva-tmava)] cursor-pointer shadow-md border text-white"
+                            className="p-3 rounded-full bg-white cursor-pointer shadow-md border text-[var(--barva-primarni)] hover:bg-gray-100 transition-all flex items-center justify-center"
                         >
                         <SlidersHorizontal size={20} />
                         </button>
@@ -72,7 +72,7 @@ function StudentCatalogView() {
                                 <p className="text-gray-500 mt-2">Zkuste upravit filtry pro lepší výsledky.</p>
                             </div>
                         )}
-                        <div className="text-center mt-8">
+                        <div className="text-center my-8">
                             {hasMoreStudents && (
                                 <button onClick={loadMoreStudents} disabled={loadingStudents} className="px-5 py-2 rounded-full bg-[var(--barva-primarni)] cursor-pointer text-white font-semibold shadow-md hover:bg-[var(--barva-primarni)]/90 transition-all ease-in-out duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                     {loadingStudents ? 'Načítám...' : 'Načíst další'}

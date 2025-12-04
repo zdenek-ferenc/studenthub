@@ -25,7 +25,7 @@ export default function ProfileSkillsSection({ skills, languages, isOwner }: { s
     const validLanguages = languages.filter(l => l.Language);
 
     return (
-        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs mb-10 border border-gray-100">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs mb-4 border border-gray-100">
             <div className="space-y-6">
                 <div>
                     <h3 className="font-semibold text-gray-500 uppercase text-xs mb-3">Dovednosti a level</h3>
@@ -71,7 +71,7 @@ export default function ProfileSkillsSection({ skills, languages, isOwner }: { s
                     <h3 className="font-semibold text-gray-500 uppercase text-xs mb-3 flex items-center gap-2">Jazyky</h3>
                     <div className="flex flex-wrap gap-2">
                         {validLanguages.map((l, i) => (
-                            <span key={i} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                            <span key={i} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs sm:text-sm font-medium">
                                 {l.Language.name}
                             </span>
                         ))}

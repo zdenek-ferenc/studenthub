@@ -204,7 +204,7 @@ export default function StartupChallengesView() {
         
     }
     return (
-        <div className="flex flex-col h-full sm:max-w-5/6 mx-auto px-4 py-4 md:py-30 4xl:py-32">
+        <div className="flex flex-col h-full min-h-screen sm:max-w-5/6 mx-auto px-4 sm:px-0 py-4 md:py-30 4xl:py-32">
         {!loading && allChallenges.length === 0 ? (
             <div className="text-center max-w-lg mx-auto">
                 <Image
@@ -231,7 +231,7 @@ export default function StartupChallengesView() {
         ) : (
             <div>
                 <CommandCenter stats={dashboardStats} />
-                <div className="relative flex flex-row justify-between sm:justify-start items-center mb-4 md:mb-8">
+                <div className="relative flex flex-row justify-between mt-6 sm:justify-start items-center mb-4 md:mb-8">
                     {filters.map((filter, index) => (
                         <button
                             key={filter.id}
@@ -239,9 +239,9 @@ export default function StartupChallengesView() {
                             buttonsRef.current[index] = el;
                             }}
                             onClick={() => setActiveFilter(filter.id)}
-                            className="flex items-center justify-center gap-2 px-3 md:px-5 py-2 md:py-3 text-xs 3xl:text-base font-semibold z-10 transition-colors duration-200 cursor-pointer"
+                            className="flex items-center justify-center gap-2 px-3 mb-1 sm:mb-O md:px-5 py-2 md:py-3 text-xs 3xl:text-base font-semibold z-10 transition-colors duration-200 cursor-pointer"
                         >
-                            <span className={activeFilter === filter.id ? 'text-sm md:text-xs 3xl:text-base text-[var(--barva-primarni)]' : 'text-gray-500 cursor-pointer hover:text-gray-600 transition-all ease-in-out duration-200'}>
+                            <span className={activeFilter === filter.id ? 'text-[var(--barva-primarni)]' : 'text-gray-500 cursor-pointer hover:text-gray-600 transition-all ease-in-out duration-200'}>
                                 {filter.label}
                             </span>
                             <span
@@ -254,7 +254,7 @@ export default function StartupChallengesView() {
                         </button>
                     ))}
                     <div
-                        className="hidden md:block absolute bottom-0 h-1 bg-[var(--barva-primarni)] rounded-full transition-all duration-300 ease-in-out"
+                        className="absolute bottom-0 h-1 bg-[var(--barva-primarni)] rounded-full transition-all duration-300 ease-in-out"
                         style={underlineStyle}
                     />
                 </div>
@@ -270,7 +270,7 @@ export default function StartupChallengesView() {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center bg-white p-12 rounded-2xl shadow-md">
+                    <div className="text-center bg-white py-12 px-6 rounded-2xl shadow-xs">
                         <h2 className="text-xl font-bold text-[var(--barva-tmava)]">Žádné výzvy v této kategorii</h2>
                         <p className="text-gray-500 mt-2">Zkuste se podívat do jiné sekce.</p>
                     </div>

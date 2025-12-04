@@ -136,8 +136,8 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
                     <span>Upravit profil</span>
                   </Link>
                   <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 cursor-pointer text-left md:text-xs 3xl:text-sm rounded-br-xl rounded-bl-xl text-[var(--barva-tmava)] hover:text-[var(--barva-primarni)]  transition-all ease-in-out duration-200">
-                    <LogOut className="w-4 h-4 text-[var(--barva-primarni)]" />
-                    <span>Odhlásit se</span>
+                    <LogOut className="w-4 h-4 text-red-500" />
+                    <span className='text-red-500 hover:text-red-700 transition-all ease-in-out duration-200'>Odhlásit se</span>
                   </button>
                 </div>
             </div>

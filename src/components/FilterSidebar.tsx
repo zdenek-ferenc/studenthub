@@ -1,8 +1,8 @@
 "use client";
 
-import { Search, X, SlidersHorizontal } from 'lucide-react';
+import { Search, X, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useState, useMemo, Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, Transition, Popover } from '@headlessui/react';
 
 type Skill = {
   id: string;
@@ -23,7 +23,7 @@ type FilterSidebarProps = {
 
 const popularSkillsList = ['Marketing', 'React', 'Python', 'UX Design', 'Figma', 'Copywriting', 'SEO', 'Frontend', 'Backend'];
 
-const FilterContent = ({
+const DesktopFilterContent = ({
   allSkills,
   selectedSkillIds,
   setSelectedSkillIds,
@@ -33,7 +33,6 @@ const FilterContent = ({
   setSortBy,
 }: Omit<FilterSidebarProps, 'isMobileOpen' | 'setMobileOpen'>) => {
   const [skillSearch, setSkillSearch] = useState('');
-  const [showAll, setShowAll] = useState(false);
 
   const handleSkillToggle = (skillId: string) => {
     const newSelectedIds = new Set(selectedSkillIds);
@@ -47,88 +46,170 @@ const FilterContent = ({
     [allSkills, selectedSkillIds]
   );
   
-  const availableSkills = useMemo(() => {
-    let sourceSkills = showAll ? allSkills : allSkills.filter(skill => popularSkillsList.includes(skill.name));
+  const availableSkillsInPopover = useMemo(() => {
+    let skills = allSkills.filter(skill => !selectedSkillIds.includes(skill.id));
     if (skillSearch) {
-      sourceSkills = allSkills.filter(skill => 
+      skills = skills.filter(skill => 
         skill.name.toLowerCase().includes(skillSearch.toLowerCase())
       );
     }
-    return sourceSkills.filter(skill => !selectedSkillIds.includes(skill.id));
-  }, [allSkills, selectedSkillIds, skillSearch, showAll]);
+    return skills;
+  }, [allSkills, selectedSkillIds, skillSearch]);
+
+  const quickSelectSkills = popularSkillsList
+    .map(name => allSkills.find(s => s.name === name))
+    .filter((s): s is Skill => !!s);
 
   return (
-    <div className="bg-white h-full">
-      <div className="mb-6">
-        <label htmlFor="student-search" className="text-sm font-bold text-[var(--barva-tmava)] block mb-2">Vyhledej studenta</label>
-        <div className="relative">
-          <Search className="absolute w-3 3xl:w-4 left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            id="student-search"
-            type="text"
-            placeholder="Jméno, příjmení, bio..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full leading-none pl-8 3xl:pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition text-[var(--barva-tmava)]"
-          />
+    <div className="space-y-2 2xl:space-y-3">
+        <div className="bg-white p-1 3xl:p-2 rounded-xl border border-gray-100 shadow-xs w-full flex flex-col md:flex-row items-center gap-2">
+            <div className="relative w-full flex-grow">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                    id="student-search"
+                    type="text"
+                    placeholder="Jméno, příjmení, bio..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-2 border-none rounded-lg focus:outline-none focus:ring-0 focus:ring-[var(--barva-primarni)] text-sm 3xl:text-base transition text-[var(--barva-tmava)] bg-gray-50 md:bg-transparent"
+                />
+            </div>
+            <div className="w-full md:w-1/5 xl:w-[200px] bg-gray-100 rounded-xl md:border-l border-gray-100 md:px-2">
+                <select
+                    id="sort-by"
+                    className="min-w-max w-full whitespace-nowrap text-sm 3xl:text-base text-[var(--barva-tmava)] py-2 px-3 xl:p-3 xl:px-2 border-none rounded-lg focus:outline-none transition bg-gray-50 md:bg-transparent focus:ring-0 cursor-pointer"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    >
+                    <option value="match">Největší shoda</option>
+                    <option value="newest">Nejnovější</option>
+                    <option value="level">Nejvyšší úroveň</option>
+                </select>
+            </div>
         </div>
-      </div>
 
-      <div className="mb-6">
-          <label htmlFor="sort-by" className="text-sm font-bold text-[var(--barva-tmava)] block mb-2">
-            Seřadit podle
-          </label>
-          <select 
-            id="sort-by"
-            className="w-full text-[var(--barva-tmava)] text-sm 3xl:text-base px-2 3xl:px-4 py-1.5 3xl:py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition bg-white"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="match">Největší shoda</option>
-            <option value="newest">Nejnovější</option>
-            <option value="level">Nejvyšší úroveň</option>
-          </select>
-      </div>
-
-      <div>
-        <label className="text-sm font-bold text-[var(--barva-tmava)] block mb-2">
-          Filtruj podle dovedností
-        </label>
-        
-        {selectedSkills.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {selectedSkills.map(skill => (
-              <button key={`selected-${skill.id}`} onClick={() => handleSkillToggle(skill.id)} className="cursor-pointer flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-3 py-2 rounded-full text-sm font-semibold transition-colors">
-                {skill.name}
-                <X size={14} />
-              </button>
-            ))}
-          </div>
-        )}
-        
-        <div className="relative mb-3">
-          <Search className="absolute left-3 w-3 3xl:w-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input type="text" placeholder="Hledej dovednost..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full pl-8 3xl:pl-10 pr-4 py-1.5 text-sm 3xl:text-base 3xl:py-2.5 border border-gray-300 rounded-lg leading-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition text-[var(--barva-tmava)]" />
+        <div className="bg-white p-1.5 3xl:p-3 px-5 rounded-xl border border-gray-100 shadow-xs w-full space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-semibold text-gray-500 mx-2">Dovednosti:</span>
+                {quickSelectSkills.map(skill => {
+                    if (selectedSkillIds.includes(skill.id)) return null;
+                    return (
+                        <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-xs 3xl:text-sm font-medium hover:bg-[var(--barva-svetle-pozadi)] border border-white hover:text-[var(--barva-primarni)] hover:border-[var(--barva-primarni)] transition-all ease-in-out duration-200 cursor-pointer">
+                            {skill.name}
+                        </button>
+                    );
+                })}
+                <Popover className="relative">
+                    {({ open }) => (
+                        <>
+                        <Popover.Button className="flex items-center gap-2 text-xs 3xl:text-sm cursor-pointer font-medium py-1.5 px-3 rounded-full border-2 border-dashed border-gray-300 text-gray-500 hover:border-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition">
+                            <span>Další</span>
+                            <ChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} size={16} />
+                        </Popover.Button>
+                        <Transition as={Fragment} enter="transition ease-out duration-200" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-150" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
+                            <Popover.Panel className="absolute z-30 mt-2 w-72 bg-white shadow-lg rounded-lg p-4 border border-gray-100">
+                                <input type="text" placeholder="Hledej dovednost..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full px-3 py-2 mb-3 border text-gray-600 border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-0" />
+                                <div className="max-h-48 overflow-y-auto flex flex-wrap gap-2">
+                                    {availableSkillsInPopover.map(skill => (
+                                        <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm cursor-pointer hover:bg-[var(--barva-svetle-pozadi)] border border-white hover:text-[var(--barva-primarni)] hover:border-[var(--barva-primarni)] transition-all ease-in-out duration-200">{skill.name}</button>
+                                    ))}
+                                </div>
+                            </Popover.Panel>
+                        </Transition>
+                        </>
+                    )}
+                </Popover>
+            </div>
+            {(selectedSkillIds.length > 0) && (
+                <div className="border-t border-gray-100 pt-3 flex flex-wrap items-center gap-2">
+                    {selectedSkills.map(skill => (
+                        <button key={`selected-${skill.id}`} onClick={() => handleSkillToggle(skill.id)} className="flex items-center gap-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] px-3 py-1.5 rounded-full text-sm cursor-pointer font-semibold">
+                            {skill.name} <X size={16} />
+                        </button>
+                    ))}
+                    <button onClick={() => setSelectedSkillIds([])} className="text-gray-500 hover:text-red-500 text-sm font-medium ml-auto">
+                        Vymazat vybrané
+                    </button>
+                </div>
+            )}
         </div>
-        
-        <div className="flex justify-between items-center mb-2 xl:mb-4">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase">
-                {skillSearch ? 'Výsledky hledání' : (showAll ? 'Všechny dovednosti' : 'Populární dovednosti')}
-            </h4>
-            {!skillSearch && <button onClick={() => setShowAll(!showAll)} className="text-xs font-bold text-[var(--barva-primarni)] cursor-pointer hover:underline">{showAll ? 'Zobrazit méně' : 'Zobrazit vše'}</button>}
-        </div>
-        
-        <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
-          {availableSkills.map(skill => (
-            <button key={skill.id} onClick={() => handleSkillToggle(skill.id)} className="flex items-center justify-center cursor-pointer gap-1.5 hover:bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm transition-colors">
-              {skill.name}
-            </button>
-          ))}
-          {availableSkills.length === 0 && <p className="text-sm text-gray-500 w-full text-center py-4">{skillSearch ? 'Žádná dovednost nenalezena.' : 'Všechny populární dovednosti jsou vybrány.'}</p>}
-        </div>
-      </div>
     </div>
   );
+};
+
+const MobileFilterContent = (props: Omit<FilterSidebarProps, 'isMobileOpen' | 'setMobileOpen'>) => {
+    const {
+        allSkills,
+        selectedSkillIds,
+        setSelectedSkillIds,
+        searchQuery,
+        setSearchQuery,
+        sortBy,
+        setSortBy,
+    } = props;
+    const [skillSearch, setSkillSearch] = useState('');
+
+    const handleSkillToggle = (skillId: string) => {
+        const newSelectedIds = new Set(selectedSkillIds);
+        if (newSelectedIds.has(skillId)) newSelectedIds.delete(skillId);
+        else newSelectedIds.add(skillId);
+        setSelectedSkillIds(Array.from(newSelectedIds));
+    };
+
+    const selectedSkills = useMemo(() => 
+        allSkills.filter(skill => selectedSkillIds.includes(skill.id)),
+        [allSkills, selectedSkillIds]
+    );
+
+    const availableSkills = useMemo(() => {
+        let skills = allSkills.filter(skill => !selectedSkillIds.includes(skill.id));
+        if (skillSearch) {
+            skills = skills.filter(skill => 
+                skill.name.toLowerCase().includes(skillSearch.toLowerCase())
+            );
+        }
+        return skills;
+    }, [allSkills, selectedSkillIds, skillSearch]);
+
+    return (
+        <div className="p-4 space-y-6">
+            <div>
+                <label htmlFor="student-search-mobile" className="text-sm font-bold text-gray-700 block mb-2">Vyhledej studenta</label>
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                    <input id="student-search-mobile" type="text" placeholder="Jméno, příjmení, bio..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 border text-gray-600 border-gray-300 rounded-lg"/>
+                </div>
+            </div>
+            <div>
+                <label htmlFor="sort-by-mobile" className="text-sm font-bold text-gray-700 block mb-2">Seřadit podle</label>
+                <select id="sort-by-mobile" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full py-2 px-4 border text-gray-600 border-gray-300 rounded-lg bg-white">
+                    <option value="match">Největší shoda</option>
+                    <option value="newest">Nejnovější</option>
+                    <option value="level">Nejvyšší úroveň</option>
+                </select>
+            </div>
+            <div>
+                <label className="text-sm font-bold text-gray-700 block mb-2">Filtruj podle dovedností</label>
+                {selectedSkillIds.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3 mt-4">
+                        {selectedSkills.map(skill => (
+                            <button key={`mobile-selected-${skill.id}`} onClick={() => handleSkillToggle(skill.id)} className="flex items-center gap-1.5 bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)] px-3 py-1 rounded-full text-sm">
+                                {skill.name} <X size={14} />
+                            </button>
+                        ))}
+                    </div>
+                )}
+                <input type="text" placeholder="Hledej dovednost..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} className="w-full px-4 py-2 mb-2 border text-gray-600 border-gray-300 rounded-lg"/>
+                <div className="max-h-48 overflow-y-auto flex flex-wrap gap-2 p-2 rounded-lg">
+                    {availableSkills.map(skill => (
+                        <button key={`mobile-available-${skill.id}`} onClick={() => handleSkillToggle(skill.id)} className="px-3 py-1 bg-white text-[var(--barva-primarni)] rounded-full text-sm border hover:bg-gray-200">
+                        + {skill.name}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default function FilterSidebar(props: FilterSidebarProps) {
@@ -136,27 +217,26 @@ export default function FilterSidebar(props: FilterSidebarProps) {
 
   return (
     <>
-        <aside className="hidden lg:block w-full lg:w-74 p-4 xl:p-5 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
-            <FilterContent {...props} />
-        </aside>
+        <div className="hidden lg:block w-full">
+            <DesktopFilterContent {...props} />
+        </div>
 
         <Transition appear show={isMobileOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-50 lg:hidden" onClose={() => setMobileOpen(false)}>
+            <Dialog as="div" className="relative z-40 lg:hidden" onClose={() => setMobileOpen(false)}>
                 <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                    <div className="fixed inset-0 bg-black/80 bg-opacity-25" />
+                    <div className="fixed inset-0 bg-black/70 bg-opacity-25" />
                 </Transition.Child>
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center p-4 text-center">
                         <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all p-4">
-                                <div className="flex justify-end items-center">
-                                    <button onClick={() => setMobileOpen(false)} className="p-1 rounded-full text-gray-400 hover:bg-gray-100 cursor-pointer"><X size={20} /></button>
+                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                                <div className="flex justify-between items-center p-4">
+                                    <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-[var(--barva-primarni)] flex items-center gap-2"><SlidersHorizontal size={20} /> Filtry</Dialog.Title>
+                                    <button onClick={() => setMobileOpen(false)} className="p-1 rounded-full text-[var(--barva-primarni)] hover:bg-gray-100"><X size={20} /></button>
                                 </div>
-                                <div className="max-h-[80vh] overflow-y-auto">
-                                <FilterContent {...props} />
-                                </div>
-                                <div className="flex items-center justify-center pt-4">
-                                    <button onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded-full bg-[var(--barva-primarni)] text-white text-sm font-semibold">Zobrazit výsledky</button>
+                                <MobileFilterContent {...props} />
+                                <div className="p-4 border-t">
+                                    <button onClick={() => setMobileOpen(false)} className="w-full px-6 py-2.5 rounded-full bg-[var(--barva-primarni)] text-white font-semibold">Zobrazit výsledky</button>
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>
