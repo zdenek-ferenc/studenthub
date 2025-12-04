@@ -1,7 +1,6 @@
 "use client";
 
 import { mockCareerData } from './mock-data';
-import { TrendingUp} from 'lucide-react';
 import Link from 'next/link';
 
 const LevelProgress = ({ level, xp, xpForNextLevel }: { level: number; xp: number; xpForNextLevel: number }) => {

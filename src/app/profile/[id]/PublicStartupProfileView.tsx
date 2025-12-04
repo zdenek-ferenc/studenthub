@@ -205,20 +205,20 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                 <aside className="lg:col-span-1 bg-white lg:bg-transparent space-y-3 lg:space-y-5 3xl:space-y-6 lg:top-28 rounded-2xl">
                     <StartupInfoCard profile={profile} isOwner={isOwner} />
                     <div className="bg-white p-4 pt-0 lg:pt-6 xl:p-6 rounded-2xl lg:shadow-xs lg:border lg:border-gray-100">
-                        <div className="hidden lg:block flex justify-between items-center mb-3">
+                        <div className="lg:block flex justify-between items-center mb-3">
                             <h3 className="font-bold text-lg text-[var(--barva-tmava)]">Kategorie</h3>
-                            {isOwner && (
-                                <Link href="/profile/edit?tab=categories" title="Upravit kategorie" className="text-gray-400 hover:text-[var(--barva-primarni)] transition-colors">
-                                    <PlusCircle size={20} />
-                                </Link>
-                            )}
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             {profile.StartupCategory.map((cat, i) => (
                                 <span key={i} className="3xl:px-3 px-2 py-1 3xl:py-1.5 bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)] rounded-lg text-xs 3xl:text-sm font-medium">
                                     {cat.Category.name}
                                 </span>
                             ))}
+                            {isOwner && (
+                                <Link href="/profile/edit?tab=categories" title="Upravit kategorie" className="text-gray-400 hover:text-[var(--barva-primarni)] transition-colors">
+                                    <PlusCircle size={20} />
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </aside>
