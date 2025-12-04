@@ -17,12 +17,12 @@ export default function DemoChallengeView() {
         <span className="px-2.5 py-1 md:px-4 md:py-2 font-medium text-[var(--barva-primarni)] border border-[var(--barva-primarni)] bg-[var(--barva-svetle-pozadi)] text-xs md:text-sm rounded-full cursor-default">Finanční odměna</span>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-2">
         <DemoStudentChallengeCard
           challenge={mockChallengeData1}
           isBookmarked={false}
         />
-        <div className='hidden md:block'>
+        <div className='hidden mt-4 md:block'>
           <DemoStudentChallengeCard
           challenge={mockChallengeData2}
           isBookmarked={true}

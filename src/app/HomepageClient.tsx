@@ -225,7 +225,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-        <section className="py-16 md:py-32 bg-white">
+        <section className="py-16 lg:py-32 bg-white">
           <div className="container mx-auto px-4 sm:px-6">
             <ScrollAnimator>
               <div className="text-center mb-6 sm:mb-12 md:mb-16">
@@ -294,7 +294,7 @@ export default function HomePage() {
             </ScrollAnimator>
           </div>
         </section>
-        <section className="py-16 md:py-32 bg-[var(--barva-svetle-pozadi)]">
+        <section className="py-16 lg:py-32 bg-[var(--barva-svetle-pozadi)]">
           <div className="container mx-auto px-4 sm:px-6">
             <ScrollAnimator>
               <div className="text-center mb-12 md:mb-16">
@@ -330,7 +330,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-        <section className="py-16 pb-32 md:py-32 bg-white">
+        <section className="py-8 sm:py-16 pb-32 lg:py-32 bg-white">
           <div className="w-5/6 3xl:w-4/5 mx-auto lg:px-6 space-y-4 lg:space-y-24">
             <ScrollAnimator>
               <div className="flex flex-col 2xl:flex-row items-center gap-8 md:gap-12">
@@ -346,7 +346,7 @@ export default function HomePage() {
             <ScrollAnimator>
               <div className="flex flex-col 2xl:flex-row-reverse items-center md:gap-12">
                 <div className="flex-1 w-full 2xl:w-1/2">
-                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 mt-6 lg:mt-0">Rychlý nábor bez rizika.</h2>
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 flex flex-col gap-2 mt-4">Rychlý nábor bez rizika.</h2>
                   <p className="md:text-lg text-gray-600 mb-8">Navrhli jsme proces, který ti šetří čas. Soustřeď se jen na kvalitu odevzdané práce. Anonymní hodnocení a snadný výběr vítězů.</p>
                   <div className='w-full xl:w-4/5 mx-auto'>
                     <DemoStartupFeatures />

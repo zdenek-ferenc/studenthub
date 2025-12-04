@@ -55,10 +55,8 @@ return (
             <CareerGrowthWidget />
         </div>
     </div>
-
-    {/* MOBILE / TABLET LAYOUT (< 1024px) */}
     <div className="lg:hidden md:py-12">
-        <div className="relative flex items-center justify-around bg-white p-1 rounded-full mb-3 border border-gray-100 shadow-sm">
+        <div className="relative flex items-center justify-around bg-white p-1 rounded-full mb-3 border border-gray-100 shadow-xs">
             <PillButton id="challenges" label="Výzvy" icon={Briefcase} activeTab={activeTab} setActiveTab={setActiveTab} />
             <PillButton id="growth" label="Růst" icon={TrendingUp} activeTab={activeTab} setActiveTab={setActiveTab} />
             <PillButton id="activities" label="Aktivity" icon={LayoutGrid} activeTab={activeTab} setActiveTab={setActiveTab} />

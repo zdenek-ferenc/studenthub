@@ -17,20 +17,27 @@ export type CompletedChallengeData = {
   position: number | null;
 };
 
+function getInitials(name?: string | null) {
+  if (!name) return "??";
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
 const ResultTag = ({ rating, position }: { rating: number | null, position: number | null }) => {
   if (position && position <= 3) {
     return (
       <div className="flex flex-col md:flex-row items-center gap-4">
         <div className="items-center flex gap-1.5 text-sm font-semibold text-yellow-500">
-          <div className="items-center flex gap-1.5">
-            <Trophy size={16} />
-            <span className='leading-none bg-yellow-500 bg-clip-text text-transparent'>{position}. místo</span>
-          </div>
+          <Trophy size={16} />
+          <span className="leading-none bg-yellow-500 bg-clip-text text-transparent">
+            {position}. místo
+          </span>
         </div>
         {rating && (
           <div className="flex items-center gap-1.5 text-sm font-semibold text-[var(--barva-primarni)]">
             <Star size={16} />
-            <span className='leading-none'>{rating} / 10</span>
+            <span className="leading-none">{rating} / 10</span>
           </div>
         )}
       </div>
@@ -62,17 +69,29 @@ export default function CompletedChallengeCard({ submission }: { submission: Com
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
       <div className="bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-xs hover:border-blue-200 hover:shadow-sm hover:bg-blue-50/50 transition-all duration-300 flex items-center gap-4">
-        <Image
-          src={Challenge.StartupProfile?.logo_url || '/logo.svg'}
-          alt="logo"
-          width={56}
-          height={56}
-          className="rounded-xl w-14 h-14 object-cover flex-shrink-0"
-        />
+        {Challenge.StartupProfile?.logo_url ? (
+          <Image
+            src={Challenge.StartupProfile.logo_url}
+            alt="logo"
+            width={56}
+            height={56}
+            className="rounded-xl w-14 h-14 object-cover flex-shrink-0"
+          />
+        ) : (
+          <div className="w-14 h-14 rounded-xl bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] flex-shrink-0 flex items-center justify-center font-bold text-lg">
+            {getInitials(Challenge.StartupProfile?.company_name)}
+          </div>
+        )}
+
         <div className="flex-grow min-w-0">
-          <h4 className="text-md sm:text-lg font-bold text-[var(--barva-tmava)] truncate">{Challenge.title}</h4>
-          <p className="text-sm font-semibold text-gray-500 truncate">{Challenge.StartupProfile?.company_name}</p>
+          <h4 className="text-md sm:text-lg font-bold text-[var(--barva-tmava)] truncate">
+            {Challenge.title}
+          </h4>
+          <p className="text-sm font-semibold text-gray-500 truncate">
+            {Challenge.StartupProfile?.company_name}
+          </p>
         </div>
+
         <div className="flex-shrink-0 flex items-center gap-4">
           <ResultTag rating={rating} position={position} />
           <div className="hidden sm:block opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-300">

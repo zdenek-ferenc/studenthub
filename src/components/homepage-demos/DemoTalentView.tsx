@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 
 export default function DemoTalentView() {
   return (
-    <div className="p-2 sm:p-4 rounded-lg sm:max-h-[500px] overflow-y-auto custom-scrollbar">
+    <div className="pb-2 py-2 pt-0 lg:p-4 rounded-lg sm:max-h-[500px] overflow-y-auto custom-scrollbar">
       <div className="relative mb-4">
         <input
           type="text"
