@@ -26,6 +26,17 @@ const InfoTag = ({ icon: Icon, text, colorClass, className }: { icon: React.Elem
     </div>
 );
 
+const getInitials = (name: string) => {
+    if (!name) return '?';
+    return name
+        .split(' ')
+        .filter(part => part.length > 0)
+        .slice(0, 2)
+        .map(part => part[0])
+        .join('')
+        .toUpperCase();
+};
+
 export default function RecommendedChallengeCard({ challenge }: { challenge: RecommendedChallenge }) {
     const daysRemaining = challenge.deadline ? differenceInCalendarDays(new Date(challenge.deadline), new Date()) : null;
     let deadlineText: string | null = null;
@@ -56,13 +67,20 @@ export default function RecommendedChallengeCard({ challenge }: { challenge: Rec
         <Link href={`/challenges/${challenge.id}`} className="group block bg-white p-2 2xl:p-4 rounded-2xl shadow-xs border-2 border-gray-100 hover:shadow-sm hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 h-full">
             <div className="flex flex-col justify-between h-full">
                 <div className="flex items-start gap-4">
-                    <Image 
-                        src={challenge.StartupProfile?.logo_url || '/logo.svg'} 
-                        alt="logo" 
-                        width={48} 
-                        height={48} 
-                        className="rounded-lg w-10 h-10 3xl:w-12 3xl:h-12 object-cover flex-shrink-0" 
-                    />
+                    {challenge.StartupProfile?.logo_url ? (
+                        <Image 
+                            src={challenge.StartupProfile.logo_url} 
+                            alt="logo" 
+                            width={48} 
+                            height={48} 
+                            className="rounded-full w-10 h-10 3xl:w-12 3xl:h-12 object-cover flex-shrink-0" 
+                        />
+                    ) : (
+                        <div className="rounded-full w-10 h-10 3xl:w-12 3xl:h-12 flex items-center justify-center bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] text-sm font-bold flex-shrink-0">
+                            {getInitials(challenge.StartupProfile?.company_name || '')}
+                        </div>
+                    )}
+                    
                     <div className="flex-grow min-w-0">
                         <p className="text-xs 3xl:text-sm font-semibold text-gray-500 truncate">{challenge.StartupProfile?.company_name}</p>
                         <h5 className="text-xs xl:text-sm 3xl:text-lg font-bold text-gray-800 break-words">{challenge.title}</h5>

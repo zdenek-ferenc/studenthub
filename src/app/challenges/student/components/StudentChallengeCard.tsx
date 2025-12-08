@@ -128,6 +128,17 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
     return 0;
   });
 
+  const getInitials = (name: string) => {
+    if (!name) return '?';
+    return name
+        .split(' ')
+        .filter(part => part.length > 0)
+        .slice(0, 2)
+        .map(part => part[0])
+        .join('')
+        .toUpperCase();
+};
+
   return (
     <div 
       className={`group relative bg-white rounded-[20px] shadow-sm transition-all duration-400 ease-in-out border border-gray-100 flex flex-col h-full overflow-hidden ${isHoveringButton ? '-translate-y-1' : ''}`}
@@ -156,7 +167,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
       <div className="p-5 sm:p-6 flex flex-col h-full">
         
         <div className="flex items-start gap-4 mb-4">
-          <div className="hidden sm:block relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
+          <div className="hidden sm:block relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-full overflow-hidden border border-gray-100 bg-gray-50">
             {challenge.StartupProfile?.logo_url ? (
               <Image 
                 src={challenge.StartupProfile.logo_url} 
@@ -165,8 +176,8 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
                 className="object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-300 font-bold text-xl">
-                {challenge.StartupProfile?.company_name?.charAt(0) || '?'}
+              <div className="w-full h-full flex items-center justify-center text-[var(--barva-primarni)] bg-[var(--barva-svetle-pozadi)] font-bold text-xl">
+                {getInitials(challenge.StartupProfile?.company_name || '')}
               </div>
             )}
           </div>
@@ -191,7 +202,7 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
                 className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-sm font-semibold tracking-wide ${
                   isMatch
                     ? 'bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)]'
-                    : 'bg-gray-100 border border-gray-500 text-gray-500'
+                    : 'bg-gray-50/50 border border-gray-400 text-gray-500'
                 }`}
               >
                 {Skill.name}

@@ -119,7 +119,7 @@ export default function StudentChallengeDetail({ challenge, applicantCount, acti
   const effectiveTab = user ? ((activeTab === 'qna' && !isApplied) ? 'assignment' : (activeTab || 'assignment')) : 'assignment';
 
   return (
-    <div className="p-4 md:max-w-4/5 2xl:max-w-1/2 mx-auto md:py-24 xl:py-32 md:px-4 space-y-4 sm:space-y-4">
+    <div className="p-4 lg:max-w-4/5 2xl:max-w-4/6 mx-auto md:py-24 xl:py-32 md:px-4 space-y-4 sm:space-y-4">
       <div className="flex justify-between md:items-end gap-2">
         <button
         onClick={() => router.back()}

@@ -24,10 +24,22 @@ function StartupCatalogView() {
 
     return (
         <div className="min-h-screen flex flex-col max-w-5/6 mx-auto py-4 sm:py-8 md:py-24 xl:py-28 3xl:py-32 items-start gap-1 lg:gap-3">
+            <div className='w-full mb-3 3xl:mb-4 flex justify-between items-center'>
+                <h1 className="text-xl 3xl:text-2xl font-semibold text-[var(--barva-tmava)]">Objev inovativní startupy</h1>
+                <div className="lg:hidden flex justify-between items-center">
+                    <button 
+                        onClick={() => setIsFilterOpen(true)}
+                        className="p-3 rounded-full bg-white shadow-md border text-[var(--barva-primarni)]"
+                    >
+                        <SlidersHorizontal size={20} />
+                    </button>
+                </div>
+            </div>
+
             {loadingFilters ? (
-                <aside className="hidden lg:block w-full lg:w-80 p-6 bg-white rounded-2xl shadow-xs border border-gray-100 h-fit top-28 flex-shrink-0">
+                <div className="w-full p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
                     <p className="text-gray-500">Načítám filtry...</p>
-                </aside>
+                </div>
             ) : (
                 <StartupFilterSidebar
                     allCategories={allCategories}
@@ -41,21 +53,8 @@ function StartupCatalogView() {
                     setMobileOpen={setIsFilterOpen} 
                 />
             )}
-            <main className="flex-1 w-full">
-                <div className='mb-3 3xl:mb-4 flex justify-between items-center'>
-                    <div>
-                    <h1 className="text-xl 3xl:text-2xl font-semibold text-[var(--barva-tmava)]">Objev inovativní startupy</h1>
-                </div>
-                <div className="lg:hidden flex justify-between items-center">
-                    <button 
-                        onClick={() => setIsFilterOpen(true)}
-                        className="p-3 rounded-full bg-white shadow-md border text-[var(--barva-primarni)]"
-                    >
-                        <SlidersHorizontal size={20} />
-                    </button>
-                </div>
-                </div>
-                
+            
+            <main className="flex-1 w-full mt-4">
                 {loadingStartups && startups.length === 0 ? (
                     <div className="">
                     </div>
