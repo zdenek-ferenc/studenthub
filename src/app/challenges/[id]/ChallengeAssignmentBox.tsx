@@ -130,32 +130,33 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                         <h1 className="text-xl md:text-2xl xl:text-3xl font-bold text-[var(--barva-tmava)] leading-tight">{challenge.title}</h1>
                     </div>
                 </header>
-                <div className="grid grid-cols-3 items-start md:items-center md:divide-y-0 md:divide-x divide-gray-100 md:bg-gray-50/50 rounded-2xl md:border border-gray-100 mb-4 xl:mb-6">
-                    <div className="p-2 md:p-6 flex flex-col items-center justify-center text-center group transition-colors duration-300 first:rounded-t-2xl md:first:rounded-l-2xl md:first:rounded-tr-none">
-                        <div className="mb-2 text-[var(--barva-primarni)] transition-colors">
-                            <Trophy size={24} strokeWidth={1.5} />
+                
+                <div className="grid grid-cols-2 sm:grid-cols-3 bg-gray-50/50 rounded-2xl border border-gray-100 mb-4 xl:mb-6 overflow-hidden">
+                    <div className="col-span-2 sm:col-span-1 p-4 md:p-6 flex flex-col items-center justify-center text-center group transition-colors duration-300 border-b border-gray-100 sm:border-b-0 sm:border-r">
+                        <div className="mb-2 text-[var(--barva-primarni)] md:text-[var(--barva-primarni)] transition-colors">
+                            <Trophy size={24} strokeWidth={1.5} className="hidden md:block" />
                         </div>
-                        <span className="text-xs font-bold text-[var(--barva-tmava)] uppercase tracking-wider mb-2">Odměna</span>
+                        <span className="text-xs font-bold text-[var(--barva-primarni)] md:text-[var(--barva-tmava)] uppercase tracking-wider mb-2">Odměna</span>
                         <div className="flex items-center justify-center w-full">
                             {rewardsContent}
                         </div>
                     </div>
-                    <div className="p-2 md:p-6 flex flex-col items-center justify-center text-center group transition-colors duration-300">
-                        <div className="mb-2 text-[var(--barva-primarni)] transition-colors">
-                            <Users size={24} strokeWidth={1.5} />
+                    <div className="col-span-1 p-4 md:p-6 flex flex-col items-center justify-center text-center group transition-colors duration-300 border-r border-gray-100">
+                        <div className="mb-2 text-[var(--barva-primarni)] md:text-[var(--barva-primarni)] transition-colors">
+                            <Users size={24} strokeWidth={1.5} className="hidden md:block" />
                         </div>
-                        <span className="text-xs font-bold text-[var(--barva-tmava)] uppercase tracking-wider mb-1">Kapacita</span>
+                        <span className="text-xs font-bold text-[var(--barva-primarni)] md:text-[var(--barva-tmava)]  uppercase tracking-wider mb-1">Kapacita</span>
                         <div className="flex items-baseline gap-1">
                             <span className="text-xl md:text-2xl font-bold text-[var(--barva-tmava)]">{currentApplicants}</span>
                             <span className="text-gray-400 font-medium text-lg">/ {challenge.max_applicants || '∞'}</span>
                         </div>
                         <span className="text-[10px] md:text-xs text-gray-400 mt-1">přihlášených studentů</span>
                     </div>
-                    <div className="p-2 md:p-6 flex flex-col items-center justify-center text-center group transition-colors duration-300 last:rounded-b-2xl md:last:rounded-r-2xl md:last:rounded-bl-none">
-                        <div className="mb-2 text-[var(--barva-primarni)] transition-colors">
-                            <CalendarClock size={24} strokeWidth={1.5} />
+                    <div className="col-span-1 p-4 md:p-6 flex flex-col items-center justify-center text-center group transition-colors duration-300">
+                        <div className="mb-2 text-[var(--barva-primarni)] md:text-[var(--barva-primarni)] transition-colors">
+                            <CalendarClock size={24} strokeWidth={1.5} className="hidden md:block" />
                         </div>
-                        <span className="text-xs font-bold text-[var(--barva-tmava)] uppercase tracking-wider mb-1">Deadline</span>
+                        <span className="text-xs font-bold text-[var(--barva-primarni)] md:text-[var(--barva-tmava)] uppercase tracking-wider mb-1">Deadline</span>
                         <div className={`text-xl md:text-2xl font-bold ${daysRemaining < 3 ? 'text-red-500' : 'text-[var(--barva-tmava)]'}`}>
                             {daysRemaining >= 0 ? `${daysRemaining} dní` : 'Ukončeno'}
                         </div>
@@ -164,6 +165,7 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                         </span>
                     </div>
                 </div>
+
             </div>
             <div className="px-6 sm:px-10 pb-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-14">
@@ -218,7 +220,9 @@ export default function ChallengeAssignmentBox({ challenge, isApplied, studentSk
                                             <div key={index} className="group relative flex items-center gap-3 px-4 py-3 bg-gray-50 text-gray-400 rounded-xl border border-gray-100 cursor-not-allowed">
                                                 <Lock size={18} />
                                                 <span className="text-sm">{getFileNameFromUrl(url)}</span>
-                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                                                
+                                                {/* ZDE JE OPRAVA: Přidáno 'hidden md:block', aby se tooltip nevykresloval na mobilu */}
+                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                                                     Pro stažení se musíte přihlásit
                                                 </span>
                                             </div>

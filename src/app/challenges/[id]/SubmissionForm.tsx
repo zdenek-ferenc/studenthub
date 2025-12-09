@@ -211,9 +211,6 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
   return (
     <>
       <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-xs border border-gray-100 mt-8">
-        <h2 className="text-lg !sm:text-xl font-bold text-center text-[var(--barva-tmava)] mb-6">
-          {isSubmitted ? 'Tvoje odevzdané řešení' : 'Odevzdat řešení'}
-        </h2>
         <form onSubmit={handleSubmit(onTriggerSubmit)} className="space-y-6">
           <div>
             <div className="flex justify-between items-center mb-3">

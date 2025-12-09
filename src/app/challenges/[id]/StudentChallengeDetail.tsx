@@ -145,7 +145,8 @@ export default function StudentChallengeDetail({ challenge, applicantCount, acti
               </button>
             );
             return qnaDisabled ? (
-              <Tooltip content="Musíš se přihlásit k výzvě, abys viděl dotazy">{qnaButton}</Tooltip>
+              // ZDE JE ÚPRAVA: Přidáno alignment="right"
+              <Tooltip content="Musíš se přihlásit k výzvě, abys viděl dotazy" alignment="right">{qnaButton}</Tooltip>
             ) : qnaButton;
           })()}
         </div>

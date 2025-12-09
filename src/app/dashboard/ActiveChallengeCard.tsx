@@ -26,6 +26,17 @@ export type ActiveChallengeData = {
   } | null;
 };
 
+const getInitials = (name: string) => {
+    if (!name) return '?';
+    return name
+        .split(' ')
+        .filter(part => part.length > 0)
+        .slice(0, 2)
+        .map(part => part[0])
+        .join('')
+        .toUpperCase();
+};
+
 const ProgressBar = ({ value, maxValue }: { value: number, maxValue: number }) => {
   const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
   return (
@@ -94,10 +105,8 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
       } else {
           deadlineText = `Zbývá ${daysRemaining} dní`;
           if (daysRemaining <= 7) {
-              // 5, 6, 7 dní
               deadlineColor = 'text-orange-500'; 
           } else {
-              // 8+ dní
               deadlineColor = 'text-gray-500';
           }
       }
@@ -108,13 +117,19 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
       <div className={`bg-white p-4 rounded-2xl shadow-xs border-1 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
         <div className="flex items-center gap-4 flex-grow w-full">
             <div className="flex-shrink-0">
-                <Image 
-                    src={Challenge.StartupProfile?.logo_url || '/logo.svg'} 
-                    alt="logo" 
-                    width={64} 
-                    height={64} 
-                    className="rounded-xl w-12 h-12 sm:w-16 sm:h-16 object-cover" 
-                />
+                {Challenge.StartupProfile?.logo_url ? (
+                    <Image 
+                        src={Challenge.StartupProfile.logo_url} 
+                        alt="logo" 
+                        width={64} 
+                        height={64} 
+                        className="rounded-xl w-12 h-12 sm:w-16 sm:h-16 object-cover bg-white border border-gray-100" 
+                    />
+                ) : (
+                    <div className="rounded-xl w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] font-bold text-lg sm:text-xl border border-[var(--barva-primarni)]/10">
+                        {getInitials(Challenge.StartupProfile?.company_name || '')}
+                    </div>
+                )}
             </div>
             <div className="flex flex-col flex-grow min-w-0">
                 <h4 className="text-sm 3xl:text-lg font-semibold text-[var(--barva-tmava)] truncate max-w-2xs sm:max-w-xs lg:max-w-lg">{Challenge.title}</h4>
@@ -143,7 +158,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 <ProgressBar value={completedCount} maxValue={totalOutputs} />
             </div>
             <div className="w-full flex justify-between items-center mt-3 h-auto">
-                <div className="flex flex-col gap-1.5"> {/* Kontejner pro řazení pod sebe */}
+                <div className="flex flex-col gap-1.5"> 
                     {deadlineText && (
                         <div className={`flex items-center gap-1.5 text-xs font-medium ${deadlineColor}`}>
                             <DeadlineIcon size={14} />
