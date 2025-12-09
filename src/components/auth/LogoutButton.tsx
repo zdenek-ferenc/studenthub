@@ -37,10 +37,6 @@ export default function LogoutButton() {
                 )}
                 <span>Odhlásit se</span>
             </button>
-            
-            <p className="text-center text-xs text-gray-400 mt-4">
-                Jste přihlášeni v aplikaci RiseHigh
-            </p>
         </div>
     );
 }

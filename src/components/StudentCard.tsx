@@ -1,168 +1,158 @@
 "use client";
 
-import { CheckCircle, Trophy } from 'lucide-react';
 import Image from 'next/image';
-import { useMemo, useState, useEffect } from 'react'; 
 import Link from 'next/link';
-import { supabase } from '../lib/supabaseClient'; 
+import { User, MapPin, ExternalLink, Trophy, Briefcase } from 'lucide-react';
 
+// Upravil jsem typy, aby byly flexibilnější
 type Skill = {
   id: string;
   name: string;
 };
 
+type StudentSkill = {
+  Skill: Skill;
+};
+
+type Submission = {
+  id: string;
+  is_winner?: boolean; 
+};
+
 type Student = {
-  user_id: string;
-  first_name: string;
-  last_name: string;
-  username: string;
+  id?: string;       // Může být undefined
+  user_id?: string;  // Supabase často vrací user_id
+  first_name: string | null;
+  last_name: string | null;
   profile_picture_url: string | null;
   bio: string | null;
-  StudentSkill: { Skill: Skill }[];
+  StudentSkill?: StudentSkill[];
+  university?: string;
+  faculty?: string;
+  Submission?: Submission[]; 
+  wins_count?: number;
 };
 
-type StudentCardProps = {
-  student: Student;
-  demoStats?: { completed: number; won: number };
-};
-
-const getInitials = (firstName: string, lastName:string) => {
-  return `${firstName?.charAt(0) ?? ''}${lastName?.charAt(0) ?? ''}`.toUpperCase();
-};
-
-const formatChallengeText = (count: number, type: 'completed' | 'won') => {
-    const nouns = {
-      completed: { one: 'hotová výzva', few: 'hotové výzvy', other: 'hotových výzev' },
-      won: { one: 'vyhraná výzva', few: 'vyhrané výzvy', other: 'vyhraných výzev' },
-    };
-    
-    const selectedNouns = nouns[type];
-
-    if (count === 1) return `${count} ${selectedNouns.one}`;
-    if (count >= 2 && count <= 4) return `${count} ${selectedNouns.few}`;
-    return `${count} ${selectedNouns.other}`;
-};
-
-
-export default function StudentCard({ student, demoStats }: StudentCardProps) {
-  const [stats, setStats] = useState<{ completed: number; won: number } | null>(null);
-
-  const sortedSkills = useMemo(() => {
-    if (!student?.StudentSkill) return [];
-    return [...student.StudentSkill].sort((a, b) => a.Skill.name.length - b.Skill.name.length);
-  }, [student?.StudentSkill]);
+export default function StudentCard({ student }: { student: Student }) {
   
+  // 1. ZÍSKÁNÍ ID: Zkusíme user_id, pak id.
+  const profileId = student.user_id || student.id;
 
-  useEffect(() => {
-    if (demoStats) {
-      setStats(demoStats);
-      return;
-    }
+  const getInitials = (first: string | null, last: string | null) => {
+    return `${first?.charAt(0) || ''}${last?.charAt(0) || ''}`.toUpperCase() || '?';
+  };
 
-    const fetchChallengeStats = async () => {
-        if (!student.user_id) return;
+  const displayName = `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Neznámý student';
+  const skills = student.StudentSkill?.map(s => s.Skill) || [];
 
-        const { data, error } = await supabase
-            .from('Submission')
-            .select('position, Challenge!inner(status)')
-            .eq('student_id', student.user_id)
-            .eq('Challenge.status', 'closed');
-        
-        if (error) {
-            console.error(`Error fetching stats for student ${student.user_id}:`, error);
-            setStats({ completed: 0, won: 0 }); 
-            return;
-        }
+  const participationCount = student.Submission?.length || 0;
+  const winsCount = student.wins_count ?? (student.Submission?.filter(s => s.is_winner).length || 0);
 
-        const completedCount = data.length;
-        const wonCount = data.filter(sub => sub.position !== null && sub.position <= 3).length;
+  // Pokud nemáme ID, vykreslíme kartu, ale BEZ odkazu (div místo Link), aby to neházelo chybu
+  const CardContent = (
+    <div 
+        className="
+            relative bg-white rounded-[20px] h-full flex flex-col
+            border border-gray-100 shadow-sm
+            transition-all duration-300 ease-in-out
+            hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--barva-primarni)]/20
+            active:scale-[0.99]
+        "
+      >
+        {/* Visual Cue */}
+        {profileId && (
+            <div className="absolute top-5 right-5 text-gray-300 group-hover:text-[var(--barva-primarni)] transition-colors duration-300">
+                <ExternalLink size={18} />
+            </div>
+        )}
 
-        setStats({ completed: completedCount, won: wonCount });
-    };
+        <div className="p-5 sm:p-6 flex-grow flex flex-col">
+            <div className="flex items-center gap-4 mb-4">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 rounded-full overflow-hidden border border-gray-100 bg-gray-50 group-hover:border-[var(--barva-primarni)]/10 transition-colors">
+                    {student.profile_picture_url ? (
+                        <Image 
+                            src={student.profile_picture_url} 
+                            alt={displayName}
+                            fill
+                            className="object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[var(--barva-primarni)] bg-[var(--barva-svetle-pozadi)] font-bold text-xl">
+                            {getInitials(student.first_name, student.last_name)}
+                        </div>
+                    )}
+                </div>
+                
+                <div className="flex-1 min-w-0 pr-6">
+                    <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-[var(--barva-primarni)] transition-colors">
+                        {displayName}
+                    </h3>
+                    {(student.university || student.faculty) && (
+                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5 truncate">
+                            <MapPin size={12} />
+                            <span>{student.university} {student.faculty ? `• ${student.faculty}` : ''}</span>
+                        </div>
+                    )}
+                </div>
+            </div>
 
-    fetchChallengeStats();
-  }, [student.user_id, demoStats]);
+            <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-4">
+                {student.bio || "Student zatím nevyplnil biografie."}
+            </p>
 
+            {skills.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-auto">
+                    {skills.slice(0, 3).map((skill) => (
+                        <span 
+                            key={skill.id}
+                            className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-[var(--barva-svetle-pozadi)] text-[var(--barva-primarni)] border border-[var(--barva-primarni)] transition-colors"
+                        >
+                            {skill.name}
+                        </span>
+                    ))}
+                    {skills.length > 3 && (
+                        <span className="px-2 py-1 text-[11px] text-gray-400 font-medium">
+                            +{skills.length - 3}
+                        </span>
+                    )}
+                </div>
+            )}
+        </div>
 
-  if (!student) {
-    return null;
+        <div className="px-5 sm:px-6 py-4 border-t border-gray-100 bg-gray-50/30 rounded-b-[20px] flex items-center justify-between">
+            <div className="flex items-center gap-2" title="Počet zapojených výzev">
+                <div className="p-1.5 rounded-full bg-blue-50 text-blue-500">
+                    <Briefcase size={14} />
+                </div>
+                <div className="flex flex-col leading-none">
+                    <span className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Účast</span>
+                    <span className="text-sm font-bold text-gray-700">{participationCount}x</span>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2" title="Počet vyhraných výzev">
+                <div className="p-1.5 rounded-full bg-amber-50 text-amber-500">
+                    <Trophy size={14} />
+                </div>
+                <div className="flex flex-col leading-none">
+                    <span className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Výhry</span>
+                    <span className="text-sm font-bold text-gray-700">{winsCount}x</span>
+                </div>
+            </div>
+        </div>
+      </div>
+  );
+
+  // Pokud máme ID, obalíme to odkazem. Pokud ne, vrátíme jen div.
+  if (profileId) {
+    return (
+        <Link href={`/profile/${profileId}`} className="block h-full group outline-none">
+            {CardContent}
+        </Link>
+    );
   }
 
-  return (
-      <Link href={`/profile/${student.user_id}`} className="block group">
-        <div className="bg-white rounded-2xl shadow-xs p-4 3xl:p-6 border border-gray-100 group-hover:shadow-sm transition-all duration-300 ease-in-out flex flex-col h-full">
-          <div className="flex items-center gap-4 mb-4">
-            {student.profile_picture_url ? (
-              <Image 
-                src={student.profile_picture_url} 
-                alt={`${student.first_name} ${student.last_name}`}
-                width={56}
-                height={56}
-                className="w-10 h-10 3xl:w-14 3xl:h-14 rounded-full object-cover" 
-              />
-            ) : (
-              <div className="flex items-center justify-center w-10 h-10 3xl:w-14 3xl:h-14 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full text-xs lg:text-[14px] 3xl:text-lg font-bold text-[var(--barva-primarni)]">
-                <span>{getInitials(student.first_name, student.last_name)}</span>
-              </div>
-            )}
-            <div>
-              <h3 className="text-sm 3xl:text-lg font-bold text-gray-800">{student.first_name} {student.last_name}</h3>
-              <p className="text-xs 3xl:text-sm text-gray-500">@{student.username}</p>
-            </div>
-          </div>
-
-          <div className="relative 2xl:h-[30px] 3xl:h-[60px] mb-5">
-              <p className="text-gray-600 text-xs 3xl:text-sm line-clamp-3">
-                  {student.bio || 'Tento uživatel zatím nepřidal žádný popis.'}
-              </p>
-          </div>
-
-          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 mb-5 text-[12px] 3xl:text-sm font-medium text-gray-500">
-            {stats ? (
-              <div className='pt-2 flex flex-col gap-2 3xl:gap-4'>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle className="text-green-500 w-3.5 3xl:w-6" size={18} />
-                  <span>{formatChallengeText(stats.completed, 'completed')}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Trophy className="text-amber-500 w-3.5 3xl:w-6" size={18} />
-                  <span>{formatChallengeText(stats.won, 'won')}</span>
-                </div>
-              </div>
-            ) : (
-              <div className="h-5 bg-gray-200 rounded-md animate-pulse w-3/4"></div>
-            )}
-          </div>
-          
-          <div className="flex flex-wrap items-center content-start gap-2 h-auto overflow-hidden">
-            {(!sortedSkills || sortedSkills.length === 0) && (
-              <span className="bg-gray-100 text-gray-500 px-3 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm font-medium">
-                Uživatel nepřidal žádné dovednosti
-              </span>
-            )}
-            {sortedSkills.slice(0, 4).map(({ Skill }) => (
-              Skill && (
-                <span key={Skill.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm 3xl:font-semibold transition-colors">
-                  {Skill.name}
-                </span>
-              )
-            ))}
-            {sortedSkills.length > 4 && (
-              <span className="flex items-center gap-2 whitespace-nowrap self-center">
-                {sortedSkills[4]?.Skill && (
-                  <span key={sortedSkills[4].Skill.id} className="flex items-center justify-center gap-1.5 bg-[var(--barva-svetle-pozadi)] leading-none text-[var(--barva-primarni)] border border-[var(--barva-primarni)] px-2 py-1.5 3xl:px-3 3xl:py-2 rounded-full text-[11px] 3xl:text-sm 3xl:font-semibold transition-colors">
-                    {sortedSkills[4].Skill.name}
-                  </span>
-                )}
-                {sortedSkills.length > 5 && (
-                  <span className="text-[var(--barva-primarni)] text-[11px] 3xl:text-sm self-center">
-                    +{sortedSkills.length - 5}
-                  </span>
-                )}
-              </span>
-            )}
-          </div>
-        </div>
-      </Link>
-  );
+  // Fallback pro případ chyby v datech (abys viděl aspoň kartu, i když nejde prokliknout)
+  console.warn(`StudentCard: Chybí ID pro studenta ${displayName}`);
+  return <div className="block h-full group outline-none cursor-default">{CardContent}</div>;
 }

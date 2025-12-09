@@ -2,13 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-
-import { Bookmark, ChevronRight, Users, Trophy, Calendar } from 'lucide-react';
+import { Bookmark, Users, Trophy, Calendar } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../../lib/supabaseClient';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { useDashboard } from '../../../../contexts/DashboardContext';
-
 
 type Skill = { id: string; name: string; };
 type StartupProfile = { company_name: string; logo_url: string | null; };
@@ -28,10 +26,7 @@ type Challenge = {
   location?: string;
 };
 
-
-
 const RewardsDisplay = ({ challenge }: { challenge: Challenge }) => {
-
   const rewards = [
     challenge.reward_first_place,
     challenge.reward_second_place,
@@ -51,9 +46,8 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
   const { refreshSavedChallenges } = useDashboard();
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isHoveringButton, setIsHoveringButton] = useState(false);
+  
   const applicantCount = challenge.Submission.length;
-
 
   useEffect(() => {
     if (!user) return;
@@ -77,7 +71,6 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
     checkSavedStatus();
   }, [user, challenge.id]);
 
-
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -89,7 +82,6 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
 
     try {
       if (currentlySaved) {
-
         const { error } = await supabase
           .from('SavedChallenge')
           .delete()
@@ -99,7 +91,6 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
         setIsSaved(false);
         showToast('Výzva odebrána z uložených.', 'success');
       } else {
-
         const { error } = await supabase
           .from('SavedChallenge')
           .insert({ student_id: user.id, challenge_id: challenge.id });
@@ -137,123 +128,119 @@ export default function StudentChallengeCard({ challenge, studentSkillIds = [], 
         .map(part => part[0])
         .join('')
         .toUpperCase();
-};
+  };
 
   return (
-    <div 
-      className={`group relative bg-white rounded-[20px] shadow-sm transition-all duration-400 ease-in-out border border-gray-100 flex flex-col h-full overflow-hidden ${isHoveringButton ? '-translate-y-1' : ''}`}
-    >
-      
-      {isApplied && (
-        <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl z-20 shadow-sm">
-          PŘIHLÁŠENO
-        </div>
-      )}
-
-      {!isApplied && (
-        <button
-          onClick={handleSaveToggle}
-          disabled={isSaving}
-          className={`absolute cursor-pointer top-4 right-4 z-20 p-2 rounded-full transition-all duration-400 ${
-            isSaved
-              ? 'bg-yellow-50 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600'
-              : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'
-          }`}
-        >
-          <Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
-        </button>
-      )}
-
-      <div className="p-5 sm:p-6 flex flex-col h-full">
+    <Link href={`/challenges/${challenge.id}`} className="block h-full group outline-none">
+      <div 
+        className="
+            relative bg-white rounded-[20px] shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden
+            transition-all duration-300 ease-in-out
+            hover:shadow-md hover:border-[var(--barva-primarni)]/40
+            active:scale-[0.98] active:duration-150
+        "
+      >
         
-        <div className="flex items-start gap-4 mb-4">
-          <div className="hidden sm:block relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-full overflow-hidden border border-gray-100 bg-gray-50">
-            {challenge.StartupProfile?.logo_url ? (
-              <Image 
-                src={challenge.StartupProfile.logo_url} 
-                alt={challenge.StartupProfile.company_name}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[var(--barva-primarni)] bg-[var(--barva-svetle-pozadi)] font-bold text-xl">
-                {getInitials(challenge.StartupProfile?.company_name || '')}
-              </div>
+        {isApplied && (
+          <div className="absolute top-0 right-0 bg-green-50 text-green-600 text-[10px] font-bold px-3 py-1 rounded-bl-xl z-20 shadow-sm pointer-events-none">
+            PŘIHLÁŠENO
+          </div>
+        )}
+
+        {!isApplied && (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={handleSaveToggle}
+            className={`absolute cursor-pointer top-4 right-4 z-20 p-2 rounded-full transition-all duration-300 ${
+              isSaved
+                ? 'bg-yellow-50 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600 shadow-xs scale-110'
+                : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 hover:scale-110'
+            }`}
+          >
+            <Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
+          </div>
+        )}
+
+        <div className="p-5 sm:p-6 flex flex-col h-full">
+          
+          <div className="flex items-start gap-4 mb-4">
+            <div className="hidden sm:block relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-full overflow-hidden border border-gray-100 bg-gray-50">
+              {challenge.StartupProfile?.logo_url ? (
+                <Image 
+                  src={challenge.StartupProfile.logo_url} 
+                  alt={challenge.StartupProfile.company_name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[var(--barva-primarni)] bg-[var(--barva-svetle-pozadi)] font-bold text-xl">
+                  {getInitials(challenge.StartupProfile?.company_name || '')}
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0 pt-1">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5 truncate">
+                {challenge.StartupProfile?.company_name}
+              </p>
+              <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-[var(--barva-primarni)] transition-colors duration-300">
+                {challenge.title}
+              </h3>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4 sm:mb-6 flex-grow">
+            {challenge.short_description}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-4 sm:mb-6">
+            {sortedSkills.slice(0, 3).map(({ Skill }) => {
+              const isMatch = studentSkillIds.includes(Skill.id);
+              return (
+                <span
+                  key={Skill.id}
+                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide ${
+                    isMatch
+                      ? 'bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)]/20 text-[var(--barva-primarni)]'
+                      : 'bg-gray-50 border border-gray-200 text-gray-500'
+                  }`}
+                >
+                  {Skill.name}
+                </span>
+              );
+            })}
+            {sortedSkills.length > 3 && (
+              <span className="rounded-full text-[11px] font-semibold text-gray-400 pl-1">
+                +{sortedSkills.length - 3}
+              </span>
             )}
           </div>
-          <div className="flex-1 min-w-0 pt-1">
-            <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-0.5 truncate">
-              {challenge.StartupProfile?.company_name}
-            </p>
-            <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-[var(--barva-primarni)] transition-colors">
-              {challenge.title}
-            </h3>
-          </div>
-        </div>
-        <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4 sm:mb-6 flex-grow">
-          {challenge.short_description}
-        </p>
-        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2 sm:mb-6">
-          {sortedSkills.slice(0, 3).map(({ Skill }) => {
-            const isMatch = studentSkillIds.includes(Skill.id);
-            return (
-              <span
-                key={Skill.id}
-                className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-sm font-semibold tracking-wide ${
-                  isMatch
-                    ? 'bg-[var(--barva-svetle-pozadi)] border border-[var(--barva-primarni)] text-[var(--barva-primarni)]'
-                    : 'bg-gray-50/50 border border-gray-400 text-gray-500'
-                }`}
-              >
-                {Skill.name}
+
+          <div className="pt-4 border-t border-gray-100 grid grid-cols-2 gap-y-3">
+            <div className="flex items-center gap-2 text-gray-500">
+              <Users size={14} />
+              <span className="text-xs font-medium">
+                <span className="text-gray-900 font-bold">{applicantCount}</span>
+                <span className="text-gray-400 mx-0.5">/</span>
+                {challenge.max_applicants || '∞'}
               </span>
-            );
-          })}
-          {sortedSkills.length > 3 && (
-            <span className="rounded-full text-[11px] font-semibold text-gray-500">
-              +{sortedSkills.length - 3}
-            </span>
-          )}
-        </div>
-        <div className="pt-4 border-gray-100 grid grid-cols-2 gap-y-3">
-          
-          <div className="flex items-center gap-2 text-gray-500">
-            <Users size={14} />
-            <span className="text-xs font-medium">
-              <span className="text-gray-900 font-bold">{applicantCount}</span>
-              <span className="text-gray-400 mx-0.5">/</span>
-              {challenge.max_applicants || '∞'}
-            </span>
-          </div>
+            </div>
 
-          <div className="flex items-center gap-2 text-gray-500 justify-end">
-            <Trophy size={16} className="text-amber-500" />
-            <RewardsDisplay challenge={challenge} />
-          </div>
+            <div className="flex items-center gap-2 text-gray-500 justify-end">
+              <Trophy size={16} className="text-amber-500" />
+              <RewardsDisplay challenge={challenge} />
+            </div>
 
-          <div className="flex items-center gap-2 text-gray-500 col-span-2">
-            <Calendar size={14} />
-            <span className="text-xs font-medium">
-              Do {new Date(challenge.deadline).toLocaleDateString('cs-CZ')}
-            </span>
+            <div className="flex items-center gap-2 text-gray-500 col-span-2">
+              <Calendar size={14} />
+              <span className="text-xs font-medium">
+                Do {new Date(challenge.deadline).toLocaleDateString('cs-CZ')}
+              </span>
+            </div>
           </div>
 
         </div>
-
-        <div className="mt-5">
-            <Link href={`/challenges/${challenge.id}`} className="block w-full">
-                <button 
-                  onMouseEnter={() => setIsHoveringButton(true)}
-                  onMouseLeave={() => setIsHoveringButton(false)}
-                  className="w-full cursor-pointer py-2.5 rounded-xl bg-[var(--barva-primarni)]/90 text-white text-sm font-semibold hover:bg-[var(--barva-primarni)]/100 transition-colors duration-300 flex items-center justify-center gap-2"
-                >
-                    Zobrazit detail
-                    <ChevronRight size={16} className="opacity-70 group-hover:translate-x-1 transition-transform" />
-                </button>
-            </Link>
-        </div>
-
       </div>
-    </div>
+    </Link>
   );
 }

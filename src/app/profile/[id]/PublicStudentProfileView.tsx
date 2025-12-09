@@ -91,7 +91,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
                 </button>
             )}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
-                <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:sticky lg:top-28">
+                <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:top-28">
                     <ProfileInfoCard
                         profile={profile}
                         isOwner={isOwner}
@@ -106,7 +106,7 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
                     <ProfilePortfolioSection isOwner={isOwner} submissions={profile.Submission} />
                     <ProfileSkillsSection skills={profile.StudentSkill} languages={profile.StudentLanguage} isOwner={isOwner} />
                 </main>
-                <LogoutButton />
+                {isOwner && <LogoutButton />}
             </div>
         </div>
     );

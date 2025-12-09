@@ -144,8 +144,14 @@ function ProfileCircle({ profile, pathname }: { profile: Profile, pathname: stri
         </div>
     );
 }
+type Notification = { 
+    id: string; 
+    message: string; 
+    link_url: string | null; 
+    is_read: boolean; 
+    created_at: string; 
+};
 
-type Notification = { id: string; message: string; link_url: string; is_read: boolean; created_at: string; };
 function NotificationBell() {
     const { user } = useAuth();
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -153,14 +159,67 @@ function NotificationBell() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const notificationRef = useRef<HTMLDivElement>(null);
-    const fetchUnreadCount = useCallback(async () => { if (!user) return; const { count } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false); setUnreadCount(count || 0); }, [user]);
-    useEffect(() => { fetchUnreadCount(); const intervalId = setInterval(fetchUnreadCount, 60000); return () => clearInterval(intervalId); }, [user, fetchUnreadCount]);
-    useEffect(() => { const handleClickOutside = (event: MouseEvent) => { if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) { setIsOpen(false); } }; document.addEventListener("mousedown", handleClickOutside); return () => { document.removeEventListener("mousedown", handleClickOutside); }; }, [notificationRef]);
-    const onBellClick = async () => { if (!user) return; setIsOpen(!isOpen); if (!isOpen) { setIsLoading(true); const { data } = await supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5); setNotifications(data || []); setIsLoading(false); if (unreadCount > 0) { await supabase.from('notifications').update({ is_read: true }).eq('user_id', user!.id).eq('is_read', false); setUnreadCount(0); } } };
+    
+    const fetchUnreadCount = useCallback(async () => { 
+        if (!user) return; 
+        const { count } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false); 
+        setUnreadCount(count || 0); 
+    }, [user]);
+
+    useEffect(() => { 
+        fetchUnreadCount(); 
+        const intervalId = setInterval(fetchUnreadCount, 60000); 
+        return () => clearInterval(intervalId); 
+    }, [user, fetchUnreadCount]);
+
+    useEffect(() => { 
+        const handleClickOutside = (event: MouseEvent) => { if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) { setIsOpen(false); } }; 
+        document.addEventListener("mousedown", handleClickOutside); 
+        return () => { document.removeEventListener("mousedown", handleClickOutside); }; 
+    }, [notificationRef]);
+
+    const onBellClick = async () => { 
+        if (!user) return; 
+        setIsOpen(!isOpen); 
+        if (!isOpen) { 
+            setIsLoading(true); 
+            const { data } = await supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5); 
+            setNotifications(data || []); 
+            setIsLoading(false); 
+            if (unreadCount > 0) { 
+                await supabase.from('notifications').update({ is_read: true }).eq('user_id', user!.id).eq('is_read', false); 
+                setUnreadCount(0); 
+            } 
+        } 
+    };
+
     return (
         <div className="relative" ref={notificationRef}>
-            <button onClick={onBellClick} className="relative bg-[var(--barva-svetle-pozadi)] p-2 rounded-full cursor-pointer transition-colors"><Bell className="w-5 h-5 3xl:w-5 3xl:h-5 text-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-all ease-in duration-100" />{unreadCount > 0 && (<span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>)}</button>
-            {isOpen && (<div className="absolute right-0 mt-2 w-80 rounded-2xl shadow-lg z-20 bg-white"><div className="py-2 px-4 rounded-t-xl font-semibold text-white text-sm 3xl:text-base bg-[var(--barva-primarni)] border-b border-[var(--barva-primarni2)]">Notifikace</div><div className="flex flex-col">{isLoading ? (<p className="p-4 text-sm text-gray-500">Načítám...</p>) : notifications.length > 0 ? (notifications.map(notif => (<Link key={notif.id} href={notif.link_url} onClick={() => setIsOpen(false)} className="p-3 3xl:p-4 text-xs 3xl:text-sm text-gray-700 hover:bg-[var(--barva-primarni)]/5 border-b border-[var(--barva-primarni2)] last:border-b-0">{notif.message}</Link>))) : (<p className="p-4 text-sm text-gray-500">Zatím žádné novinky.</p>)}</div><div className="p-2 bg-gray-50 flex justify-center items-center rounded-b-2xl leading-none"><Link href="/notifications" onClick={() => setIsOpen(false)} className="text-sm font-semibold text-[var(--barva-primarni)]">Zobrazit všechny</Link></div></div>)}
+            <button onClick={onBellClick} className="relative bg-[var(--barva-svetle-pozadi)] p-2 rounded-full cursor-pointer transition-colors">
+                <Bell className="w-5 h-5 3xl:w-5 3xl:h-5 text-[var(--barva-primarni)] hover:text-[var(--barva-primarni)] transition-all ease-in duration-100" />
+                {unreadCount > 0 && (<span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>)}
+            </button>
+            {isOpen && (
+                <div className="absolute right-0 mt-2 w-80 rounded-2xl shadow-lg z-20 bg-white">
+                    <div className="py-2 px-4 rounded-t-xl font-semibold text-white text-sm 3xl:text-base bg-[var(--barva-primarni)] border-b border-[var(--barva-primarni2)]">Notifikace</div>
+                    <div className="flex flex-col">
+                        {isLoading ? (
+                            <p className="p-4 text-sm text-gray-500">Načítám...</p>
+                        ) : notifications.length > 0 ? (
+                            notifications.map(notif => (
+                                <Link key={notif.id} href={notif.link_url || '#'} onClick={() => setIsOpen(false)} className="p-3 3xl:p-4 text-xs 3xl:text-sm text-gray-700 hover:bg-[var(--barva-primarni)]/5 border-b border-[var(--barva-primarni2)] last:border-b-0">
+                                    {notif.message}
+                                </Link>
+                            ))
+                        ) : (
+                            <p className="p-4 text-sm text-gray-500">Zatím žádné novinky.</p>
+                        )}
+                    </div>
+                    <div className="p-2 bg-gray-50 flex justify-center items-center rounded-b-2xl leading-none">
+                        <Link href="/notifications" onClick={() => setIsOpen(false)} className="text-sm font-semibold text-[var(--barva-primarni)]">Zobrazit všechny</Link>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -200,11 +259,11 @@ export default function Header() {
           <div className="flex-1 flex justify-start">
             {isRegistrationFlow ? (
               <div className="cursor-default">
-                <Image src="/logo.svg" alt="logo" width={200} height={80} className="w-auto h-6 lg:h-8 3xl:h-10" />
+                <Image src="/logo.svg" alt="logo" width={200} height={80} className="w-auto h-6 lg:h-8" />
               </div>
             ) : (
               <Link href="/">
-                <Image src="/logo.svg" alt="logo" width={200} height={80} className="w-auto h-6 lg:h-8 3xl:h-10" />
+                <Image src="/logo.svg" alt="logo" width={200} height={80} className="w-auto h-6 lg:h-8" />
               </Link>
             )}
           </div>

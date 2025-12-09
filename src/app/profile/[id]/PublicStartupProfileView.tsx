@@ -36,8 +36,6 @@ type StartupProfile = {
     Challenge: Challenge[];
 };
 
-
-
 const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwner: boolean }) => {
     const { user, showToast } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
@@ -264,9 +262,11 @@ export default function PublicStartupProfileView({ profileId }: { profileId: str
                     </div>
                 </main>
             </div>
-            <div className=' md:hidden mt-6'>
-                <LogoutButton />
-            </div>
+            {isOwner && (
+                <div className='md:hidden mt-6'>
+                    <LogoutButton />
+                </div>
+            )}
         </div>
     );
 }

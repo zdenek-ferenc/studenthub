@@ -210,7 +210,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
 
   return (
     <>
-      <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-xs border border-gray-100 mt-8">
+      <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-xs border border-gray-100 mt-2 md:mt-4 mb-6">
         <form onSubmit={handleSubmit(onTriggerSubmit)} className="space-y-6">
           <div>
             <div className="flex justify-between items-center mb-3">
@@ -245,7 +245,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
           </div>
           
           <div>
-            <label className="block text-md sm:text-lg font-semibold text-gray-800 mb-3">Nahrání souborů</label>
+            <label className="block text-md sm:text-lg font-semibold text-gray-800 mb-3">Nahrání souborů (ZIP)</label>
             {uploadedFile && (
               <div className="flex items-center justify-between bg-gray-100 p-2 rounded-md text-sm">
                 <span className="font-medium text-gray-700 truncate pr-2">{uploadedFile.name}</span>
@@ -266,12 +266,12 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
                 </label>
                 
                 <div className="flex items-center gap-2 mt-2">
-                  <p className="text-xs text-gray-500">Prosím, nahrajte všechny soubory sbalené do jednoho ZIP archivu.</p>
+                  <p className="text-sm text-gray-500">Prosím, nahrajte všechny soubory zabalené do jednoho ZIP archivu.</p>
                   <Popover className="relative">
                     {() => (
                       <>
                         <Popover.Button className="focus:outline-none">
-                          <Info className="w-4 h-4 text-gray-400 hover:text-blue-500 cursor-pointer" />
+                          <Info className="w-4 h-4 text-blue-500 hover:text-blue-700 cursor-pointer" />
                         </Popover.Button>
                         <Transition
                           as={Fragment}
@@ -279,11 +279,11 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
                           leave="transition ease-in duration-150" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1"
                         >
                           <Popover.Panel className="absolute bottom-full left-1/2 z-10 mb-2 w-64 -translate-x-1/2 transform px-4 sm:px-0">
-                            <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                            <div className="overflow-hidden rounded-lg shadow-lg">
                               <div className="bg-white p-4">
                                 <p className="text-sm font-medium text-gray-900">Jak vytvořit ZIP?</p>
                                 <p className="mt-1 text-sm text-gray-500">Vyberte soubory, klikněte na ně pravým tlačítkem a zvolte možnost „Komprimovat do ZIP“.</p>
-                                <a href="https://support.microsoft.com/cs-cz/windows/zazipov%C3%A1n%C3%AD-a-rozzipov%C3%A1n%C3%AD-soubor%C5%AF-8d28fa72-f2f9-712f-67df-f80cf89fd4e5" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm font-semibold text-blue-600 hover:text-blue-800">
+                                <a href="https://support.microsoft.com/cs-cz/windows/zazipov%C3%A1n%C3%AD-a-rozzipov%C3%A1n%C3%AD-soubor%C5%AF-8d28fa72-f2f9-712f-67df-f80cf89fd4e5" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm font-semibold text-[var(--barva-primarni)] hover:text-[var(--barva-tmava)] transition-all ease-in-out duration-200">
                                   Celý návod &rarr;
                                 </a>
                               </div>
@@ -301,7 +301,7 @@ export default function SubmissionForm({ challengeId, submissionId, initialSubmi
 
           {!isSubmitted && (
             <div className="pt-4 flex justify-center">
-              <button type="submit" disabled={isSubmitting} className="mt-6 text-base sm:text-lg px-5 py-2 rounded-full bg-[var(--barva-primarni)] text-white font-semibold cursor-pointer">
+              <button type="submit" disabled={isSubmitting} className="mt-6 text-base sm:text-lg px-5 py-2 rounded-full bg-[var(--barva-primarni)]/90 hover:-translate-y-0.5 hover:bg-[var(--barva-primarni)] transition-all ease-in-out duration-200 text-white font-semibold cursor-pointer">
                 {isSubmitting ? 'Odevzdávám...' : 'Odevzdat řešení'}
               </button>
             </div>

@@ -114,7 +114,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
 
   return (
     <Link href={`/challenges/${Challenge.id}`} className="block group">
-      <div className={`bg-white p-4 rounded-2xl shadow-xs border-1 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center md:gap-4`}>
+      <div className={`bg-white p-4 rounded-2xl shadow-xs border-1 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 flex flex-col xl:flex-row items-start md:items-center md:gap-4`}>
         <div className="flex items-center gap-4 flex-grow w-full">
             <div className="flex-shrink-0">
                 {Challenge.StartupProfile?.logo_url ? (
@@ -132,7 +132,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 )}
             </div>
             <div className="flex flex-col flex-grow min-w-0">
-                <h4 className="text-sm 3xl:text-lg font-semibold text-[var(--barva-tmava)] truncate max-w-2xs sm:max-w-xs lg:max-w-lg">{Challenge.title}</h4>
+                <h4 className="text-sm 3xl:text-lg font-semibold text-[var(--barva-tmava)]  lg:max-w-xl">{Challenge.title}</h4>
                 <div className="mt-2">
                     <div className="hidden md:flex xl:hidden flex-wrap gap-1.5">
                         {Challenge.ChallengeSkill.slice(0, 2).map(({ Skill }, index) => (
@@ -149,7 +149,7 @@ export default function ActiveChallengeCard({ submission }: { submission: Active
                 </div>
             </div>
         </div>
-        <div className="flex-shrink-0 w-full md:w-56 mt-2 md:mt-0 flex flex-col justify-between">
+        <div className="flex-shrink-0 w-full xl:w-56 mt-2 md:mt-0 flex flex-col justify-between">
             <div className='w-full'>
                 <div className="flex justify-between items-center text-sm font-semibold text-gray-600">
                     <span className='flex items-center gap-1.5'><CheckSquare size={14}/></span>
