@@ -60,7 +60,7 @@ export function ChallengesProvider({ children }: { children: ReactNode }) {
     try {
         if (user && studentSkills.length === 0) {
             const { data: studentSkillsData } = await supabase.from('StudentSkill').select('Skill(id, name)').eq('student_id', user.id);
-            const skills = studentSkillsData?.flatMap(item => item.Skill || []) || [];
+            const skills = studentSkillsData?.flatMap((item): Skill[] => item.Skill ? [item.Skill] : []) || [];
             setStudentSkills(skills);
         } else if (!user) {
             setStudentSkills([]);

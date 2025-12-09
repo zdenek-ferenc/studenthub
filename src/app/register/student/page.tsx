@@ -295,16 +295,18 @@ export default function StudentRegistrationPage() {
 
             if (relatedTableData) {
                 if (relatedTableData.deleteCondition) {
+                    const tableName = relatedTableData.table === 'StudentSkill' ? 'StudentSkill' : 'StudentLanguage';
                     const { error: deleteError } = await supabase
-                        .from(relatedTableData.table)
+                        .from(tableName)
                         .delete()
                         .match(relatedTableData.deleteCondition);
 
                     if (deleteError && deleteError.code !== 'PGRST204') throw deleteError;
                 }
                 if (relatedTableData.data.length > 0) {
+                    const tableName = relatedTableData.table === 'StudentSkill' ? 'StudentSkill' : 'StudentLanguage';
                     const { error: insertError } = await supabase
-                        .from(relatedTableData.table)
+                        .from(tableName)
                         .insert(relatedTableData.data);
                     if (insertError) throw insertError;
                 }

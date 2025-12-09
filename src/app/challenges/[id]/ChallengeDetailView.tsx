@@ -15,18 +15,18 @@ type Challenge = {
   startup_id: string;
   title: string;
   description: string;
-  short_description: string;
-  goals: string;
-  expected_outputs: string;
+  short_description: string | null; 
+  goals: string | null;             
+  expected_outputs: string | null;  
   reward_first_place: number | null;
   reward_second_place: number | null;
   reward_third_place: number | null;
   reward_description: string | null;
-  prize_pool_paid: boolean;
+  prize_pool_paid: boolean | null;  
   attachments_urls: string[] | null;
   deadline: string;
   created_at: string;
-  max_applicants: number;
+  max_applicants: number | null;   
   number_of_winners: number | null;
   ChallengeSkill: { Skill: { id: string, name: string } }[];
   StartupProfile: { company_name: string, logo_url: string | null } | null;
@@ -38,7 +38,7 @@ type RawChallengeData = Omit<Challenge, 'ChallengeSkill'> & {
 };
 
 
-function CreateChallengeView() {
+function ChallengeDetailView() { 
   const { profile, loading: authLoading } = useAuth();
   const params = useParams();
   const challengeId = params.id as string;
@@ -64,8 +64,6 @@ function CreateChallengeView() {
         `)
         .eq('id', challengeId)
         .single();
-
-      // Fetch applicant count for guests/students (bypassing RLS on Submission table)
       const { data: countData } = await supabase
         .rpc('get_challenge_applicant_count', { challenge_id: challengeId });
 
@@ -76,7 +74,8 @@ function CreateChallengeView() {
       if (error) {
         console.error("Chyba při načítání detailu výzvy:", error);
       } else if (data) {
-        const rawData = data as RawChallengeData;
+        const rawData = data as unknown as RawChallengeData;
+        
         const cleanedData: Challenge = {
           ...rawData,
           ChallengeSkill: (rawData.ChallengeSkill || []).map(cs => ({
@@ -117,7 +116,6 @@ function CreateChallengeView() {
     return <p className="text-center py-20">Výzva nebyla nalezena.</p>;
   }
 
-  // Allow public access (guests treated as students for view purposes)
   if (!profile || profile.role === 'student') {
     return <StudentChallengeDetail challenge={challenge} applicantCount={applicantCount} activeTab={activeTab} setActiveTab={setActiveTab} />;
   }
@@ -133,4 +131,4 @@ function CreateChallengeView() {
   return <p>Pro zobrazení detailu se musíte přihlásit.</p>;
 }
 
-export default CreateChallengeView;
+export default ChallengeDetailView;

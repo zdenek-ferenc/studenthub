@@ -305,11 +305,11 @@ export default function StartupRegistrationPage() {
 
         if (relatedTableData) {
             if (relatedTableData.deleteCondition) {
-                const { error: deleteError } = await supabase.from(relatedTableData.table).delete().match(relatedTableData.deleteCondition);
+                const { error: deleteError } = await supabase.from("StartupCategory").delete().match(relatedTableData.deleteCondition);
                 if (deleteError && deleteError.code !== 'PGRST204') throw deleteError;
             }
             if (relatedTableData.data.length > 0) {
-                const { error: insertError } = await supabase.from(relatedTableData.table).insert(relatedTableData.data);
+                const { error: insertError } = await supabase.from("StartupCategory").insert(relatedTableData.data);
                 if (insertError) throw insertError;
             }
         }

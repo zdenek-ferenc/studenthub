@@ -20,13 +20,11 @@ export default function DemoTalentView() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StudentCard 
           student={mockStudentData1} 
-          demoStats={{ completed: 4, won: 1 }} 
         />
         <div className='hidden md:block'>
           <StudentCard 
-          student={mockStudentData2} 
-          demoStats={{ completed: 9, won: 3 }}
-        />
+            student={mockStudentData2} 
+          />
         </div>
         
       </div>

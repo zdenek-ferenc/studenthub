@@ -2,54 +2,51 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { User, MapPin, ExternalLink, Trophy, Briefcase } from 'lucide-react';
+import { MapPin, ExternalLink, Trophy, Briefcase } from 'lucide-react';
 
-// Upravil jsem typy, aby byly flexibilnější
 type Skill = {
-  id: string;
-  name: string;
+id: string;
+name: string;
 };
 
 type StudentSkill = {
-  Skill: Skill;
+Skill: Skill;
 };
 
 type Submission = {
-  id: string;
-  is_winner?: boolean; 
+id: string;
+is_winner?: boolean; 
 };
 
 type Student = {
-  id?: string;       // Může být undefined
-  user_id?: string;  // Supabase často vrací user_id
-  first_name: string | null;
-  last_name: string | null;
-  profile_picture_url: string | null;
-  bio: string | null;
-  StudentSkill?: StudentSkill[];
-  university?: string;
-  faculty?: string;
-  Submission?: Submission[]; 
-  wins_count?: number;
+id?: string;       
+user_id?: string;  
+first_name: string | null;
+last_name: string | null;
+profile_picture_url: string | null;
+bio: string | null;
+StudentSkill?: StudentSkill[];
+university?: string;
+faculty?: string;
+Submission?: Submission[]; 
+wins_count?: number;
 };
 
 export default function StudentCard({ student }: { student: Student }) {
-  
-  // 1. ZÍSKÁNÍ ID: Zkusíme user_id, pak id.
-  const profileId = student.user_id || student.id;
 
-  const getInitials = (first: string | null, last: string | null) => {
+const profileId = student.user_id || student.id;
+
+const getInitials = (first: string | null, last: string | null) => {
     return `${first?.charAt(0) || ''}${last?.charAt(0) || ''}`.toUpperCase() || '?';
-  };
+};
 
-  const displayName = `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Neznámý student';
-  const skills = student.StudentSkill?.map(s => s.Skill) || [];
+const displayName = `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Neznámý student';
+const skills = student.StudentSkill?.map(s => s.Skill) || [];
 
-  const participationCount = student.Submission?.length || 0;
-  const winsCount = student.wins_count ?? (student.Submission?.filter(s => s.is_winner).length || 0);
+const participationCount = student.Submission?.length || 0;
+const winsCount = student.wins_count ?? (student.Submission?.filter(s => s.is_winner).length || 0);
 
-  // Pokud nemáme ID, vykreslíme kartu, ale BEZ odkazu (div místo Link), aby to neházelo chybu
-  const CardContent = (
+const CardContent = (
     <div 
         className="
             relative bg-white rounded-[20px] h-full flex flex-col
@@ -58,8 +55,7 @@ export default function StudentCard({ student }: { student: Student }) {
             hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--barva-primarni)]/20
             active:scale-[0.99]
         "
-      >
-        {/* Visual Cue */}
+    >
         {profileId && (
             <div className="absolute top-5 right-5 text-gray-300 group-hover:text-[var(--barva-primarni)] transition-colors duration-300">
                 <ExternalLink size={18} />
@@ -140,19 +136,17 @@ export default function StudentCard({ student }: { student: Student }) {
                 </div>
             </div>
         </div>
-      </div>
-  );
+    </div>
+);
 
-  // Pokud máme ID, obalíme to odkazem. Pokud ne, vrátíme jen div.
-  if (profileId) {
+if (profileId) {
     return (
         <Link href={`/profile/${profileId}`} className="block h-full group outline-none">
             {CardContent}
         </Link>
     );
-  }
+}
 
-  // Fallback pro případ chyby v datech (abys viděl aspoň kartu, i když nejde prokliknout)
-  console.warn(`StudentCard: Chybí ID pro studenta ${displayName}`);
-  return <div className="block h-full group outline-none cursor-default">{CardContent}</div>;
+console.warn(`StudentCard: Chybí ID pro studenta ${displayName}`);
+return <div className="block h-full group outline-none cursor-default">{CardContent}</div>;
 }

@@ -78,12 +78,28 @@ export default function CreateChallengeWizard() {
                     .single();
 
                 if (data) {
-                    const fetchedData = {
-                        ...data,
+                    const allowedStatus = ['draft', 'open'];
+                    const fetchedData: Partial<ChallengeFormData> = {
+                        id: data.id,
+                        title: data.title,
+                        short_description: data.short_description,
+                        description: data.description,
+                        goals: data.goals,
                         expected_outputs: data.expected_outputs
                             ? data.expected_outputs.split('\n').map((item: string) => ({ value: item }))
                             : [{ value: '' }],
-                        skills: data.ChallengeSkill.map((s: { skill_id: string }) => s.skill_id)
+                        has_financial_reward: data.has_financial_reward,
+                        reward_first_place: data.reward_first_place,
+                        reward_second_place: data.reward_second_place,
+                        reward_third_place: data.reward_third_place,
+                        reward_description: data.reward_description,
+                        skills: data.ChallengeSkill.map((s: { skill_id: string }) => s.skill_id),
+                        attachments_urls: data.attachments_urls || [],
+                        deadline: data.deadline,
+                        max_applicants: data.max_applicants,
+                        type: data.type,
+                        status: allowedStatus.includes(data.status) ? (data.status as "draft" | "open") : "draft",
+                        number_of_winners: data.number_of_winners,
                     };
                     methods.reset(fetchedData);
 
