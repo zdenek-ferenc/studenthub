@@ -29,7 +29,8 @@ type Challenge = {
     max_applicants: number | null; 
     deadline: string;
     created_at: string;
-    prize_pool_paid: boolean; 
+    prize_pool_paid?: boolean; 
+    payment_status?: string | null;
     Submission: { id: string, student_id: string }[];
     ChallengeSkill: { Skill: { id: string, name: string } }[];
     StartupProfile: { company_name: string, logo_url: string | null } | null;
@@ -184,14 +185,15 @@ export default function StartupChallengeDetail({ challenge: initialChallenge, ac
 
     const totalPrizePool = useMemo(() => {
         return (challenge.reward_first_place || 0) + 
-               (challenge.reward_second_place || 0) + 
-               (challenge.reward_third_place || 0);
+            (challenge.reward_second_place || 0) + 
+            (challenge.reward_third_place || 0);
     }, [challenge]);
 
     const isLocked = useMemo(() => {
         const hasFinancialReward = totalPrizePool > 0;
-        return hasFinancialReward && !challenge.prize_pool_paid;
-    }, [totalPrizePool, challenge.prize_pool_paid]);
+        const isPaid = challenge.prize_pool_paid || challenge.payment_status === 'fully_paid';
+        return hasFinancialReward && !isPaid;
+    }, [totalPrizePool, challenge.prize_pool_paid, challenge.payment_status]);
 
 
     const fetchInitialSubmissions = useCallback(async () => {
