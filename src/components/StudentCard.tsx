@@ -93,7 +93,7 @@ const CardContent = (
             </div>
 
             <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-4">
-                {student.bio || "Student zatím nevyplnil biografie."}
+                {student.bio || "Student zatím nevyplnil bio."}
             </p>
 
             {skills.length > 0 && (
