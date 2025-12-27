@@ -311,6 +311,90 @@ body {
   100% { transform: translateX(-50%); }
 }
 
+
+@keyframes soft-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale(0.98); /* 3D vynutí GPU akceleraci */
+    filter: blur(4px); /* Moderní efekt, ale s mírou */
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-soft-fade-up {
+  /* will-change informuje prohlížeč dopředu, aby optimalizoval vrstvy */
+  will-change: opacity, transform; 
+  animation: soft-fade-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  opacity: 0; /* Výchozí stav skrytý */
+}
+
+/* Optimalizované delaye - zkrátíme je, aby LCP bylo rychlejší */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+
+/* Původní marquee optimalizace */
 .animate-marquee {
   animation: marquee 80s linear infinite;
+  will-change: transform; /* Důležité pro plynulost na mobilech */
+  transform: translateZ(0); /* Hack pro plynulost */
+}
+
+
+/* Aurora - barevná záře */
+.aurora-blob {
+  position: absolute;
+  filter: blur(80px);
+  opacity: 0.6;
+  border-radius: 50%;
+  animation: blob-bounce 10s infinite ease-in-out alternate;
+}
+
+@keyframes blob-bounce {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(20px, -20px) scale(1.1); }
+}
+
+/* Glass efekt pro karty/logobar */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Textový gradient pro nadpis */
+.text-glow-gradient {
+  background: linear-gradient(135deg, #FFFFFF 0%, #CEE8FF 50%, #8ecae6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 30px rgba(142, 202, 230, 0.3); /* Jemná záře kolem textu */
+}
+
+/* Button s vnitřní září (Inner Glow) */
+.btn-shiny {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-shiny::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-20deg);
+  transition: 0.5s;
+}
+
+.btn-shiny:hover::before {
+  left: 150%;
+  transition: 0.5s;
 }

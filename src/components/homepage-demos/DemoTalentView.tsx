@@ -11,7 +11,7 @@ export default function DemoTalentView() {
         <input
           type="text"
           placeholder="Hledat podle dovedností ..."
-          className="w-full pl-8 sm:pl-10 pr-4 py-2 text-sm sm:text-base sm:py-3 rounded-full border border-gray-300"
+          className="w-full pl-8 sm:pl-10 pr-4 py-2 text-sm sm:text-base sm:py-3 rounded-full border border-gray-300 bg-gray-50"
           disabled
         />
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
@@ -19,11 +19,13 @@ export default function DemoTalentView() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StudentCard 
-          student={mockStudentData1} 
+          student={mockStudentData1}
+          customHref="/register"
         />
         <div className='hidden md:block'>
           <StudentCard 
-            student={mockStudentData2} 
+            student={mockStudentData2}
+            customHref="/register"
           />
         </div>
         
