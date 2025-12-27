@@ -134,8 +134,7 @@ export default function NotificationsView() {
         };
 
         fetchNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user, showToast]);
+    }, [user, showToast, allNotifications]);
 
     const filterCounts = useMemo(() => {
         if (profile?.role !== 'startup') return { all: 0, contact: 0, applications: 0, submissions: 0 };

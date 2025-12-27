@@ -5,10 +5,12 @@ import type { Submission } from './SubmissionCard';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent, DragStartEvent, DragOverlay, useDroppable } from '@dnd-kit/core';
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Star, ThumbsDown, ArrowLeft } from 'lucide-react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { GripVertical, Star, ThumbsDown, ArrowLeft, Loader2 } from 'lucide-react';
 
 type AnonymousSubmission = Submission & { anonymousId: string };
 type ChallengeForWinners = { 
+    id: string; 
     reward_first_place: number | null; 
     reward_second_place: number | null; 
     reward_third_place: number | null; 
@@ -21,7 +23,7 @@ const FinalistItem = ({ submission, isOverlay = false }: { submission: Anonymous
         <div className="cursor-grab active:cursor-grabbing touch-none">
             <GripVertical className="h-5 w-5 text-gray-400" />
         </div>
-        <div className="flex-grow">
+        <div className="grow">
             <p className="font-bold text-gray-800 text-sm">{submission.anonymousId}</p>
         </div>
         <div className="flex items-center gap-1 font-bold text-sm text-amber-600 bg-amber-100 px-2 py-1 rounded-md">
@@ -53,6 +55,8 @@ const WinnerDropzone = ({ place, submission, reward }: { place: 1 | 2 | 3, submi
 };
 
 export default function FinalSelection({ submissions, challenge, onFinalize, onBack }: { submissions: AnonymousSubmission[], challenge: ChallengeForWinners, onFinalize: (winners: { [key: number]: string }) => void, onBack: () => void }) {
+    const supabase = createClientComponentClient();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [shortlist, setShortlist] = useState<AnonymousSubmission[]>([]);
     const [place1, setPlace1] = useState<AnonymousSubmission[]>([]);
     const [place2, setPlace2] = useState<AnonymousSubmission[]>([]);
@@ -141,24 +145,63 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
     };
     
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
-    const activeSubmission = activeId ? submissions.find(s => s.id === activeId) : null;    
-    const handleFinalizeClick = () => {
-        const winnerIds: { [key: number]: string } = {};
-        if (place1[0]) winnerIds[1] = place1[0].id;
-        if (place2[0]) winnerIds[2] = place2[0].id;
-        if (place3[0]) winnerIds[3] = place3[0].id;
-        onFinalize(winnerIds);
+    const activeSubmission = activeId ? submissions.find(s => s.id === activeId) : null;  
+    
+    const handleFinalizeClick = async () => {
+        setIsSubmitting(true);
+        try {
+            const updates = [];
+            
+            if (place1[0]) {
+                updates.push(supabase.from('Submission').update({ position: 1 }).eq('id', place1[0].id));
+            }
+            if (place2[0]) {
+                updates.push(supabase.from('Submission').update({ position: 2 }).eq('id', place2[0].id));
+            }
+            if (place3[0]) {
+                updates.push(supabase.from('Submission').update({ position: 3 }).eq('id', place3[0].id));
+            }
+
+            const results = await Promise.all(updates);
+            
+            const errors = results.filter(r => r.error);
+            if (errors.length > 0) {
+                console.error("Chyba při ukládání pozic:", errors);
+                throw new Error("Nepodařilo se uložit pozice vítězů.");
+            }
+
+            // Uzavření výzvy, Trigger distribute_challenge_xp
+            const { error: closeError } = await supabase
+                .from('Challenge')
+                .update({ status: 'closed' })
+                .eq('id', challenge.id);
+
+            if (closeError) throw closeError;
+
+            const winnerIds: { [key: number]: string } = {};
+            if (place1[0]) winnerIds[1] = place1[0].id;
+            if (place2[0]) winnerIds[2] = place2[0].id;
+            if (place3[0]) winnerIds[3] = place3[0].id;
+            
+            onFinalize(winnerIds);
+
+        } catch (err) {
+            console.error('Chyba při finalizaci:', err);
+            alert('Něco se pokazilo při ukládání výsledků. Zkuste to prosím znovu.');
+            setIsSubmitting(false); 
+        }
     };
 
     const allSlotsFilled = winnerSlots.every(place => (place === 1 ? place1 : place === 2 ? place2 : place3).length > 0);
     const displayedShortlist = showLowRated ? shortlist : shortlist.filter(s => (s.rating || 0) >= 5);
+    
     return (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="text-center mb-8">
-                <button onClick={onBack} className="pb-2 text-sm text-[var(--barva-tmava)] hover:text-[var(--barva-primarni)] transition-all ease-in-out duration-200 cursor-pointer flex items-center gap-1 mx-auto">
+                <button onClick={onBack} className="pb-2 text-sm text-(--barva-tmava) hover:text-(--barva-primarni) transition-all ease-in-out duration-200 cursor-pointer flex items-center gap-1 mx-auto">
                     <ArrowLeft size={14} /> Zpět na hodnocení
                 </button>
-                <h2 className="text-3xl font-bold text-center text-[var(--barva-tmava)] mt-2">Finální výběr vítězů</h2>
+                <h2 className="text-3xl font-bold text-center text-(--barva-tmava) mt-2">Finální výběr vítězů</h2>
                 <p className="text-center text-gray-600 text-lg mt-2">Přetáhněte nejlepší řešení z finalistů na vítězné pozice.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -170,7 +213,7 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
                         </button>
                     </div>
                     <SortableContext items={shortlist.map(c => c.id)} strategy={verticalListSortingStrategy}>
-                        <div className="space-y-3 min-h-[200px] max-h-[500px] overflow-y-auto pr-2">
+                        <div className="space-y-3 min-h-50 max-h-125 overflow-y-auto pr-2">
                             {displayedShortlist.map(sub => <SortableFinalistItem key={sub.id} submission={sub} />)}
                         </div>
                     </SortableContext>
@@ -182,8 +225,18 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
                 </div>
             </div>
             <div className="text-center mt-10">
-                <button onClick={handleFinalizeClick} disabled={!allSlotsFilled} className="px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-bold text-lg shadow-lg hover:bg-[var(--barva-primarni)]/90 cursor-pointer transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                    {allSlotsFilled ? 'Vyhlásit výsledky a uzavřít výzvu' : `Obsaďte všechny pozice (${winnerSlots.length})`}
+                <button 
+                    onClick={handleFinalizeClick} 
+                    disabled={!allSlotsFilled || isSubmitting} 
+                    className="px-8 py-3 rounded-full bg-(--barva-primarni) text-white font-bold text-lg shadow-lg hover:bg-(--barva-primarni)/90 cursor-pointer transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+                >
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 className="animate-spin" /> Zpracovávám výsledky...
+                        </>
+                    ) : (
+                        allSlotsFilled ? 'Vyhlásit výsledky a uzavřít výzvu' : `Obsaďte všechny pozice (${winnerSlots.length})`
+                    )}
                 </button>
             </div>
             <DragOverlay>{activeSubmission && <FinalistItem submission={activeSubmission} isOverlay />}</DragOverlay>

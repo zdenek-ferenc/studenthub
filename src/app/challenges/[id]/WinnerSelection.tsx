@@ -24,7 +24,7 @@ type Containers = {
 const SubmissionItem = ({ submission }: { submission: AnonymousSubmission }) => {
     return (
         <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border">
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center font-bold text-gray-500 text-sm">
+            <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0 flex items-center justify-center font-bold text-gray-500 text-sm">
                 <User size={20} />
             </div>
             <div>
@@ -60,7 +60,7 @@ const WinnerDropzone = ({ place, submission }: { place: 1 | 2 | 3, submission: A
     return (
         <div ref={setNodeRef} className={`p-4 rounded-2xl border-2 border-dashed h-32 flex flex-col justify-center items-center transition-colors ${placeColors[place]} ${isOver ? 'bg-opacity-50 scale-[1.02]' : ''}`}>
             <p className="font-bold text-lg text-gray-700 mb-2">{placeText[place]}</p>
-            <div className="min-h-[58px] flex items-center justify-center">
+            <div className="min-h-14.5 flex items-center justify-center">
                 {submission ? (
                     <SortableContext items={[submission.id]} strategy={verticalListSortingStrategy}>
                         <SortableSubmissionItem submission={submission} />
@@ -184,7 +184,7 @@ export default function WinnerSelection({ favorites, challenge, onFinalize }: { 
                 <div className="lg:col-span-1 bg-gray-50 p-4 rounded-2xl">
                     <h4 className="font-bold text-center text-gray-700 mb-4">Favorité k umístění</h4>
                     <SortableContext items={containers.candidates.map(c => c.id)} strategy={verticalListSortingStrategy}>
-                        <div className="space-y-3 min-h-[100px]">
+                        <div className="space-y-3 min-h-25">
                             {containers.candidates.map(sub => <SortableSubmissionItem key={sub.id} submission={sub} />)}
                             {containers.candidates.length === 0 && <p className="text-center text-sm text-gray-500 pt-8">Všichni favorité jsou umístěni.</p>}
                         </div>
@@ -201,7 +201,7 @@ export default function WinnerSelection({ favorites, challenge, onFinalize }: { 
                 <button 
                     onClick={handleFinalizeClick}
                     disabled={!allSlotsFilled}
-                    className="px-8 py-4 rounded-full bg-red text-white font-bold text-lg shadow-lg hover:bg-[var(--barva-primarni)]/90 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="px-8 py-4 rounded-full bg-red text-white font-bold text-lg shadow-lg hover:bg-(--barva-primarni)]/90 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     {allSlotsFilled ? 'Vyhlásit výsledky a uzavřít výzvu' : `Obsaďte všechny pozice (${winnerSlots.length})`}
                 </button>
