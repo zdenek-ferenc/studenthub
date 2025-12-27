@@ -135,7 +135,7 @@ const EvaluationStatusPanel = ({
                         <button
                             onClick={onProceed}
                             disabled={isLocked}
-                            className={`mt-6 px-8 py-3 rounded-full font-semibold shadow-md transition-all ${isLocked ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[var(--barva-primarni)] text-white hover:bg-blue-700'}`}
+                            className={`mt-6 px-8 py-3 cursor-pointer rounded-full font-semibold shadow-md transition-all ${isLocked ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[var(--barva-primarni)] text-white hover:opacity-90'}`}
                         >
                             {isLocked ? 'Nejdříve odemkněte výhru' : 'Přejít k výběru vítězů'}
                         </button>

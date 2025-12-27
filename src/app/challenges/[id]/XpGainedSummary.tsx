@@ -26,7 +26,7 @@ export default function XpGainedSummary({ events }: { events: XpEvent[] }) {
 
     return (
         <div className="bg-green-500 p-6 rounded-2xl mt-8 border">
-            <h3 className="text-xl font-bold text-center text-[var(--barva-tmava)] mb-4">Shrnutí odměn a progrese</h3>
+            <h3 className="text-xl font-bold text-center mb-4">Shrnutí odměn a progrese</h3>
             <div className="space-y-4 max-w-lg mx-auto">
                 {studentXpEvent && (
                     <XpRow

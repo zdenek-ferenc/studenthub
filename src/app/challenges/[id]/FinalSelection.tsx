@@ -19,11 +19,11 @@ type ChallengeForWinners = {
 type ContainerId = 'shortlist' | 'place1' | 'place2' | 'place3';
 
 const FinalistItem = ({ submission, isOverlay = false }: { submission: AnonymousSubmission, isOverlay?: boolean }) => (
-    <div className={`flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border ${isOverlay ? 'shadow-lg scale-105' : ''}`}>
+    <div className={`flex items-center gap-3 p-3 bg-white cursor-pointer rounded-lg shadow-sm border ${isOverlay ? 'shadow-lg scale-105' : ''}`}>
         <div className="cursor-grab active:cursor-grabbing touch-none">
             <GripVertical className="h-5 w-5 text-gray-400" />
         </div>
-        <div className="grow">
+        <div className="flex-grow">
             <p className="font-bold text-gray-800 text-sm">{submission.anonymousId}</p>
         </div>
         <div className="flex items-center gap-1 font-bold text-sm text-amber-600 bg-amber-100 px-2 py-1 rounded-md">
@@ -198,10 +198,10 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
     return (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="text-center mb-8">
-                <button onClick={onBack} className="pb-2 text-sm text-(--barva-tmava) hover:text-(--barva-primarni) transition-all ease-in-out duration-200 cursor-pointer flex items-center gap-1 mx-auto">
+                <button onClick={onBack} className="pb-2 text-sm text-[var(--barva-tmava)] hover:text-[var(--barva-primarni)] transition-all ease-in-out duration-200 cursor-pointer flex items-center gap-1 mx-auto">
                     <ArrowLeft size={14} /> Zpět na hodnocení
                 </button>
-                <h2 className="text-3xl font-bold text-center text-(--barva-tmava) mt-2">Finální výběr vítězů</h2>
+                <h2 className="text-3xl font-bold text-center text-[var(--barva-tmava)] mt-2">Finální výběr vítězů</h2>
                 <p className="text-center text-gray-600 text-lg mt-2">Přetáhněte nejlepší řešení z finalistů na vítězné pozice.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -213,7 +213,7 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
                         </button>
                     </div>
                     <SortableContext items={shortlist.map(c => c.id)} strategy={verticalListSortingStrategy}>
-                        <div className="space-y-3 min-h-50 max-h-125 overflow-y-auto pr-2">
+                        <div className="space-y-3 min-h-[200px] max-h-[500px] overflow-y-auto pr-2">
                             {displayedShortlist.map(sub => <SortableFinalistItem key={sub.id} submission={sub} />)}
                         </div>
                     </SortableContext>
@@ -228,7 +228,7 @@ export default function FinalSelection({ submissions, challenge, onFinalize, onB
                 <button 
                     onClick={handleFinalizeClick} 
                     disabled={!allSlotsFilled || isSubmitting} 
-                    className="px-8 py-3 rounded-full bg-(--barva-primarni) text-white font-bold text-lg shadow-lg hover:bg-(--barva-primarni)/90 cursor-pointer transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+                    className="px-8 py-3 rounded-full bg-[var(--barva-primarni)] text-white font-bold text-lg shadow-lg hover:opacity-90 cursor-pointer transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
                 >
                     {isSubmitting ? (
                         <>
