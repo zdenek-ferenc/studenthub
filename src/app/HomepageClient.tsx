@@ -155,7 +155,7 @@
               </h1>
 
               <p className="animate-soft-fade-up delay-300 mt-6 max-w-2xl text-lg sm:text-xl text-gray-400 font-light leading-relaxed">
-                Zahodili jsme nudné životopisy. Propojujeme <span className="text-white font-medium">ambiciózní studenty</span> a <span className="text-white font-medium">top startupy</span> skrze reálné výzvy.
+                Zahodili jsme nudné životopisy. Propojujeme <span className="text-white font-medium">ambiciózní studenty</span> a <span className="text-white font-medium">startupy</span> skrze reálné výzvy.
               </p>
 
               <div className="animate-soft-fade-up delay-400 mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
