@@ -530,7 +530,7 @@ export default function StartupChallengeDetail({ challenge: initialChallenge, ac
                                                 
                                                 <button
                                                     onClick={handleUnlock}
-                                                    className="btn-shiny w-full py-4 rounded-xl bg-blue-600 text-white font-bold text-lg shadow-lg shadow-blue-900/20 hover:-translate-y-1 transition-all flex items-center justify-center"
+                                                    className="btn-shiny cursor-pointer w-full py-4 rounded-xl bg-blue-600 text-white font-bold text-lg shadow-lg shadow-blue-900/20 hover:-translate-y-1 transition-all flex items-center justify-center"
                                                 >
                                                     Složit odměnu <span className="text-blue-200 font-normal text-base ml-2">({totalPrizePool.toLocaleString('cs-CZ')} Kč)</span>
                                                 </button>
