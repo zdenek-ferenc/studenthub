@@ -8,6 +8,8 @@ import withAuth from '../../components/withAuth';
 import { useData } from '../../contexts/DataContext';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { SlidersHorizontal } from 'lucide-react';
+import Link from 'next/link';
+import { ShieldCheck, UserCog, ArrowLeft } from 'lucide-react';
 
 
 function StudentCatalogView() {
@@ -25,9 +27,49 @@ function StudentCatalogView() {
         return <LoadingSpinner />;
     }
 
-    if (profile?.role !== 'startup') {
-        return <p className="text-center py-20 text-3xl text-[var(--barva-primarni)]">K zobrazení této stránky nemáte oprávnění.</p>;
-    }
+        if (profile?.role !== 'startup') {
+            return (
+                <div className="min-h-[60vh] md:py-32 w-full flex items-center justify-center p-4">
+                <div className="max-w-xl w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden relative">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[var(--barva-primarni)] to-[var(--barva-primarni2)]"></div>
+                    
+                    <div className="p-8 md:p-12 text-center flex flex-col items-center">
+                    <div className="w-20 h-20 bg-[var(--barva-primarni2)]/30 rounded-full flex items-center justify-center mb-6 text-[var(--barva-primarni)] animate-soft-fade-up">
+                        <ShieldCheck size={40} strokeWidth={1.5} />
+                    </div>
+
+                    <h2 className="text-2xl md:text-3xl font-bold text-[var(--barva-tmava)] mb-4 animate-soft-fade-up delay-100">
+                        Tato sekce je pro firmy
+                    </h2>
+
+                    <p className="text-gray-500 mb-8 leading-relaxed animate-soft-fade-up delay-200">
+                        Dostal ses do katalogu talentů, který slouží startupům k vyhledávání šikovných lidí, jako jsi ty. 
+                        <br className="hidden md:block" />
+                        Jako student sem přístup nepotřebuješ – důležité je, aby tvůj profil zářil pro ně!
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-4 w-full justify-center animate-soft-fade-up delay-300">
+                        <Link 
+                        href="/dashboard"
+                        className="px-6 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-2"
+                        >
+                        <ArrowLeft size={18} />
+                        Zpět na přehled
+                        </Link>
+
+                        <Link 
+                        href="/profile/edit"
+                        className="px-6 py-3 rounded-xl bg-[var(--barva-primarni)] text-white font-medium hover:bg-[var(--barva-tmava)] hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                        >
+                        <UserCog size={18} />
+                        Vylepšit můj profil
+                        </Link>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            );
+            }
 
     return (
         <div className="min-h-screen flex flex-col max-w-5/6 mx-auto py-2 sm:py-8 md:py-24 xl:py-28 3xl:py-32 items-start gap-1 lg:gap-3">
