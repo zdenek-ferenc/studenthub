@@ -1,58 +1,31 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import type { Metadata } from 'next'
-import ChallengeDetailView from './ChallengeDetailView' 
+    import { Suspense } from 'react';
+    import ChallengePageClient from './ChallengePageClient';
 
 
-async function createSupabaseServerClient() {
-    const cookieStore = await cookies() 
-    return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-        cookies: {
-            get(name: string) {
-                return cookieStore.get(name)?.value
-            },
-            set(name: string, value: string, options: CookieOptions) {
-                cookieStore.set({ name, value, ...options })
-            },
-            remove(name: string, options: CookieOptions) {
-                cookieStore.set({ name, value: '', ...options })
-            },
-        },
-    }
-)
-}
+    export default function ChallengePage({ params }: { params: { id: string } }) {
+    const challengeId = params.id;
 
-type Props = {
-    params: Promise<{ id: string }>
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { id } = await params 
-
-    const supabase = await createSupabaseServerClient()
-
-    const { data: challenge } = await supabase
-        .from('Challenge')
-        .select('title, short_description')
-        .eq('id', id)
-        .single()
-
-    if (!challenge) {
-        return {
-            title: 'Výzva nenalezena',
-        }
+    return (
+        <div className="min-h-screen bg-[var(--barva-svetle-pozadi)]">
+        <Suspense fallback={<ChallengeLoadingState />}>
+            <ChallengePageClient id={challengeId} />
+        </Suspense>
+        </div>
+    );
     }
 
-    return {
-        title: challenge.title,
-        description: challenge.short_description || 'Detail výzvy na RiseHigh.',
+    function ChallengeLoadingState() {
+    return (
+        <div className="pt-32 pb-12 max-w-7xl mx-auto px-4 md:px-6 space-y-8">
+        <div className="h-64 w-full bg-gray-100 rounded-3xl animate-pulse" />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8">
+            <div className="space-y-6">
+                <div className="h-12 w-3/4 bg-gray-100 rounded-lg animate-pulse" />
+                <div className="h-40 w-full bg-gray-100 rounded-2xl animate-pulse" />
+            </div>
+            <div className="hidden lg:block h-96 w-full bg-gray-100 rounded-2xl animate-pulse" />
+        </div>
+        </div>
+    );
     }
-}
-
-
-export default function ChallengeDetailPage() {
-    return <ChallengeDetailView />
-}

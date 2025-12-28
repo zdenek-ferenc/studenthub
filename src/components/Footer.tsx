@@ -1,9 +1,9 @@
-"use client"; // Důležité pro interaktivitu akordeonů
+"use client";
 
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Github, Twitter, Linkedin, Instagram, Heart, ShieldCheck, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { Github, Linkedin, Instagram, ChevronDown, } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -96,12 +96,6 @@ export default function Footer() {
             <span className="hidden md:inline">|</span>
             <Link href="/zasady-ochrany-udaju" className="hover:text-white transition-colors">Ochrana údajů</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Podmínky</Link>
-          </div>
-
-          <div className="flex items-center gap-1.5 opacity-80">
-              <span>Made with</span>
-              <Heart size={12} className="text-red-500 fill-red-500" />
-              <span>in Ostrava</span>
           </div>
 
         </div>

@@ -1,134 +1,80 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
 import { useAuth } from '../../../contexts/AuthContext';
-import { supabase } from '../../../lib/supabaseClient';
-import LoadingSpinner from '../../../components/LoadingSpinner'
 import StudentChallengeDetail from './StudentChallengeDetail';
 import StartupChallengeDetail from './StartupChallengeDetail';
-import type { Submission } from './SubmissionCard';
+import type { ChallengeDetailData } from './ChallengePageClient';
 
-type Challenge = {
-  id: string;
-  status: 'draft' | 'open' | 'closed' | 'archived';
-  startup_id: string;
-  title: string;
-  description: string;
-  short_description: string | null; 
-  goals: string | null;             
-  expected_outputs: string | null;  
-  reward_first_place: number | null;
-  reward_second_place: number | null;
-  reward_third_place: number | null;
-  reward_description: string | null;
-  prize_pool_paid: boolean | null;  
-  attachments_urls: string[] | null;
-  deadline: string;
-  created_at: string;
-  max_applicants: number | null;   
-  number_of_winners: number | null;
-  ChallengeSkill: { Skill: { id: string, name: string } }[];
-  StartupProfile: { company_name: string, logo_url: string | null } | null;
-  Submission: Submission[];
+type ChallengeDetailViewProps = {
+  challenge: ChallengeDetailData | null;
+  applicantCount?: number | null;
 };
 
-type RawChallengeData = Omit<Challenge, 'ChallengeSkill'> & {
-  ChallengeSkill: { Skill: { id: string, name: string } }[];
-};
-
-
-function ChallengeDetailView() { 
+export default function ChallengeDetailView({ challenge, applicantCount = null }: ChallengeDetailViewProps) { 
   const { profile, loading: authLoading } = useAuth();
-  const params = useParams();
-  const challengeId = params.id as string;
 
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
-  const [applicantCount, setApplicantCount] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<'assignment' | 'qna'>('assignment');
-  const [unansweredCount, setUnansweredCount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!challengeId) return;
-
-    const fetchChallenge = async () => {
-      const { data, error } = await supabase
-        .from('Challenge')
-        .select(`
-          *,
-          created_at,
-          ChallengeSkill ( Skill ( * ) ),
-          StartupProfile ( * ),
-          Submission ( *, StudentProfile ( * ) )
-        `)
-        .eq('id', challengeId)
-        .single();
-      const { data: countData } = await supabase
-        .rpc('get_challenge_applicant_count', { challenge_id: challengeId });
-
-      if (countData !== null) {
-        setApplicantCount(countData);
-      }
-
-      if (error) {
-        console.error("Chyba při načítání detailu výzvy:", error);
-      } else if (data) {
-        const rawData = data as unknown as RawChallengeData;
-        
-        const cleanedData: Challenge = {
-          ...rawData,
-          ChallengeSkill: (rawData.ChallengeSkill || []).map(cs => ({
-            Skill: Array.isArray(cs.Skill) ? cs.Skill[0] : cs.Skill
-          })).filter(cs => cs.Skill),
-        };
-
-        setChallenge(cleanedData);
-      }
-      setLoading(false);
-    };
-
-    fetchChallenge();
-  }, [challengeId]);
-
-  useEffect(() => {
-    if (!challengeId) return;
-    const fetchUnanswered = async () => {
-      const { error, count } = await supabase
-        .from('ChallengeQuestion')
-        .select('*', { count: 'exact', head: true })
-        .eq('challenge_id', challengeId)
-        .is('answer_text', null);
-
-      if (!error) {
-        setUnansweredCount(count || 0);
-      }
-    };
-
-    fetchUnanswered();
-  }, [challengeId]);
-
-  if (authLoading || loading) {
-    return <div className='pt-12 lg:pt-28 3xl:pt-34'><LoadingSpinner /></div>
-  }
+  if (authLoading) return null;
 
   if (!challenge) {
     return <p className="text-center py-20">Výzva nebyla nalezena.</p>;
   }
 
-  if (!profile || profile.role === 'student') {
-    return <StudentChallengeDetail challenge={challenge} applicantCount={applicantCount} activeTab={activeTab} setActiveTab={setActiveTab} />;
+  // 1. POHLED STUDENTA
+  if (profile?.role === 'student') {
+    // Ensure completed_outputs is always string[] for all submissions
+    const safeChallenge = {
+      ...challenge,
+      Submission: challenge.Submission?.map(sub => ({
+        ...sub,
+        completed_outputs: Array.isArray(sub.completed_outputs)
+          ? sub.completed_outputs.filter(x => typeof x === 'string')
+          : typeof sub.completed_outputs === 'string'
+            ? [sub.completed_outputs]
+            : Array.isArray(sub.completed_outputs)
+              ? sub.completed_outputs.map(x => String(x))
+              : [],
+      })) ?? [],
+    };
+    return (
+      <StudentChallengeDetail 
+        challenge={safeChallenge} 
+        applicantCount={applicantCount} 
+      />
+    );
   }
 
-  if (profile.role === 'startup') {
+  // 2. POHLED STARTUPU
+  if (profile?.role === 'startup') {
     if (challenge.startup_id === profile.id) {
-      return <StartupChallengeDetail challenge={challenge} activeTab={activeTab} setActiveTab={setActiveTab} unansweredCount={unansweredCount} setUnansweredCount={setUnansweredCount} />;
+      const safeChallenge = {
+        ...challenge,
+        Submission: challenge.Submission?.map(sub => ({
+          ...sub,
+          completed_outputs: Array.isArray(sub.completed_outputs)
+            ? sub.completed_outputs.filter(x => typeof x === 'string')
+            : typeof sub.completed_outputs === 'string'
+              ? [sub.completed_outputs]
+              : Array.isArray(sub.completed_outputs)
+                ? sub.completed_outputs.map(x => String(x))
+                : [],
+        })) ?? [],
+      };
+      return (
+        <StartupChallengeDetail 
+          challenge={safeChallenge} 
+        />
+      );
     } else {
-      return <p className="text-center py-20">K zobrazení této stránky nemáte oprávnění.</p>;
+      return <p className="text-center py-20">K zobrazení této stránky nemáte oprávnění (cizí startup).</p>;
     }
   }
 
-  return <p>Pro zobrazení detailu se musíte přihlásit.</p>;
+  return (
+    <div className="text-center py-32 px-4">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Pro zobrazení detailu se musíte přihlásit</h2>
+      <p className="text-gray-500 mb-8 max-w-md mx-auto">
+        Tato výzva je dostupná pouze pro registrované studenty a startupy.
+      </p>
+    </div>
+  );
 }
-
-export default ChallengeDetailView;

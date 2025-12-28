@@ -40,6 +40,7 @@
         }
     }, [profile, authLoading, router]);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const displayName = studentProfile?.username ? studentProfile.username : "zpět";
 
     if (authLoading || dashboardLoading || profile?.role === 'startup') {
