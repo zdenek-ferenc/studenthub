@@ -160,7 +160,7 @@ export default function ModernRecommendedChallengesWidget() {
                                 recommendations.map(c => (
                                     <Link href={`/challenges/${c.id}`} key={c.id} className="block group">
                                         <div className="bg-white/[0.03] border border-white/5 p-3 rounded-2xl flex items-center gap-4 hover:bg-white/[0.07] hover:border-white/10 transition-all ease-in-out duration-300">
-                                            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0 overflow-hidden border border-white/5">
+                                            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0 overflow-hidden border border-white/5">
                                                 {c.StartupProfile?.logo_url ? (
                                                     <Image src={c.StartupProfile.logo_url} alt="logo" width={40} height={40} className="object-cover w-full h-full"/>
                                                 ) : (

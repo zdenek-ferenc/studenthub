@@ -62,11 +62,11 @@ export default function ModernActiveChallengeCard({ submission }: { submission: 
                     <Link href={`/challenges/${Challenge.id}`} className="flex flex-1 gap-4 w-full group/link min-w-0">                        
                         <div className="hidden md:block shrink-0 pt-1 md:pt-0">
                             {Challenge.StartupProfile?.logo_url ? (
-                                <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shadow-sm transition-transform">
+                                <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-white/5 border border-white/10 shadow-sm transition-transform">
                                     <Image src={Challenge.StartupProfile.logo_url} alt="logo" fill className="object-cover" />
                                 </div>
                             ) : (
-                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 font-bold text-lg transition-transform">
+                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 font-bold text-lg transition-transform">
                                     {getInitials(Challenge.StartupProfile?.company_name || '')}
                                 </div>
                             )}

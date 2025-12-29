@@ -37,7 +37,7 @@ export default function ModernSavedChallengeCard({ savedChallenge }: { savedChal
             </button>
 
             <div className="bg-[#0B1623]/40 border border-white/5 rounded-2xl p-4 flex items-center gap-4 hover:bg-[#0B1623]/60 hover:border-white/10 transition-all">
-                <div className="w-12 h-12 shrink-0 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                <div className="w-12 h-12 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                     {Challenge.StartupProfile?.logo_url && <Image src={Challenge.StartupProfile.logo_url} alt="logo" width={48} height={48} className="object-cover w-full h-full" />}
                 </div>
                 <div className="flex-grow min-w-0 pr-8">

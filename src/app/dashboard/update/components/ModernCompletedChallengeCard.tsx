@@ -16,7 +16,7 @@ export default function ModernCompletedChallengeCard({ submission }: { submissio
             <div className="bg-[#0B1623]/40 border border-white/5 rounded-2xl p-4 md:p-5 hover:bg-[#0B1623]/60 hover:border-white/10 transition-all h-full flex flex-col md:flex-row md:items-center gap-1">
                 
                 <div className="flex items-start md:items-center gap-4 flex-grow min-w-0">
-                    <div className="hidden md:flex w-12 h-12 shrink-0 rounded-xl overflow-hidden bg-white/5 border border-white/10 items-center justify-center">
+                    <div className="hidden md:flex w-12 h-12 shrink-0 rounded-full overflow-hidden bg-white/5 border border-white/10 items-center justify-center">
                         {Challenge.StartupProfile?.logo_url ? (
                             <Image src={Challenge.StartupProfile.logo_url} alt="logo" width={48} height={48} className="object-cover w-full h-full" />
                         ) : (
