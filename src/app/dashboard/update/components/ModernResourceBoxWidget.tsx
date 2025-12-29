@@ -52,7 +52,7 @@ const SKILL_RESOURCES: Record<string, ResourceItem[]> = {
         { name: 'Wordtune', desc: 'Přepiš to lépe (AI)', url: 'https://www.wordtune.com/', icon: FileText, color: 'text-purple-400' },
     ],
     'backend': [
-        { name: 'Roadmap.sh', desc: 'Co se sakra učit dál', url: 'https://roadmap.sh/backend', icon: Globe, color: 'text-yellow-400' },
+        { name: 'Roadmap.sh', desc: 'Co se učit dál', url: 'https://roadmap.sh/backend', icon: Globe, color: 'text-yellow-400' },
         { name: 'Supabase', desc: 'Backend za 5 minut', url: 'https://supabase.com/', icon: Database, color: 'text-emerald-400' },
     ]
 };
