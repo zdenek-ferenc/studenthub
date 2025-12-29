@@ -11,10 +11,11 @@ import './globals.css';
 
 import ToastContainer from '../components/ToastContainer';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 import BottomNavBar from '../components/BottomNavBar';
 import OnboardingGuide from '../components/OnboardingGuide';
+import CookieConsentWidget from '../components/CookieConsentWidget'; 
 
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -44,14 +45,21 @@ function AppContent({ children }: { children: ReactNode }) {
 }
 
 export default function ClientLayoutWrapper({ children }: { children: ReactNode }) {
+    const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
+
     return (
         <AuthProvider>
             <DashboardProvider>
                 <ChallengesProvider>
                     <DataProvider>
                         <AppContent>{children}</AppContent>
-                        <Analytics />
-                        <SpeedInsights />
+                        <CookieConsentWidget onDecision={setAnalyticsEnabled} />
+                            {analyticsEnabled && (
+                                <>
+                                    <Analytics />
+                                    <SpeedInsights />
+                                </>
+                            )}
                         <ToastContainer />
                     </DataProvider>
                 </ChallengesProvider>
