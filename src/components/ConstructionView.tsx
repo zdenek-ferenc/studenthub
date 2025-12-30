@@ -14,7 +14,7 @@
 
     export default function ConstructionView({ title, description, badgeText, icon, gradient }: ConstructionViewProps) {
     return (
-        <div className="min-h-[90vh] w-full flex items-center justify-center p-4 relative overflow-hidden bg-slate-50">
+        <div className="min-h-[60vh] md:min-h-[90vh] w-full flex items-center justify-center p-4 relative overflow-hidden bg-slate-50">
         
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
             <motion.div 

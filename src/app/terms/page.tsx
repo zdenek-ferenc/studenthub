@@ -2,16 +2,14 @@
 
     import React, { useState, useEffect } from 'react';
     import { useRouter } from 'next/navigation';
-    import { ArrowLeft, Shield, Scale, ArrowUp } from 'lucide-react';
+    import { ArrowLeft, Shield, Scale, ChevronUp } from 'lucide-react';
 
     export default function TermsPage() {
     const router = useRouter();
     const [showScrollTop, setShowScrollTop] = useState(false);
 
-    // Logic pro zobrazení šipky při scrollování
     useEffect(() => {
         const handleScroll = () => {
-        // Ukáže se, pokud sjedeme o více než 400px
         if (window.scrollY > 400) {
             setShowScrollTop(true);
         } else {
@@ -30,7 +28,7 @@
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
         
-        <main className="max-w-3xl mx-auto px-4 md:py-32">
+        <main className="max-w-3xl mx-auto px-4 pb-12 md:py-32">
             
             <header className="mb-12 text-center">
             <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -433,12 +431,12 @@
 
         <button 
             onClick={scrollToTop}
-            className={`fixed left-6 bottom-32 z-50 p-3 bg-white/80 backdrop-blur-sm border border-gray-200 text-[var(--barva-primarni)] rounded-full shadow-lg md:hidden transition-all duration-300 transform hover:scale-110 active:scale-95 ${
+            className={`fixed left-6 bottom-28 z-50 p-3 text-white backdrop-blur-sm bg-[var(--barva-primarni)] rounded-full shadow-lg md:hidden transition-all duration-300 transform hover:scale-110 active:scale-95 ${
             showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
             }`}
             aria-label="Zpět nahoru"
         >
-            <ArrowUp size={24} />
+            <ChevronUp size={24} />
         </button>
 
         </div>
