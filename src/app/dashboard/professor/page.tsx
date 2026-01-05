@@ -47,7 +47,7 @@ export default function ProfessorDashboard() {
 
             if (error) throw error;
 
-            const fetchedRequests = data as AcademicRequest[] || [];
+            const fetchedRequests = (data as unknown as AcademicRequest[]) || [];
             setRequests(fetchedRequests);
 
             const totalStudents = fetchedRequests.reduce((sum, req) => sum + (req.student_count || 0), 0);
