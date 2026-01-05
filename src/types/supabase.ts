@@ -19,34 +19,46 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_public: boolean | null
           join_code: string | null
           professor_id: string
+          project_types: Json | null
+          requirements: Json | null
           semester: string | null
           status: string | null
           student_count: number | null
           subject_name: string
+          timeline: Json | null
         }
         Insert: {
           created_at?: string
           description?: string | null
           id?: string
+          is_public?: boolean | null
           join_code?: string | null
           professor_id: string
+          project_types?: Json | null
+          requirements?: Json | null
           semester?: string | null
           status?: string | null
           student_count?: number | null
           subject_name: string
+          timeline?: Json | null
         }
         Update: {
           created_at?: string
           description?: string | null
           id?: string
+          is_public?: boolean | null
           join_code?: string | null
           professor_id?: string
+          project_types?: Json | null
+          requirements?: Json | null
           semester?: string | null
           status?: string | null
           student_count?: number | null
           subject_name?: string
+          timeline?: Json | null
         }
         Relationships: []
       }
@@ -67,6 +79,9 @@ export type Database = {
       }
       Challenge: {
         Row: {
+          academic_project_type:
+            | Database["public"]["Enums"]["academic_project_type"]
+            | null
           academic_request_id: string | null
           attachments_urls: string[] | null
           created_at: string | null
@@ -96,6 +111,9 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          academic_project_type?:
+            | Database["public"]["Enums"]["academic_project_type"]
+            | null
           academic_request_id?: string | null
           attachments_urls?: string[] | null
           created_at?: string | null
@@ -125,6 +143,9 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          academic_project_type?:
+            | Database["public"]["Enums"]["academic_project_type"]
+            | null
           academic_request_id?: string | null
           attachments_urls?: string[] | null
           created_at?: string | null
@@ -1131,6 +1152,9 @@ export type Database = {
       get_challenges_with_skills: {
         Args: { p_search_term: string; p_skill_ids: string[] }
         Returns: {
+          academic_project_type:
+            | Database["public"]["Enums"]["academic_project_type"]
+            | null
           academic_request_id: string | null
           attachments_urls: string[] | null
           created_at: string | null
@@ -1255,6 +1279,18 @@ export type Database = {
       }
     }
     Enums: {
+      academic_project_type:
+        | "marketing_strategy"
+        | "market_research"
+        | "brand_identity"
+        | "social_media"
+        | "software_development"
+        | "web_development"
+        | "mobile_app"
+        | "ux_ui_design"
+        | "data_analysis"
+        | "business_plan"
+        | "custom"
       challenge_status: "draft" | "open" | "closed" | "archived"
       challenge_type: "public" | "anonymous"
       contact_status: "pending" | "accepted" | "rejected"
@@ -1399,6 +1435,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      academic_project_type: [
+        "marketing_strategy",
+        "market_research",
+        "brand_identity",
+        "social_media",
+        "software_development",
+        "web_development",
+        "mobile_app",
+        "ux_ui_design",
+        "data_analysis",
+        "business_plan",
+        "custom",
+      ],
       challenge_status: ["draft", "open", "closed", "archived"],
       challenge_type: ["public", "anonymous"],
       contact_status: ["pending", "accepted", "rejected"],

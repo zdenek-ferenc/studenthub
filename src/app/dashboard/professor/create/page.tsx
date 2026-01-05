@@ -1,51 +1,69 @@
 "use client";
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../../lib/supabaseClient';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { generateJoinCode } from '../../../../lib/utils/code-generator';
-import { ArrowLeft, RefreshCw, Save } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { motion, useAnimation } from 'framer-motion';
+import { ProjectTypeKey, PROJECT_TYPES_CONFIG } from '../../../../types/academic';
+import Step1_SubjectInfo from './steps/Step1_SubjectInfo';
+import Step2_ProjectDefinition from './steps/Step2_ProjectDefinition';
+import Step3_Timeline from './steps/Step3_Timeline';
+import WizardNavigation from '../../../../components/WizardNavigation';
 
-type CreateRequestFormData = {
+export type CreateRequestFormData = {
     subject_name: string;
     semester: string;
     student_count: number;
     description: string;
     join_code: string;
+    selected_project_type: ProjectTypeKey;
+    deliverables: { value: string }[];
+    requirements: { value: string }[];
+    deadline_application: string;
+    deadline_delivery: string;
 };
 
 export default function CreateRequestPage() {
     const { user, showToast } = useAuth();
     const router = useRouter();
+    const [currentStep, setCurrentStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
-    const controls = useAnimation();
-    const [isErrorState, setIsErrorState] = useState(false);
 
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm<CreateRequestFormData>({
+    const methods = useForm<CreateRequestFormData>({
         defaultValues: {
             join_code: generateJoinCode(),
             semester: 'ZS 2025',
-            student_count: 30
+            student_count: 30,
+            selected_project_type: 'marketing_strategy',
+            deliverables: PROJECT_TYPES_CONFIG['marketing_strategy'].defaultDeliverables.map(d => ({ value: d })),
+            // ZDE JE ZMĚNA - Logičtější defaulty
+            requirements: [
+                { value: 'Přístup k interním datům (např. GA4, CRM)' },
+                { value: 'Dostupnost pro 3 online konzultace během semestru' }
+            ]
         }
     });
-
-    const { onChange: onJoinCodeChange, ...joinCodeRest } = register('join_code', { required: true });
-
-    const handleGenerateCode = () => {
-        setValue('join_code', generateJoinCode());
-        setIsErrorState(false);
-    };
 
     const onSubmit = async (data: CreateRequestFormData) => {
         if (!user) return;
         setIsLoading(true);
-        setIsErrorState(false);
 
-        const finalJoinCode = data.join_code.toUpperCase();
+        const projectDefinition = [{
+            type: data.selected_project_type,
+            title: PROJECT_TYPES_CONFIG[data.selected_project_type].title,
+            deliverables: data.deliverables.map(d => d.value).filter(Boolean)
+        }];
+
+        const timeline = {
+            deadline_application: data.deadline_application,
+            deadline_delivery: data.deadline_delivery
+        };
+
+        const requirementsArray = data.requirements.map(r => r.value).filter(Boolean);
 
         try {
             const { error } = await supabase
@@ -56,139 +74,74 @@ export default function CreateRequestPage() {
                     semester: data.semester,
                     student_count: data.student_count,
                     description: data.description,
-                    join_code: finalJoinCode,
-                    status: 'open'
+                    join_code: data.join_code.toUpperCase(),
+                    status: 'open',
+                    project_types: projectDefinition,
+                    timeline: timeline,
+                    requirements: requirementsArray,
+                    is_public: true
                 });
 
-            if (error) {
-                if (error.code === '23505' && error.message?.includes('join_code')) {
-                    showToast('Tento kód je již obsazen, vygenerovali jsme nový.', 'error');
-                    
-                    const newCode = generateJoinCode();
-                    setValue('join_code', newCode);
-                    setIsErrorState(true);
+            if (error) throw error;
 
-                    controls.start({
-                        x: [0, -10, 10, -10, 10, 0],
-                        transition: { duration: 0.4 }
-                    });
-
-                    setIsLoading(false);
-                    return; 
-                }
-                throw error; 
-            }
-
-            showToast('Poptávka byla úspěšně vytvořena!', 'success');
+            showToast('Předmět byl úspěšně vypsán a je otevřen pro startupy!', 'success');
             router.push('/dashboard/professor');
 
-        } catch (error: unknown) {
-            console.error('Error creating request:', error);
-            showToast('Chyba při vytváření poptávky.', 'error');
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Nepodařilo se vytvořit předmět.', 'error');
+        } finally {
             setIsLoading(false);
         }
     };
 
+    const nextStep = async () => {
+        const valid = await methods.trigger(); 
+        // V reálu bychom validovali jen fieldy pro daný krok, ale pro jednoduchost stačí takto
+        if (valid) setCurrentStep(prev => prev + 1);
+    };
+
+    const prevStep = () => setCurrentStep(prev => prev - 1);
+
     return (
-        <div className="min-h-screen bg-[var(--barva-svetle-pozadi)] p-6 md:py-32">
-            <div className="max-w-2xl mx-auto">
-                <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10">
-                <Link href="/dashboard/professor" className="inline-flex items-center text-gray-500 hover:text-gray-800 mb-4 transition-colors">
-                    <ArrowLeft size={20} className="mr-2" />
-                    Zpět na Dashboard
-                </Link>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Nová Poptávka</h1>
-                    <p className="text-gray-500 mb-8">Vypište nový předmět pro spolupráci se startupy.</p>
-
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="min-h-screen bg-[var(--barva-svetle-pozadi)] md:py-32">
+            <div className="max-w-3xl mx-auto">
+                {/* Header */}
+                <div className="flex items-end justify-between mb-4">
+                    <Link href="/dashboard/professor" className="inline-flex text-sm items-center text-gray-500 hover:text-[var(--barva-primarni)] transition-colors">
+                        <ArrowLeft size={18} className="mr-2" />
+                        Zrušit a zpět
+                    </Link>
+                    <div className="flex items-end justify-between">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Název Předmětu</label>
-                            <input
-                                {...register('subject_name', { required: 'Název předmětu je povinný' })}
-                                className="input w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--barva-primarni)] focus:ring-2 focus:ring-[var(--barva-primarni)]/20 outline-none transition-all"
-                                placeholder="např. Marketingová Komunikace"
-                            />
-                            {errors.subject_name && <p className="text-red-500 text-sm mt-1">{errors.subject_name.message}</p>}
                         </div>
+                        {/* Progress bar */}
+                        <div className="flex gap-2">
+                            {[1, 2, 3].map(step => (
+                                <div key={step} className={`h-2 w-12 rounded-full transition-all ${step <= currentStep ? 'bg-[var(--barva-primarni)]' : 'bg-gray-200'}`} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Semestr</label>
-                                <select
-                                    {...register('semester', { required: true })}
-                                    className="input w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--barva-primarni)] focus:ring-2 focus:ring-[var(--barva-primarni)]/20 outline-none transition-all bg-white"
-                                >
-                                    <option value="ZS 2025">Zimní Semestr 2025</option>
-                                    <option value="LS 2026">Letní Semestr 2026</option>
-                                    <option value="ZS 2026">Zimní Semestr 2026</option>
-                                </select>
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <FormProvider {...methods}>
+                        <form onSubmit={methods.handleSubmit(onSubmit)}>
+                            <div className="p-8 md:p-6">
+                                {currentStep === 1 && <Step1_SubjectInfo />}
+                                {currentStep === 2 && <Step2_ProjectDefinition />}
+                                {currentStep === 3 && <Step3_Timeline />}
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Odhad Studentů</label>
-                                <input
-                                    type="number"
-                                    {...register('student_count', { required: true, min: 1 })}
-                                    className="input w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--barva-primarni)] focus:ring-2 focus:ring-[var(--barva-primarni)]/20 outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Popis Spolupráce</label>
-                            <textarea
-                                {...register('description', { required: 'Popis je povinný' })}
-                                rows={4}
-                                className="input w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--barva-primarni)] focus:ring-2 focus:ring-[var(--barva-primarni)]/20 outline-none transition-all resize-none"
-                                placeholder="Co od firmy očekáváte? Jaký je cíl projektu?"
+
+                            <WizardNavigation 
+                                currentStep={currentStep} 
+                                totalSteps={3} 
+                                onNext={nextStep} 
+                                onPrev={prevStep}
+                                isSubmitting={isLoading}
                             />
-                            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
-                        </div>
-                        <div className={`bg-gray-50 p-6 rounded-2xl border transition-colors duration-300 ${isErrorState ? 'border-red-300 bg-red-50' : 'border-gray-100'}`}>
-                            <label className={`block text-sm font-medium mb-2 transition-colors ${isErrorState ? 'text-red-600' : 'text-gray-700'}`}>
-                                Unikátní Kód Předmětu
-                            </label>
-                            <div className="flex gap-3">
-                                <motion.input
-                                    animate={controls}
-                                    {...joinCodeRest}
-                                    onChange={(e) => {
-                                        e.target.value = e.target.value.toUpperCase();
-                                        onJoinCodeChange(e);
-                                        setIsErrorState(false);
-                                    }}
-                                    className={`flex-grow px-4 text-black py-3 rounded-xl border font-mono text-lg font-bold text-center tracking-widest uppercase focus:ring-2 outline-none transition-all ${
-                                        isErrorState 
-                                            ? 'border-red-300 text-red-600 focus:border-red-500 focus:ring-red-200' 
-                                            : 'border-gray-200 focus:border-[var(--barva-primarni)] focus:ring-[var(--barva-primarni)]/20'
-                                    }`}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handleGenerateCode}
-                                    className="px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
-                                    title="Vygenerovat nový kód"
-                                >
-                                    <RefreshCw size={24} />
-                                </button>
-                            </div>
-                            <p className={`text-xs mt-2 transition-colors ${isErrorState ? 'text-red-500' : 'text-gray-500'}`}>
-                                {isErrorState ? 'Původní kód byl obsazen. Vygenerovali jsme nový.' : 'Tento kód budou studenti používat pro připojení k předmětu.'}
-                            </p>
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full py-4 rounded-xl font-bold text-white bg-[var(--barva-primarni)] hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        >
-                            {isLoading ? (
-                                'Ukládám...'
-                            ) : (
-                                <>
-                                    <Save size={20} />
-                                    Vytvořit Poptávku
-                                </>
-                            )}
-                        </button>
-                    </form>
+                        </form>
+                    </FormProvider>
                 </div>
             </div>
         </div>

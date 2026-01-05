@@ -190,11 +190,6 @@ const EvaluationStatusPanel = ({
     );
 };
 
-interface DatabaseError extends Error {
-    code?: string;
-    details?: string;
-    hint?: string;
-}
 
 
 export default function StartupChallengeDetail({ challenge: initialChallenge, activeTab, setActiveTab, unansweredCount, setUnansweredCount }: { challenge: Challenge, activeTab?: 'assignment'|'qna', setActiveTab?: import('react').Dispatch<import('react').SetStateAction<'assignment'|'qna'>> , unansweredCount?: number, setUnansweredCount?: import('react').Dispatch<import('react').SetStateAction<number>> }) {
@@ -374,9 +369,11 @@ export default function StartupChallengeDetail({ challenge: initialChallenge, ac
         setIsModalOpen(false);
 
         try {
-            const { error } = await supabase.rpc('finalize_challenge_v2', {
-                p_challenge_id: challenge.id,
-                p_winners: winnersToConfirm
+            const { error } = await supabase.functions.invoke('finalize-challenge', {
+                body: {
+                    challenge_id: challenge.id,
+                    winners: winnersToConfirm
+                }
             });
 
             if (error) throw error;
@@ -391,15 +388,14 @@ export default function StartupChallengeDetail({ challenge: initialChallenge, ac
             router.refresh();
 
         } catch (error: unknown) {
-            const err = error as DatabaseError;
+            console.error('Finalize error:', error);
             
-            console.error('Finalize error:', err);
-            
-            if (err.message?.includes('timeout') || err.code === '57014') {
-                showToast('Proces běží na pozadí. Obnovte stránku za chvíli.', 'success');
-                setTimeout(() => window.location.reload(), 3000);
+            const errorMessage = error instanceof Error ? error.message : 'Nastala neznámá chyba';
+
+            if (errorMessage.includes('timeout')) {
+                showToast('Proces trvá déle a běží na pozadí. Zkuste obnovit stránku za chvíli.', 'success');
             } else {
-                showToast(`Chyba: ${err.message || 'Nepodařilo se dokončit operaci'}`, 'error');
+                showToast(`Chyba: ${errorMessage}`, 'error');
             }
         }
     };
