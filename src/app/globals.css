@@ -109,7 +109,24 @@ button {
   animation-delay: calc(25ms * var(--char-index));
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
 
+@keyframes shimmer-move {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer-fast {
+  animation: shimmer-move 1.5s infinite linear;
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 
 @keyframes slide-in-reveal {
   from {
@@ -263,28 +280,6 @@ button {
   background-size: 200% 200%;
 
   animation: subtleShimmer 15s linear infinite;
-}
-
-@import 'react-phone-number-input/style.css';
-
-
-.PhoneInputInput {
-   
-    width: 100% !important;
-    border-width: 1px !important;
-    border-color: #fff !important;
-    border-radius: 0.5rem !important;
-    padding-left: 0.75rem !important;
-    font-weight: 400 !important;
-    font-size: 0.875rem !important;
-}
-
-
-.PhoneInputInput:focus {
-    outline: 2px solid transparent !important;
-    outline-offset: 2px !important;
-    border-color: #fff;
-    box-shadow: 0 0 0 2px var(--barva-primarni-light) !important;
 }
 
 

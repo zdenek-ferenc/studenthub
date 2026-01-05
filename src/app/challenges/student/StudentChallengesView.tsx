@@ -5,7 +5,6 @@ import { useChallenges } from '../../../contexts/ChallengesContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import StudentChallengeCard from './components/StudentChallengeCard';
 import ChallengeFilter from './components/ChallengeFilter';
-import LoadingSpinner from '../../../components/LoadingSpinner';
 import { SlidersHorizontal } from 'lucide-react';
 import ChallengeViewSwitch, { ChallengeViewType } from './components/ChallengeViewSwitch';
 
@@ -13,7 +12,6 @@ export default function StudentChallengesView() {
   const { user } = useAuth();
   const {
     challenges,
-    loading,
     searchQuery,
     setSearchQuery,
     selectedSkillIds,
@@ -102,9 +100,6 @@ export default function StudentChallengesView() {
         />
       </div>
       <main className="flex-1 w-full">
-        {loading ? (
-          <LoadingSpinner />
-        ) : (
           <>
             {displayedChallenges.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
@@ -133,7 +128,6 @@ export default function StudentChallengesView() {
               </div>
             )}
           </>
-        )}
       </main>
     </div>
   );

@@ -188,10 +188,10 @@
 
             <div className="animate-soft-fade-up delay-600 mt-12 pb-24 sm:mt-24 w-full max-w-6xl mx-auto">
               <div className="text-center mb-6">
-                <p className="text-sm text-gray-500 uppercase tracking-widest font-semibold">Důvěřují nám</p>
+                <p className="text-sm text-gray-300 uppercase tracking-widest font-semibold">Důvěřují nám</p>
               </div>
               
-              <div className="glass-panel rounded-3xl p-4 sm:p-8 overflow-hidden relative">
+              <div className="glass-panel !border-none rounded-3xl p-4 sm:p-8 overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#001224] via-transparent to-[#001224] z-10 pointer-events-none"></div>
                 
                 <div className="flex w-max animate-marquee items-center gap-12 sm:gap-20">
@@ -370,7 +370,7 @@
                         <li className="flex items-center gap-2 text-gray-700 font-medium"><Check className="text-[var(--barva-primarni)]"/> Ověřené dovednosti</li>
                       </ul>
                   </div>
-                  <div className="flex-1 w-full lg:w-auto bg-gray-50 rounded-3xl p-6 border border-gray-100">
+                  <div className="flex-1 w-full lg:w-auto bg-gray-50 rounded-3xl p-2 md:p-6 border border-gray-100">
                       <DemoStudentFeatures />
                   </div>
                 </div>
@@ -396,7 +396,7 @@
                           </div>
                       </div>
                   </div>
-                  <div className="flex-1 w-full lg:w-auto bg-gray-50 rounded-3xl p-6 border border-gray-100">
+                  <div className="flex-1 w-full lg:w-auto bg-gray-50 rounded-3xl p-2 md:p-6 border border-gray-100">
                       <DemoStartupFeatures />
                   </div>
                 </div>

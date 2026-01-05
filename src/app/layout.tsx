@@ -1,12 +1,13 @@
-import type { Metadata } from 'next' 
-import { Sora } from "next/font/google";
-import ClientLayoutWrapper from './ClientLayoutWrapper'; 
+import type { Metadata, Viewport } from 'next';
+import { sora } from './fonts';
+import ClientLayoutWrapper from './ClientLayoutWrapper';
 import './globals.css';
 
-const sora = Sora({
-  subsets: ["latin"],
-  variable: '--font-sora',
-});
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#EFF8FF', 
+};
 
 export const metadata: Metadata = {
   title: {
@@ -36,12 +37,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="cs">
-      <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1"
-        />
-      </head>
       <body className={sora.variable}>
         <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
       </body>

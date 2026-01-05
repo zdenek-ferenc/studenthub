@@ -6,7 +6,7 @@ import { useDebounce } from '../../../../hooks/useDebounce';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 import GDPRModal from '../../../../components/GDPRModal';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
-import 'react-phone-number-input/style.css'; 
+import '@/components/ui/phone-input.css'
 import { Controller } from 'react-hook-form';
 
 type FormData = {
@@ -61,7 +61,6 @@ export default function Step1_PersonalInfo({ onNext, initialData }: StepProps) {
   useEffect(() => {
     const userHasStoppedTyping = usernameValue === debouncedUsername;
 
-    // Řízení ikonky
     if (isValidating) {
       setUsernameStatus('checking');
     } else if (!debouncedUsername || debouncedUsername.length < 5) {

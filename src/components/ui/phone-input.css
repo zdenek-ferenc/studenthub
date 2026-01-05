@@ -1,0 +1,25 @@
+@import 'react-phone-number-input/style.css';
+
+.PhoneInputInput {
+    width: 100% !important;
+    border-width: 1px !important;
+    border-color: #fff !important;
+    border-radius: 0.5rem !important;
+    padding-left: 0.75rem !important;
+    font-weight: 400 !important;
+    font-size: 0.875rem !important;
+    background-color: transparent; 
+    color: inherit;
+}
+
+.PhoneInputInput:focus {
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+    border-color: #fff;
+    box-shadow: 0 0 0 2px var(--barva-primarni-light) !important;
+}
+
+.PhoneInput {
+    display: flex;
+    align-items: center;
+}

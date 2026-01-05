@@ -1,7 +1,7 @@
 "use client";
 
-import { GripVertical, Check } from 'lucide-react';
-import { useState } from 'react';
+import { GripVertical} from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { DndContext, DragEndEvent, useSensor, useSensors, PointerSensor, useDraggable, useDroppable, DragOverlay, DragStartEvent, defaultDropAnimationSideEffects, DropAnimation } from '@dnd-kit/core';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 
@@ -11,9 +11,11 @@ type Finalist = {
     rating: number;
 };
 
+const FIXED_CARD_HEIGHT = "h-16"; 
+
 const FinalistCard = ({ finalist, isOverlay = false, isDragging = false }: { finalist: Finalist, isOverlay?: boolean, isDragging?: boolean }) => (
     <div className={`
-        p-3 bg-white rounded-lg shadow-sm border flex items-center justify-between 
+        ${FIXED_CARD_HEIGHT} w-full p-3 bg-white rounded-lg shadow-sm border flex items-center justify-between 
         ${isOverlay ? 'cursor-grabbing shadow-xl ring-2 ring-[var(--barva-primarni)] z-50' : 'cursor-grab hover:border-blue-500'}
         ${isDragging ? 'opacity-0' : 'opacity-100'}
     `}>
@@ -27,12 +29,14 @@ const FinalistCard = ({ finalist, isOverlay = false, isDragging = false }: { fin
 
 const WinnerCard = ({ finalist, index, isOverlay = false, isDragging = false }: { finalist: Finalist, index: number, isOverlay?: boolean, isDragging?: boolean }) => (
     <div className={`
-        p-3 bg-white rounded-lg border-2 border-amber-400 flex gap-1 items-center justify-between w-full
+        ${FIXED_CARD_HEIGHT} w-full p-3 bg-white rounded-lg border-2 border-amber-400 flex gap-2 items-center justify-between
         ${isOverlay ? 'cursor-grabbing shadow-xl z-50' : 'cursor-grab hover:border-amber-500'}
         ${isDragging ? 'opacity-0' : 'opacity-100'}
     `}>
-        <span className="font-medium text-sm">{index + 1}. místo: {finalist.name}</span>
-        <Check className="text-green-500" />
+        <div className='flex flex-col'>
+            <span className="font-medium text-sm"><span className="text-amber-600 font-bold mr-1">{index + 1}.</span> {finalist.name}</span>
+            <span className="font-medium text-gray-500 text-xs">({finalist.rating}/10)</span>
+        </div>
     </div>
 );
 
@@ -71,9 +75,9 @@ const DroppableWinnerSlot = ({ index, winner, children }: { index: number, winne
         <div 
             ref={setNodeRef} 
             className={`
-                rounded-lg transition-all duration-200 
+                rounded-lg transition-all duration-200 w-full
                 ${isOver ? 'bg-amber-100 border-amber-400 scale-[1.02]' : ''} 
-                ${!winner ? 'h-12 bg-gray-200 border-2 border-dashed border-gray-400 flex items-center justify-center' : ''}
+                ${!winner ? `${FIXED_CARD_HEIGHT} bg-gray-200 border-2 border-dashed border-gray-400 flex items-center justify-center` : ''}
             `}
         >
             {children}
@@ -90,7 +94,7 @@ const DroppableFinalistsList = ({ children }: { children: React.ReactNode }) => 
         <div 
             ref={setNodeRef} 
             className={`
-                rounded-xl transition-colors p-2 -m-2 min-h-[200px]
+                rounded-xl transition-colors p-2 min-h-[200px]
                 ${isOver ? 'bg-blue-50/50 ring-2 ring-blue-100' : ''}
             `}
         >
@@ -105,6 +109,11 @@ const DroppableFinalistsList = ({ children }: { children: React.ReactNode }) => 
 
 
 const DemoFinalSelection = () => {
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     const [finalists, setFinalists] = useState<Finalist[]>([
         { id: '2', name: 'Řešení #2', rating: 8 },
         { id: '3', name: 'Řešení #3', rating: 7 },
@@ -136,7 +145,7 @@ const DemoFinalSelection = () => {
                 item: data.item,
                 type: data.type,
                 index: data.index,
-                width: element?.offsetWidth
+                width: element?.offsetWidth 
             });
         }
     };
@@ -208,6 +217,8 @@ const DemoFinalSelection = () => {
         }),
     };
 
+    if (!isMounted) return <div className="h-[400px] w-full bg-gray-50 rounded-2xl border-2 border-gray-100" />;
+
     return (
         <DndContext 
             sensors={sensors} 
@@ -221,12 +232,12 @@ const DemoFinalSelection = () => {
                         <DraggableFinalist key={finalist.id} finalist={finalist} />
                     ))}
                     {finalists.length === 0 && (
-                        <div className="text-center text-gray-400 text-sm py-8 border-2 border-dashed border-gray-200 rounded-lg">
-                            Všechna řešení umístěna
+                        <div>
+                            
                         </div>
                     )}
                 </DroppableFinalistsList>
-                <div>
+                <div className='rounded-xl transition-colors p-2 min-h-[200px]'>
                     <h4 className="hidden sm:block font-semibold text-gray-800 mb-3">Vítězné pozice</h4>
                     <h4 className="sm:hidden font-semibold text-gray-800 mb-3">Vítězové</h4>
                     <div className="space-y-3">
@@ -235,7 +246,7 @@ const DemoFinalSelection = () => {
                                 {winner ? (
                                     <DraggableWinner finalist={winner} index={index} />
                                 ) : (
-                                    <span className="text-gray-500 text-sm">Přetáhni {index + 1}. místo</span>
+                                    <span className="text-gray-500 text-sm">{index + 1}. místo</span>
                                 )}
                             </DroppableWinnerSlot>
                         ))}

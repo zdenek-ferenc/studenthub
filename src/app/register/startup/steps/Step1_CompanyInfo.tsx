@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import GDPRModal from '../../../../components/GDPRModal';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
+import '@/components/ui/phone-input.css'
 import { Controller } from 'react-hook-form';
 
 type FormData = {

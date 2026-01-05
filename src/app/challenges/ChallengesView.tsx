@@ -2,18 +2,33 @@
 
 import { useAuth } from '../../contexts/AuthContext'; 
 import withAuth from '../../components/withAuth'; 
+import dynamic from 'next/dynamic'; 
 
-import StartupChallengesView from './startup/StartupChallengesView';
-import StudentChallengesView from './student/StudentChallengesView';
-import LoadingSpinner from '../../components/LoadingSpinner'
+// Pomocník pro fade-in animaci obsahu
+const FadeInWrapper = ({ children }: { children: React.ReactNode }) => (
+    <div className="animate-fade-in duration-500 w-full">
+        {children}
+    </div>
+);
+
+const StartupChallengesView = dynamic(
+  () => import('./startup/StartupChallengesView').then(mod => function StartupLoaded() {
+      return <FadeInWrapper><mod.default /></FadeInWrapper>;
+  })
+);
+
+const StudentChallengesView = dynamic(
+  () => import('./student/StudentChallengesView').then(mod => function StudentLoaded() {
+      return <FadeInWrapper><mod.default /></FadeInWrapper>;
+  })
+);
 
 function ChallengesView() {
-  const { profile, loading } = useAuth();
+  const { profile } = useAuth();
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
+  // ZDE UŽ NENÍ ŽÁDNÝ LOADER!
+  // Layout garantuje, že tuto komponentu zobrazí, až když je auth i data ready.
+  
   if (profile?.role === 'startup') {
     return <StartupChallengesView />;
   }
@@ -22,7 +37,7 @@ function ChallengesView() {
     return <StudentChallengesView />;
   }
 
-  return <p className="text-center py-20">Pro zobrazení této stránky nemáte oprávnění.</p>;
+  return null;
 }
 
 export default withAuth(ChallengesView);
