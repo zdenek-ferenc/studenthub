@@ -1,8 +1,5 @@
-    // src/types/academic.ts
-
     export type AcademicRequestStatus = 'open' | 'matched' | 'closed' | 'draft';
 
-    // --- NOVÉ DEFINICE PRO PROJEKTY ---
 
     export type ProjectTypeKey = 
     | 'marketing_strategy'
@@ -24,9 +21,9 @@
     defaultDeliverables: string[];
     }
 
-    // Struktura JSON objektu uloženého v DB v sloupci project_types
     export interface ProjectDefinition {
     type: ProjectTypeKey;
+    title: string;      
     custom_title?: string;
     deliverables: string[];
     }
@@ -37,7 +34,6 @@
     deadline_delivery?: string;
     }
 
-    // Konfigurace pro UI (tohle chybělo a způsobovalo error)
     export const PROJECT_TYPES_CONFIG: Record<ProjectTypeKey, ProjectTypeDefinition> = {
     marketing_strategy: { type: 'marketing_strategy', title: 'Marketingová strategie', defaultDeliverables: ['Analýza trhu', 'Marketingový mix', 'Akční plán'] },
     market_research: { type: 'market_research', title: 'Průzkum trhu', defaultDeliverables: ['Dotazníkové šetření', 'Vyhodnocení dat', 'Závěrečná zpráva'] },
@@ -52,7 +48,6 @@
     custom: { type: 'custom', title: 'Vlastní zadání', defaultDeliverables: ['Dle domluvy'] },
     };
 
-    // --- STÁVAJÍCÍ INTERFACE ROZŠÍŘENÝ O NOVÁ DATA ---
 
     export interface AcademicRequest {
         id: string;
@@ -65,9 +60,8 @@
         join_code: string;
         created_at?: string;
         
-        // Nová pole
-        project_types?: ProjectDefinition[]; // JSONB
-        requirements?: string[]; // JSONB
-        timeline?: ProjectTimeline; // JSONB
+        project_types?: ProjectDefinition[]; 
+        requirements?: string[]; 
+        timeline?: ProjectTimeline; 
         is_public?: boolean;
     }
