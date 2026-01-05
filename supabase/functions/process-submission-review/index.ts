@@ -1,14 +1,13 @@
 // supabase/functions/process-submission-review/index.ts
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts';
 
-// Helper funkce pro výpočty XP, aby byl kód čistý
+// Helper funkce beze změny
 const calculateXpForNextLevel = (level: number, base: number, exponent: number) => {
   return Math.floor(base * (level ** exponent));
 };
 
-// Definice typů pro robustnost
 interface Submission {
   id: string;
   student_id: string;
@@ -17,7 +16,6 @@ interface Submission {
   position: number | null;
 }
 
-// Hlavní handler, který se postará o logiku
 async function processXpUpdate(submission: Submission) {
   const supabaseAdmin = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
@@ -27,21 +25,19 @@ async function processXpUpdate(submission: Submission) {
   const { id: submission_id, student_id, challenge_id, rating, position } = submission;
 
   if (rating === null) {
-    console.log(`Submission ${submission.id} has no rating yet. Skipping XP processing.`);
+    console.log(`Submission ${submission.id} has no rating yet. Skipping.`);
     return;
   }
 
-  // --- 1. Aktualizace celkové úrovně studenta ---
+  // --- 1. Aktualizace profilu (Zůstává stejné) ---
   const { data: studentProfile, error: profileError } = await supabaseAdmin
     .from('StudentProfile').select('level, xp').eq('user_id', student_id).single();
 
-  if (profileError) {
-    throw new Error(`[Profile] ${profileError.message}`);
-  }
+  if (profileError) throw new Error(`[Profile] ${profileError.message}`);
   
-  const base_xp = 25; // Rebalanced
-  const quality_bonus = Math.floor(((rating / 10) ** 2) * 25); // Rebalanced
-  const position_bonus = position === 1 ? 100 : position === 2 ? 75 : position === 3 ? 50 : 0; // Rebalanced
+  const base_xp = 25;
+  const quality_bonus = Math.floor(((rating / 10) ** 2) * 25);
+  const position_bonus = position === 1 ? 100 : position === 2 ? 75 : position === 3 ? 50 : 0;
   const totalXpGain = base_xp + quality_bonus + position_bonus;
 
   let { level, xp } = studentProfile;
@@ -55,115 +51,106 @@ async function processXpUpdate(submission: Submission) {
     xpForNextLevel = calculateXpForNextLevel(level, 100, 1.6);
   }
 
-  await supabaseAdmin.from('StudentProfile').update({ level, xp }).eq('user_id', student_id);
-
-  // Zápis události
-  await supabaseAdmin.from('XpEvent').insert({
+  // Paralelní update profilu a insert XP eventu pro profil
+  await Promise.all([
+    supabaseAdmin.from('StudentProfile').update({ level, xp }).eq('user_id', student_id),
+    supabaseAdmin.from('XpEvent').insert({
       student_id, submission_id, event_type: 'student_xp', xp_gained: totalXpGain, new_level: level > originalLevel ? level : null
-  });
+    })
+  ]);
 
-  // --- 2. Aktualizace úrovní dovedností ---
-  const { data: challengeSkills, error: skillsError } = await supabaseAdmin
+  // --- 2. Aktualizace skills (OPTIMALIZOVÁNO) ---
+  const { data: challengeSkills } = await supabaseAdmin
     .from('ChallengeSkill').select('skill_id').eq('challenge_id', challenge_id);
 
-  if (skillsError) {
-    throw new Error(`[Skills] ${skillsError.message}`);
-  }
-  if (!challengeSkills) {
-    return;
-  }
-
-  for (const { skill_id } of challengeSkills) {
-    const { data: studentSkill, error: studentSkillError } = await supabaseAdmin
-      .from('StudentSkill').select('level, xp').eq('student_id', student_id).eq('skill_id', skill_id).single();
+  if (challengeSkills && challengeSkills.length > 0) {
     
-    const isWinner = position !== null && position <= 3;
-    const baseMultiplier = isWinner ? 75 : 50;
-    const skillXpGain = Math.floor((rating / 10) * baseMultiplier);
-
-    if (studentSkillError && studentSkillError.code === 'PGRST116') { // PGRST116 = not found
-      // Student skill nemá, tak mu ho vytvoříme
-      let newSkillLevel = 1;
-      let newSkillXp = skillXpGain;
-      let xpForNextSkillLevel = calculateXpForNextLevel(newSkillLevel, 75, 1.4);
+    // Zde použijeme Promise.all pro paralelní zpracování všech skillů najednou
+    const skillUpdates = challengeSkills.map(async ({ skill_id }) => {
+      const { data: studentSkill } = await supabaseAdmin
+        .from('StudentSkill').select('level, xp').eq('student_id', student_id).eq('skill_id', skill_id).single();
       
-      while (newSkillXp >= xpForNextSkillLevel) {
-          newSkillXp -= xpForNextSkillLevel;
+      const isWinner = position !== null && position <= 3;
+      const baseMultiplier = isWinner ? 75 : 50;
+      const skillXpGain = Math.floor((rating / 10) * baseMultiplier);
+      
+      if (!studentSkill) {
+        // Create new skill logic
+        let newSkillLevel = 1;
+        let newSkillXp = skillXpGain;
+        let nextLvl = calculateXpForNextLevel(newSkillLevel, 75, 1.4);
+        
+        while (newSkillXp >= nextLvl) {
+          newSkillXp -= nextLvl;
           newSkillLevel++;
-          xpForNextSkillLevel = calculateXpForNextLevel(newSkillLevel, 75, 1.4);
+          nextLvl = calculateXpForNextLevel(newSkillLevel, 75, 1.4);
+        }
+
+        // Paralelní insert skillu a eventu
+        return Promise.all([
+           supabaseAdmin.from('StudentSkill').insert({ student_id, skill_id, level: newSkillLevel, xp: newSkillXp }),
+           supabaseAdmin.from('XpEvent').insert({
+              student_id, submission_id, event_type: 'new_skill', xp_gained: skillXpGain, skill_id, new_level: newSkillLevel > 1 ? newSkillLevel : null
+           })
+        ]);
+
+      } else {
+        // Update existing skill logic
+        let { level: sLevel, xp: sXp } = studentSkill;
+        const origSLevel = sLevel;
+        sXp += skillXpGain;
+        let nextLvl = calculateXpForNextLevel(sLevel, 75, 1.4);
+
+        while (sXp >= nextLvl) {
+          sXp -= nextLvl;
+          sLevel++;
+          nextLvl = calculateXpForNextLevel(sLevel, 75, 1.4);
+        }
+
+        // Paralelní update skillu a eventu
+        return Promise.all([
+            supabaseAdmin.from('StudentSkill').update({ level: sLevel, xp: sXp }).eq('student_id', student_id).eq('skill_id', skill_id),
+            supabaseAdmin.from('XpEvent').insert({
+              student_id, submission_id, event_type: 'skill_xp', xp_gained: skillXpGain, skill_id, new_level: sLevel > origSLevel ? sLevel : null
+            })
+        ]);
       }
+    });
 
-      await supabaseAdmin.from('StudentSkill').insert({ student_id, skill_id, level: newSkillLevel, xp: newSkillXp });
-      // Zápis události jako "nový skill"
-      await supabaseAdmin.from('XpEvent').insert({
-          student_id, submission_id, event_type: 'new_skill', xp_gained: skillXpGain, skill_id, new_level: newSkillLevel > 1 ? newSkillLevel : null
-      });
-
-    } else if (studentSkill) {
-      // Student skill má, tak ho aktualizujeme
-      let { level: skillLevel, xp: skillXp } = studentSkill;
-      const originalSkillLevel = skillLevel;
-      skillXp += skillXpGain;
-      let xpForNextSkillLevel = calculateXpForNextLevel(skillLevel, 75, 1.4);
-
-      while (skillXp >= xpForNextSkillLevel) {
-        skillXp -= xpForNextSkillLevel;
-        skillLevel++;
-        xpForNextSkillLevel = calculateXpForNextLevel(skillLevel, 75, 1.4);
-      }
-
-      await supabaseAdmin.from('StudentSkill').update({ level: skillLevel, xp: skillXp }).eq('student_id', student_id).eq('skill_id', skill_id);
-      // Zápis události jako "vylepšení skillu"
-       await supabaseAdmin.from('XpEvent').insert({
-          student_id, submission_id, event_type: 'skill_xp', xp_gained: skillXpGain, skill_id, new_level: skillLevel > originalSkillLevel ? skillLevel : null
-      });
-    }
+    // Čekáme, až se zpracují všechny skilly
+    await Promise.all(skillUpdates);
   }
 
-  // --- 3. Vytvoření notifikace pro studenta ---
-  const { data: challenge } = await supabaseAdmin
-    .from('Challenge')
-    .select('title')
-    .eq('id', challenge_id)
-    .single();
+  // --- 3. Notifikace ---
+  const { data: challengeData } = await supabaseAdmin
+    .from('Challenge').select('title').eq('id', challenge_id).single();
 
-  let notificationMessage = '';
-  let notificationType: 'submission_reviewed' | 'submission_winner' = 'submission_reviewed';
+  let message = '';
+  let type = 'submission_reviewed';
 
   if (position && position <= 3) {
-    notificationMessage = `Gratulujeme! Umístil ses na ${position}. místě ve výzvě "${challenge?.title}".`;
-    notificationType = 'submission_winner';
+    message = `Gratulujeme! Umístil ses na ${position}. místě ve výzvě "${challengeData?.title}".`;
+    type = 'submission_winner';
   } else {
-    notificationMessage = `Tvoje řešení pro výzvu "${challenge?.title}" bylo ohodnoceno. Podívej se na zpětnou vazbu.`;
+    message = `Tvoje řešení pro výzvu "${challengeData?.title}" bylo ohodnoceno. Podívej se na zpětnou vazbu.`;
   }
 
   await supabaseAdmin.from('notifications').insert({
     user_id: student_id,
-    message: notificationMessage,
+    message,
     link_url: `/challenges/${challenge_id}`,
-    type: notificationType
+    type: type
   });
 }
 
-// Hlavní Deno server, který naslouchá požadavkům
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
-
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
-    const { record: submission } = await req.json();
-    await processXpUpdate(submission as Submission);
-    
-    return new Response(JSON.stringify({ message: "XP and notification processed successfully" }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    });
+    const { record } = await req.json();
+    await processXpUpdate(record as Submission);
+    return new Response(JSON.stringify({ message: "Success" }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    });
+    const msg = err instanceof Error ? err.message : "Error";
+    return new Response(JSON.stringify({ error: msg }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 });
   }
 });
