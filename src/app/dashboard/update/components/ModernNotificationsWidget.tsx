@@ -51,7 +51,7 @@ export default function ModernNotificationsWidget() {
             
             <div className="space-y-3">
                 {loading ? <p className="text-gray-500 text-sm">Načítám...</p> : notifications.length === 0 ? (
-                    <div className="text-center text-gray-500 py-4 text-sm">Vše tiché. 🔕</div>
+                    <div className="text-center text-gray-500 py-4 text-sm">Žádné notifikace. 🔕</div>
                 ) : (
                     notifications.map(n => (
                         <Link href={n.link_url || '#'} key={n.id} className={`flex items-start gap-3 py-2 md:p-3 rounded-xl border border-transparent hover:bg-white/5 hover:border-white/5 transition-all ${!n.is_read ? 'bg-white/[0.02]' : ''}`}>
