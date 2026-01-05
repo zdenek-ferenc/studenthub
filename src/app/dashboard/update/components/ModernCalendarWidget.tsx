@@ -53,10 +53,10 @@ export default function ModernCalendarWidget() {
     const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
 
     return (
-        <div className="bg-[#0B1623]/60 backdrop-blur-xl border border-white/5 rounded-3xl p-6 h-full min-h-[300px] flex flex-col">
+        <div className="bg-[#0B1623]/60 backdrop-blur-xl shadow-xl border border-white/5 rounded-3xl p-4 md:p-6 h-full min-h-[300px] flex flex-col">
             
             <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-white flex items-center gap-2">
+                <h3 className="font-bold text-sm md:text-base text-white flex items-center gap-2">
                     <CalendarIcon size={18} className="text-blue-400" /> 
                     Kalendář
                 </h3>

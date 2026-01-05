@@ -54,12 +54,12 @@ export default function ModernStudentChallengesWidget() {
 
     return (
         // ZDE JE TEN WRAPPER (CONTAINER) PODLE TVÉHO PŘÁNÍ
-        <div className="bg-[#0B1623]/60 backdrop-blur-xl border border-white/5 rounded-3xl p-6 relative overflow-hidden h-full flex flex-col">
+        <div className="bg-[#0B1623]/60 backdrop-blur-xl shadow-xl border border-white/5 rounded-3xl p-4 md:p-6 relative overflow-hidden h-full flex flex-col">
             
             {/* HLAVIČKA A NAVIGACE */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-3 md:mb-6">
                 {/* UPRAVENÝ NADPIS PODLE VZORU */}
-                <h3 className="font-bold text-white flex items-center gap-2">
+                <h3 className="font-bold text-sm md:text-base text-white flex items-center gap-2">
                     <LayoutList size={18} className="text-blue-400"/> 
                     Moje Výzvy
                 </h3>

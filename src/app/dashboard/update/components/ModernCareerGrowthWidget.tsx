@@ -60,7 +60,7 @@ export default function ModernCareerGrowthWidget() {
     const displayedSkills = showAllSkills ? allSkills : allSkills.slice(0, 5);
 
     return (
-        <div className="bg-[#0B1623]/60 backdrop-blur-xl border border-white/5 rounded-3xl p-6 relative overflow-hidden">
+        <div className="bg-[#0B1623]/60 backdrop-blur-xl shadow-xl border border-white/5 rounded-3xl p-4 md:p-6 relative overflow-hidden">
             {unseenUpdates.studentLevelUp && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-none animate-fade-in-up">
                     <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 animate-bounce">LEVEL UP!</h2>
@@ -68,15 +68,19 @@ export default function ModernCareerGrowthWidget() {
             )}
 
             <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-white flex items-center gap-2"><TrendingUp size={18} className="text-purple-400"/> Kariérní Růst</h3>
+                <h3 className="font-bold text-sm md:text-base text-white flex items-center gap-2"><TrendingUp size={18} className="text-purple-400"/> Kariérní Růst</h3>
                 <div className="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-bold">
                     Level {progress.level}
                 </div>
             </div>
 
             <div className="relative pt-2 pb-6 text-center">
-                <div className="text-4xl font-bold flex flex-col text-white mb-2">{progress.level} <span className='text-sm opacity-50 font-thin'>Úroveň profilu</span></div>
-                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-2">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-24 h-24 bg-blue-600/40 rounded-full blur-[50px] pointer-events-none"></div>
+                <div className="text-4xl font-bold flex flex-col text-white mb-2 relative z-10">
+                    {progress.level} 
+                    <span className='text-sm opacity-50 font-thin'>Úroveň profilu</span>
+                </div>
+                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-2 relative z-10">
                     <motion.div 
                         initial={{ width: 0 }} 
                         animate={{ width: `${percentage}%` }} 
@@ -84,7 +88,7 @@ export default function ModernCareerGrowthWidget() {
                         className="h-full bg-gradient-to-r from-purple-600 to-blue-600 shadow-[0_0_10px_#9333ea]" 
                     />
                 </div>
-                <p className="text-xs text-gray-400">{progress.xp} / {xpForNextLevel} XP do dalšího levelu</p>
+                <p className="text-xs text-gray-400 relative z-10">{progress.xp} / {xpForNextLevel} XP do dalšího levelu</p>
             </div>
 
             <div className="space-y-4">

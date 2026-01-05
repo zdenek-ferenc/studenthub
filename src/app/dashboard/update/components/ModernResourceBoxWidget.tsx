@@ -9,7 +9,7 @@ import {
     ChevronDown, Briefcase, 
     GraduationCap, Zap, Layers,
     DollarSign, Send, UserCheck, Coffee,
-    Library
+    NotebookPen
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -190,16 +190,15 @@ export default function ModernResourceBoxWidget() {
 
 
     return (
-        <div className="bg-gradient-to-br from-[#0B1623]/90 to-[#121e2e]/90 backdrop-blur-xl border border-white/5 rounded-3xl p-5 h-full flex flex-col relative overflow-visible group">
+        <div className="bg-gradient-to-br from-[#0B1623]/90 to-[#121e2e]/90 backdrop-blur-xl shadow-xl border border-white/5 rounded-3xl p-4 md:p-6 h-full flex flex-col relative overflow-visible group">
             
-            <div className="flex items-center gap-3 mb-5 px-1">
-                <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
-                    <Library size={20} />
-                </div>
-                <div>
-                    <h3 className="font-bold text-base text-white leading-none mb-1">Zdroje</h3>
-                    <p className="text-[11px] text-gray-400 font-medium">Výběr nástrojů a know-how.</p>
-                </div>
+            <div className="flex flex-col gap-3 mb-5 px-1">
+                
+                <h3 className="font-bold text-sm md:text-base text-white flex items-center gap-2">
+                    <NotebookPen size={18} className="text-blue-400"/> 
+                    Zdroje
+                </h3>
+                <p className="text-[11px] text-gray-400 font-medium">Výběr nástrojů a know-how.</p>
             </div>
 
             <div className="flex p-1 bg-[#001224] border border-white/5 rounded-xl mb-4">
@@ -325,7 +324,7 @@ const ResourceLink = ({ item }: { item: ResourceItem }) => (
         href={item.url} 
         target="_blank" 
         rel="noopener noreferrer"
-        className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/10 transition-all ease-in-out duration-200 group/item"
+        className="flex items-center gap-3 p-2 md:p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-white/10 transition-all ease-in-out duration-200 group/item"
     >
         <div className={`p-2 rounded-lg bg-[#0B1623] ${item.color} shadow-sm border border-white/5 shrink-0`}>
             <item.icon size={16} />

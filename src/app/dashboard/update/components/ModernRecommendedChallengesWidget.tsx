@@ -119,10 +119,9 @@ export default function ModernRecommendedChallengesWidget() {
     };
 
     return (
-        // UPRAVENÝ HLAVNÍ KONTEJNER - ABY LADIL SE ZBYTKEM DASHBOARDU
         <div className={`
             bg-[#0B1623]/80 backdrop-blur-xl border border-white/5 rounded-3xl 
-            transition-all duration-500 ease-in-out relative overflow-hidden p-6 shadow-xl
+            transition-all duration-500 ease-in-out relative overflow-hidden p-4 md:p-6 shadow-xl
         `}>
 
             <div className="flex justify-between items-start relative z-10">
@@ -131,7 +130,7 @@ export default function ModernRecommendedChallengesWidget() {
                         <Lightbulb size={18} />
                     </div>
                     <div>
-                        <h3 className="font-bold text-white leading-tight">Doporučené výzvy</h3>
+                        <h3 className="font-bold text-sm md:text-base text-white leading-tight">Doporučené výzvy</h3>
                         <p className={`text-xs text-gray-500 transition-opacity duration-300 ${isCollapsed ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'}`}>
                             Na základě tvých dovedností
                         </p>

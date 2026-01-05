@@ -40,10 +40,13 @@ export default function ModernNotificationsWidget() {
     }, [user, fetchNotifs]);
 
     return (
-        <div className="bg-[#0B1623]/60 backdrop-blur-xl border border-white/5 rounded-3xl p-6">
-            <div className="flex items-center gap-2 mb-4">
-                <div className="w-1.5 h-6 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]"></div>
-                <h3 className="font-bold text-white">Notifikace</h3>
+        <div className="bg-[#0B1623]/60 backdrop-blur-xl shadow-xl border border-white/5 rounded-3xl p-4 md:p-6">
+            <div className="flex items-center gap-3 mb-5 px-1">
+                
+                <h3 className="font-bold text-sm md:text-base text-white flex items-center gap-2">
+                    <Bell size={18} className="text-red-400"/> 
+                    Notifikace
+                </h3>
             </div>
             
             <div className="space-y-3">
@@ -56,8 +59,8 @@ export default function ModernNotificationsWidget() {
                                 {getIcon(n.type)}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className={`text-sm ${!n.is_read ? 'text-white font-semibold' : 'text-gray-400'} truncate`}>{n.message}</p>
-                                <p className="text-xs text-gray-600 mt-0.5">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: cs })}</p>
+                                <p className={`text-xs md:text-sm ${!n.is_read ? 'text-white font-semibold' : 'text-gray-400'} truncate`}>{n.message}</p>
+                                <p className="text-[10px] md:text-xs text-gray-600 mt-0.5">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: cs })}</p>
                             </div>
                             {!n.is_read && <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></div>}
                         </Link>

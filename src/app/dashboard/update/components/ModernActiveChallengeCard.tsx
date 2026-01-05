@@ -57,7 +57,7 @@ export default function ModernActiveChallengeCard({ submission }: { submission: 
 
     return (
         <div className="relative group block h-full"> 
-            <div className="bg-[#0B1623]/80 cursor-pointerbackdrop-blur-xl border border-blue-500/30 rounded-3xl p-5 hover:border-blue-500/70 transition-all duration-300 relative overflow-visible flex flex-col h-full">
+            <div className="bg-[#0B1623]/80 cursor-pointerbackdrop-blur-xl border border-blue-500/30 rounded-3xl p-3 md:p-5 hover:border-blue-500/70 transition-all duration-300 relative overflow-visible flex flex-col h-full">
                 <div className="flex flex-col md:flex-row gap-5 items-start md:items-center flex-1">
                     <Link href={`/challenges/${Challenge.id}`} className="flex flex-1 gap-4 w-full group/link min-w-0">                        
                         <div className="hidden md:block shrink-0 pt-1 md:pt-0">
@@ -73,11 +73,11 @@ export default function ModernActiveChallengeCard({ submission }: { submission: 
                         </div>
 
                         <div className="flex flex-col flex-1 min-w-0 justify-center">
-                            <div className="mb-1">
+                            <div className="mb-1 flex flex-col gap-1">
                                 <span className="text-[10px] md:text-xs text-blue-400 font-bold uppercase group-hover/link:text-white transition-all ease-in-out duration-300 tracking-wider block mb-0.5 truncate">
                                     {Challenge.StartupProfile?.company_name}
                                 </span>
-                                <h4 className="text-base md:text-lg font-bold text-white group-hover/link:text-blue-400 transition-all ease-in-out duration-300 leading-tight line-clamp-2 break-words">
+                                <h4 className="text-sm md:text-lg mb-1 font-bold text-white group-hover/link:text-blue-400 transition-all ease-in-out duration-300 leading-tight line-clamp-2 break-words">
                                     {Challenge.title}
                                 </h4>
                             </div>

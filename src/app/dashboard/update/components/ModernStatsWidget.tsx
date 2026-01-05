@@ -14,7 +14,7 @@ type ModernStatItemProps = {
 const ModernStatItem = ({ icon: Icon, value, label, colorClass }: ModernStatItemProps) => (
     <div className="
         bg-[#0B1623]/40 backdrop-blur-md border border-white/5 rounded-2xl 
-        p-3 lg:p-4 
+        p-2 md:p-3 lg:p-4 
         flex flex-row lg:flex-col items-center lg:items-start gap-3 lg:gap-0 lg:justify-between 
         hover:border-white/10 transition-all group
     ">
@@ -41,17 +41,14 @@ export default function ModernStatsWidget() {
     if (loading || !stats) return <div className="h-40 flex items-center justify-center text-blue-500"><LoadingSpinner /></div>;
 
     return (
-        // HLAVNÍ CONTAINER - DARK MODE
-        <div className="bg-[#0B1623]/60 backdrop-blur-xl border border-white/5 rounded-3xl p-6 relative overflow-hidden">
+        <div className="bg-[#0B1623]/60 backdrop-blur-xl shadow-xl border border-white/5 rounded-3xl p-4 md:p-6 relative overflow-hidden">
             
-            {/* HLAVIČKA SEKCE */}
             <div className="flex items-center gap-3 mb-6">
                 
-                <h3 className="font-bold text-white flex items-center gap-2"><BarChart3 size={18} className="text-blue-400"/> Moje Statistiky</h3>
+                <h3 className="font-bold text-sm md:text-base text-white flex items-center gap-2"><BarChart3 size={18} className="text-blue-400"/> Moje Statistiky</h3>
 
             </div>
 
-            {/* TVŮJ PŮVODNÍ GRID */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 flex-1">
                 <ModernStatItem 
                     icon={CheckCircle} value={stats.completedCount} label="Dokončeno" colorClass="text-emerald-400" 
@@ -66,7 +63,7 @@ export default function ModernStatsWidget() {
                     icon={Trophy} value={stats.totalWins} label="Vítězství" colorClass="text-yellow-400" 
                 />
                 
-                <div className="col-span-2 lg:col-span-4 bg-gradient-to-r from-amber-900/10 to-orange-900/10 border border-amber-500/20 rounded-2xl p-3 lg:p-4 flex items-center gap-3 lg:gap-4 backdrop-blur-md hover:border-amber-500/30 transition-colors">
+                <div className="col-span-2 lg:col-span-4 bg-gradient-to-r from-amber-900/10 to-orange-900/10 border border-amber-500/20 rounded-2xl p-2 md:p-3 lg:p-4 flex items-center gap-3 lg:gap-4 backdrop-blur-md hover:border-amber-500/30 transition-colors">
                     <div className="shrink-0 p-2.5 lg:p-3 rounded-xl bg-amber-500/20 text-amber-400">
                         <DollarSign className="w-5 h-5 lg:w-6 lg:h-6" />
                     </div>
