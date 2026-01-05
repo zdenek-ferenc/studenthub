@@ -9,7 +9,6 @@ type Category = { id: string; name: string; };
 type Skill = { id: string; name: string; };
 type Language = { id: string; name: string; };
 
-// 1. ÚPRAVA: Přidán deadline do typu
 type ChallengeStatus = { 
     status: 'open' | 'closed' | 'draft' | 'archived'; 
     deadline: string; 
@@ -39,6 +38,7 @@ export type Student = {
     xp: number | null;
     StudentSkill: { Skill: Skill }[];
     StudentLanguage: { Language: Language }[];
+    Submission: { id: string; is_winner: boolean }[];
 };
 
 type StartupFiltersType = {
@@ -62,9 +62,13 @@ type StudentFiltersType = {
 type RawStudentSkillFromDB = { Skill: Skill | Skill[] | null };
 type RawStudentLanguageFromDB = { Language: Language | Language[] | null };
 
-type RawStudentProfileFromDB = Omit<Student, 'StudentSkill' | 'StudentLanguage' | 'level_progress'> & {
+// 1. ZMĚNA: Raw typ odpovídá databázi (status místo is_winner)
+type RawSubmissionFromDB = { id: string; status: string };
+
+type RawStudentProfileFromDB = Omit<Student, 'StudentSkill' | 'StudentLanguage' | 'level_progress' | 'Submission'> & {
     StudentSkill: RawStudentSkillFromDB[] | null;
     StudentLanguage: RawStudentLanguageFromDB[] | null;
+    Submission: RawSubmissionFromDB[] | null;
 };
 
 type DataContextType = {
@@ -159,11 +163,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const from = currentPage * ITEMS_PER_PAGE;
         const to = from + ITEMS_PER_PAGE - 1;
 
+        // 2. ZMĚNA: Select status místo is_winner
         let query = supabase.from('StudentProfile')
             .select(`
                 user_id, first_name, last_name, username, profile_picture_url, university, bio, created_at, level, xp,
                 StudentSkill ( Skill ( id, name ) ),
-                StudentLanguage ( Language ( id, name ) )
+                StudentLanguage ( Language ( id, name ) ),
+                Submission ( id, status )
             `)
             .not('first_name', 'is', null)
             .neq('first_name', '')
@@ -193,7 +199,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
             if (error) throw error;
 
             if (data) {
-                const rawDataFromDB = data as RawStudentProfileFromDB[];
+                // Tady používáme double cast, abychom umlčeli ten TypeScript error, 
+                // protože my víme, že Submission v DB má 'status', i když TS si myslí svoje
+                const rawDataFromDB = data as unknown as RawStudentProfileFromDB[];
+                
                 const cleanedData: Student[] = rawDataFromDB.map((student): Student => {
 
                     const skills: { Skill: Skill }[] = (student.StudentSkill ?? [])
@@ -216,6 +225,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
                         })
                         .filter((item): item is { Language: Language } => item !== null);
 
+                    // 3. ZMĚNA: Mapování statusu na is_winner a filtrace "applied"
+                    const processedSubmissions = (student.Submission ?? [])
+                        .filter(sub => sub.status !== 'applied') // Odfiltrujeme ty, co se jen přihlásili
+                        .map(sub => ({
+                            id: sub.id,
+                            is_winner: sub.status === 'winner' // Pokud je status 'winner', je vítěz
+                        }));
+
                     return {
                         user_id: student.user_id,
                         first_name: student.first_name,
@@ -229,6 +246,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                         xp: student.xp ?? null,
                         StudentSkill: skills,
                         StudentLanguage: languages,
+                        Submission: processedSubmissions
                     };
                 });
 

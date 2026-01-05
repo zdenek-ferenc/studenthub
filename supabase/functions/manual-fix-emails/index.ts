@@ -6,6 +6,10 @@ import { Resend } from 'npm:resend@2.0.0'
 // !!! ZDE DOPLŇ DATA !!!
 const CHALLENGE_ID = "eecfe240-258a-4156-94f7-ca1407313593"; 
 const EMAILS_TO_SKIP = [
+  "notklasik@gmail.com",
+  "258951@vutbr.cz",
+  "nymburskab@gmail.com",
+  "marek.kostal1@gmail.com",
   "trojankova.e@gmail.com",
   "antekirt2@gmail.com",
   "jirka4870@gmail.com",
@@ -13,29 +17,27 @@ const EMAILS_TO_SKIP = [
 ]; 
 // !!!!!!!!!!!!!!!!!!!!!!
 
-
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') // Pozor: zde musí být SERVICE_ROLE
+const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') 
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
 const supabase = (SUPABASE_URL && SERVICE_ROLE_KEY) 
   ? createClient(SUPABASE_URL, SERVICE_ROLE_KEY) 
   : null
 
-// --- TVŮJ DESIGN SYSTEM (KOPÍROVÁNO 1:1) ---
+// Pomocná funkce pro pauzu (Throttle)
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const COLORS = {
-  primary: '#2563EB',
-  textMain: '#111827',
-  textMuted: '#6B7280',
-  border: '#E5E7EB',
-  bgBadgeWinner: '#FFFBEB',
-  textBadgeWinner: '#B45309',
-  bgBadgePartic: '#EFF6FF',
-  textBadgePartic: '#2563EB'
+  primary: '#2563EB', textMain: '#111827', textMuted: '#6B7280', border: '#E5E7EB',
+  bgBadgeWinner: '#FFFBEB', textBadgeWinner: '#B45309', bgBadgePartic: '#EFF6FF', textBadgePartic: '#2563EB'
 };
 
 const getEmailHtml = (name: string, title: string, type: 'winner' | 'participant', challengeTitle: string) => {
+  // ... (TENTO KÓD ZŮSTÁVÁ STEJNÝ JAKO PŘEDTÍM - DESIGN) ...
+  // Pro úsporu místa zde v chatu to neopisuji celé, 
+  // NECH TAM TEN HTML GENERÁTOR, CO JSI TAM MĚL
   const isWinner = type === 'winner';
   const badgeText = isWinner ? 'VÍTĚZSTVÍ' : 'HODNOCENÍ';
   const badgeBg = isWinner ? COLORS.bgBadgeWinner : COLORS.bgBadgePartic;
@@ -52,10 +54,7 @@ const getEmailHtml = (name: string, title: string, type: 'winner' | 'participant
   return `
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; } .btn:hover { opacity: 0.9; }</style>
-</head>
+<head><meta charset="utf-8"><style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; } .btn:hover { opacity: 0.9; }</style></head>
 <body style="background-color: #ffffff; color: ${COLORS.textMain}; padding: 40px 20px;">
   <div style="max-width: 480px; margin: 0 auto;">
     <div style="margin-bottom: 32px;"><a href="https://risehigh.io" style="color: ${COLORS.primary}; font-weight: 800; font-size: 20px; text-decoration: none; letter-spacing: -0.5px;">RiseHigh</a></div>
@@ -82,33 +81,31 @@ Deno.serve(async (req) => {
   try {
     if (!RESEND_API_KEY || !supabase) throw new Error("Missing Keys");
 
-    // 1. Načíst Challenge Info
     const { data: challenge } = await supabase.from('Challenge').select('title').eq('id', CHALLENGE_ID).single();
     if (!challenge) return new Response("Challenge not found", { status: 404 });
 
-    // 2. Načíst submissions
     const { data: submissions } = await supabase
       .from('Submission')
       .select(`id, status, position, StudentProfile ( first_name, User ( email ) )`)
       .eq('challenge_id', CHALLENGE_ID)
-      .neq('status', 'applied'); // Posíláme jen těm co mají hodnocení
+      .neq('status', 'applied');
 
     if (!submissions?.length) return new Response('No submissions found', { status: 200 });
 
     const results = [];
 
-    // 3. Loop
+    // TADY JE TA ZMĚNA - PAUZA V CYKLU
     for (const sub of submissions) {
       const email = sub.StudentProfile?.User?.email;
       const name = sub.StudentProfile?.first_name || 'Studente';
       
       if (!email) continue;
 
-      // --- FILTR PROTI DUPLICITÁM ---
+      // FILTR PROTI DUPLICITÁM
       if (EMAILS_TO_SKIP.includes(email)) {
         console.log(`Skipping ${email} - already sent.`);
         results.push({ email, status: 'skipped' });
-        continue;
+        continue; // Jde na dalšího, bez čekání
       }
 
       const isWinner = sub.status === 'winner' || (sub.position !== null && sub.position > 0);
@@ -123,9 +120,17 @@ Deno.serve(async (req) => {
         });
         console.log(`Email sent to ${email}`);
         results.push({ email, status: 'sent' });
+
+        // !!! TADY JE TA BRZDA !!!
+        // Čekáme 1000ms (1 sekundu) než pošleme další mail, abychom nenaštvali Resend
+        await sleep(1000); 
+
       } catch (error) {
         console.error(`Failed to send email to ${email}:`, error);
         results.push({ email, status: 'error', error: error.message });
+        
+        // I po chybě chvíli počkáme
+        await sleep(1000);
       }
     }
 
