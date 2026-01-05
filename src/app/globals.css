@@ -109,6 +109,15 @@ button {
   animation-delay: calc(25ms * var(--char-index));
 }
 
+@keyframes slideUpBg {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.legacy-enter-animation {
+  animation: slideUpBg 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);

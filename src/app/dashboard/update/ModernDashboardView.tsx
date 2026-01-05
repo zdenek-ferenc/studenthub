@@ -26,17 +26,17 @@
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6 pt-6 md:pt-32 max-w-[1600px]">
             
-            <div className="mb-5 animate-fade-in-up delay-100">
+            <div className="mb-3 md:mb-5 animate-fade-in-up delay-100">
                 <ModernStudentChallengesWidget />
             </div>
 
-            <div className="mb-5 animate-fade-in-up delay-200">
+            <div className="mb-3 md:mb-5 animate-fade-in-up delay-200">
                 <ModernRecommendedChallengesWidget />
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 animate-fade-in-up delay-300">
                 
-                <div className="xl:col-span-8 flex flex-col gap-6">
+                <div className="xl:col-span-8 flex flex-col gap-3 md:gap-5">
                     <div className="w-full">
                         <ModernStatsWidget />
                     </div>
@@ -52,7 +52,7 @@
                     
                 </div>
 
-                <div className="xl:col-span-4 flex flex-col gap-6">
+                <div className="xl:col-span-4 flex flex-col gap-3 md:gap-5">
                     <div className="w-full">
                         <ModernCareerGrowthWidget />
                     </div>

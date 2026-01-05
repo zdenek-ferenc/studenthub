@@ -1,3 +1,5 @@
+// supabase/functions/send-challenge-emails/index.ts
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Resend } from 'npm:resend@2.0.0'
 
@@ -148,15 +150,22 @@ Deno.serve(async (req) => {
       const isWinner = sub.status === 'winner' || (sub.position !== null && sub.position > 0);
       const subject = isWinner ? `Výhra ve výzvě: ${record.title}` : `Zpětná vazba: ${record.title}`;
       
-      await resend.emails.send({
-        from: 'RiseHigh <info@risehigh.io>',
-        to: email,
-        subject: subject,
-        html: getEmailHtml(name, subject, isWinner ? 'winner' : 'participant', record.title)
-      });
+      // ZMĚNA: Try-catch blok uvnitř mapy, aby jeden vadný email neshodil ostatní
+      try {
+        await resend.emails.send({
+          from: 'RiseHigh <info@risehigh.io>',
+          to: email,
+          subject: subject,
+          html: getEmailHtml(name, subject, isWinner ? 'winner' : 'participant', record.title)
+        });
+        console.log(`Email sent to ${email}`);
+      } catch (error) {
+        console.error(`Failed to send email to ${email}:`, error);
+      }
     });
 
-    await Promise.all(promises);
+    await Promise.allSettled(promises);
+    
     return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
 
   } catch (err) {

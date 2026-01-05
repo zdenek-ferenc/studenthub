@@ -1099,6 +1099,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_next_level_xp_skill: {
+        Args: { current_level: number }
+        Returns: number
+      }
+      calculate_next_level_xp_student: {
+        Args: { current_level: number }
+        Returns: number
+      }
       check_contact_eligibility: {
         Args: { p_startup_id: string; p_student_id: string }
         Returns: Database["public"]["CompositeTypes"]["contact_eligibility_status"]
@@ -1112,6 +1120,10 @@ export type Database = {
       current_user_auth_role: { Args: never; Returns: string }
       current_user_id: { Args: never; Returns: string }
       current_user_role: { Args: never; Returns: string }
+      finalize_challenge_v2: {
+        Args: { p_challenge_id: string; p_winners: Json }
+        Returns: undefined
+      }
       get_challenge_applicant_count: {
         Args: { challenge_id: string }
         Returns: number

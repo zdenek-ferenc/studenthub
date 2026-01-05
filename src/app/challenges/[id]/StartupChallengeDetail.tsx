@@ -190,6 +190,12 @@ const EvaluationStatusPanel = ({
     );
 };
 
+interface DatabaseError extends Error {
+    code?: string;
+    details?: string;
+    hint?: string;
+}
+
 
 export default function StartupChallengeDetail({ challenge: initialChallenge, activeTab, setActiveTab, unansweredCount, setUnansweredCount }: { challenge: Challenge, activeTab?: 'assignment'|'qna', setActiveTab?: import('react').Dispatch<import('react').SetStateAction<'assignment'|'qna'>> , unansweredCount?: number, setUnansweredCount?: import('react').Dispatch<import('react').SetStateAction<number>> }) {
     const [challenge, setChallenge] = useState(initialChallenge);
@@ -365,15 +371,16 @@ export default function StartupChallengeDetail({ challenge: initialChallenge, ac
 
     const handleFinalizeChallenge = async () => {
         if (!winnersToConfirm) return;
-        const updates = Object.entries(winnersToConfirm).map(([place, submissionId]) =>
-            supabase.from('Submission').update({ position: parseInt(place), status: 'winner' }).eq('id', submissionId)
-        );
-        await Promise.all(updates);
-        const { error } = await supabase.from('Challenge').update({ status: 'closed' }).eq('id', challenge.id);
+        setIsModalOpen(false);
 
-        if (error) {
-            showToast(`Chyba: ${error.message}`, 'error');
-        } else {
+        try {
+            const { error } = await supabase.rpc('finalize_challenge_v2', {
+                p_challenge_id: challenge.id,
+                p_winners: winnersToConfirm
+            });
+
+            if (error) throw error;
+
             showToast('Výsledky byly úspěšně vyhlášeny!', 'success');
 
             await fetchInitialSubmissions();
@@ -382,8 +389,19 @@ export default function StartupChallengeDetail({ challenge: initialChallenge, ac
                 status: 'closed'
             }));
             router.refresh();
+
+        } catch (error: unknown) {
+            const err = error as DatabaseError;
+            
+            console.error('Finalize error:', err);
+            
+            if (err.message?.includes('timeout') || err.code === '57014') {
+                showToast('Proces běží na pozadí. Obnovte stránku za chvíli.', 'success');
+                setTimeout(() => window.location.reload(), 3000);
+            } else {
+                showToast(`Chyba: ${err.message || 'Nepodařilo se dokončit operaci'}`, 'error');
+            }
         }
-        setIsModalOpen(false);
     };
 
     if (loading) return <p className="text-center py-20">Načítám přihlášky...</p>;

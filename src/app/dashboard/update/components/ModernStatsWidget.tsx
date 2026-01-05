@@ -1,7 +1,7 @@
 "use client";
 
 import { useDashboard } from '../../../../contexts/DashboardContext';
-import { Star, CheckCircle, Percent, Trophy, DollarSign } from 'lucide-react';
+import { Star, CheckCircle, Percent, Trophy, DollarSign, BarChart3 } from 'lucide-react';
 import LoadingSpinner from '../../../../components/LoadingSpinner';
 
 type ModernStatItemProps = {
@@ -13,7 +13,7 @@ type ModernStatItemProps = {
 
 const ModernStatItem = ({ icon: Icon, value, label, colorClass }: ModernStatItemProps) => (
     <div className="
-        bg-[#0B1623]/60 backdrop-blur-md border border-white/5 rounded-2xl 
+        bg-[#0B1623]/40 backdrop-blur-md border border-white/5 rounded-2xl 
         p-3 lg:p-4 
         flex flex-row lg:flex-col items-center lg:items-start gap-3 lg:gap-0 lg:justify-between 
         hover:border-white/10 transition-all group
@@ -41,30 +41,42 @@ export default function ModernStatsWidget() {
     if (loading || !stats) return <div className="h-40 flex items-center justify-center text-blue-500"><LoadingSpinner /></div>;
 
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 h-full">
-            <ModernStatItem 
-                icon={CheckCircle} value={stats.completedCount} label="Dokončeno" colorClass="text-emerald-400" 
-            />
-            <ModernStatItem 
-                icon={Star} value={stats.avgRating} label="Rating" colorClass="text-blue-400" 
-            />
-            <ModernStatItem 
-                icon={Percent} value={`${stats.successRate}%`} label="Úspěšnost" colorClass="text-sky-400" 
-            />
-            <ModernStatItem 
-                icon={Trophy} value={stats.totalWins} label="Vítězství" colorClass="text-yellow-400" 
-            />
+        // HLAVNÍ CONTAINER - DARK MODE
+        <div className="bg-[#0B1623]/60 backdrop-blur-xl border border-white/5 rounded-3xl p-6 relative overflow-hidden">
             
-            <div className="col-span-2 lg:col-span-4 bg-gradient-to-r from-amber-900/20 to-orange-900/20 border border-amber-500/20 rounded-2xl p-3 lg:p-4 flex items-center gap-3 lg:gap-4 backdrop-blur-md">
-                <div className="shrink-0 p-2.5 lg:p-3 rounded-xl bg-amber-500/20 text-amber-400">
-                    <DollarSign className="w-5 h-5 lg:w-6 lg:h-6" />
-                </div>
-                <div>
-                    <div className="text-xl lg:text-2xl font-bold text-amber-100 leading-none mb-0.5">
-                        {stats.totalEarnings.toLocaleString('cs-CZ')} Kč
+            {/* HLAVIČKA SEKCE */}
+            <div className="flex items-center gap-3 mb-6">
+                
+                <h3 className="font-bold text-white flex items-center gap-2"><BarChart3 size={18} className="text-blue-400"/> Moje Statistiky</h3>
+
+            </div>
+
+            {/* TVŮJ PŮVODNÍ GRID */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 flex-1">
+                <ModernStatItem 
+                    icon={CheckCircle} value={stats.completedCount} label="Dokončeno" colorClass="text-emerald-400" 
+                />
+                <ModernStatItem 
+                    icon={Star} value={stats.avgRating} label="Rating" colorClass="text-blue-400" 
+                />
+                <ModernStatItem 
+                    icon={Percent} value={`${stats.successRate}%`} label="Úspěšnost" colorClass="text-sky-400" 
+                />
+                <ModernStatItem 
+                    icon={Trophy} value={stats.totalWins} label="Vítězství" colorClass="text-yellow-400" 
+                />
+                
+                <div className="col-span-2 lg:col-span-4 bg-gradient-to-r from-amber-900/10 to-orange-900/10 border border-amber-500/20 rounded-2xl p-3 lg:p-4 flex items-center gap-3 lg:gap-4 backdrop-blur-md hover:border-amber-500/30 transition-colors">
+                    <div className="shrink-0 p-2.5 lg:p-3 rounded-xl bg-amber-500/20 text-amber-400">
+                        <DollarSign className="w-5 h-5 lg:w-6 lg:h-6" />
                     </div>
-                    <div className="text-[10px] lg:text-xs font-medium text-amber-500/80 uppercase tracking-wider">
-                        Celkový výdělek
+                    <div>
+                        <div className="text-xl lg:text-2xl font-bold text-amber-100 leading-none mb-0.5">
+                            {stats.totalEarnings.toLocaleString('cs-CZ')} Kč
+                        </div>
+                        <div className="text-[10px] lg:text-xs font-medium text-amber-500/80 uppercase tracking-wider">
+                            Celkový výdělek
+                        </div>
                     </div>
                 </div>
             </div>
