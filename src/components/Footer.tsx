@@ -91,7 +91,7 @@ export default function Footer() {
       <div className="border-t border-white/10 bg-[var(--barva-tmava-tmavsi)]/50 pb-24 lg:pb-0">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs md:text-sm text-gray-500">
           
-          <div className="flex flex-wrap justify-center md:justify-start gap-4 text-center md:text-left">
+          <div className="flex flex-wrap justify-center md:justify-start gap-4 text-center text-white md:text-left">
             <p>&copy; {currentYear} RiseHigh.</p>
             <span className="hidden md:inline">|</span>
             <Link href="/zasady-ochrany-udaju" className="hover:text-white transition-colors">Ochrana údajů</Link>

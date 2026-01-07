@@ -246,7 +246,7 @@ const DemoFinalSelection = () => {
                                 {winner ? (
                                     <DraggableWinner finalist={winner} index={index} />
                                 ) : (
-                                    <span className="text-gray-500 text-sm">{index + 1}. místo</span>
+                                    <span className="text-gray-800 text-sm">{index + 1}. místo</span>
                                 )}
                             </DroppableWinnerSlot>
                         ))}
