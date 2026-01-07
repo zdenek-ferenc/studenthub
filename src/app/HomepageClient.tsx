@@ -202,6 +202,7 @@
                         alt={logo.alt}
                         width={120}
                         height={40}
+                        priority={true}
                         className="h-6 sm:h-8 w-auto object-contain hover:brightness-100 hover:contrast-100 transition-all" 
                       />
                     </div>
