@@ -33,9 +33,7 @@
         
         <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-[#001224]"></div>
-            
             <div className="absolute inset-0 bg-grid-white opacity-20 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)]"></div>
-            
             <div className="aurora-blob w-[500px] h-[500px] bg-blue-600/30 top-[-10%] left-[-10%] blur-[120px]"></div>
             <div className="aurora-blob w-[400px] h-[400px] bg-cyan-500/20 bottom-[10%] right-[-5%] blur-[100px] delay-1000"></div>
             <div className="aurora-blob w-[600px] h-[300px] bg-indigo-600/20 top-[40%] left-[30%] blur-[120px] delay-2000"></div>
@@ -86,7 +84,7 @@
             </div>
             </div>
 
-            <div className="animate-soft-fade-up delay-100 mt-12 pb-24 sm:mt-24 w-full max-w-6xl mx-auto">
+            <div className="mt-12 pb-24 sm:mt-24 w-full max-w-6xl mx-auto">
             <div className="text-center mb-6">
                 <p className="text-sm text-gray-300 uppercase tracking-widest font-semibold">Důvěřují nám</p>
             </div>
@@ -102,9 +100,9 @@
                         alt={logo.alt}
                         width={120}
                         height={40}
-                        priority={index < 8}
-                        quality={85}
-                        className="h-6 sm:h-8 w-auto object-contain hover:brightness-100 hover:contrast-100 transition-all"
+                        priority={index < 8} 
+                        quality={75}
+                        className="h-6 sm:h-8 w-auto object-contain hover:brightness-100 hover:contrast-100 transition-all" 
                     />
                     </div>
                 ))}
