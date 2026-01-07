@@ -21,7 +21,7 @@ const FinalistCard = ({ finalist, isOverlay = false, isDragging = false }: { fin
     `}>
         <div className='flex flex-col'>
             <span className="font-medium text-sm">{finalist.name}</span>
-            <span className="font-medium text-gray-500 text-xs">({finalist.rating}/10)</span>
+            <span className="font-medium text-gray-700 text-xs">({finalist.rating}/10)</span>
         </div>
         <GripVertical className="text-gray-400" />
     </div>
@@ -34,8 +34,8 @@ const WinnerCard = ({ finalist, index, isOverlay = false, isDragging = false }: 
         ${isDragging ? 'opacity-0' : 'opacity-100'}
     `}>
         <div className='flex flex-col'>
-            <span className="font-medium text-sm"><span className="text-amber-600 font-bold mr-1">{index + 1}.</span> {finalist.name}</span>
-            <span className="font-medium text-gray-500 text-xs">({finalist.rating}/10)</span>
+            <span className="font-medium text-sm"><span className="text-black font-bold mr-1">{index + 1}.</span> {finalist.name}</span>
+            <span className="font-medium text-gray-700 text-xs">({finalist.rating}/10)</span>
         </div>
     </div>
 );
