@@ -5,23 +5,36 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cookie, X } from 'lucide-react';
 
-export default function CookieConsentWidget() {
+interface CookieConsentWidgetProps {
+    onDecision: (enabled: boolean) => void;
+}
+
+export default function CookieConsentWidget({ onDecision }: CookieConsentWidgetProps) {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         const consensus = localStorage.getItem('cookie_consent');
-        if (!consensus) {
+        
+        if (consensus === 'true') {
+            onDecision(true);
+            setIsVisible(false);
+        } else if (consensus === 'false') {
+            onDecision(false);
+            setIsVisible(false);
+        } else {
             setIsVisible(true);
         }
-    }, []);
+    }, [onDecision]);
 
     const handleAccept = () => {
         localStorage.setItem('cookie_consent', 'true');
+        onDecision(true);
         setIsVisible(false);
     };
 
     const handleDecline = () => {
         localStorage.setItem('cookie_consent', 'false');
+        onDecision(false); 
         setIsVisible(false);
     };
 
