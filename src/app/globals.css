@@ -323,8 +323,8 @@ button {
 @keyframes soft-fade-up {
   from {
     opacity: 0;
-    transform: translate3d(0, 20px, 0) scale(0.98); /* 3D vynutí GPU akceleraci */
-    filter: blur(4px); /* Moderní efekt, ale s mírou */
+    transform: translate3d(0, 20px, 0) scale(0.98); 
+    filter: blur(4px); 
   }
   to {
     opacity: 1;
@@ -334,26 +334,21 @@ button {
 }
 
 .animate-soft-fade-up {
-  /* will-change informuje prohlížeč dopředu, aby optimalizoval vrstvy */
   will-change: opacity, transform; 
   animation: soft-fade-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  opacity: 0; /* Výchozí stav skrytý */
+  opacity: 0; 
 }
 
-/* Optimalizované delaye - zkrátíme je, aby LCP bylo rychlejší */
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
 
-/* Původní marquee optimalizace */
 .animate-marquee {
-  animation: marquee 80s linear infinite;
-  will-change: transform; /* Důležité pro plynulost na mobilech */
-  transform: translateZ(0); /* Hack pro plynulost */
+  animation: marquee 40s linear infinite;
+  will-change: transform; 
+  transform: translateZ(0); 
 }
 
-
-/* Aurora - barevná záře */
 .aurora-blob {
   position: absolute;
   filter: blur(80px);
@@ -367,7 +362,6 @@ button {
   100% { transform: translate(20px, -20px) scale(1.1); }
 }
 
-/* Glass efekt pro karty/logobar */
 .glass-panel {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
@@ -376,16 +370,14 @@ button {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* Textový gradient pro nadpis */
 .text-glow-gradient {
   background: linear-gradient(135deg, #FFFFFF 0%, #CEE8FF 50%, #8ecae6 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 30px rgba(142, 202, 230, 0.3); /* Jemná záře kolem textu */
+  text-shadow: 0 0 30px rgba(142, 202, 230, 0.3); 
 }
 
-/* Button s vnitřní září (Inner Glow) */
 .btn-shiny {
   position: relative;
   overflow: hidden;

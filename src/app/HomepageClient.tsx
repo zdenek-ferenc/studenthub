@@ -109,20 +109,28 @@
     </button>
   );
 
+  import unklogo from '../../public/unklogo.png';
+  import vutlogo from '../../public/vutlogo.png';
+  import sporteralogo from '../../public/sporteralogo.png';
+  import contributelogo from '../../public/contributelogo.png';
+  import renownlogo from '../../public/renownlogo.png';
+  import obzoremlogo from '../../public/obzoremlogo.svg'; // U SVG pozor na loader, ale většinou OK
+  import vdlogo from '../../public/vdlogo.svg';
+  import citroneklogo from '../../public/citroneklogo.png';
 
   export default function HomePage() {
     const [activeTab, setActiveTab] = useState('challenges');
     const { user, profile } = useAuth();
 
     const logos = [
-      { src: '/unklogo.png', alt: 'Unknown Agency' },
-      { src: '/vutlogo.png', alt: 'VUT' },
-      { src: '/sporteralogo.png', alt: 'Sportera' },
-      { src: '/contributelogo.png', alt: 'Contribute' },
-      { src: '/renownlogo.png', alt: 'Renown Media' },
-      { src: '/obzoremlogo.svg', alt: 'Studio Obzorem' },
-      { src: '/vdlogo.svg', alt: 'Virtigo Digital' },
-      { src: '/citroneklogo.png', alt: 'Citronek' }
+      { src: unklogo, alt: 'Unknown Agency' },
+      { src: vutlogo, alt: 'VUT' },
+      { src: sporteralogo, alt: 'Sportera' },
+      { src: contributelogo, alt: 'Contribute' },
+      { src: renownlogo, alt: 'Renown Media' },
+      { src: obzoremlogo, alt: 'Studio Obzorem' },
+      { src: vdlogo, alt: 'Virtigo Digital' },
+      { src: citroneklogo, alt: 'Citronek' }
     ];
 
     return (
@@ -186,7 +194,7 @@
               </div>
             </div>
 
-            <div className="animate-soft-fade-up delay-600 mt-12 pb-24 sm:mt-24 w-full max-w-6xl mx-auto">
+            <div className="animate-soft-fade-up delay-100 mt-12 pb-24 sm:mt-24 w-full max-w-6xl mx-auto">
               <div className="text-center mb-6">
                 <p className="text-sm text-gray-300 uppercase tracking-widest font-semibold">Důvěřují nám</p>
               </div>
@@ -202,7 +210,8 @@
                         alt={logo.alt}
                         width={120}
                         height={40}
-                        priority={true}
+                        priority={index < logos.length} 
+                        quality={85}
                         className="h-6 sm:h-8 w-auto object-contain hover:brightness-100 hover:contrast-100 transition-all" 
                       />
                     </div>
