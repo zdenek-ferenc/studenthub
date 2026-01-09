@@ -1,10 +1,7 @@
-// supabase/functions/handle-challenge-closed/index.ts
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
 // --- KONFIGURACE XP ---
-// Používáme stejný vzorec jako v předchozích verzích
 const calculateNextLevelXp = (level: number) => Math.floor(100 * (level ** 1.6));
 const calculateSkillNextLevelXp = (level: number) => Math.floor(75 * (level ** 1.4));
 
@@ -24,19 +21,19 @@ interface WebhookPayload {
 }
 
 Deno.serve(async (req) => {
-  // CORS
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
+    // OPRAVA: Použití SERVICE_ROLE_KEY místo SUPABASE_SERVICE_ROLE_KEY
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SERVICE_ROLE_KEY') ?? '' 
     )
 
     const payload: WebhookPayload = await req.json();
     const { record, old_record } = payload;
 
-    // 1. BEZPEČNOSTNÍ KONTROLA: Spouštíme jen při uzavření výzvy
+    // 1. BEZPEČNOSTNÍ KONTROLA
     if (record.status !== 'closed' || old_record.status === 'closed') {
       return new Response(JSON.stringify({ message: 'Ignored: Not a closing event' }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
@@ -47,14 +44,13 @@ Deno.serve(async (req) => {
     const challengeId = record.id;
     console.log(`🔒 Zpracovávám uzavření výzvy: ${challengeId} (${record.title})`);
 
-    // 2. NAČTENÍ DAT (BULK FETCH)
-    // Načteme vše najednou, abychom nedělali DB dotazy v cyklu
+    // 2. NAČTENÍ DAT
     const [submissionsRes, challengeSkillsRes] = await Promise.all([
       supabase
         .from('Submission')
         .select('id, student_id, rating, position, status')
         .eq('challenge_id', challengeId)
-        .neq('status', 'applied'), // Ignorujeme ty, co nic neodevzdali
+        .neq('status', 'applied'),
       
       supabase
         .from('ChallengeSkill')
@@ -72,24 +68,21 @@ Deno.serve(async (req) => {
     const skillIds = challengeSkillsRes.data?.map(s => s.skill_id) || [];
     const studentIds = submissions.map(s => s.student_id);
 
-    // Načtení profilů a skillů studentů pro výpočet
     const [profilesRes, studentSkillsRes] = await Promise.all([
       supabase.from('StudentProfile').select('user_id, level, xp').in('user_id', studentIds),
       supabase.from('StudentSkill').select('student_id, skill_id, level, xp').in('student_id', studentIds).in('skill_id', skillIds)
     ]);
 
     const profilesMap = new Map(profilesRes.data?.map(p => [p.user_id, p]) || []);
-    // Mapování: "studentId_skillId" -> SkillData
     const skillsMap = new Map(studentSkillsRes.data?.map(s => [`${s.student_id}_${s.skill_id}`, s]) || []);
 
-    // 3. VÝPOČTY (IN-MEMORY)
+    // 3. VÝPOČTY
     const profileUpdates = [];
     const skillUpserts = [];
     const xpEvents = [];
     const notifications = [];
 
     for (const sub of submissions) {
-      // Ignorujeme submissions bez ratingu (pokud nějaké takové existují ve stavu reviewed)
       if (sub.rating === null) continue;
 
       // A. VÝPOČET XP PROFILU
@@ -104,7 +97,6 @@ Deno.serve(async (req) => {
         const oldLevel = level;
         xp += totalXpGain;
         
-        // Level Up Logic
         let nextLevelXp = calculateNextLevelXp(level);
         while (xp >= nextLevelXp) {
           xp -= nextLevelXp;
@@ -119,13 +111,13 @@ Deno.serve(async (req) => {
           updated_at: new Date().toISOString()
         });
 
-        // Event log
         xpEvents.push({
           student_id: sub.student_id,
           submission_id: sub.id,
           event_type: 'student_xp',
           xp_gained: totalXpGain,
-          new_level: level > oldLevel ? level : null
+          new_level: level > oldLevel ? level : null,
+          is_seen: false
         });
       }
 
@@ -159,7 +151,6 @@ Deno.serve(async (req) => {
           updated_at: new Date().toISOString()
         });
 
-        // XP Event pro každý skill (volitelné, může generovat hodně řádků, ale pro detailní log je to dobré)
         xpEvents.push({
           student_id: sub.student_id,
           submission_id: sub.id,
@@ -189,67 +180,48 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 4. ULOŽENÍ DO DB (TRANSAKČNÍ SÉRIE)
+    // 4. ULOŽENÍ DO DB
     console.log(`💾 Ukládám: ${profileUpdates.length} profilů, ${skillUpserts.length} skillů, ${xpEvents.length} eventů.`);
 
-    // Upsert Skillů
-    if (skillUpserts.length > 0) {
-      const { error } = await supabase.from('StudentSkill').upsert(skillUpserts);
-      if (error) console.error('Error updating skills:', error);
-    }
+    if (skillUpserts.length > 0) await supabase.from('StudentSkill').upsert(skillUpserts);
+    if (profileUpdates.length > 0) await supabase.from('StudentProfile').upsert(profileUpdates);
+    if (xpEvents.length > 0) await supabase.from('XpEvent').insert(xpEvents);
+    if (notifications.length > 0) await supabase.from('notifications').insert(notifications);
 
-    // Update Profilů
-    if (profileUpdates.length > 0) {
-      const { error } = await supabase.from('StudentProfile').upsert(profileUpdates);
-      if (error) console.error('Error updating profiles:', error);
-    }
-
-    // Insert Eventů
-    if (xpEvents.length > 0) {
-      const { error } = await supabase.from('XpEvent').insert(xpEvents);
-      if (error) console.error('Error inserting XP events:', error);
-    }
-
-    // Insert Notifikací
-    if (notifications.length > 0) {
-      const { error } = await supabase.from('notifications').insert(notifications);
-      if (error) console.error('Error inserting notifications:', error);
-    }
-
-    // 5. ASYNCHRONNÍ VOLÁNÍ E-MAILŮ (FIRE AND FORGET)
-    // Toto je klíč k tomu, aby to "nepadalo". Zavoláme druhou funkci a nečekáme na výsledek.
+    // 5. ODESLÁNÍ E-MAILŮ
     const emailPayload = {
-      record: record, // Pošleme data o výzvě
+      record: record,
       old_record: old_record,
       table: 'Challenge',
       type: 'UPDATE',
-      manual_trigger: true // Signál pro funkci, že má běžet i když to není přímý webhook
+      manual_trigger: true
     };
 
-    // Použijeme fetch k invokaci druhé funkce.
-    // DŮLEŽITÉ: Nepoužíváme 'await' na response body, jen odešleme request.
-    // EdgeRuntime.waitUntil zajistí, že request odejde i když tato funkce skončí.
     const emailFunctionUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-challenge-emails`;
     
-    console.log('🚀 Odpaluji e-maily na pozadí...');
+    console.log(`🚀 Odpaluji e-maily na URL: ${emailFunctionUrl}`);
     
-    // Trik pro "Fire and Forget" v Deno Edge Functions
     const emailPromise = fetch(emailFunctionUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        // OPRAVA: Použití SERVICE_ROLE_KEY pro autorizaci
+        'Authorization': `Bearer ${Deno.env.get('SERVICE_ROLE_KEY')}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(emailPayload)
-    }).catch(err => console.error("Chyba při volání email funkce:", err));
+    })
+    .then(async (res) => {
+        if (res.ok) {
+            console.log("✅ Email function invoked successfully (200 OK)");
+        } else {
+            const errText = await res.text();
+            console.error(`❌ Email function failed with status ${res.status}: ${errText}`);
+        }
+    })
+    .catch(err => console.error("❌ Network error invoking email function:", err));
 
-    // V Supabase Edge Runtime je dobré použít waitUntil, pokud je dostupný, 
-    // jinak prostě jen neawaitujeme a doufáme, že runtime nekillne request (což u fetch většinou projde).
-    // Pokud máš novější verzi Deno deploy:
     if (typeof EdgeRuntime !== 'undefined' && EdgeRuntime.waitUntil) {
         EdgeRuntime.waitUntil(emailPromise);
-    } else {
-        // Fallback: Jen to spustíme a nečekáme
     }
 
     return new Response(JSON.stringify({ success: true, processed: submissions.length }), {
