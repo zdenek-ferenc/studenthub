@@ -1,77 +1,23 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { supabase } from '../../../lib/supabaseClient';
 import { useAuth } from '../../../contexts/AuthContext';
-import LoadingSpinner from '../../../components/LoadingSpinner';
-import SkillRadarChart from './components/SkillRadarChart';
-import ProfilePortfolioSection from './components/ProfilePortfolioSection';
-import ProfileSkillsSection from './components/ProfileSkillsSection';
-import ProfileInfoCard from './components/ProfileInfoCard';
-import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { StudentProfile } from './types';
-import LogoutButton from '@/components/auth/LogoutButton';
+import ModernProfileLayout from './components/ModernProfileLayout';
+import ModernStudentHeader from './components/ModernStudentHeader';
+import ModernSkillsWidget from './components/ModernSkillsWidget';
+import ModernSkillRadarWidget from './components/ModernSkillRadarWidget';
+import ModernPortfolioWidget from './components/ModernPortfolioWidget';
+import { ChevronLeft } from 'lucide-react';
 
-export default function PublicStudentProfileView({ profileId }: { profileId: string }) {
-    const { user, profile: viewerProfile } = useAuth();
-    const [profile, setProfile] = useState<StudentProfile | null>(null);
+type Props = {
+    profile: StudentProfile;
+}
+
+export default function PublicStudentProfileView({ profile }: Props) {
+    const { user } = useAuth();
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [hasFetched, setHasFetched] = useState(false);
-
-    const isOwner = user?.id === profileId;
-
-    useEffect(() => {
-        setHasFetched(false);
-        setProfile(null);
-        setLoading(true);
-    }, [profileId]);
-
-    useEffect(() => {
-        if (!hasFetched && profileId) {
-            const fetchProfileData = async () => {
-                const { data, error } = await supabase
-                    .from('StudentProfile')
-                    .select(`
-                        user_id, 
-                        first_name, 
-                        last_name, 
-                        username, 
-                        bio, 
-                        profile_picture_url,
-                        university, 
-                        field_of_study, 
-                        level, 
-                        xp,
-                        github_url, 
-                        linkedin_url,
-                        dribbble_url, 
-                        personal_website_url,
-                        recruitment_status, 
-                        StudentSkill (level, xp, Skill (name)),
-                        StudentLanguage (Language (name)),
-                        Submission ( rating, position, is_public_on_profile, Challenge (*, ChallengeSkill(Skill(name)), StartupProfile(company_name, logo_url)) )
-                    `)
-                    .eq('user_id', profileId)
-                    .eq('Submission.is_public_on_profile', true)
-                    .single();
-
-                if (data) {
-                    setProfile(data as unknown as StudentProfile);
-                } else {
-                    console.error("Nepodařilo se načíst data studenta:", error);
-                }
-                setLoading(false);
-                setHasFetched(true);
-            };
-            fetchProfileData();
-        }
-    }, [profileId, hasFetched]);
-
-    if (loading || !profile) {
-        return <div className='pt-32'><LoadingSpinner /></div>;
-    }
+    const isOwner = user?.id === profile.user_id;
 
     const skillsForChart = profile.StudentSkill.map(s => ({
         name: s.Skill.name,
@@ -80,34 +26,49 @@ export default function PublicStudentProfileView({ profileId }: { profileId: str
     }));
 
     return (
-        <div className="flex min-h-screen flex-col md:mx-20 2xl:mx-28 3xl:mx-32 py-4 md:py-32 px-4">
-            {!isOwner && (
+        <ModernProfileLayout>
+            <div className="mb-2">
                 <button
                     onClick={() => router.back()}
-                    className="flex items-center cursor-pointer gap-1 text-sm font-semibold text-gray-500 hover:text-[var(--barva-primarni)] transition-colors mb-4"
+                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium group"
                 >
-                    <ChevronLeft size={16} />
+                    <div className="p-1.5 rounded-lg bg-white/5 border border-white/10 group-hover:border-white/20 transition-all">
+                        <ChevronLeft size={16} />
+                    </div>
                     Zpět na přehled
                 </button>
-            )}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-8 items-start">
-                <aside className="lg:col-span-1 space-y-3 sm:space-y-8 lg:top-28">
-                    <ProfileInfoCard
-                        profile={profile}
-                        isOwner={isOwner}
-                        viewerProfile={viewerProfile}
-                    />
-                    <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-xs border border-gray-100">
-                        <h3 className="font-bold text-base sm:text-xl text-[var(--barva-tmava)] mb-2">Top dovednosti</h3>
-                        <SkillRadarChart skills={skillsForChart} isOwner={isOwner} />
-                    </div>
-                </aside>
-                <main className="lg:col-span-2 space-y-3 sm:space-y-8">
-                    <ProfilePortfolioSection isOwner={isOwner} submissions={profile.Submission} />
-                    <ProfileSkillsSection skills={profile.StudentSkill} languages={profile.StudentLanguage} isOwner={isOwner} />
-                </main>
-                {isOwner && <LogoutButton />}
             </div>
-        </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                {/* LEVÝ SLOUPEC (Šířka 4/12) - Identita & Radar */}
+                <div className="lg:col-span-4 space-y-6 flex flex-col lg:sticky lg:top-24">
+                    
+                    {/* 1. Identity Widget */}
+                    <ModernStudentHeader profile={profile} isOwner={isOwner} />
+
+                    {/* 2. Radar Graph (Analýza zaměření) */}
+                    <ModernSkillRadarWidget skills={skillsForChart} isOwner={isOwner} />
+                </div>
+
+                {/* PRAVÝ SLOUPEC (Šířka 8/12) - Skills & Portfolio */}
+                <div className="lg:col-span-8 space-y-6">
+                     
+                     {/* 3. Skills & Languages Widget (TEĎ ZDE, ŠIROKÝ) */}
+                     <ModernSkillsWidget 
+                        skills={profile.StudentSkill} 
+                        languages={profile.StudentLanguage} 
+                        isOwner={isOwner}
+                     />
+
+                     {/* 4. Portfolio Widget */}
+                     <ModernPortfolioWidget 
+                        submissions={profile.Submission} 
+                        isOwner={isOwner} 
+                     />
+                </div>
+
+            </div>
+        </ModernProfileLayout>
     );
 }

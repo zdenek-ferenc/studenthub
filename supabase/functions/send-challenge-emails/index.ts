@@ -128,10 +128,12 @@ Deno.serve(async (req) => {
   try {
     if (!RESEND_API_KEY || !supabase) throw new Error("Missing Keys");
     const payload = await req.json();
-    const { record, old_record, table } = payload;
+    const { record, old_record, table, manual_trigger } = payload;
 
-    if (table !== 'Challenge' || (record.status === 'closed' && old_record.status === 'closed')) {
-      return new Response('Ignored', { status: 200 });
+    if (!manual_trigger) {
+        if (table !== 'Challenge' || (record.status === 'closed' && old_record.status === 'closed')) {
+          return new Response('Ignored', { status: 200 });
+        }
     }
 
     const { data: submissions } = await supabase

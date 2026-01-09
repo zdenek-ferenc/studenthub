@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { useAuth } from '../../../contexts/AuthContext';
-import LoadingSpinner from '../../../components/LoadingSpinner';
 import IdealCandidateCard from './components/IdealCandidateCard';
 import StartupQnA from './components/StartupQnA';
 import StartupProfileChallengeCard from './components/StartupProfileChallengeCard';
@@ -12,30 +11,9 @@ import Link from 'next/link';
 import { PlusCircle, Edit, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/components/auth/LogoutButton';
+import { StartupProfile } from './types';
 
-type Skill = { id: string; name: string; };
-type Technology = { name: string; };
-type Category = { name: string; };
-type Challenge = {
-    id: string;
-    title: string;
-    status: 'open' | 'closed';
-    deadline: string;
-    ChallengeSkill: { Skill: Skill }[];
-};
-type StartupProfile = {
-    user_id: string;
-    company_name: string;
-    description: string | null;
-    vision: string | null;
-    website: string | null;
-    logo_url: string | null;
-    ideal_candidate_description: string | null;
-    StartupCategory: { Category: Category }[];
-    StartupTechnology: { Technology: Technology }[];
-    Challenge: Challenge[];
-};
-
+// Zde musíme nechat StartupInfoCard, protože obsahuje interaktivní editaci
 const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwner: boolean }) => {
     const { user, showToast } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
@@ -125,67 +103,25 @@ const StartupInfoCard = ({ profile, isOwner }: { profile: StartupProfile, isOwne
     );
 };
 
-export default function PublicStartupProfileView({ profileId }: { profileId: string }) {
-    const { user, profile: viewerProfile } = useAuth();
-    const router = useRouter();
-    const [profile, setProfile] = useState<StartupProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [studentSkillIds, setStudentSkillIds] = useState<string[]>([]);
-    const [appliedChallengeIds, setAppliedChallengeIds] = useState<string[]>([]);
-    const [hasFetched, setHasFetched] = useState(false);
-
-    const isOwner = user?.id === profileId;
-
-    useEffect(() => {
-        setHasFetched(false);
-        setProfile(null);
-        setLoading(true);
-    }, [profileId]);
-
-    useEffect(() => {
-        if (!hasFetched && profileId) {
-            const fetchProfileData = async () => {
-                const { data: profileData, error: profileError } = await supabase
-                    .from('StartupProfile')
-                    .select(`
-                        *,
-                        StartupCategory (Category (name)),
-                        StartupTechnology (Technology (name)),
-                        Challenge (id, title, status, deadline, ChallengeSkill(Skill(id, name)))
-                    `)
-                    .eq('user_id', profileId)
-                    .single();
-
-                if (profileData) {
-                    setProfile(profileData as StartupProfile);
-                } else {
-                    console.error("Nepodařilo se načíst data startupu:", profileError);
-                }
-
-                if (viewerProfile?.role === 'student' && user) {
-                    const [skillData, submissionData] = await Promise.all([
-                        supabase.from('StudentSkill').select('skill_id').eq('student_id', user.id),
-                        supabase.from('Submission').select('challenge_id').eq('student_id', user.id)
-                    ]);
-                    if (skillData.data) setStudentSkillIds(skillData.data.map(s => s.skill_id));
-                    if (submissionData.data) setAppliedChallengeIds(submissionData.data.map(s => s.challenge_id));
-                }
-                setLoading(false);
-                setHasFetched(true);
-            };
-            fetchProfileData();
-        }
-    }, [profileId, hasFetched, user, viewerProfile]);
-    
-    if (loading || !profile) {
-        return <div className='pt-32'><LoadingSpinner /></div>;
+type Props = {
+    profile: StartupProfile;
+    viewerContext: {
+        skillIds: string[];
+        appliedChallengeIds: string[];
     }
+}
+
+export default function PublicStartupProfileView({ profile, viewerContext }: Props) {
+    const { user } = useAuth();
+    const router = useRouter();
+
+    const isOwner = user?.id === profile.user_id;
+    const { skillIds: studentSkillIds, appliedChallengeIds } = viewerContext;
 
     const now = new Date();
     const activeChallenges = profile.Challenge.filter(c => c.status === 'open' && new Date(c.deadline) >= now);
     
     const hasIdealCandidateInfo = !!profile.ideal_candidate_description || profile.StartupTechnology.length > 0;
-    
     const showIdealCandidateSection = hasIdealCandidateInfo || isOwner;
 
     return (

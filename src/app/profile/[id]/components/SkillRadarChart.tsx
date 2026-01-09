@@ -52,8 +52,8 @@ export default function SkillRadarChart({ skills, isOwner }: SkillRadarChartProp
         <div className="skill-radar-chart-container h-[50px] sm:h-[250px] xs:h-[180px] focus:outline-none">
             <ResponsiveContainer className="focus:ring-0">
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={topSkills} className="focus:ring-0">
-                    <PolarGrid stroke="var(--barva-podtext)" strokeOpacity={0.2} />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--barva-tmava)', fontSize: 12 }} />
+                    <PolarGrid stroke="#fff" strokeOpacity={0.2} />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--barva-primarni)', fontSize: 12 }} />
                     <Radar name="Level" dataKey="level" stroke="var(--barva-primarni)" fill="var(--barva-primarni)" fillOpacity={0.6} />
                     <Tooltip
                         contentStyle={{
